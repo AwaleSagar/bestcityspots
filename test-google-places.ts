@@ -4,13 +4,11 @@ dotenv.config({ path: ".env.local" });
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
-type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | Json[]
-  | { [key: string]: Json };
+interface PlaceResult {
+  displayName?: { text?: string };
+  formattedAddress?: string;
+  id?: string;
+}
 
 function jsonType(value: unknown): string {
   if (value === null) return "null";
@@ -111,6 +109,26 @@ function parseArgs(argv: string[]) {
   return out;
 }
 
+function extractPlaces(data: unknown): PlaceResult[] | null {
+  if (typeof data !== "object" || data === null || !("places" in data)) {
+    return null;
+  }
+
+  const placesValue = (data as { places?: unknown }).places;
+  if (!Array.isArray(placesValue)) return null;
+
+  return placesValue.filter((item): item is PlaceResult => typeof item === "object" && item !== null);
+}
+
+function extractErrorMessage(data: unknown): string | null {
+  if (typeof data !== "object" || data === null || !("error" in data)) {
+    return null;
+  }
+
+  const message = (data as { error?: { message?: unknown } }).error?.message;
+  return typeof message === "string" ? message : null;
+}
+
 async function testGooglePlaces() {
   if (!API_KEY) {
     console.error("❌ GOOGLE_PLACES_API_KEY is not set in .env.local");
@@ -138,25 +156,25 @@ async function testGooglePlaces() {
       }),
     });
 
-    const data = (await response.json()) as unknown;
+    const data: unknown = await response.json();
 
     if (response.ok) {
       console.log("✅ API Key is working!");
       printJsonLayout("FULL RESPONSE LAYOUT", data);
 
       // If it's the expected response shape, also print a focused mapping of places[] only.
-      const maybePlaces = (data as any)?.places;
-      if (Array.isArray(maybePlaces)) {
-        printJsonLayout("places[] OBJECT LAYOUT (sampled)", maybePlaces.slice(0, 5));
+      const places = extractPlaces(data);
+      if (places) {
+        printJsonLayout("places[] OBJECT LAYOUT (sampled)", places.slice(0, 5));
         console.log("\n📍 Sample results:");
-        maybePlaces.slice(0, 3).forEach((place: any) => {
-          const name = place?.displayName?.text ?? "<no displayName.text>";
-          const addr = place?.formattedAddress ?? "<no formattedAddress>";
+        places.slice(0, 3).forEach((place) => {
+          const name = place.displayName?.text ?? "<no displayName.text>";
+          const addr = place.formattedAddress ?? "<no formattedAddress>";
           console.log(`- ${name} (${addr})`);
         });
       }
     } else {
-      const msg = (data as any)?.error?.message || "Unknown error";
+      const msg = extractErrorMessage(data) || "Unknown error";
       console.error("❌ API Error:", msg);
       printJsonLayout("ERROR RESPONSE LAYOUT", data);
       console.log("\nFull error data:", JSON.stringify(data, null, 2));
