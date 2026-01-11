@@ -25,7 +25,12 @@
   /* Liquid Glass Accents */
   --liquid-glow-1: rgba(59, 130, 246, 0.15);
   --liquid-glow-2: rgba(147, 51, 234, 0.15);
-  --liquid-border: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.05) 100%);
+  --liquid-border: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
 
   /* Elevation Tokens */
   --shadow-3xl: 0 35px 60px -15px rgba(0, 0, 0, 0.8);
@@ -79,8 +84,12 @@
   position: absolute;
   inset: 0;
   background: var(--liquid-border);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   mask-composite: exclude;
   -webkit-mask-composite: xor;
   padding: 1px;
@@ -105,9 +114,15 @@
 }
 
 @keyframes orb-move {
-  0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(100px, 50px) scale(1.2); }
-  100% { transform: translate(-50px, 100px) scale(0.8); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(100px, 50px) scale(1.2);
+  }
+  100% {
+    transform: translate(-50px, 100px) scale(0.8);
+  }
 }
 
 /* Custom Scrollbar */

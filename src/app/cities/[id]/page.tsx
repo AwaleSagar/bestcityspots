@@ -1,7 +1,20 @@
 import { getCityById } from "@/lib/cities";
-import { 
-  MapPin, Users, Navigation, ArrowLeft, Globe, Wind, Cloud, Thermometer,
-  Sun, CloudSun, CloudFog, CloudDrizzle, CloudRain, CloudSnow, CloudLightning
+import {
+  MapPin,
+  Users,
+  Navigation,
+  ArrowLeft,
+  Globe,
+  Wind,
+  Cloud,
+  Thermometer,
+  Sun,
+  CloudSun,
+  CloudFog,
+  CloudDrizzle,
+  CloudRain,
+  CloudSnow,
+  CloudLightning,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,7 +35,10 @@ async function getWeatherData(lat: number, lng: number) {
   }
 }
 
-const weatherCodeMap: Record<number, { label: string; icon: any }> = {
+const weatherCodeMap: Record<
+  number,
+  { label: string; icon: React.ComponentType<{ className?: string }> }
+> = {
   0: { label: "Clear Sky", icon: Sun },
   1: { label: "Mainly Clear", icon: CloudSun },
   2: { label: "Partly Cloudy", icon: CloudSun },
@@ -46,24 +62,35 @@ const weatherCodeMap: Record<number, { label: string; icon: any }> = {
 
 async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
   const weather = await getWeatherData(lat, lng);
-  const weatherInfo = weather ? weatherCodeMap[weather.weather_code] || { label: "Unknown", icon: Cloud } : null;
+  const weatherInfo = weather
+    ? weatherCodeMap[weather.weather_code] || { label: "Unknown", icon: Cloud }
+    : null;
   const WeatherIcon = weatherInfo?.icon || Cloud;
 
   const metrics = [
-    { icon: Thermometer, label: "Current Temp", value: weather ? `${Math.round(weather.temperature_2m)}°C` : "N/A" },
+    {
+      icon: Thermometer,
+      label: "Current Temp",
+      value: weather ? `${Math.round(weather.temperature_2m)}°C` : "N/A",
+    },
     { icon: WeatherIcon, label: "Condition", value: weatherInfo?.label || "Unknown" },
     { icon: Wind, label: "Wind Speed", value: weather ? `${weather.wind_speed_10m} km/h` : "N/A" },
     { icon: Globe, label: "Coordinates", value: `${lat.toFixed(2)}°, ${lng.toFixed(2)}°` },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-slow-fade-in">
+    <div className="animate-slow-fade-in grid grid-cols-2 gap-4 md:grid-cols-4">
       {metrics.map((item, i) => (
-        <div key={i} className="p-8 rounded-[2rem] bg-white/[0.01] border border-white/5 space-y-4 hover:bg-white/[0.04] transition-all duration-500">
-          <item.icon className="w-5 h-5 text-blue-500/30" />
+        <div
+          key={i}
+          className="space-y-4 rounded-[2rem] border border-white/5 bg-white/[0.01] p-8 transition-all duration-500 hover:bg-white/[0.04]"
+        >
+          <item.icon className="h-5 w-5 text-blue-500/30" />
           <div>
-            <div className="text-[9px] font-black uppercase tracking-widest text-gray-600 mb-1">{item.label}</div>
-            <div className="text-lg font-black text-white/80 tracking-tight">{item.value}</div>
+            <div className="mb-1 text-[9px] font-black tracking-widest text-gray-600 uppercase">
+              {item.label}
+            </div>
+            <div className="text-lg font-black tracking-tight text-white/80">{item.value}</div>
           </div>
         </div>
       ))}
@@ -73,13 +100,16 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
 
 function WeatherSkeleton() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="p-8 rounded-[2rem] bg-white/[0.01] border border-white/5 space-y-4 animate-pulse">
-          <div className="w-5 h-5 bg-white/5 rounded-full" />
+        <div
+          key={i}
+          className="animate-pulse space-y-4 rounded-[2rem] border border-white/5 bg-white/[0.01] p-8"
+        >
+          <div className="h-5 w-5 rounded-full bg-white/5" />
           <div className="space-y-2">
-            <div className="w-12 h-2 bg-white/5 rounded" />
-            <div className="w-20 h-4 bg-white/5 rounded" />
+            <div className="h-2 w-12 rounded bg-white/5" />
+            <div className="h-4 w-20 rounded bg-white/5" />
           </div>
         </div>
       ))}
@@ -87,16 +117,16 @@ function WeatherSkeleton() {
   );
 }
 
-export default async function CityPage({ 
-  params, 
-  searchParams 
-}: { 
-  params: Promise<{ id: string }>,
-  searchParams: Promise<{ lat?: string; lng?: string }>
+export default async function CityPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ lat?: string; lng?: string }>;
 }) {
   const { id } = await params;
   const { lat, lng } = await searchParams;
-  
+
   const city = await getCityById(parseInt(id));
 
   if (!city) {
@@ -107,71 +137,82 @@ export default async function CityPage({
   const finalLng = lng ? parseFloat(lng) : city.lng;
 
   return (
-    <main className="min-h-screen bg-transparent text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
-      <div className="max-w-5xl mx-auto px-6 py-20">
+    <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
+      <div className="mx-auto max-w-5xl px-6 py-20">
         <nav className="mb-20">
-          <Link 
+          <Link
             href="/"
-            className="inline-flex items-center gap-4 text-gray-500 hover:text-white transition-all group"
+            className="group inline-flex items-center gap-4 text-gray-500 transition-all hover:text-white"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-white/[0.03] border border-white/10 group-hover:bg-blue-500/20 group-hover:border-blue-500/40 transition-all duration-500 liquid-glass">
-              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <div className="liquid-glass flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] transition-all duration-500 group-hover:border-blue-500/40 group-hover:bg-blue-500/20">
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
             </div>
-            <span className="font-black uppercase tracking-[0.2em] text-xs">Return to Explorer</span>
+            <span className="text-xs font-black tracking-[0.2em] uppercase">
+              Return to Explorer
+            </span>
           </Link>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
           {/* Main Info Column */}
-          <div className="lg:col-span-8 space-y-20">
-            <header className="space-y-8 relative">
-              <div className="absolute -top-20 -left-20 w-64 h-64 bg-blue-600/10 blur-[120px] -z-10 animate-pulse" />
-              <div className="flex items-center gap-4 text-blue-400 font-black tracking-[0.4em] uppercase text-[10px]">
-                <Navigation className="w-4 h-4" />
-                {city.iso3} <span className="text-white/20">//</span> {city.capital || "Urban Center"}
+          <div className="space-y-20 lg:col-span-8">
+            <header className="relative space-y-8">
+              <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-blue-600/10 blur-[120px]" />
+              <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
+                <Navigation className="h-4 w-4" />
+                {city.iso3} <span className="text-white/20">/&#47;</span>{" "}
+                {city.capital || "Urban Center"}
               </div>
-              <h1 className="text-8xl md:text-[10rem] font-black tracking-tighter leading-[0.8] bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-transparent">
+              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-8xl leading-[0.8] font-black tracking-tighter text-transparent md:text-[10rem]">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
-                <p className="text-4xl md:text-5xl text-white/40 font-black italic tracking-tight">
+                <p className="text-4xl font-black tracking-tight text-white/40 italic md:text-5xl">
                   {city.country}
                 </p>
                 <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
               </div>
             </header>
 
-            <section className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-              <div className="p-10 rounded-[3rem] liquid-glass hover:bg-white/[0.05] transition-all duration-700 group/card shadow-2xl">
-                <div className="flex items-center gap-4 text-gray-500 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover/card:bg-blue-500/20 transition-all">
-                    <Users className="w-5 h-5 text-blue-400" />
+            <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+              <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
+                <div className="mb-6 flex items-center gap-4 text-gray-500">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 transition-all group-hover/card:bg-blue-500/20">
+                    <Users className="h-5 w-5 text-blue-400" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Census Data</span>
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+                    Census Data
+                  </span>
                 </div>
-                <div className="text-5xl font-black text-white tracking-tighter mb-2">
-                  {city.population?.toLocaleString() ?? 'N/A'}
+                <div className="mb-2 text-5xl font-black tracking-tighter text-white">
+                  {city.population?.toLocaleString() ?? "N/A"}
                 </div>
-                <div className="text-xs text-gray-500 font-bold uppercase tracking-widest">Global Residents</div>
+                <div className="text-xs font-bold tracking-widest text-gray-500 uppercase">
+                  Global Residents
+                </div>
               </div>
 
-              <div className="p-10 rounded-[3rem] liquid-glass hover:bg-white/[0.05] transition-all duration-700 group/card shadow-2xl">
-                <div className="flex items-center gap-4 text-gray-500 mb-6">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center border border-purple-500/20 group-hover/card:bg-purple-500/20 transition-all">
-                    <MapPin className="w-5 h-5 text-purple-400" />
+              <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
+                <div className="mb-6 flex items-center gap-4 text-gray-500">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-all group-hover/card:bg-purple-500/20">
+                    <MapPin className="h-5 w-5 text-purple-400" />
                   </div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Territory</span>
+                  <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+                    Territory
+                  </span>
                 </div>
-                <div className="text-3xl font-black text-white tracking-tight mb-2 leading-tight">
-                  {city.admin_name || 'Autonomous'}
+                <div className="mb-2 text-3xl leading-tight font-black tracking-tight text-white">
+                  {city.admin_name || "Autonomous"}
                 </div>
-                <div className="text-xs text-gray-500 font-bold uppercase tracking-widest">Regional Hub</div>
+                <div className="text-xs font-bold tracking-widest text-gray-500 uppercase">
+                  Regional Hub
+                </div>
               </div>
             </section>
 
             {/* Geographic Profile Section */}
             <section className="space-y-10">
-              <h2 className="text-sm font-black uppercase tracking-[0.4em] text-white/20 flex items-center gap-4">
+              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-white/20 uppercase">
                 Structural Profile <span className="h-px flex-1 bg-white/5" />
               </h2>
               <Suspense fallback={<WeatherSkeleton />}>
@@ -181,22 +222,23 @@ export default async function CityPage({
           </div>
 
           {/* Sidebar / Quick Actions */}
-          <div className="lg:col-span-4 space-y-8 sticky top-20">
-            <div className="p-10 rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-800 text-white shadow-3xl shadow-blue-500/20 space-y-8 relative overflow-hidden group/cta">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full translate-x-10 -translate-y-10 group-hover/cta:scale-150 transition-transform duration-1000" />
-              <h3 className="text-3xl font-black leading-tight tracking-tighter">
+          <div className="sticky top-20 space-y-8 lg:col-span-4">
+            <div className="shadow-3xl group/cta relative space-y-8 overflow-hidden rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-800 p-10 text-white shadow-blue-500/20">
+              <div className="absolute top-0 right-0 h-32 w-32 translate-x-10 -translate-y-10 rounded-full bg-white/10 blur-3xl transition-transform duration-1000 group-hover/cta:scale-150" />
+              <h3 className="text-3xl leading-tight font-black tracking-tighter">
                 Explore The Urban <br /> Essence
               </h3>
-              <p className="text-blue-100/70 font-bold text-sm leading-relaxed tracking-wide">
-                Unlock exclusive insights and historical landmarks of {city.city} with our premium membership.
+              <p className="text-sm leading-relaxed font-bold tracking-wide text-blue-100/70">
+                Unlock exclusive insights and historical landmarks of {city.city} with our premium
+                membership.
               </p>
-              <button className="w-full py-6 bg-white text-blue-600 rounded-[2rem] font-black text-lg hover:bg-gray-100 transition-all active:scale-[0.98] shadow-xl">
+              <button className="w-full rounded-[2rem] bg-white py-6 text-lg font-black text-blue-600 shadow-xl transition-all hover:bg-gray-100 active:scale-[0.98]">
                 Get Access
               </button>
             </div>
 
-            <div className="p-10 rounded-[3rem] liquid-glass space-y-8">
-              <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+            <div className="liquid-glass space-y-8 rounded-[3rem] p-10">
+              <h4 className="text-[10px] font-black tracking-[0.3em] text-gray-500 uppercase">
                 Core Metrics
               </h4>
               <div className="space-y-6">
@@ -205,9 +247,13 @@ export default async function CityPage({
                   { label: "Connectivity", value: "Gigabit+" },
                   { label: "Safety Tier", value: "Alpha" },
                 ].map((item, i) => (
-                  <div key={i} className="flex justify-between items-center group/metric">
-                    <span className="text-gray-400 font-black text-xs uppercase tracking-widest group-hover/metric:text-white transition-colors">{item.label}</span>
-                    <span className="font-black text-white group-hover/metric:text-blue-400 transition-colors tracking-tight">{item.value}</span>
+                  <div key={i} className="group/metric flex items-center justify-between">
+                    <span className="text-xs font-black tracking-widest text-gray-400 uppercase transition-colors group-hover/metric:text-white">
+                      {item.label}
+                    </span>
+                    <span className="font-black tracking-tight text-white transition-colors group-hover/metric:text-blue-400">
+                      {item.value}
+                    </span>
                   </div>
                 ))}
               </div>

@@ -37,6 +37,39 @@ If fetching/search feels slow, add indexes:
 
 Run `supabase/performance.sql` in Supabase → SQL Editor.
 
+## Development
+
+### Code Quality
+
+This project follows strict coding standards to ensure maintainability and readability:
+
+- **Linting**: Run `npm run lint` to check for code issues
+- **Formatting**: Run `npm run format` to format code with Prettier
+- **Type Checking**: Run `npm run type-check` to verify TypeScript types
+
+### Contributing
+
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed information about:
+
+- Code style guidelines
+- TypeScript conventions
+- React/Next.js best practices
+- Commit message format
+- Pull request process
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Run ESLint with auto-fix
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+npm run type-check   # Run TypeScript type checking
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
