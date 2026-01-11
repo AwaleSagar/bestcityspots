@@ -109,6 +109,31 @@ function parseArgs(argv: string[]) {
   return out;
 }
 
+function isValidDisplayName(displayName: unknown): displayName is PlaceResult["displayName"] {
+  if (displayName === undefined) return true;
+  if (typeof displayName !== "object" || displayName === null) return false;
+
+  const text = (displayName as { text?: unknown }).text;
+  return text === undefined || typeof text === "string";
+}
+
+function isPlaceResult(item: unknown): item is PlaceResult {
+  if (typeof item !== "object" || item === null) return false;
+
+  const candidate = item as { displayName?: unknown; formattedAddress?: unknown; id?: unknown };
+  if (!isValidDisplayName(candidate.displayName)) return false;
+
+  if (candidate.formattedAddress !== undefined && typeof candidate.formattedAddress !== "string") {
+    return false;
+  }
+
+  if (candidate.id !== undefined && typeof candidate.id !== "string") {
+    return false;
+  }
+
+  return true;
+}
+
 function extractPlaces(data: unknown): PlaceResult[] | null {
   if (typeof data !== "object" || data === null || !("places" in data)) {
     return null;
@@ -117,7 +142,7 @@ function extractPlaces(data: unknown): PlaceResult[] | null {
   const placesValue = (data as { places?: unknown }).places;
   if (!Array.isArray(placesValue)) return null;
 
-  return placesValue.filter((item): item is PlaceResult => typeof item === "object" && item !== null);
+  return placesValue.filter(isPlaceResult);
 }
 
 function extractErrorMessage(data: unknown): string | null {
