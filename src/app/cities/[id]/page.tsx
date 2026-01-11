@@ -1,6 +1,6 @@
 import { getCityById } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
-import { getTopPlaces, Landmark } from "@/lib/places";
+import { getTopPlaces } from "@/lib/places";
 import ExperiencesSection from "./ExperiencesSection";
 import {
   MapPin,
