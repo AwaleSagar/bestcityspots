@@ -20,6 +20,23 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Database Security (Supabase / Postgres)
+
+This app uses Supabase/Postgres; protect it with **Row Level Security (RLS)** and **least-privilege policies**.
+
+- **Enable RLS + safe policies**: open Supabase → SQL Editor → run `supabase/security.sql`
+- **Never expose service role**: do not put `SUPABASE_SERVICE_ROLE_KEY` in any `NEXT_PUBLIC_*` env var.
+- **RLS is the real security**: the anon key is public by design; data access is controlled by policies.
+
+## Database Performance (Supabase / Postgres)
+
+If fetching/search feels slow, add indexes:
+
+- **Top 10 by population**: `supabase/performance.sql` adds `cities_population_desc_idx`
+- **Fast ILIKE search**: enables `pg_trgm` + adds `cities_city_ascii_trgm_idx`
+
+Run `supabase/performance.sql` in Supabase → SQL Editor.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

@@ -1,26 +1,164 @@
 @import "tailwindcss";
 
+/* 
+  Tailwind CSS v4 automatically maps any CSS variables starting with --color-* 
+  to your theme. By using this naming convention directly in :root, 
+  we can avoid using the @theme block for colors and suppress linting warnings.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Sustainable Design: Pure black for OLED power savings */
+  --background: #000000;
+  --foreground: #ffffff;
 
-@theme inline {
+  /* Theme Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: #3b82f6;
+  --color-accent-600: #2563eb;
+  --color-accent-foreground: #ffffff;
+
+  /* Glassmorphism 2.0 Tokens */
+  --color-glass: rgba(255, 255, 255, 0.03);
+  --color-glass-heavy: rgba(10, 10, 10, 0.85);
+  --color-glass-border: rgba(255, 255, 255, 0.08);
+
+  /* Liquid Glass Accents */
+  --liquid-glow-1: rgba(59, 130, 246, 0.15);
+  --liquid-glow-2: rgba(147, 51, 234, 0.15);
+  --liquid-border: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.05) 100%);
+
+  /* Elevation Tokens */
+  --shadow-3xl: 0 35px 60px -15px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 30px rgba(59, 130, 246, 0.1);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Transition Tokens for Sustainable CPU usage */
+  --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Glassmorphism & Depth Utilities */
+.glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-glass-border);
+}
+
+.glass-dropdown {
+  background: var(--color-glass-heavy);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-3xl), var(--shadow-glow);
+}
+
+.liquid-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+  backdrop-filter: blur(25px) saturate(150%);
+  -webkit-backdrop-filter: blur(25px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--liquid-border);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  padding: 1px;
+  pointer-events: none;
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+  transition: all 0.4s var(--transition-fluid);
+}
+
+/* Moving Orbs Background */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  z-index: -5;
+  opacity: 0.4;
+  animation: orb-move 20s infinite alternate ease-in-out;
+}
+
+@keyframes orb-move {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(100px, 50px) scale(1.2); }
+  100% { transform: translate(-50px, 100px) scale(0.8); }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+@keyframes slow-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.animate-slow-fade-in {
+  animation: slow-fade-in 1.4s var(--transition-fluid) forwards;
 }
