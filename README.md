@@ -50,6 +50,7 @@ This project follows strict coding standards to ensure maintainability and reada
 ### Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed information about:
+
 - Code style guidelines
 - TypeScript conventions
 - React/Next.js best practices
