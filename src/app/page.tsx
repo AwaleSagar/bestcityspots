@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { searchCities, getTopCities, City } from "@/lib/cities";
+import { searchCities, City } from "@/lib/cities";
+import { fetchTrendingDestinations } from "@/app/actions";
 import { formatPopulation } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, ArrowRight } from "lucide-react";
@@ -18,11 +19,11 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchTop = async () => {
-      const cities = await getTopCities(5);
+    const loadTrending = async () => {
+      const cities = await fetchTrendingDestinations();
       setTopCities(cities);
     };
-    fetchTop();
+    loadTrending();
   }, []);
 
   // Handle search with faster debounce
@@ -91,16 +92,16 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-transparent font-sans text-white">
-      <div className="mx-auto max-w-2xl px-6 py-32">
+      <div className="mx-auto max-w-2xl px-6 py-12">
         {/* Principle 1: Hierarchy - Clear Heading */}
         <motion.header
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-24 text-center"
+          className="mb-6 text-center"
         >
           {/* Minimalist Tech Accent */}
-          <div className="mb-10 flex items-center justify-center gap-4 opacity-40">
+          <div className="mb-8 flex items-center justify-center gap-4 opacity-40">
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white" />
             <span className="text-[9px] font-black tracking-[0.6em] text-white uppercase">
               Atlas // Index 01
@@ -108,21 +109,21 @@ export default function Home() {
             <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white" />
           </div>
 
-          <h1 className="relative mb-10 block py-10 overflow-visible">
-            <span className="bg-gradient-to-b from-white via-white to-white/10 bg-clip-text text-7xl leading-[1.2] font-black tracking-tighter text-transparent md:text-[9rem] block pb-8">
+          <h1 className="relative mb-4 block py-4 overflow-visible">
+            <span className="bg-gradient-to-b from-white via-white to-white/10 bg-clip-text text-6xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl block pb-4">
               Best City <br /> Spots
             </span>
             {/* Liquid Glow Underlay */}
             <div className="absolute top-1/2 left-1/2 -z-10 h-64 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/5 blur-[120px]" />
           </h1>
 
-          <div className="mx-auto max-w-lg space-y-4">
-            <p className="text-xl leading-snug font-medium tracking-tight text-white/40">
+          <div className="mx-auto max-w-lg space-y-2">
+            <p className="text-lg leading-snug font-medium tracking-tight text-white/40 md:text-xl">
               Exploring the world&apos;s most <span className="text-white/90 italic">vibrant</span> urban centers through a <span className="text-white/90">premium intelligence</span> lens.
             </p>
-            <div className="flex items-center justify-center gap-2 pt-2">
+            <div className="flex items-center justify-center gap-2 pt-1">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
-              <span className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">
+              <span className="text-[11px] font-black tracking-[0.2em] text-white/40 uppercase">
                 Real-time Data Active
               </span>
             </div>
@@ -170,18 +171,18 @@ export default function Home() {
             )}
           </div>
 
-          <div className="mt-6 flex items-center justify-between px-4 text-[10px] font-black tracking-[0.3em] uppercase">
-            <div className="text-white/20" aria-live="polite">
+          <div className="mt-6 flex items-center justify-between px-4 text-[11px] font-black tracking-[0.3em] uppercase">
+            <div className="text-white/40" aria-live="polite">
               {isSearching ? (
-                <span className="animate-pulse text-blue-400/60">Analyzing Data...</span>
+                <span className="animate-pulse text-blue-400/80">Analyzing Data...</span>
               ) : shouldShowResults ? (
-                <span className="text-white/40">{searchResults.length} matches found</span>
+                <span className="text-white/60">{searchResults.length} matches found</span>
               ) : (
                 "System Idle"
               )}
             </div>
             {!shouldShowResults && (
-              <div className="animate-pulse text-blue-500/30">Ready to explore</div>
+              <div className="animate-pulse text-blue-500/50">Ready to explore</div>
             )}
           </div>
 
@@ -269,10 +270,10 @@ export default function Home() {
                               {highlightMatch(city.city, searchQuery)}
                             </div>
                             <div
-                              className={`text-[10px] font-black tracking-[0.2em] uppercase transition-colors duration-500 ${
+                              className={`text-[11px] font-black tracking-[0.2em] uppercase transition-colors duration-500 ${
                                 activeIndex === idx
-                                  ? "text-blue-400/60"
-                                  : "text-white/20 group-hover/item:text-white/40"
+                                  ? "text-blue-400/80"
+                                  : "text-white/40 group-hover/item:text-white/60"
                               }`}
                             >
                               {city.country}
@@ -284,8 +285,8 @@ export default function Home() {
                             <div
                               className={`text-xl font-black transition-colors duration-500 ${
                                 activeIndex === idx
-                                  ? "text-blue-500/30"
-                                  : "text-white/[0.05] group-hover/item:text-white/[0.08]"
+                                  ? "text-blue-500/50"
+                                  : "text-white/[0.1] group-hover/item:text-white/[0.2]"
                               }`}
                             >
                               {formatPopulation(city.population)}

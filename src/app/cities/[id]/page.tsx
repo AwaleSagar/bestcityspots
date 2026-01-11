@@ -1,5 +1,7 @@
 import { getCityById } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
+import { getTopPlaces, Landmark } from "@/lib/places";
+import ExperiencesSection from "./ExperiencesSection";
 import {
   MapPin,
   Users,
@@ -99,6 +101,48 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
   );
 }
 
+async function ExperiencesWrapper({ cityName }: { cityName: string }) {
+  const [landmarks, restaurants, hotels] = await Promise.all([
+    getTopPlaces(cityName, "landmarks"),
+    getTopPlaces(cityName, "restaurants"),
+    getTopPlaces(cityName, "hotels"),
+  ]);
+
+  return (
+    <div className="space-y-8">
+      <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-white/40 uppercase">
+        Top Experiences <span className="h-px flex-1 bg-white/5" />
+      </h2>
+      <ExperiencesSection
+        landmarks={landmarks}
+        restaurants={restaurants}
+        hotels={hotels}
+      />
+    </div>
+  );
+}
+
+function SectionSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div className="h-4 w-48 bg-white/5 rounded animate-pulse" />
+      <div className="flex gap-2">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-10 w-24 bg-white/5 rounded-2xl animate-pulse" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="animate-pulse h-24 rounded-[2.5rem] border border-white/5 bg-white/[0.01]"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WeatherSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -139,8 +183,8 @@ export default async function CityPage({
 
   return (
     <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
-      <div className="mx-auto max-w-5xl px-6 py-20">
-        <nav className="mb-20">
+      <div className="mx-auto max-w-5xl px-6 py-12">
+        <nav className="mb-12">
           <Link
             href="/"
             className="group inline-flex items-center gap-4 text-gray-500 transition-all hover:text-white"
@@ -156,15 +200,15 @@ export default async function CityPage({
 
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
           {/* Main Info Column */}
-          <div className="space-y-20 lg:col-span-8">
-            <header className="space-y-8 relative py-10 overflow-visible">
+          <div className="space-y-12 lg:col-span-8">
+            <header className="relative space-y-6 py-6 overflow-visible">
               <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-blue-600/10 blur-[120px]" />
               <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
                 <Navigation className="h-4 w-4" />
                 {city.iso3} <span className="text-white/20">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
               </div>
-              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-6xl leading-[1.2] font-black tracking-tighter text-transparent sm:text-7xl md:text-8xl lg:text-[9rem] break-words block pb-8">
+              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-6xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl break-words block pb-4">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
@@ -177,35 +221,35 @@ export default async function CityPage({
 
             <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
               <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
-                <div className="mb-6 flex items-center gap-4 text-gray-500">
+                <div className="mb-6 flex items-center gap-4 text-gray-400">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 transition-all group-hover/card:bg-blue-500/20">
                     <Users className="h-5 w-5 text-blue-400" />
                   </div>
-                  <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+                  <span className="text-[11px] font-black tracking-[0.2em] uppercase">
                     Census Data
                   </span>
                 </div>
                 <div className="mb-2 text-5xl font-black tracking-tighter text-white">
                   {formatPopulation(city.population)}
                 </div>
-                <div className="text-xs font-bold tracking-widest text-gray-500 uppercase">
+                <div className="text-xs font-bold tracking-widest text-white/40 uppercase">
                   Global Residents
                 </div>
               </div>
 
               <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
-                <div className="mb-6 flex items-center gap-4 text-gray-500">
+                <div className="mb-6 flex items-center gap-4 text-gray-400">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-all group-hover/card:bg-purple-500/20">
                     <MapPin className="h-5 w-5 text-purple-400" />
                   </div>
-                  <span className="text-[10px] font-black tracking-[0.2em] uppercase">
+                  <span className="text-[11px] font-black tracking-[0.2em] uppercase">
                     Territory
                   </span>
                 </div>
                 <div className="mb-2 text-3xl leading-tight font-black tracking-tight text-white">
                   {city.admin_name || "Autonomous"}
                 </div>
-                <div className="text-xs font-bold tracking-widest text-gray-500 uppercase">
+                <div className="text-xs font-bold tracking-widest text-white/40 uppercase">
                   Regional Hub
                 </div>
               </div>
@@ -213,13 +257,18 @@ export default async function CityPage({
 
             {/* Geographic Profile Section */}
             <section className="space-y-10">
-              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-white/20 uppercase">
+              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-white/40 uppercase">
                 Structural Profile <span className="h-px flex-1 bg-white/5" />
               </h2>
               <Suspense fallback={<WeatherSkeleton />}>
                 <WeatherSection lat={finalLat} lng={finalLng} />
               </Suspense>
             </section>
+
+            {/* Landmarks Section */}
+            <Suspense fallback={<SectionSkeleton />}>
+              <ExperiencesWrapper cityName={city.city} />
+            </Suspense>
           </div>
 
           {/* Sidebar / Quick Actions */}
@@ -239,7 +288,7 @@ export default async function CityPage({
             </div>
 
             <div className="liquid-glass space-y-8 rounded-[3rem] p-10">
-              <h4 className="text-[10px] font-black tracking-[0.3em] text-gray-500 uppercase">
+              <h4 className="text-[11px] font-black tracking-[0.3em] text-white/40 uppercase">
                 Core Metrics
               </h4>
               <div className="space-y-6">
@@ -249,7 +298,7 @@ export default async function CityPage({
                   { label: "Safety Tier", value: "Alpha" },
                 ].map((item, i) => (
                   <div key={i} className="group/metric flex items-center justify-between">
-                    <span className="text-xs font-black tracking-widest text-gray-400 uppercase transition-colors group-hover/metric:text-white">
+                    <span className="text-xs font-black tracking-widest text-white/40 uppercase transition-colors group-hover/metric:text-white">
                       {item.label}
                     </span>
                     <span className="font-black tracking-tight text-white transition-colors group-hover/metric:text-blue-400">
