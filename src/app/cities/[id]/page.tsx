@@ -1,4 +1,5 @@
 import { getCityById } from "@/lib/cities";
+import { formatPopulation } from "@/lib/format";
 import {
   MapPin,
   Users,
@@ -156,14 +157,14 @@ export default async function CityPage({
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
           {/* Main Info Column */}
           <div className="space-y-20 lg:col-span-8">
-            <header className="relative space-y-8">
+            <header className="space-y-8 relative py-10 overflow-visible">
               <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-blue-600/10 blur-[120px]" />
               <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
                 <Navigation className="h-4 w-4" />
                 {city.iso3} <span className="text-white/20">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
               </div>
-              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-8xl leading-[0.8] font-black tracking-tighter text-transparent md:text-[10rem]">
+              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-6xl leading-[1.2] font-black tracking-tighter text-transparent sm:text-7xl md:text-8xl lg:text-[9rem] break-words block pb-8">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
@@ -185,7 +186,7 @@ export default async function CityPage({
                   </span>
                 </div>
                 <div className="mb-2 text-5xl font-black tracking-tighter text-white">
-                  {city.population?.toLocaleString() ?? "N/A"}
+                  {formatPopulation(city.population)}
                 </div>
                 <div className="text-xs font-bold tracking-widest text-gray-500 uppercase">
                   Global Residents

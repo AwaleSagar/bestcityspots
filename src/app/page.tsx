@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { searchCities, getTopCities, City } from "@/lib/cities";
+import { formatPopulation } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -93,18 +94,39 @@ export default function Home() {
       <div className="mx-auto max-w-2xl px-6 py-32">
         {/* Principle 1: Hierarchy - Clear Heading */}
         <motion.header
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-16 space-y-6 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-24 text-center"
         >
-          <h1 className="bg-gradient-to-b from-white via-white/90 to-white/30 bg-clip-text text-7xl leading-[0.85] font-black tracking-tighter text-transparent drop-shadow-2xl md:text-8xl">
-            Best City <br /> Spots
+          {/* Minimalist Tech Accent */}
+          <div className="mb-10 flex items-center justify-center gap-4 opacity-40">
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-white" />
+            <span className="text-[9px] font-black tracking-[0.6em] text-white uppercase">
+              Atlas // Index 01
+            </span>
+            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white" />
+          </div>
+
+          <h1 className="relative mb-10 block py-10 overflow-visible">
+            <span className="bg-gradient-to-b from-white via-white to-white/10 bg-clip-text text-7xl leading-[1.2] font-black tracking-tighter text-transparent md:text-[9rem] block pb-8">
+              Best City <br /> Spots
+            </span>
+            {/* Liquid Glow Underlay */}
+            <div className="absolute top-1/2 left-1/2 -z-10 h-64 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/5 blur-[120px]" />
           </h1>
-          <p className="mx-auto max-w-md text-xl leading-relaxed font-medium tracking-tight text-white/50">
-            Discover the world&apos;s most vibrant urban centers with our{" "}
-            <span className="text-white/80">premium directory</span>.
-          </p>
+
+          <div className="mx-auto max-w-lg space-y-4">
+            <p className="text-xl leading-snug font-medium tracking-tight text-white/40">
+              Exploring the world&apos;s most <span className="text-white/90 italic">vibrant</span> urban centers through a <span className="text-white/90">premium intelligence</span> lens.
+            </p>
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <span className="text-[10px] font-black tracking-[0.2em] text-white/20 uppercase">
+                Real-time Data Active
+              </span>
+            </div>
+          </div>
         </motion.header>
 
         {/* Principle 7: Alignment - Centered search experience */}
@@ -218,11 +240,11 @@ export default function Home() {
                     >
                       <Link
                         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                        className="flex w-full items-center justify-between px-10 py-6"
+                        className="flex w-full items-center justify-between gap-4 px-10 py-6"
                       >
-                        <div className="flex items-center gap-6">
+                        <div className="flex min-w-0 items-center gap-6">
                           <div
-                            className={`flex h-14 w-14 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] transition-all duration-700 ${
+                            className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] transition-all duration-700 ${
                               activeIndex === idx
                                 ? "scale-110 border-blue-500/40 bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
                                 : "group-hover/item:scale-105 group-hover/item:bg-white/5"
@@ -236,9 +258,9 @@ export default function Home() {
                               }`}
                             />
                           </div>
-                          <div>
+                          <div className="min-w-0">
                             <div
-                              className={`text-2xl font-black tracking-tight transition-colors duration-500 ${
+                              className={`truncate text-2xl font-black tracking-tight transition-colors duration-500 ${
                                 activeIndex === idx
                                   ? "text-white"
                                   : "text-white/80 group-hover/item:text-white"
@@ -257,7 +279,7 @@ export default function Home() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-6">
+                        <div className="flex flex-shrink-0 items-center gap-6">
                           <div className="hidden text-right sm:block">
                             <div
                               className={`text-xl font-black transition-colors duration-500 ${
@@ -266,7 +288,7 @@ export default function Home() {
                                   : "text-white/[0.05] group-hover/item:text-white/[0.08]"
                               }`}
                             >
-                              {city.population?.toLocaleString()}
+                              {formatPopulation(city.population)}
                             </div>
                           </div>
                           <div
