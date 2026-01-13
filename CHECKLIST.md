@@ -1,0 +1,22 @@
+## Pending Feature Checklist
+
+- Enhance place descriptions with user-generated content (Phase 1).
+- Add “Save for Later” sync to Supabase/user accounts (beyond local).
+- Implement basic offline maps (Phase 1).
+- Build itinerary generator UI (Phase 2).
+- Integrate Gemini for personalization within itineraries (Phase 2).
+- Add transportation planning to itineraries (Phase 2).
+- Implement booking link integration (Phase 2).
+- Launch local wisdom database (Phase 3).
+- Build safety alert system (Phase 3).
+- Add emergency contact features (Phase 3).
+- Implement offline translation (Phase 3).
+- Gemini-powered city intro with top attractions + year-round seasons/weather, cached in Supabase for 1 year to avoid repeat API calls.
+- Create budget tracking interface (Phase 4).
+- Add expense categorization (Phase 4).
+- Implement smart financial alerts (Phase 4).
+- Build post-trip analytics (Phase 4).
+- Advanced personalization/ML for user preferences (Phase 5).
+- Social features (share itineraries) (Phase 5).
+- Integration with booking platforms (Phase 5).
+- Advanced AI recommendations (Phase 5).

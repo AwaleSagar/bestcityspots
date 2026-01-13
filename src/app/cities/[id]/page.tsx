@@ -1,6 +1,7 @@
 import { getCityById } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
+import { getCityInsight } from "@/lib/intelligence";
 import ExperiencesSection from "./ExperiencesSection";
 import {
   MapPin,
@@ -18,6 +19,8 @@ import {
   CloudRain,
   CloudSnow,
   CloudLightning,
+  Sparkles,
+  CalendarRange,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -114,6 +117,7 @@ async function ExperiencesWrapper({ cityName }: { cityName: string }) {
         Top Experiences <span className="h-px flex-1 bg-white/5" />
       </h2>
       <ExperiencesSection
+        cityName={cityName}
         landmarks={landmarks}
         restaurants={restaurants}
         hotels={hotels}
@@ -180,6 +184,7 @@ export default async function CityPage({
 
   const finalLat = lat ? parseFloat(lat) : city.lat;
   const finalLng = lng ? parseFloat(lng) : city.lng;
+  const aiInsight = await getCityInsight(city);
 
   return (
     <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
@@ -218,6 +223,80 @@ export default async function CityPage({
                 <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
               </div>
             </header>
+
+            {aiInsight && (
+              <section className="space-y-6 rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-2xl">
+                <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
+                  <Sparkles className="h-4 w-4 text-blue-300" />
+                  AI City Briefing
+                </div>
+                <p className="text-lg leading-relaxed text-white/80">{aiInsight.intro}</p>
+
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/50">
+                      Major attractions
+                    </div>
+                    <div className="space-y-3">
+                      {aiInsight.attractions.map((a, idx) => (
+                        <div
+                          key={idx}
+                          className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
+                        >
+                          <div className="text-white font-black">{a.name}</div>
+                          <div className="text-white/60">{a.why}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/50">
+                      <CalendarRange className="h-4 w-4 text-blue-300" />
+                      Seasons
+                    </div>
+                    <div className="space-y-3">
+                      {aiInsight.seasons.map((s, idx) => (
+                        <div
+                          key={idx}
+                          className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
+                        >
+                          <div className="flex items-center justify-between text-white">
+                            <span className="font-black">{s.name}</span>
+                            <span className="text-[11px] uppercase tracking-[0.2em] text-white/50">
+                              {s.months}
+                            </span>
+                          </div>
+                          <div className="text-white/60">{s.summary}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-white/50">
+                      Year-round weather
+                    </div>
+                    <div className="space-y-3">
+                      {aiInsight.weather.map((w, idx) => (
+                        <div
+                          key={idx}
+                          className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
+                        >
+                          <div className="flex items-center justify-between text-white">
+                            <span className="font-black">{w.season}</span>
+                            <span className="text-[11px] uppercase tracking-[0.2em] text-blue-300">
+                              {w.tempC}
+                            </span>
+                          </div>
+                          <div className="text-white/60">{w.notes}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
 
             <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
               <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">

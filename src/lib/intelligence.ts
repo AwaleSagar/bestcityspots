@@ -4,6 +4,103 @@ import { City } from "./cities";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 
+export interface CityInsight {
+  intro: string;
+  attractions: { name: string; why: string }[];
+  seasons: { name: string; months: string; summary: string }[];
+  weather: { season: string; tempC: string; notes: string }[];
+}
+
+function sanitizeJsonResponse(raw: string) {
+  return raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+}
+
+function isFresh(updated_at?: string, ttlDays = 365) {
+  if (!updated_at) return false;
+  const updated = new Date(updated_at);
+  const now = new Date();
+  const days = (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24);
+  return days < ttlDays;
+}
+
+export async function getCityInsight(city: City): Promise<CityInsight | null> {
+  if (!process.env.GOOGLE_GEMINI_API_KEY) {
+    console.warn("GOOGLE_GEMINI_API_KEY not found, skipping AI city insight.");
+    return null;
+  }
+
+  try {
+    const { data: cached } = await supabase
+      .from("city_ai_insights")
+      .select("intro, attractions, seasons, weather, updated_at")
+      .eq("city_id", city.id)
+      .maybeSingle();
+
+    if (cached && isFresh(cached.updated_at, 365)) {
+      return {
+        intro: cached.intro || "",
+        attractions: (cached.attractions || []) as CityInsight["attractions"],
+        seasons: (cached.seasons || []) as CityInsight["seasons"],
+        weather: (cached.weather || []) as CityInsight["weather"],
+      };
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+    const prompt = `
+      You are a concise travel curator. Summarize ${city.city}, ${city.country}.
+      Return ONLY a JSON object with keys:
+      {
+        "intro": "≤500 characters, vivid but factual city intro",
+        "attractions": [
+          { "name": "spot name", "why": "1 short sentence" },
+          { "name": "...", "why": "..." },
+          { "name": "...", "why": "..." }
+        ],
+        "seasons": [
+          { "name": "Spring", "months": "Mar-May", "summary": "concise guidance" },
+          { "name": "Summer", "months": "Jun-Aug", "summary": "concise guidance" },
+          { "name": "Autumn", "months": "Sep-Nov", "summary": "concise guidance" },
+          { "name": "Winter", "months": "Dec-Feb", "summary": "concise guidance" }
+        ],
+        "weather": [
+          { "season": "Spring", "tempC": "avg temp range in °C", "notes": "travel tip" },
+          { "season": "Summer", "tempC": "avg temp range in °C", "notes": "travel tip" },
+          { "season": "Autumn", "tempC": "avg temp range in °C", "notes": "travel tip" },
+          { "season": "Winter", "tempC": "avg temp range in °C", "notes": "travel tip" }
+        ]
+      }
+      Do not add prose, code fences, or Markdown—just JSON.
+    `;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const parsed = JSON.parse(sanitizeJsonResponse(response.text()));
+
+    const insight: CityInsight = {
+      intro: parsed.intro || "",
+      attractions: Array.isArray(parsed.attractions) ? parsed.attractions.slice(0, 4) : [],
+      seasons: Array.isArray(parsed.seasons) ? parsed.seasons.slice(0, 4) : [],
+      weather: Array.isArray(parsed.weather) ? parsed.weather.slice(0, 4) : [],
+    };
+
+    await supabase.from("city_ai_insights").upsert({
+      city_id: city.id,
+      city_name: city.city,
+      country: city.country,
+      intro: insight.intro,
+      attractions: insight.attractions,
+      seasons: insight.seasons,
+      weather: insight.weather,
+      updated_at: new Date().toISOString(),
+    });
+
+    return insight;
+  } catch (e) {
+    console.error("Failed to get city insight:", e);
+    return null;
+  }
+}
+
 /**
  * Uses Google Gemini AI to find currently trending global cities
  * and caches them in Supabase for 24 hours.
