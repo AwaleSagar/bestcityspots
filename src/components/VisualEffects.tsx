@@ -107,7 +107,7 @@ export default function VisualEffects() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsAtlasMode(false)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 backdrop-blur-xl p-6"
             role="dialog"
             aria-modal="true"
             aria-label="Atlas system diagnostics"
@@ -115,7 +115,7 @@ export default function VisualEffects() {
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className="w-full max-w-2xl rounded-3xl border border-blue-500/30 bg-black p-8 shadow-[0_0_100px_rgba(59,130,246,0.1)]"
+              className="w-full max-w-2xl rounded-3xl border border-blue-500/30 bg-background p-8 shadow-glow"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mb-8 flex items-center justify-between">
@@ -127,14 +127,14 @@ export default function VisualEffects() {
                     <div className="text-xs font-black tracking-[0.3em] text-blue-400 uppercase">
                       System Diagnostics
                     </div>
-                    <div className="text-lg font-black tracking-tighter text-white">
+                    <div className="text-lg font-black tracking-tighter text-foreground">
                       ATLAS CORE // VER 1.0.1
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsAtlasMode(false)}
-                  className="rounded-lg border border-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:bg-white/5"
+                  className="rounded-lg border border-foreground/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:bg-foreground/5"
                 >
                   Terminate Session
                 </button>
@@ -149,8 +149,8 @@ export default function VisualEffects() {
                   { icon: Globe, label: "Global Nodes", val: "CITIES_INTEL.V4" },
                   { icon: Activity, label: "Uptime", val: "99.982% // SYNC" },
                 ].map((item, i) => (
-                  <div key={i} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
-                    <div className="mb-2 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-white/30">
+                  <div key={i} className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-4">
+                    <div className="mb-2 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-foreground/30">
                       <item.icon className="h-3 w-3" />
                       {item.label}
                     </div>

@@ -35,6 +35,8 @@ export const metadata: Metadata = {
 };
 
 import VisualEffects from "@/components/VisualEffects";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function RootLayout({
   children,
@@ -46,14 +48,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-blue-500/30 selection:text-blue-200`}
       >
-        <a
-          href="#main-content"
-          className="skip-link pointer-events-auto fixed left-4 top-4 z-[200] rounded-xl border border-white/10 bg-black/80 px-4 py-2 text-xs font-black tracking-[0.2em] text-white/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100"
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
         >
-          Skip to content
-        </a>
-        <VisualEffects />
-        <div className="relative z-10">{children}</div>
+          <div className="fixed right-4 top-4 z-[200]">
+            <ThemeToggle />
+          </div>
+          <a
+            href="#main-content"
+            className="skip-link pointer-events-auto fixed left-4 top-4 z-[200] rounded-xl border border-foreground/10 bg-background/80 px-4 py-2 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100"
+          >
+            Skip to content
+          </a>
+          <VisualEffects />
+          <div className="relative z-10">{children}</div>
+        </ThemeProvider>
       </body>
     </html>
   );

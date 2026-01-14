@@ -67,8 +67,8 @@ export async function searchCities(query: string, limit = 10, signal?: AbortSign
     // Note: supabase-js doesn't support AbortSignal directly; we guard by ignoring results if aborted.
     const { data, error } = await supabase
       .from("cities")
-      .select("id, city, city_ascii, country, population, lat, lng")
-      .ilike("city_ascii", `%${cleanQuery}%`)
+      .select("id, city, city_ascii, country, population, lat, lng, admin_name, capital")
+      .or(`city_ascii.ilike.%${cleanQuery}%,country.ilike.%${cleanQuery}%,admin_name.ilike.%${cleanQuery}%`)
       .order("population", { ascending: false, nullsFirst: false })
       .limit(safeLimit);
 

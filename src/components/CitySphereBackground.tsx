@@ -134,9 +134,9 @@ export default function CitySphereBackground() {
   }, [shouldReduceMotion]);
 
   return (
-    <div className="city-sphere-layer pointer-events-none fixed inset-0 z-0 overflow-hidden bg-black">
+    <div className="city-sphere-layer pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
       {/* Deep space grain/starfield effect */}
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
+      <div className="absolute inset-0 opacity-20 dark:opacity-20 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--color-foreground) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
       
       <div ref={containerRef} className="city-sphere">
         {points.map((p, i) => {
@@ -176,12 +176,12 @@ export default function CitySphereBackground() {
               
               {/* The Label - only visible if active */}
               <span
-                className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 transition-all duration-1000"
+                className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground transition-all duration-1000"
                 style={{
                   opacity: labelOpacity,
                   filter: blurValue > 0 ? `blur(${blurValue}px)` : undefined,
                   transform: `translateX(${isActive ? 0 : -8}px)`,
-                  textShadow: isActive ? '0 0 10px rgba(255,255,255,0.3)' : 'none',
+                  textShadow: isActive ? '0 0 10px var(--color-background)' : 'none',
                 }}
               >
                 {label}
@@ -194,7 +194,7 @@ export default function CitySphereBackground() {
       <div 
         className="absolute inset-0 z-10 pointer-events-none" 
         style={{
-          background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.85) 100%)'
+          background: 'radial-gradient(circle at center, transparent 0%, var(--color-background) 30%, var(--color-vignette-outer) 100%)'
         }}
       />
       <div className="city-sphere-vignette absolute inset-0 z-10 backdrop-blur-[0.5px]" />
