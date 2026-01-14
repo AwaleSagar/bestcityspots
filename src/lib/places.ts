@@ -86,7 +86,7 @@ export async function getTopPlaces(
         "Content-Type": "application/json",
         "X-Goog-Api-Key": API_KEY,
         "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel",
+          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location",
       },
       body: JSON.stringify({
         textQuery: queryMap[type],
