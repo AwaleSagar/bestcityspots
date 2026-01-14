@@ -109,8 +109,8 @@ export default function Home() {
             <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-white" />
           </div>
 
-          <h1 className="relative mb-4 block py-4 overflow-visible">
-            <span className="bg-gradient-to-b from-white via-white to-white/10 bg-clip-text text-6xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl block pb-4">
+          <h1 className="relative mb-4 block py-2 md:py-4 overflow-visible">
+            <span className="bg-gradient-to-b from-white via-white to-white/10 bg-clip-text text-5xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl block pb-4">
               Best City <br /> Spots
             </span>
             {/* Liquid Glow Underlay */}
@@ -118,7 +118,7 @@ export default function Home() {
           </h1>
 
           <div className="mx-auto max-w-lg space-y-2">
-            <p className="text-lg leading-snug font-medium tracking-tight text-white/40 md:text-xl">
+            <p className="text-base md:text-xl leading-snug font-medium tracking-tight text-white/40">
               Exploring the world&apos;s most <span className="text-white/90 italic">vibrant</span> urban centers through a <span className="text-white/90">premium intelligence</span> lens.
             </p>
             <div className="flex items-center justify-center gap-2 pt-1">
@@ -143,7 +143,7 @@ export default function Home() {
           </label>
 
           <div className="group relative">
-            <Search className="absolute top-1/2 left-8 h-6 w-6 -translate-y-1/2 text-gray-500 transition-all duration-500 group-focus-within:text-blue-400" />
+            <Search className="absolute top-1/2 left-6 md:left-8 h-5 w-5 md:h-6 md:w-6 -translate-y-1/2 text-gray-500 transition-all duration-500 group-focus-within:text-blue-400" />
             <input
               id="city-search"
               ref={inputRef}
@@ -156,7 +156,7 @@ export default function Home() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Search by city or country..."
-              className="liquid-glass w-full rounded-[2.5rem] border border-white/10 bg-white/[0.03] py-8 pr-8 pl-20 text-2xl shadow-2xl shadow-black transition-all duration-700 outline-none hover:bg-white/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
+              className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-white/10 bg-white/[0.03] py-5 md:py-8 pr-6 md:pr-8 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl shadow-black transition-all duration-700 outline-none hover:bg-white/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
             />
 
             {/* Principle 4: Contrast - Loading indicator */}
@@ -228,7 +228,7 @@ export default function Home() {
                 exit={{ opacity: 0, y: 10 }}
                 className="mt-8 space-y-4"
               >
-                <ul className="glass-dropdown shadow-3xl divide-y divide-white/5 overflow-hidden rounded-[2.5rem]">
+                <ul className="glass-dropdown shadow-3xl divide-y divide-white/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]">
                   {searchResults.map((city, idx) => (
                     <motion.li
                       key={city.id}
@@ -241,18 +241,18 @@ export default function Home() {
                     >
                       <Link
                         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                        className="flex w-full items-center justify-between gap-4 px-10 py-6"
+                        className="flex w-full items-center justify-between gap-4 px-6 md:px-10 py-4 md:py-6"
                       >
-                        <div className="flex min-w-0 items-center gap-6">
+                        <div className="flex min-w-0 items-center gap-4 md:gap-6">
                           <div
-                            className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02] transition-all duration-700 ${
+                            className={`flex h-12 w-12 md:h-14 md:w-14 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-white/5 bg-white/[0.02] transition-all duration-700 ${
                               activeIndex === idx
                                 ? "scale-110 border-blue-500/40 bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
                                 : "group-hover/item:scale-105 group-hover/item:bg-white/5"
                             }`}
                           >
                             <MapPin
-                              className={`h-6 w-6 transition-colors duration-500 ${
+                              className={`h-5 w-5 md:h-6 md:w-6 transition-colors duration-500 ${
                                 activeIndex === idx
                                   ? "text-blue-400"
                                   : "text-white/20 group-hover/item:text-blue-400/60"
@@ -261,7 +261,7 @@ export default function Home() {
                           </div>
                           <div className="min-w-0">
                             <div
-                              className={`truncate text-2xl font-black tracking-tight transition-colors duration-500 ${
+                              className={`truncate text-xl md:text-2xl font-black tracking-tight transition-colors duration-500 ${
                                 activeIndex === idx
                                   ? "text-white"
                                   : "text-white/80 group-hover/item:text-white"
@@ -270,7 +270,7 @@ export default function Home() {
                               {highlightMatch(city.city, searchQuery)}
                             </div>
                             <div
-                              className={`text-[11px] font-black tracking-[0.2em] uppercase transition-colors duration-500 ${
+                              className={`text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase transition-colors duration-500 ${
                                 activeIndex === idx
                                   ? "text-blue-400/80"
                                   : "text-white/40 group-hover/item:text-white/60"

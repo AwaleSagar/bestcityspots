@@ -153,24 +153,40 @@ function MetricCard({
   const display = isEmpty ? (
     <span className="text-white/30">N/A</span>
   ) : (
-    <span className="text-2xl font-black tracking-tight text-white">
-      {typeof value === "number" ? value.toLocaleString() : value} {unit}
-    </span>
+    <div className="flex flex-col items-start leading-tight">
+      <span className="text-2xl font-black tracking-tight text-white">
+        {typeof value === "number" ? value.toLocaleString() : value}
+      </span>
+      {unit && (
+        <span className="text-xs font-black uppercase tracking-widest text-white/60">
+          {unit}
+        </span>
+      )}
+    </div>
   );
 
   return (
-    <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-4 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
-          <Icon className="h-5 w-5 text-blue-300" />
-        </div>
-        <div>
-          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">{label}</div>
-          {display}
+    <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-5 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
+            <Icon className="h-5 w-5 text-blue-300" />
+          </div>
+          <div>
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+              {label}
+            </div>
+            {display}
+          </div>
         </div>
       </div>
-      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 text-right">
-        {isEmpty ? "Pending" : source || "Live"}
+      <div className="flex items-center justify-between border-t border-white/5 pt-3">
+        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
+          Data Source
+        </div>
+        <div className="text-[9px] font-black uppercase tracking-[0.1em] text-white/40 text-right max-w-[120px] leading-relaxed">
+          {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
+        </div>
       </div>
     </div>
   );
@@ -270,15 +286,15 @@ export default async function CityPage({
   return (
     <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
       <div className="mx-auto max-w-5xl px-6 py-12">
-        <nav className="mb-12">
+        <nav className="mb-8 md:mb-12">
           <Link
             href="/"
-            className="group inline-flex items-center gap-4 text-gray-500 transition-all hover:text-white"
+            className="group inline-flex items-center gap-3 md:gap-4 text-gray-500 transition-all hover:text-white py-2"
           >
-            <div className="liquid-glass flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] transition-all duration-500 group-hover:border-blue-500/40 group-hover:bg-blue-500/20">
-              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] transition-all duration-500 group-hover:border-blue-500/40 group-hover:bg-blue-500/20">
+              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:-translate-x-1" />
             </div>
-            <span className="text-xs font-black tracking-[0.2em] uppercase">
+            <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
               Return to Explorer
             </span>
           </Link>
@@ -287,18 +303,18 @@ export default async function CityPage({
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
           {/* Main Info Column */}
           <div className="space-y-12 lg:col-span-8">
-            <header className="relative space-y-6 py-6 overflow-visible">
+            <header className="relative space-y-4 py-4 md:space-y-6 md:py-6 overflow-visible">
               <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-blue-600/10 blur-[120px]" />
               <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
                 <Navigation className="h-4 w-4" />
                 {city.iso3} <span className="text-white/20">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
               </div>
-              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-6xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl break-words block pb-4">
+              <h1 className="bg-gradient-to-b from-white via-white to-white/20 bg-clip-text text-5xl leading-[1.1] font-black tracking-tighter text-transparent md:text-8xl break-words block pb-4">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
-                <p className="text-4xl font-black tracking-tight text-white/40 italic md:text-5xl">
+                <p className="text-3xl font-black tracking-tight text-white/40 italic md:text-5xl">
                   {city.country}
                 </p>
                 <div className="h-px flex-1 bg-gradient-to-r from-white/20 to-transparent" />
@@ -306,12 +322,12 @@ export default async function CityPage({
             </header>
 
             {aiInsight && (
-              <section className="space-y-6 rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-2xl">
+              <section className="space-y-6 rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-6 md:rounded-[3rem] md:p-10 shadow-2xl">
                 <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
                   <Sparkles className="h-4 w-4 text-blue-300" />
                   AI City Briefing
                 </div>
-                <p className="text-lg leading-relaxed text-white/80">{aiInsight.intro}</p>
+                <p className="text-base md:text-lg leading-relaxed text-white/80">{aiInsight.intro}</p>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                   <div className="space-y-3">
@@ -325,7 +341,7 @@ export default async function CityPage({
                           className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
                         >
                           <div className="text-white font-black">{a.name}</div>
-                          <div className="text-white/60">{a.why}</div>
+                          <div className="mt-1 text-white/60 leading-relaxed">{a.why}</div>
                         </div>
                       ))}
                     </div>
@@ -342,13 +358,13 @@ export default async function CityPage({
                           key={idx}
                           className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
                         >
-                          <div className="flex items-center justify-between text-white">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-white">
                             <span className="font-black">{s.name}</span>
-                            <span className="text-[11px] uppercase tracking-[0.2em] text-white/50">
+                            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">
                               {s.months}
                             </span>
                           </div>
-                          <div className="text-white/60">{s.summary}</div>
+                          <div className="mt-2 text-white/60 leading-relaxed">{s.summary}</div>
                         </div>
                       ))}
                     </div>
@@ -364,13 +380,13 @@ export default async function CityPage({
                           key={idx}
                           className="rounded-2xl border border-white/5 bg-white/[0.02] p-4 text-sm text-white/80"
                         >
-                          <div className="flex items-center justify-between text-white">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-white">
                             <span className="font-black">{w.season}</span>
-                            <span className="text-[11px] uppercase tracking-[0.2em] text-blue-300">
+                            <span className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-300">
                               {w.tempC}
                             </span>
                           </div>
-                          <div className="text-white/60">{w.notes}</div>
+                          <div className="mt-2 text-white/60 leading-relaxed">{w.notes}</div>
                         </div>
                       ))}
                     </div>
@@ -379,8 +395,8 @@ export default async function CityPage({
               </section>
             )}
 
-            <section className="grid grid-cols-1 gap-8 sm:grid-cols-2">
-              <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
+            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
                 <div className="mb-6 flex items-center gap-4 text-gray-400">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 transition-all group-hover/card:bg-blue-500/20">
                     <Users className="h-5 w-5 text-blue-400" />
@@ -389,7 +405,7 @@ export default async function CityPage({
                     Census Data
                   </span>
                 </div>
-                <div className="mb-2 text-5xl font-black tracking-tighter text-white">
+                <div className="mb-2 text-4xl md:text-5xl font-black tracking-tighter text-white">
                   {formatPopulation(city.population)}
                 </div>
                 <div className="text-xs font-bold tracking-widest text-white/40 uppercase">
@@ -397,7 +413,7 @@ export default async function CityPage({
                 </div>
               </div>
 
-              <div className="liquid-glass group/card rounded-[3rem] p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
+              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-all duration-700 hover:bg-white/[0.05]">
                 <div className="mb-6 flex items-center gap-4 text-gray-400">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-all group-hover/card:bg-purple-500/20">
                     <MapPin className="h-5 w-5 text-purple-400" />
@@ -406,7 +422,7 @@ export default async function CityPage({
                     Territory
                   </span>
                 </div>
-                <div className="mb-2 text-3xl leading-tight font-black tracking-tight text-white">
+                <div className="mb-2 text-2xl md:text-3xl leading-tight font-black tracking-tight text-white">
                   {city.admin_name || "Autonomous"}
                 </div>
                 <div className="text-xs font-bold tracking-widest text-white/40 uppercase">
@@ -432,22 +448,22 @@ export default async function CityPage({
           </div>
 
           {/* Sidebar / Quick Actions */}
-          <div className="sticky top-20 space-y-8 lg:col-span-4">
-            <div className="shadow-3xl group/cta relative space-y-8 overflow-hidden rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-800 p-10 text-white shadow-blue-500/20">
+          <div className="space-y-8 lg:sticky lg:top-20 lg:col-span-4">
+            <div className="shadow-3xl group/cta relative space-y-8 overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-800 p-8 md:p-10 text-white shadow-blue-500/20">
               <div className="absolute top-0 right-0 h-32 w-32 translate-x-10 -translate-y-10 rounded-full bg-white/10 blur-3xl transition-transform duration-1000 group-hover/cta:scale-150" />
-              <h3 className="text-3xl leading-tight font-black tracking-tighter">
+              <h3 className="text-2xl md:text-3xl leading-tight font-black tracking-tighter">
                 Explore The Urban <br /> Essence
               </h3>
               <p className="text-sm leading-relaxed font-bold tracking-wide text-blue-100/70">
                 Unlock exclusive insights and historical landmarks of {city.city} with our premium
                 membership.
               </p>
-              <button className="w-full rounded-[2rem] bg-white py-6 text-lg font-black text-blue-600 shadow-xl transition-all hover:bg-gray-100 active:scale-[0.98]">
+              <button className="w-full rounded-[2rem] bg-white py-5 md:py-6 text-base md:text-lg font-black text-blue-600 shadow-xl transition-all hover:bg-gray-100 active:scale-[0.98]">
                 Get Access
               </button>
             </div>
 
-            <div className="liquid-glass space-y-8 rounded-[3rem] p-10">
+            <div className="liquid-glass space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10">
               <h4 className="text-[11px] font-black tracking-[0.3em] text-white/40 uppercase">
                 Core Metrics
               </h4>
