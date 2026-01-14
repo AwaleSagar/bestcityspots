@@ -3,7 +3,8 @@ import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
 import { getCityMetrics } from "@/lib/metrics";
 import { getCityInsight } from "@/lib/intelligence";
-import ExperiencesSection from "./ExperiencesSection";
+import { cityIdSchema, coordinatesSchema } from "@/lib/validation";
+import ExperiencesSection from "./ExperiencesSection"; // id: 6
 import {
   MapPin,
   Users,
@@ -244,14 +245,31 @@ export default async function CityPage({
   const { id } = await params;
   const { lat, lng } = await searchParams;
 
-  const city = await getCityById(parseInt(id));
+  // Validate Inputs (Security: Input Validation)
+  const idResult = cityIdSchema.safeParse(id);
+  const coordsResult = coordinatesSchema.safeParse({ lat, lng });
+
+  if (!idResult.success) {
+    notFound(); // Invalid ID format
+  }
+
+  if (!coordsResult.success) {
+    // If coordinates are invalid (e.g. out of range or not numbers), just ignore them
+    // and let the code fallback to city defaults below.
+    console.warn("Invalid coordinates provided:", coordsResult.error);
+  }
+
+  const cityId = idResult.data;
+  const validCoords = coordsResult.success ? coordsResult.data : {};
+
+  const city = await getCityById(cityId);
 
   if (!city) {
     notFound();
   }
 
-  const finalLat = lat ? parseFloat(lat) : city.lat;
-  const finalLng = lng ? parseFloat(lng) : city.lng;
+  const finalLat = validCoords.lat ?? city.lat;
+  const finalLng = validCoords.lng ?? city.lng;
   const aiInsight = await getCityInsight(city);
   const metrics = await getCityMetrics(city);
 

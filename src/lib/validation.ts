@@ -21,6 +21,16 @@ export const passwordSchema = z
 // UUID validation for database lookups
 export const uuidSchema = z.string().uuid("Invalid ID format");
 
+// City ID validation (Integer)
+export const cityIdSchema = z.coerce.number().int().positive("City ID must be a positive integer");
+
+// Coordinate validation
+export const coordinatesSchema = z.object({
+    lat: z.coerce.number().min(-90).max(90).optional(),
+    lng: z.coerce.number().min(-180).max(180).optional(),
+});
+
+
 // Pagination params
 export const paginationSchema = z.object({
     page: z.number().int().min(1).default(1),
