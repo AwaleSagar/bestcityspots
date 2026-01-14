@@ -50,9 +50,9 @@ export async function getTopPlaces(
     const requestedRadiusKm = opts?.radiusKm ?? 90; // generous metro radius; prevents false empties
     const apiMaxRadiusKm = 50; // Google Places API limit (50,000 meters)
     const effectiveRadiusKm = Math.min(requestedRadiusKm, apiMaxRadiusKm);
-    const hasCoords = typeof opts?.lat === "number" && typeof opts?.lng === "number";
-    const centerLat = hasCoords ? opts.lat : undefined;
-    const centerLng = hasCoords ? opts.lng : undefined;
+    const centerLat = opts?.lat;
+    const centerLng = opts?.lng;
+    const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
 
     // 1. Check Supabase Cache first
     const { data: cache } = await supabase
@@ -116,7 +116,7 @@ export async function getTopPlaces(
     let places = (data.places || []) as Landmark[];
 
     // Filter out obvious outliers when we have coordinates
-    if (hasCoords && typeof centerLat === "number" && typeof centerLng === "number") {
+    if (hasCoords) {
       const filtered = places.filter((place) => {
         const lat = place.location?.latitude;
         const lng = place.location?.longitude;
