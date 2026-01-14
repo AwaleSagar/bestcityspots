@@ -54,6 +54,21 @@
   }
 }
 
+/* Accessible focus treatment (subtle, consistent) */
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.65);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.12);
+}
+
+/* Skip link: visually hidden until focused (see layout.tsx) */
+.skip-link {
+  transform: translateY(-8px);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* Glassmorphism & Depth Utilities */
 .glass {
   background: var(--color-glass);
@@ -108,7 +123,7 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(100px);
-  z-index: -5;
+  z-index: 0;
   opacity: 0.4;
   animation: orb-move 20s infinite alternate ease-in-out;
 }
@@ -188,4 +203,71 @@
 
 .animate-scan {
   animation: scan 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* City name sphere background (landing page) */
+.city-sphere-layer {
+  perspective: 1400px;
+}
+.city-sphere {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1px;
+  height: 1px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.city-sphere-tag {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  user-select: none;
+  font-size: clamp(10px, 1.25vw, 16px);
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(59, 130, 246, 0.14);
+  filter: saturate(120%);
+}
+.city-sphere-tag::after {
+  content: "";
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  opacity: 0.25;
+  pointer-events: none;
+}
+.city-sphere-vignette {
+  background:
+    radial-gradient(1200px 600px at 50% 40%, rgba(59, 130, 246, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 30% 70%, rgba(147, 51, 234, 0.10), transparent 55%),
+    radial-gradient(1200px 800px at 50% 50%, transparent 35%, rgba(0, 0, 0, 0.85) 80%);
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .orb {
+    animation: none !important;
+  }
 }

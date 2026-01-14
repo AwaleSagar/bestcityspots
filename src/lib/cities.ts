@@ -102,7 +102,9 @@ export async function searchCities(query: string, limit = 10, signal?: AbortSign
  */
 export async function getTopCities(limit = 10) {
   try {
-    const safeLimit = Math.max(1, Math.min(50, limit));
+    // Allow larger batches for UI/background visualizations (e.g. tag spheres),
+    // while still enforcing a reasonable upper bound.
+    const safeLimit = Math.max(1, Math.min(200, limit));
     const { data, error } = await supabase
       .from("cities")
       .select("id, city, country, population, lat, lng")

@@ -123,6 +123,7 @@ function MetricCard({
   source?: string;
 }) {
   const isEmpty = value === null || value === undefined || value === "";
+  const debugId = label.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase() || "METRIC";
   const display = isEmpty ? (
     <span className="text-white/30">N/A</span>
   ) : (
@@ -156,7 +157,7 @@ function MetricCard({
                 {label}
               </div>
               <div className="hidden text-[8px] font-mono text-blue-500/30 group-hover/metric:block">
-                ID_{Math.random().toString(16).slice(2, 6).toUpperCase()}
+                ID_{debugId}
               </div>
             </div>
             {display}
@@ -284,7 +285,10 @@ export default async function CityPage({
   const metrics = await getCityMetrics(city);
 
   return (
-    <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
+    <main
+      id="main-content"
+      className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200"
+    >
       <div className="mx-auto max-w-5xl px-6 py-12">
         <nav className="mb-8 md:mb-12">
           <Link

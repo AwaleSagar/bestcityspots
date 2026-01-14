@@ -81,17 +81,37 @@ export default function Home() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((prev) => (prev < searchResults.length - 1 ? prev + 1 : prev));
+      setActiveIndex((prev) => {
+        if (searchResults.length === 0) return -1;
+        return prev >= searchResults.length - 1 ? 0 : prev + 1;
+      });
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex((prev) => (prev > 0 ? prev - 1 : prev));
-    } else if (e.key === "Enter" && activeIndex >= 0) {
-      router.push(`/cities/${searchResults[activeIndex].id}`);
+      setActiveIndex((prev) => {
+        if (searchResults.length === 0) return -1;
+        return prev <= 0 ? searchResults.length - 1 : prev - 1;
+      });
+    } else if (e.key === "Enter") {
+      if (activeIndex >= 0 && searchResults[activeIndex]) {
+        router.push(`/cities/${searchResults[activeIndex].id}`);
+      } else if (searchResults.length > 0) {
+        router.push(`/cities/${searchResults[0].id}`);
+      }
+    } else if (e.key === "Escape") {
+      setSearchQuery("");
+      setSearchResults([]);
+      setActiveIndex(-1);
     }
   };
 
+  const resultsListId = "city-search-results";
+  const activeOptionId =
+    activeIndex >= 0 && searchResults[activeIndex]
+      ? `city-option-${searchResults[activeIndex].id}`
+      : undefined;
+
   return (
-    <main className="min-h-screen bg-transparent font-sans text-white">
+    <main id="main-content" className="min-h-screen bg-transparent font-sans text-white">
       <div className="mx-auto max-w-2xl px-6 py-12">
         {/* Principle 1: Hierarchy - Clear Heading */}
         <motion.header
@@ -156,6 +176,11 @@ export default function Home() {
               }}
               onKeyDown={handleKeyDown}
               placeholder="Search by city or country..."
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={shouldShowResults}
+              aria-controls={resultsListId}
+              aria-activedescendant={activeOptionId}
               className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-white/10 bg-white/[0.03] py-5 md:py-8 pr-6 md:pr-8 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl shadow-black transition-all duration-700 outline-none hover:bg-white/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
             />
 
@@ -228,7 +253,12 @@ export default function Home() {
                 exit={{ opacity: 0, y: 10 }}
                 className="mt-8 space-y-4"
               >
-                <ul className="glass-dropdown shadow-3xl divide-y divide-white/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]">
+                <ul
+                  id={resultsListId}
+                  role="listbox"
+                  aria-label="City search results"
+                  className="glass-dropdown shadow-3xl divide-y divide-white/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]"
+                >
                   {searchResults.map((city, idx) => (
                     <motion.li
                       key={city.id}
@@ -238,6 +268,10 @@ export default function Home() {
                       className={`group/item cursor-pointer transition-all duration-500 ${
                         activeIndex === idx ? "bg-blue-500/15" : "hover:bg-white/5"
                       }`}
+                      role="option"
+                      aria-selected={activeIndex === idx}
+                      id={`city-option-${city.id}`}
+                      onMouseEnter={() => setActiveIndex(idx)}
                     >
                       <Link
                         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
@@ -306,7 +340,7 @@ export default function Home() {
                     </motion.li>
                   ))}
                   {searchResults.length === 0 && !isSearching && (
-                    <li className="px-8 py-12 text-center">
+                    <li className="px-8 py-12 text-center" role="status" aria-live="polite">
                       <div className="mb-1 font-medium text-gray-400">
                         No matches for &quot;{searchQuery}&quot;
                       </div>
