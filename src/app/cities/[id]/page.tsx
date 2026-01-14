@@ -108,34 +108,6 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
   );
 }
 
-function MetricRow({
-  label,
-  value,
-  unit,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-  unit?: string;
-}) {
-  const display =
-    value === null || value === undefined || value === "" ? (
-      <span className="text-white/30">N/A</span>
-    ) : (
-      <span className="font-black tracking-tight text-white">
-        {typeof value === "number" ? value.toLocaleString() : value} {unit}
-      </span>
-    );
-
-  return (
-    <div className="group/metric flex items-center justify-between">
-      <span className="text-xs font-black tracking-widest text-white/40 uppercase transition-colors group-hover/metric:text-white">
-        {label}
-      </span>
-      {display}
-    </div>
-  );
-}
-
 function MetricCard({
   label,
   value,

@@ -30,6 +30,10 @@ export interface Landmark {
   types?: string[];
   googleMapsUri?: string;
   priceLevel?: string;
+  location?: {
+    latitude?: number;
+    longitude?: number;
+  };
 }
 
 export async function getTopPlaces(
@@ -47,6 +51,8 @@ export async function getTopPlaces(
     const apiMaxRadiusKm = 50; // Google Places API limit (50,000 meters)
     const effectiveRadiusKm = Math.min(requestedRadiusKm, apiMaxRadiusKm);
     const hasCoords = typeof opts?.lat === "number" && typeof opts?.lng === "number";
+    const centerLat = hasCoords ? opts.lat : undefined;
+    const centerLng = hasCoords ? opts.lng : undefined;
 
     // 1. Check Supabase Cache first
     const { data: cache } = await supabase
@@ -88,7 +94,7 @@ export async function getTopPlaces(
         locationBias: hasCoords
           ? {
               circle: {
-                center: { latitude: opts!.lat, longitude: opts!.lng },
+                center: { latitude: centerLat, longitude: centerLng },
                 radius: effectiveRadiusKm * 1000, // meters, capped by API limit
               },
             }
@@ -111,12 +117,12 @@ export async function getTopPlaces(
 
     // Filter out obvious outliers when we have coordinates
     if (hasCoords) {
-      const filtered = places.filter((p: any) => {
-        const location = (p as any).location;
-        const lat = location?.latitude;
-        const lng = location?.longitude;
+      const filtered = places.filter((place) => {
+        const lat = place.location?.latitude;
+        const lng = place.location?.longitude;
         if (typeof lat !== "number" || typeof lng !== "number") return true;
-        return haversineKm(opts!.lat!, opts!.lng!, lat, lng) <= effectiveRadiusKm;
+        if (centerLat === undefined || centerLng === undefined) return true;
+        return haversineKm(centerLat, centerLng, lat, lng) <= effectiveRadiusKm;
       });
 
       // If filtering nuked everything, fall back to the unfiltered list to avoid blank states.
