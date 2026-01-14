@@ -11,6 +11,9 @@ services:
     image: bestcityspots:latest
     ports:
       - "3000:3000"
+    environment:
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
     env_file:
       - .env.production
     restart: unless-stopped
