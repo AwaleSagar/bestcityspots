@@ -121,8 +121,7 @@ export async function getTopPlaces(
         const lat = place.location?.latitude;
         const lng = place.location?.longitude;
         if (typeof lat !== "number" || typeof lng !== "number") return true;
-        if (centerLat === undefined || centerLng === undefined) return true;
-        return haversineKm(centerLat, centerLng, lat, lng) <= effectiveRadiusKm;
+        return haversineKm(centerLat!, centerLng!, lat, lng) <= effectiveRadiusKm;
       });
 
       // If filtering nuked everything, fall back to the unfiltered list to avoid blank states.
