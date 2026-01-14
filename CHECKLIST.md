@@ -3,6 +3,7 @@
 - Enhance place descriptions with user-generated content (Phase 1).
 - Add “Save for Later” sync to Supabase/user accounts (beyond local).
 - Implement basic offline maps (Phase 1).
+- Replace placeholder “Core Metrics” with free/open feeds (connectivity via Ookla Open Data or World Bank ICT; pollution via OpenAQ/WAQI; climate via Open-Meteo/Meteostat; safety via country advisories; health via OSM counts or WHO/World Bank). Defer cost index until a paid source is approved.
 - Build itinerary generator UI (Phase 2).
 - Integrate Gemini for personalization within itineraries (Phase 2).
 - Add transportation planning to itineraries (Phase 2).

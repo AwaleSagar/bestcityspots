@@ -1,6 +1,7 @@
 import { getCityById } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
+import { getCityMetrics } from "@/lib/metrics";
 import { getCityInsight } from "@/lib/intelligence";
 import ExperiencesSection from "./ExperiencesSection";
 import {
@@ -21,10 +22,13 @@ import {
   CloudLightning,
   Sparkles,
   CalendarRange,
+  Activity,
+  Cloud as CloudIcon,
+  ThermometerSun,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 
 async function getWeatherData(lat: number, lng: number) {
   try {
@@ -104,11 +108,87 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
   );
 }
 
-async function ExperiencesWrapper({ cityName }: { cityName: string }) {
+function MetricRow({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  unit?: string;
+}) {
+  const display =
+    value === null || value === undefined || value === "" ? (
+      <span className="text-white/30">N/A</span>
+    ) : (
+      <span className="font-black tracking-tight text-white">
+        {typeof value === "number" ? value.toLocaleString() : value} {unit}
+      </span>
+    );
+
+  return (
+    <div className="group/metric flex items-center justify-between">
+      <span className="text-xs font-black tracking-widest text-white/40 uppercase transition-colors group-hover/metric:text-white">
+        {label}
+      </span>
+      {display}
+    </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  unit,
+  icon: Icon,
+  source,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+  unit?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  source?: string;
+}) {
+  const isEmpty = value === null || value === undefined || value === "";
+  const display = isEmpty ? (
+    <span className="text-white/30">N/A</span>
+  ) : (
+    <span className="text-2xl font-black tracking-tight text-white">
+      {typeof value === "number" ? value.toLocaleString() : value} {unit}
+    </span>
+  );
+
+  return (
+    <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-4 flex items-center justify-between gap-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
+          <Icon className="h-5 w-5 text-blue-300" />
+        </div>
+        <div>
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-white/40">{label}</div>
+          {display}
+        </div>
+      </div>
+      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 text-right">
+        {isEmpty ? "Pending" : source || "Live"}
+      </div>
+    </div>
+  );
+}
+
+async function ExperiencesWrapper({
+  cityName,
+  lat,
+  lng,
+}: {
+  cityName: string;
+  lat: number;
+  lng: number;
+}) {
   const [landmarks, restaurants, hotels] = await Promise.all([
-    getTopPlaces(cityName, "landmarks"),
-    getTopPlaces(cityName, "restaurants"),
-    getTopPlaces(cityName, "hotels"),
+    getTopPlaces(cityName, "landmarks", { lat, lng }),
+    getTopPlaces(cityName, "restaurants", { lat, lng }),
+    getTopPlaces(cityName, "hotels", { lat, lng }),
   ]);
 
   return (
@@ -185,6 +265,7 @@ export default async function CityPage({
   const finalLat = lat ? parseFloat(lat) : city.lat;
   const finalLng = lng ? parseFloat(lng) : city.lng;
   const aiInsight = await getCityInsight(city);
+  const metrics = await getCityMetrics(city);
 
   return (
     <main className="min-h-screen bg-transparent font-sans text-white selection:bg-blue-500/30 selection:text-blue-200">
@@ -346,7 +427,7 @@ export default async function CityPage({
 
             {/* Landmarks Section */}
             <Suspense fallback={<SectionSkeleton />}>
-              <ExperiencesWrapper cityName={city.city} />
+              <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
           </div>
 
@@ -370,21 +451,24 @@ export default async function CityPage({
               <h4 className="text-[11px] font-black tracking-[0.3em] text-white/40 uppercase">
                 Core Metrics
               </h4>
-              <div className="space-y-6">
-                {[
-                  { label: "Cost Index", value: "Premium" },
-                  { label: "Connectivity", value: "Gigabit+" },
-                  { label: "Safety Tier", value: "Alpha" },
-                ].map((item, i) => (
-                  <div key={i} className="group/metric flex items-center justify-between">
-                    <span className="text-xs font-black tracking-widest text-white/40 uppercase transition-colors group-hover/metric:text-white">
-                      {item.label}
-                    </span>
-                    <span className="font-black tracking-tight text-white transition-colors group-hover/metric:text-blue-400">
-                      {item.value}
-                    </span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 gap-4">
+                <MetricCard
+                  icon={CloudIcon}
+                  label="Pollution (PM2.5)"
+                  value={metrics?.pollution_pm25}
+                  unit="µg/m³"
+                  source={metrics?.source?.pollution as string | undefined}
+                />
+                <MetricCard
+                  icon={ThermometerSun}
+                  label="Climate Comfort"
+                  value={metrics?.climate_comfort}
+                  source={metrics?.source?.climate as string | undefined}
+                />
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+                <Activity className="h-4 w-4" />
+                {metrics?.updated_at ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}` : "Pending data"}
               </div>
             </div>
           </div>

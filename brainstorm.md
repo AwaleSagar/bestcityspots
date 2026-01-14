@@ -200,6 +200,13 @@
 - Enhance place descriptions with user-generated content
 - Add "Save for Later" functionality
 - Implement basic offline maps
+- Replace placeholder "Core Metrics" with real (free/open) feeds:
+  - Connectivity: Ookla Open Data (aggregated) or World Bank ICT country avg
+  - Pollution: OpenAQ or WAQI (free tier) for PM2.5/AQI
+  - Climate comfort: Open-Meteo climatology or Meteostat normals (seasonal comfort label)
+  - Safety: country-level advisories (State Dept/OSAC) as coarse indicator
+  - Health access: OSM hospital/clinic counts per city (Overpass) or WHO/World Bank country-level
+  - (Cost index deferred until a paid source is approved)
 
 ### Phase 2: Itinerary Intelligence (4-6 weeks)
 - Build itinerary generator UI

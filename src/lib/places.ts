@@ -2,6 +2,25 @@ import { supabase } from "./supabase";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
+function haversineKm(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export interface Landmark {
   id: string;
   displayName: { text: string };
@@ -15,11 +34,20 @@ export interface Landmark {
 
 export async function getTopPlaces(
   cityName: string,
-  type: "landmarks" | "restaurants" | "hotels"
+  type: "landmarks" | "restaurants" | "hotels",
+  opts?: { lat?: number; lng?: number; radiusKm?: number }
 ): Promise<Landmark[]> {
-  if (!API_KEY) return [];
+  if (!API_KEY) {
+    console.warn(`[places] Missing API key; returning empty for ${cityName} / ${type}`);
+    return [];
+  }
 
   try {
+    const requestedRadiusKm = opts?.radiusKm ?? 90; // generous metro radius; prevents false empties
+    const apiMaxRadiusKm = 50; // Google Places API limit (50,000 meters)
+    const effectiveRadiusKm = Math.min(requestedRadiusKm, apiMaxRadiusKm);
+    const hasCoords = typeof opts?.lat === "number" && typeof opts?.lng === "number";
+
     // 1. Check Supabase Cache first
     const { data: cache } = await supabase
       .from("city_places_cache")
@@ -57,12 +85,60 @@ export async function getTopPlaces(
       body: JSON.stringify({
         textQuery: queryMap[type],
         maxResultCount: 50, // Fetch 50 to have enough for price filtering
+        locationBias: hasCoords
+          ? {
+              circle: {
+                center: { latitude: opts!.lat, longitude: opts!.lng },
+                radius: effectiveRadiusKm * 1000, // meters, capped by API limit
+              },
+            }
+          : undefined,
       }),
     });
 
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.warn(
+        `[places] Google Places response not ok`,
+        cityName,
+        type,
+        response.status,
+        await response.text().catch(() => "")
+      );
+      return [];
+    }
     const data = await response.json();
-    const places = (data.places || []) as Landmark[];
+    let places = (data.places || []) as Landmark[];
+
+    // Filter out obvious outliers when we have coordinates
+    if (hasCoords) {
+      const filtered = places.filter((p: any) => {
+        const location = (p as any).location;
+        const lat = location?.latitude;
+        const lng = location?.longitude;
+        if (typeof lat !== "number" || typeof lng !== "number") return true;
+        return haversineKm(opts!.lat!, opts!.lng!, lat, lng) <= effectiveRadiusKm;
+      });
+
+      // If filtering nuked everything, fall back to the unfiltered list to avoid blank states.
+      places = filtered.length > 0 ? filtered : places;
+
+      if (filtered.length === 0 && places.length > 0) {
+        console.info(
+          `[places] Filter emptied results; fell back to unfiltered`,
+          { cityName, type, requestedRadiusKm, effectiveRadiusKm, total: places.length }
+        );
+      }
+    }
+
+    if (places.length === 0) {
+      console.info("[places] No places returned", {
+        cityName,
+        type,
+        hasCoords,
+        requestedRadiusKm,
+        effectiveRadiusKm,
+      });
+    }
 
     // 3. Save ALL results back to Supabase for deep filtering
     if (places.length > 0) {
