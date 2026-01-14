@@ -439,17 +439,19 @@ export default async function CityPage({
 
           {/* Sidebar / Quick Actions */}
           <div className="space-y-8 lg:sticky lg:top-20 lg:col-span-4">
-            <div className="shadow-3xl group/cta relative space-y-8 overflow-hidden rounded-[2.5rem] md:rounded-[3.5rem] bg-gradient-to-br from-blue-600 to-indigo-800 p-8 md:p-10 text-white shadow-blue-500/20">
-              <div className="absolute top-0 right-0 h-32 w-32 translate-x-10 -translate-y-10 rounded-full bg-white/10 blur-3xl transition-transform duration-1000 group-hover/cta:scale-150" />
-              <h3 className="text-2xl md:text-3xl leading-tight font-black tracking-tighter">
+            <div className="liquid-glass relative space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl">
+              <h3 className="text-2xl md:text-3xl leading-tight font-black tracking-tighter text-white">
                 Explore The Urban <br /> Essence
               </h3>
-              <p className="text-sm leading-relaxed font-bold tracking-wide text-blue-100/70">
+              <p className="text-sm leading-relaxed font-black tracking-wide text-white/60">
                 Unlock exclusive insights and historical landmarks of {city.city} with our premium
                 membership.
               </p>
-              <button className="w-full rounded-[2rem] bg-white py-5 md:py-6 text-base md:text-lg font-black text-blue-600 shadow-xl transition-all hover:bg-gray-100 active:scale-[0.98]">
-                Get Access
+              <button
+                disabled
+                className="w-full rounded-[2rem] border border-white/10 bg-white/5 py-5 md:py-6 text-base md:text-lg font-black text-white/30 shadow-xl cursor-not-allowed"
+              >
+                Coming Soon
               </button>
             </div>
 
