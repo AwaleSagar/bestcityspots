@@ -1,5 +1,6 @@
 "use client";
 
+import type { KeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { searchCities, City } from "@/lib/cities";
 import { fetchTrendingDestinations } from "@/app/actions";
@@ -108,7 +109,7 @@ export default function Home() {
     return highlightFn;
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setActiveIndex((prev) => {
@@ -122,10 +123,12 @@ export default function Home() {
         return prev <= 0 ? searchResults.length - 1 : prev - 1;
       });
     } else if (e.key === "Enter") {
-      if (activeIndex >= 0 && searchResults[activeIndex]) {
-        router.push(`/cities/${searchResults[activeIndex].id}`);
+      const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
+      if (selectedCity) {
+        router.push(`/cities/${selectedCity.id}`);
       } else if (searchResults.length > 0) {
-        router.push(`/cities/${searchResults[0].id}`);
+        const firstCity = searchResults.at(0);
+        if (firstCity) router.push(`/cities/${firstCity.id}`);
       }
     } else if (e.key === "Escape") {
       setSearchQuery("");
@@ -135,10 +138,8 @@ export default function Home() {
   };
 
   const resultsListId = "city-search-results";
-  const activeOptionId =
-    activeIndex >= 0 && searchResults[activeIndex]
-      ? `city-option-${searchResults[activeIndex].id}`
-      : undefined;
+  const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
+  const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
 
   return (
     <main id="main-content" className="min-h-screen bg-transparent font-sans text-foreground">

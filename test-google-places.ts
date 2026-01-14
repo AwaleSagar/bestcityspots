@@ -61,20 +61,25 @@ function mapJsonLayout(
       seen.add(value as object);
     }
 
-    if (Array.isArray(value)) {
-      for (let i = 0; i < Math.min(value.length, maxArrayItemsToSample); i++) {
-        walk(value[i], `${path}[]`, depth + 1);
-      }
-      return;
-    }
-
-    if (value && typeof value === "object") {
-      const obj = value as Record<string, unknown>;
-      for (const key of Object.keys(obj).sort()) {
-        walk(obj[key], path ? `${path}.${key}` : key, depth + 1);
+  if (Array.isArray(value)) {
+    const limit = Math.min(value.length, maxArrayItemsToSample);
+    for (let i = 0; i < limit; i++) {
+      const entry = value.at(i);
+      if (entry !== undefined) {
+        walk(entry, `${path}[]`, depth + 1);
       }
     }
+    return;
   }
+
+  if (value && typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const sortedEntries = Object.entries(obj).sort(([a], [b]) => a.localeCompare(b));
+    sortedEntries.forEach(([key, val]) => {
+      walk(val, path ? `${path}.${key}` : key, depth + 1);
+    });
+  }
+}
 
   walk(root, "", 0);
   return stats;
@@ -100,10 +105,16 @@ function parseArgs(argv: string[]) {
     fieldMask: "places.displayName,places.formattedAddress,places.id",
   };
 
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
-    if (a === "--query" && argv[i + 1]) out.query = argv[++i]!;
-    else if (a === "--fieldMask" && argv[i + 1]) out.fieldMask = argv[++i]!;
+  const args = [...argv];
+  while (args.length > 0) {
+    const current = args.shift();
+    if (current === "--query") {
+      const next = args.shift();
+      if (next) out.query = next;
+    } else if (current === "--fieldMask") {
+      const next = args.shift();
+      if (next) out.fieldMask = next;
+    }
   }
 
   return out;

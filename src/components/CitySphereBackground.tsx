@@ -140,7 +140,7 @@ export default function CitySphereBackground() {
       
       <div ref={containerRef} className="city-sphere">
         {points.map((p, i) => {
-          const label = labels[i] ?? "";
+          const label = labels.at(i) ?? "";
           const isActive = activeIndices.includes(i);
           const depth = (p.z / SPHERE_RADIUS + 1) / 2; // 0 (back) to 1 (front)
           
@@ -201,4 +201,3 @@ export default function CitySphereBackground() {
     </div>
   );
 }
-
