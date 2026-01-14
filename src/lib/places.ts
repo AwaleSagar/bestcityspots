@@ -117,13 +117,11 @@ export async function getTopPlaces(
 
     // Filter out obvious outliers when we have coordinates
     if (hasCoords && typeof centerLat === "number" && typeof centerLng === "number") {
-      const centerLatNum = centerLat;
-      const centerLngNum = centerLng;
       const filtered = places.filter((place) => {
         const lat = place.location?.latitude;
         const lng = place.location?.longitude;
         if (typeof lat !== "number" || typeof lng !== "number") return true;
-        return haversineKm(centerLatNum, centerLngNum, lat, lng) <= effectiveRadiusKm;
+        return haversineKm(centerLat, centerLng, lat, lng) <= effectiveRadiusKm;
       });
 
       // If filtering nuked everything, fall back to the unfiltered list to avoid blank states.
