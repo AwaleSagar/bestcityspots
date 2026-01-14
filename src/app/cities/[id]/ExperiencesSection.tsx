@@ -30,7 +30,9 @@ type SavedPlace = {
 };
 type CityNotes = Record<string, string>;
 
-const sanitizeKey = (key: string) => key.replace(/[^a-zA-Z0-9_-]/g, "_");
+const NOTE_KEY_PREFIX = "k_";
+
+const sanitizeKey = (key: string) => `${NOTE_KEY_PREFIX}${encodeURIComponent(key)}`;
 
 const toNoteMap = (notes: CityNotes) => {
   const map = new Map<string, string>();
@@ -42,11 +44,21 @@ const toNoteMap = (notes: CityNotes) => {
   return map;
 };
 
-const sanitizeNotes = (notes: CityNotes) => Object.fromEntries(toNoteMap(notes)) as CityNotes;
+const sanitizeNotes = (notes: CityNotes) =>
+  Object.fromEntries(
+    Object.entries(notes)
+      .filter(([, value]) => typeof value === "string")
+      .map(([key, value]) => [sanitizeKey(key), value as string])
+  ) as CityNotes;
 
-const parseStoredNotes = (raw: string | null) => {
+const parseStoredNotes = (raw: string | null): Map<string, CityNotes> => {
   if (!raw) return new Map<string, CityNotes>();
-  const parsed = JSON.parse(raw);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return new Map<string, CityNotes>();
+  }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
     return new Map<string, CityNotes>();
   }
@@ -174,28 +186,40 @@ export default function ExperiencesSection({
     }
   };
 
-  const saveNote = (placeId: string, note: string) => {
-    const trimmed = note.trim();
-    const safeId = sanitizeKey(placeId);
+  const updatePlaceNotes = (updater: (map: Map<string, string>) => void) => {
     setPlaceNotes((prev) => {
       const map = toNoteMap(prev);
-      if (trimmed) {
-        map.set(safeId, trimmed);
-      } else {
-        map.delete(safeId);
-      }
+      updater(map);
       const next = Object.fromEntries(map) as CityNotes;
       persistCityNotes(next);
       return next;
     });
   };
 
-  const clearNote = (placeId: string) => {
-    const safeId = sanitizeKey(placeId);
+  const updateDraftNotes = (updater: (map: Map<string, string>) => void) => {
     setDraftNotes((prev) => {
       const map = toNoteMap(prev);
-      map.delete(safeId);
+      updater(map);
       return Object.fromEntries(map) as CityNotes;
+    });
+  };
+
+  const saveNote = (placeId: string, note: string) => {
+    const trimmed = note.trim();
+    const safeId = sanitizeKey(placeId);
+    updatePlaceNotes((map) => {
+      if (trimmed) {
+        map.set(safeId, trimmed);
+      } else {
+        map.delete(safeId);
+      }
+    });
+  };
+
+  const clearNote = (placeId: string) => {
+    const safeId = sanitizeKey(placeId);
+    updateDraftNotes((map) => {
+      map.delete(safeId);
     });
     saveNote(placeId, "");
   };
@@ -214,9 +238,10 @@ export default function ExperiencesSection({
 
   const getCommunityInsights = (types?: string[]) => {
     if (!types || types.length === 0) return [];
-    const primary = types[0];
+    const primary = types.at(0);
+    if (!primary) return ["Locals love off-peak hours here", "Great photo spot near the entrance"];
     const normalizedKey = primary.toUpperCase();
-    const fallbacks = communitySnippetsMap.get(normalizedKey);
+    const fallbacks = communitySnippetsMap.get(normalizedKey) || communitySnippetsMap.get(primary);
     if (fallbacks && fallbacks.length > 0) return fallbacks.slice(0, 2);
     // Generic fallback
     return ["Locals love off-peak hours here", "Great photo spot near the entrance"];
@@ -258,8 +283,10 @@ export default function ExperiencesSection({
 
   const formatType = (types?: string[]) => {
     if (!types || types.length === 0) return "Point of Interest";
-    const primary = types[0].replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-    return primary;
+    const primary = types.at(0);
+    if (!primary) return "Point of Interest";
+    const formatted = primary.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+    return formatted;
   };
 
   const getPriceLevel = (level?: string) => {
@@ -535,10 +562,8 @@ export default function ExperiencesSection({
                             value={noteValue}
                             onChange={(e) => {
                               const value = e.target.value.slice(0, 280);
-                              setDraftNotes((prev) => {
-                                const map = toNoteMap(prev);
+                              updateDraftNotes((map) => {
                                 map.set(safePlaceId, value);
-                                return Object.fromEntries(map) as CityNotes;
                               });
                             }}
                             rows={2}

@@ -79,12 +79,17 @@ export async function getTopPlaces(
       restaurants: `Best restaurants and fine dining in ${cityName}`,
       hotels: `Top rated hotels and luxury stays in ${cityName}`,
     };
-    const queryText =
-      type === "landmarks"
-        ? queryMap.landmarks
-        : type === "restaurants"
-          ? queryMap.restaurants
-          : queryMap.hotels;
+    const queryText = (() => {
+      switch (type) {
+        case "landmarks":
+          return queryMap.landmarks;
+        case "restaurants":
+          return queryMap.restaurants;
+        case "hotels":
+        default:
+          return queryMap.hotels;
+      }
+    })();
 
     const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
       method: "POST",

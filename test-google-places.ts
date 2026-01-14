@@ -62,9 +62,13 @@ function mapJsonLayout(
     }
 
   if (Array.isArray(value)) {
-    value.slice(0, maxArrayItemsToSample).forEach((entry) => {
-      walk(entry, `${path}[]`, depth + 1);
-    });
+    const limit = Math.min(value.length, maxArrayItemsToSample);
+    for (let i = 0; i < limit; i++) {
+      const entry = value.at(i);
+      if (entry !== undefined) {
+        walk(entry, `${path}[]`, depth + 1);
+      }
+    }
     return;
   }
 
