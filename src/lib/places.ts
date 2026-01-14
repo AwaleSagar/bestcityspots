@@ -79,6 +79,12 @@ export async function getTopPlaces(
       restaurants: `Best restaurants and fine dining in ${cityName}`,
       hotels: `Top rated hotels and luxury stays in ${cityName}`,
     };
+    const queryText =
+      type === "landmarks"
+        ? queryMap.landmarks
+        : type === "restaurants"
+          ? queryMap.restaurants
+          : queryMap.hotels;
 
     const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
       method: "POST",
@@ -89,7 +95,7 @@ export async function getTopPlaces(
           "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location",
       },
       body: JSON.stringify({
-        textQuery: queryMap[type],
+        textQuery: queryText,
         maxResultCount: 50, // Fetch 50 to have enough for price filtering
         locationBias: hasCoords
           ? {

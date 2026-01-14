@@ -30,6 +30,33 @@ type SavedPlace = {
 };
 type CityNotes = Record<string, string>;
 
+const sanitizeKey = (key: string) => key.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+const toNoteMap = (notes: CityNotes) => {
+  const map = new Map<string, string>();
+  Object.entries(notes).forEach(([key, value]) => {
+    if (typeof value === "string") {
+      map.set(sanitizeKey(key), value);
+    }
+  });
+  return map;
+};
+
+const sanitizeNotes = (notes: CityNotes) => Object.fromEntries(toNoteMap(notes)) as CityNotes;
+
+const parseStoredNotes = (raw: string | null) => {
+  if (!raw) return new Map<string, CityNotes>();
+  const parsed = JSON.parse(raw);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return new Map<string, CityNotes>();
+  }
+  return new Map(
+    Object.entries(parsed)
+      .filter(([, value]) => value && typeof value === "object" && !Array.isArray(value))
+      .map(([key, value]) => [sanitizeKey(key), sanitizeNotes(value as CityNotes)])
+  );
+};
+
 const communitySnippets: Record<string, string[]> = {
   TOURIST_ATTRACTION: [
     "Arrive early to skip queues",
@@ -67,6 +94,7 @@ const communitySnippets: Record<string, string[]> = {
     "Lobby bar is quieter before 7pm",
   ],
 };
+const communitySnippetsMap = new Map<string, string[]>(Object.entries(communitySnippets));
 
 interface ExperiencesSectionProps {
   cityName: string;
@@ -119,18 +147,12 @@ export default function ExperiencesSection({
   useEffect(() => {
     try {
       const raw = typeof window !== "undefined" ? localStorage.getItem(NOTES_STORAGE_KEY) : null;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const cityNotes =
-          parsed && typeof parsed === "object" && parsed[cityName] && typeof parsed[cityName] === "object"
-            ? (parsed[cityName] as CityNotes)
-            : {};
-        setPlaceNotes(cityNotes);
-        setDraftNotes(cityNotes);
-      } else {
-        setPlaceNotes({});
-        setDraftNotes({});
-      }
+      const safeKey = sanitizeKey(cityName);
+      const notesMap = parseStoredNotes(raw);
+      const cityNotes = notesMap.get(safeKey) ?? {};
+      const safeNotes = sanitizeNotes(cityNotes);
+      setPlaceNotes(safeNotes);
+      setDraftNotes(safeNotes);
     } catch (e) {
       console.warn("Unable to read place notes:", e);
       setPlaceNotes({});
@@ -144,10 +166,9 @@ export default function ExperiencesSection({
     if (!notesHydrated || typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem(NOTES_STORAGE_KEY);
-      const parsed = raw ? JSON.parse(raw) : {};
-      const safe = parsed && typeof parsed === "object" ? parsed : {};
-      safe[cityName] = nextNotes;
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(safe));
+      const notesMap = parseStoredNotes(raw);
+      notesMap.set(sanitizeKey(cityName), sanitizeNotes(nextNotes));
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(Object.fromEntries(notesMap)));
     } catch (e) {
       console.warn("Unable to persist place notes:", e);
     }
@@ -155,23 +176,26 @@ export default function ExperiencesSection({
 
   const saveNote = (placeId: string, note: string) => {
     const trimmed = note.trim();
+    const safeId = sanitizeKey(placeId);
     setPlaceNotes((prev) => {
-      const next = { ...prev };
+      const map = toNoteMap(prev);
       if (trimmed) {
-        next[placeId] = trimmed;
+        map.set(safeId, trimmed);
       } else {
-        delete next[placeId];
+        map.delete(safeId);
       }
+      const next = Object.fromEntries(map) as CityNotes;
       persistCityNotes(next);
       return next;
     });
   };
 
   const clearNote = (placeId: string) => {
+    const safeId = sanitizeKey(placeId);
     setDraftNotes((prev) => {
-      const next = { ...prev };
-      delete next[placeId];
-      return next;
+      const map = toNoteMap(prev);
+      map.delete(safeId);
+      return Object.fromEntries(map) as CityNotes;
     });
     saveNote(placeId, "");
   };
@@ -191,7 +215,8 @@ export default function ExperiencesSection({
   const getCommunityInsights = (types?: string[]) => {
     if (!types || types.length === 0) return [];
     const primary = types[0];
-    const fallbacks = communitySnippets[primary] || communitySnippets[primary.toUpperCase()];
+    const normalizedKey = primary.toUpperCase();
+    const fallbacks = communitySnippetsMap.get(normalizedKey);
     if (fallbacks && fallbacks.length > 0) return fallbacks.slice(0, 2);
     // Generic fallback
     return ["Locals love off-peak hours here", "Great photo spot near the entrance"];
@@ -202,6 +227,14 @@ export default function ExperiencesSection({
     { id: "restaurants", label: "Dining", icon: Utensils },
     { id: "hotels", label: "Stays", icon: Hotel },
   ] as const;
+
+  const priceLevelLabels = new Map<string, string>([
+    ["PRICE_LEVEL_FREE", "Free"],
+    ["PRICE_LEVEL_INEXPENSIVE", "$"],
+    ["PRICE_LEVEL_MODERATE", "$$"],
+    ["PRICE_LEVEL_EXPENSIVE", "$$$"],
+    ["PRICE_LEVEL_VERY_EXPENSIVE", "$$$$"],
+  ]);
 
   const priceLevels = [
     { id: "PRICE_LEVEL_INEXPENSIVE", label: "$" },
@@ -231,14 +264,7 @@ export default function ExperiencesSection({
 
   const getPriceLevel = (level?: string) => {
     if (!level) return null;
-    const map: Record<string, string> = {
-      PRICE_LEVEL_FREE: "Free",
-      PRICE_LEVEL_INEXPENSIVE: "$",
-      PRICE_LEVEL_MODERATE: "$$",
-      PRICE_LEVEL_EXPENSIVE: "$$$",
-      PRICE_LEVEL_VERY_EXPENSIVE: "$$$$",
-    };
-    return map[level] || null;
+    return priceLevelLabels.get(level) || null;
   };
 
   const savedForCity = useMemo(
@@ -247,6 +273,9 @@ export default function ExperiencesSection({
   );
 
   const savedIds = useMemo(() => new Set(savedForCity.map((place) => place.id)), [savedForCity]);
+
+  const draftNotesMap = useMemo(() => toNoteMap(draftNotes), [draftNotes]);
+  const placeNotesMap = useMemo(() => toNoteMap(placeNotes), [placeNotes]);
 
   const toggleSave = (place: Landmark, type: "landmarks" | "restaurants" | "hotels") => {
     setSavedPlaces((prev) => {
@@ -379,8 +408,9 @@ export default function ExperiencesSection({
           className="grid grid-cols-1 gap-4"
         >
           {displayData.map((item) => {
-            const noteValue = draftNotes[item.id] ?? "";
-            const savedNote = placeNotes[item.id];
+            const safePlaceId = sanitizeKey(item.id);
+            const noteValue = draftNotesMap.get(safePlaceId) ?? "";
+            const savedNote = placeNotesMap.get(safePlaceId);
             const isExpanded = expandedCards.has(item.id) || !!savedNote || !!noteValue;
 
             return (
@@ -503,12 +533,14 @@ export default function ExperiencesSection({
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
                           <textarea
                             value={noteValue}
-                            onChange={(e) =>
-                              setDraftNotes((prev) => ({
-                                ...prev,
-                                [item.id]: e.target.value.slice(0, 280),
-                              }))
-                            }
+                            onChange={(e) => {
+                              const value = e.target.value.slice(0, 280);
+                              setDraftNotes((prev) => {
+                                const map = toNoteMap(prev);
+                                map.set(safePlaceId, value);
+                                return Object.fromEntries(map) as CityNotes;
+                              });
+                            }}
                             rows={2}
                             maxLength={280}
                             className="w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition focus:border-blue-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-blue-500/20"
