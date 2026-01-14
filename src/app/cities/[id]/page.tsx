@@ -139,21 +139,31 @@ function MetricCard({
   );
 
   return (
-    <div className="rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-5 flex flex-col gap-4">
-      <div className="flex items-start justify-between gap-4">
+    <div className="group/metric relative overflow-hidden rounded-[1.5rem] border border-white/5 bg-white/[0.02] p-5 flex flex-col gap-4">
+      {/* Technical Scan Decoration */}
+      <div className="pointer-events-none absolute inset-0 -z-0 opacity-0 transition-opacity duration-700 group-hover/metric:opacity-100">
+        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+      </div>
+
+      <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03]">
-            <Icon className="h-5 w-5 text-blue-300" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] transition-all duration-500 group-hover/metric:border-blue-500/30 group-hover/metric:bg-blue-500/10">
+            <Icon className="h-5 w-5 text-blue-300 transition-colors group-hover/metric:text-blue-400" />
           </div>
           <div>
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
-              {label}
+            <div className="flex items-center gap-2">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
+                {label}
+              </div>
+              <div className="hidden text-[8px] font-mono text-blue-500/30 group-hover/metric:block">
+                ID_{Math.random().toString(16).slice(2, 6).toUpperCase()}
+              </div>
             </div>
             {display}
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-white/5 pt-3">
+      <div className="relative z-10 flex items-center justify-between border-t border-white/5 pt-3">
         <div className="text-[9px] font-black uppercase tracking-[0.2em] text-white/20">
           Data Source
         </div>
@@ -444,8 +454,7 @@ export default async function CityPage({
                 Explore The Urban <br /> Essence
               </h3>
               <p className="text-sm leading-relaxed font-black tracking-wide text-white/60">
-                Unlock exclusive insights and historical landmarks of {city.city} with our premium
-                membership.
+                Grab a custom-tailored, fun-filled itinerary for {city.city}—just <span className="text-xl italic text-white">$0.99!</span> Unlock hidden gems and local secrets instantly.
               </p>
               <button
                 disabled

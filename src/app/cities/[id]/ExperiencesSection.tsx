@@ -285,9 +285,8 @@ export default function ExperiencesSection({
                   setActiveTab(tab.id);
                   setSelectedPrice(null); // Reset price when tab changes
                 }}
-                className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] transition-all duration-500 ${
-                  isActive ? "text-white" : "text-white/30 hover:text-white/50"
-                }`}
+                className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] transition-all duration-500 ${isActive ? "text-white" : "text-white/30 hover:text-white/50"
+                  }`}
               >
                 {isActive && (
                   <motion.div
@@ -297,9 +296,8 @@ export default function ExperiencesSection({
                   />
                 )}
                 <Icon
-                  className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-colors ${
-                    isActive ? "text-blue-400" : "text-white/20"
-                  }`}
+                  className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-colors ${isActive ? "text-blue-400" : "text-white/20"
+                    }`}
                 />
                 <span className="relative z-10">{tab.label}</span>
               </button>
@@ -318,11 +316,10 @@ export default function ExperiencesSection({
             >
               <button
                 onClick={() => setSelectedPrice(null)}
-                className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                  selectedPrice === null
-                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                    : "text-white/20 hover:text-white/40 border border-transparent"
-                }`}
+                className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === null
+                  ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  : "text-white/20 hover:text-white/40 border border-transparent"
+                  }`}
               >
                 ALL
               </button>
@@ -330,11 +327,10 @@ export default function ExperiencesSection({
                 <button
                   key={level.id}
                   onClick={() => setSelectedPrice(level.id)}
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                    selectedPrice === level.id
-                      ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                      : "text-white/20 hover:text-white/40 border border-transparent"
-                  }`}
+                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === level.id
+                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                    : "text-white/20 hover:text-white/40 border border-transparent"
+                    }`}
                 >
                   {level.label}
                 </button>
@@ -450,11 +446,10 @@ export default function ExperiencesSection({
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => toggleSave(item, activeTab)}
-                        className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-[11px] font-black uppercase tracking-[0.15em] transition-all ${
-                          savedIds.has(item.id)
-                            ? "border-blue-500/30 bg-blue-500/10 text-blue-200 hover:border-blue-400/50"
-                            : "border-white/10 bg-white/[0.03] text-white/50 hover:border-blue-500/20 hover:text-white"
-                        }`}
+                        className={`flex w-28 items-center justify-center gap-2 rounded-xl border py-2 text-[11px] font-black uppercase tracking-[0.15em] transition-all ${savedIds.has(item.id)
+                          ? "border-blue-500/30 bg-blue-500/10 text-blue-200 hover:border-blue-400/50"
+                          : "border-white/10 bg-white/[0.03] text-white/50 hover:border-blue-500/20 hover:text-white"
+                          }`}
                         aria-pressed={savedIds.has(item.id)}
                       >
                         {savedIds.has(item.id) ? (
@@ -471,7 +466,7 @@ export default function ExperiencesSection({
                       </button>
                       <button
                         onClick={() => toggleExpand(item.id)}
-                        className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-white/60 transition hover:border-blue-500/30 hover:text-white"
+                        className="flex w-28 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] py-2 text-[11px] font-black uppercase tracking-[0.15em] text-white/60 transition hover:border-blue-500/30 hover:text-white"
                         aria-expanded={isExpanded}
                       >
                         {isExpanded ? "Hide notes" : "Add insight"}

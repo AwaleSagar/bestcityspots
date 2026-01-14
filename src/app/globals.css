@@ -177,3 +177,15 @@
 .animate-slow-fade-in {
   animation: slow-fade-in 1.4s var(--transition-fluid) forwards;
 }
+@keyframes scan {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(1000%);
+  }
+}
+
+.animate-scan {
+  animation: scan 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}

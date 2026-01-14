@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "Discover your next destination with our curated database of world cities.",
 };
 
+import VisualEffects from "@/components/VisualEffects";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -27,12 +29,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen overflow-x-hidden antialiased selection:bg-blue-500/30 selection:text-blue-200`}
       >
-        {/* Liquid Sexy Background Elements */}
-        <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-          <div className="orb top-[-100px] left-[-100px] h-[500px] w-[500px] bg-blue-600/20" />
-          <div className="orb animation-delay-2000 right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-purple-600/20" />
-          <div className="orb animation-delay-4000 top-[40%] left-[20%] h-[300px] w-[300px] bg-indigo-600/20" />
-        </div>
+        <VisualEffects />
         {children}
       </body>
     </html>
