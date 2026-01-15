@@ -12,12 +12,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Best City Spots - Explore the World",
   description: "Discover your next destination with our curated database of world cities.",
   applicationName: "Best City Spots",
   referrer: "origin-when-cross-origin",
   category: "travel",
+  alternates: {
+    canonical: "/",
+  },
   robots: {
     index: true,
     follow: true,
@@ -26,6 +32,8 @@ export const metadata: Metadata = {
     title: "Best City Spots - Explore the World",
     description: "Discover your next destination with our curated database of world cities.",
     type: "website",
+    url: "/",
+    siteName: "Best City Spots",
   },
   twitter: {
     card: "summary_large_image",
