@@ -62,6 +62,7 @@ export const metadata: Metadata = {
   },
 };
 
+import Link from "next/link";
 import VisualEffects from "@/components/VisualEffects";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -82,7 +83,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="fixed right-4 top-4 z-[200]">
+          <div className="fixed right-4 top-4 z-[200] flex items-center gap-3">
+            <Link
+              href="/about"
+              className="rounded-full border border-foreground/10 bg-foreground/[0.04] px-4 py-2 text-[10px] font-black tracking-[0.2em] text-foreground/70 uppercase transition hover:border-foreground/30 hover:text-foreground"
+            >
+              About
+            </Link>
             <ThemeToggle />
           </div>
           <a
