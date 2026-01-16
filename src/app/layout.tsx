@@ -19,6 +19,17 @@ export const metadata: Metadata = {
   title: "Best City Spots - Explore the World",
   description: "Discover your next destination with our curated database of world cities.",
   applicationName: "Best City Spots",
+  keywords: [
+    "best cities",
+    "city guides",
+    "travel inspiration",
+    "urban intelligence",
+    "city metrics",
+    "destination discovery",
+  ],
+  authors: [{ name: "Best City Spots", url: siteUrl }],
+  creator: "Best City Spots",
+  publisher: "Best City Spots",
   referrer: "origin-when-cross-origin",
   category: "travel",
   alternates: {
@@ -34,11 +45,20 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     siteName: "Best City Spots",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Best City Spots - Urban Intelligence",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Best City Spots - Explore the World",
     description: "Discover your next destination with our curated database of world cities.",
+    images: ["/opengraph-image"],
   },
 };
 
