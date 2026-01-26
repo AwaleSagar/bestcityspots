@@ -4,6 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import { Landmark } from "@/lib/places";
 import { formatPopulation } from "@/lib/format";
 import {
+  getJsonStorageItem,
+  getStorageItem,
+  setJsonStorageItem,
+} from "@/lib/storage";
+import {
   Compass,
   Star,
   Ticket,
@@ -134,56 +139,37 @@ export default function ExperiencesSection({
 
   // Load saved places from localStorage on mount
   useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setSavedPlaces(parsed);
-        }
-      }
-    } catch (e) {
-      console.warn("Unable to read saved places:", e);
-    } finally {
-      setIsHydrated(true);
+    const parsed = getJsonStorageItem<SavedPlace[]>(STORAGE_KEY, []);
+    if (Array.isArray(parsed)) {
+      setSavedPlaces(parsed);
     }
+    setIsHydrated(true);
   }, []);
 
   // Persist saved places when they change
   useEffect(() => {
-    if (!isHydrated || typeof window === "undefined") return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(savedPlaces));
+    if (!isHydrated) return;
+    setJsonStorageItem(STORAGE_KEY, savedPlaces);
   }, [isHydrated, savedPlaces]);
 
   // Load notes for this city from localStorage
   useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem(NOTES_STORAGE_KEY) : null;
-      const safeKey = sanitizeKey(cityName);
-      const notesMap = parseStoredNotes(raw);
-      const cityNotes = notesMap.get(safeKey) ?? {};
-      const safeNotes = sanitizeNotes(cityNotes);
-      setPlaceNotes(safeNotes);
-      setDraftNotes(safeNotes);
-    } catch (e) {
-      console.warn("Unable to read place notes:", e);
-      setPlaceNotes({});
-      setDraftNotes({});
-    } finally {
-      setNotesHydrated(true);
-    }
+    const raw = getStorageItem(NOTES_STORAGE_KEY);
+    const safeKey = sanitizeKey(cityName);
+    const notesMap = parseStoredNotes(raw);
+    const cityNotes = notesMap.get(safeKey) ?? {};
+    const safeNotes = sanitizeNotes(cityNotes);
+    setPlaceNotes(safeNotes);
+    setDraftNotes(safeNotes);
+    setNotesHydrated(true);
   }, [cityName]);
 
   const persistCityNotes = (nextNotes: CityNotes) => {
-    if (!notesHydrated || typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem(NOTES_STORAGE_KEY);
-      const notesMap = parseStoredNotes(raw);
-      notesMap.set(sanitizeKey(cityName), sanitizeNotes(nextNotes));
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(Object.fromEntries(notesMap)));
-    } catch (e) {
-      console.warn("Unable to persist place notes:", e);
-    }
+    if (!notesHydrated) return;
+    const raw = getStorageItem(NOTES_STORAGE_KEY);
+    const notesMap = parseStoredNotes(raw);
+    notesMap.set(sanitizeKey(cityName), sanitizeNotes(nextNotes));
+    setJsonStorageItem(NOTES_STORAGE_KEY, Object.fromEntries(notesMap));
   };
 
   const updatePlaceNotes = (updater: (map: Map<string, string>) => void) => {

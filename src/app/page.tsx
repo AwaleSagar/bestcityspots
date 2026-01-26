@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { searchCities, City } from "@/lib/cities";
 import { fetchTrendingDestinations } from "@/app/actions";
 import { formatPopulation } from "@/lib/format";
+import { getJsonStorageItem, setJsonStorageItem } from "@/lib/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity } from "lucide-react";
 import Link from "next/link";
@@ -27,14 +28,8 @@ export default function Home() {
       const cities = await fetchTrendingDestinations();
       setTopCities(cities);
 
-      const saved = localStorage.getItem("atlas_recent_searches");
-      if (saved) {
-        try {
-          setRecentCities(JSON.parse(saved));
-        } catch (e) {
-          console.warn("Failed to load recent searches", e);
-        }
-      }
+      const saved = getJsonStorageItem<City[]>("atlas_recent_searches", []);
+      if (saved.length > 0) setRecentCities(saved);
     };
     loadData();
   }, []);
@@ -44,7 +39,7 @@ export default function Home() {
     setRecentCities((prev) => {
       const filtered = prev.filter((c) => c.id !== city.id);
       const next = [city, ...filtered].slice(0, 5);
-      localStorage.setItem("atlas_recent_searches", JSON.stringify(next));
+      setJsonStorageItem("atlas_recent_searches", next);
       return next;
     });
   };
