@@ -91,7 +91,7 @@ export default function Home() {
             part.toLowerCase() === query.toLowerCase() ? (
               <mark
                 key={i}
-                className="rounded-sm bg-blue-500/20 px-0.5 font-bold text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+                className="rounded-sm bg-purple-500/20 px-0.5 font-bold text-purple-400 shadow-[0_0_15px_rgba(147,51,234,0.2)]"
               >
                 {part}
               </mark>
@@ -192,7 +192,7 @@ export default function Home() {
               Best City <br /> Spots
             </span>
             {/* Liquid Glow Underlay */}
-            <div className="absolute top-1/2 left-1/2 -z-10 h-64 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500/5 blur-[120px]" />
+            <div className="absolute top-1/2 left-1/2 -z-10 h-64 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/5 blur-[120px]" />
           </h1>
 
           <div className="mx-auto max-w-lg space-y-2">
@@ -200,7 +200,7 @@ export default function Home() {
               Exploring the world&apos;s most <span className="text-foreground/90 italic">vibrant</span> urban centers through a <span className="text-foreground/90">premium intelligence</span> lens.
             </p>
             <div className="flex items-center justify-center gap-2 pt-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.8)]" />
               <span className="text-[11px] font-black tracking-[0.2em] text-foreground/40 uppercase">
                 Real-time Data Active
               </span>
@@ -221,7 +221,7 @@ export default function Home() {
           </label>
 
           <div className="group relative">
-            <Search className="absolute top-1/2 left-6 md:left-8 h-5 w-5 md:h-6 md:w-6 -translate-y-1/2 text-gray-500 transition-all duration-500 group-focus-within:text-blue-400" />
+            <Search className="absolute top-1/2 left-6 md:left-8 h-5 w-5 md:h-6 md:w-6 -translate-y-1/2 text-gray-500 transition-all duration-500 group-focus-within:text-purple-400" />
             <input
               id="city-search"
               ref={inputRef}
@@ -239,7 +239,7 @@ export default function Home() {
               aria-expanded={shouldShowResults}
               aria-controls={resultsListId}
               aria-activedescendant={activeOptionId}
-              className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-foreground/10 bg-foreground/[0.03] py-5 md:py-8 pr-16 md:pr-20 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl dark:shadow-black shadow-foreground/5 transition-all duration-700 outline-none hover:bg-foreground/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
+              className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-foreground/10 bg-foreground/[0.03] py-5 md:py-8 pr-16 md:pr-20 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl dark:shadow-black shadow-foreground/5 transition-all duration-700 outline-none hover:bg-foreground/[0.05] focus:border-purple-500/40 focus:ring-4 focus:ring-purple-500/10"
             />
 
             {/* Principle 4: Contrast - Loading indicator */}
@@ -248,7 +248,7 @@ export default function Home() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="h-7 w-7 rounded-full border-2 border-blue-500/10 border-t-blue-500"
+                  className="h-7 w-7 rounded-full border-2 border-purple-500/10 border-t-purple-500"
                 />
               )}
               <button
@@ -256,9 +256,9 @@ export default function Home() {
                 onClick={handleLocate}
                 disabled={isLocating}
                 aria-label="Use current location"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] text-foreground/50 transition hover:border-blue-500/30 hover:text-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] text-foreground/50 transition-colors duration-100 hover:border-purple-500/30 hover:text-purple-400 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                <LocateFixed className="h-4 w-4" />
+                <LocateFixed className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -272,9 +272,9 @@ export default function Home() {
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
-                  className={`rounded-full px-4 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all border ${
+                  className={`rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-colors duration-100 border min-h-[44px] ${
                     activeFilter === filter.id
-                      ? "bg-blue-500/10 border-blue-500/40 text-blue-400"
+                      ? "bg-purple-500/10 border-purple-500/40 text-purple-400"
                       : "bg-foreground/[0.03] border-foreground/5 text-foreground/40 hover:text-foreground/60"
                   }`}
                 >
@@ -285,9 +285,9 @@ export default function Home() {
             <div className="text-[11px] font-black tracking-[0.3em] uppercase">
               <div className="text-foreground/40" aria-live="polite">
                 {isLocating ? (
-                  <span className="animate-pulse text-blue-400/80">Locating...</span>
+                  <span className="animate-pulse text-purple-400/80">Locating...</span>
                 ) : isSearching ? (
-                  <span className="animate-pulse text-blue-400/80">Analyzing Data...</span>
+                  <span className="animate-pulse text-purple-400/80">Analyzing Data...</span>
                 ) : shouldShowResults ? (
                   <span className="text-foreground/60">{searchResults.length} matches</span>
                 ) : (
@@ -376,8 +376,8 @@ export default function Home() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className={`group/item cursor-pointer transition-all duration-500 ${
-                        activeIndex === idx ? "bg-blue-500/15" : "hover:bg-foreground/5"
+                      className={`group/item cursor-pointer transition-colors duration-100 ${
+                        activeIndex === idx ? "bg-purple-500/15" : "hover:bg-foreground/5"
                       }`}
                       role="option"
                       aria-selected={activeIndex === idx}
@@ -391,17 +391,17 @@ export default function Home() {
                       >
                         <div className="flex min-w-0 items-center gap-4 md:gap-6">
                           <div
-                            className={`flex h-12 w-12 md:h-14 md:w-14 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02] transition-all duration-700 ${
+                            className={`flex h-12 w-12 md:h-14 md:w-14 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02] transition-all duration-100 ${
                               activeIndex === idx
-                                ? "scale-110 border-blue-500/40 bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.2)]"
+                                ? "scale-110 border-purple-500/40 bg-purple-500/20 shadow-[0_0_20px_rgba(147,51,234,0.2)]"
                                 : "group-hover/item:scale-105 group-hover/item:bg-foreground/5"
                             }`}
                           >
                             <MapPin
-                              className={`h-5 w-5 md:h-6 md:w-6 transition-colors duration-500 ${
+                              className={`h-5 w-5 md:h-6 md:w-6 transition-colors duration-100 ${
                                 activeIndex === idx
-                                  ? "text-blue-400"
-                                  : "text-foreground/20 group-hover/item:text-blue-400/60"
+                                  ? "text-purple-400"
+                                  : "text-foreground/20 group-hover/item:text-purple-400/60"
                               }`}
                             />
                           </div>
@@ -420,15 +420,15 @@ export default function Home() {
                                 </span>
                               )}
                               {city.population > 5000000 && (
-                                <span className="rounded-md bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[8px] uppercase tracking-widest text-blue-400 font-black">
+                                <span className="rounded-md bg-teal-500/10 border border-teal-500/20 px-1.5 py-0.5 text-[8px] uppercase tracking-widest text-teal-400 font-black">
                                   Megacity
                                 </span>
                               )}
                             </div>
                             <div
-                              className={`text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase transition-colors duration-500 flex items-center gap-2 ${
+                              className={`text-[10px] md:text-[11px] font-black tracking-[0.2em] uppercase transition-colors duration-100 flex items-center gap-2 ${
                                 activeIndex === idx
-                                  ? "text-blue-400/80"
+                                  ? "text-purple-400/80"
                                   : "text-foreground/40 group-hover/item:text-foreground/60"
                               }`}
                             >
@@ -445,9 +445,9 @@ export default function Home() {
                         <div className="flex flex-shrink-0 items-center gap-6">
                           <div className="hidden text-right sm:block">
                             <div
-                              className={`text-xl font-black transition-colors duration-500 ${
+                              className={`text-xl font-black transition-colors duration-100 ${
                                 activeIndex === idx
-                                  ? "text-blue-500/50"
+                                  ? "text-purple-500/50"
                                   : "text-foreground/[0.1] group-hover/item:text-foreground/[0.2]"
                               }`}
                             >
@@ -455,13 +455,13 @@ export default function Home() {
                             </div>
                           </div>
                           <div
-                            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-700 ${
+                            className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-100 ${
                               activeIndex === idx
-                                ? "translate-x-0 border-blue-500/50 bg-blue-500/20 opacity-100"
+                                ? "translate-x-0 border-purple-500/50 bg-purple-500/20 opacity-100"
                                 : "-translate-x-4 border-foreground/5 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
                             }`}
                           >
-                            <ArrowRight className="h-5 w-5 text-blue-400" />
+                            <ArrowRight className="h-5 w-5 text-purple-400" />
                           </div>
                         </div>
                       </Link>

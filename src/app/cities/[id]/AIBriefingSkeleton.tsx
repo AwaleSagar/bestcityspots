@@ -3,10 +3,10 @@ import { Sparkles, CalendarRange } from "lucide-react";
 export default function AIBriefingSkeleton() {
   return (
     <section className="space-y-6 rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-6 md:rounded-[3rem] md:p-10 shadow-2xl">
-      <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
-        <Sparkles className="h-4 w-4 text-blue-300 animate-pulse" />
+      <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+        <Sparkles className="h-4 w-4 text-purple-300 animate-pulse" />
         <span className="animate-pulse">AI City Briefing</span>
-        <span className="ml-auto text-[10px] font-black tracking-[0.2em] text-blue-400/60 uppercase animate-pulse">
+        <span className="ml-auto text-[10px] font-black tracking-[0.2em] text-purple-400/60 uppercase animate-pulse">
           Generating...
         </span>
       </div>
@@ -41,7 +41,7 @@ export default function AIBriefingSkeleton() {
         {/* Seasons skeleton */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-            <CalendarRange className="h-4 w-4 text-blue-300" />
+            <CalendarRange className="h-4 w-4 text-purple-300" />
             Seasons
           </div>
           <div className="space-y-3">

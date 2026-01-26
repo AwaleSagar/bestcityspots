@@ -327,18 +327,18 @@ export default function ExperiencesSection({
                   setActiveTab(tab.id);
                   setSelectedPrice(null); // Reset price when tab changes
                 }}
-                className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] transition-all duration-500 ${isActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/50"
+                className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] transition-colors duration-100 ${isActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/50"
                   }`}
               >
                 {isActive && (
                   <motion.div
                     layoutId="active-tab"
-                    className="absolute inset-0 bg-blue-500/10 border border-blue-500/20 rounded-xl md:rounded-2xl"
+                    className="absolute inset-0 bg-purple-500/10 border border-purple-500/20 rounded-xl md:rounded-2xl"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
                 <Icon
-                  className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-colors ${isActive ? "text-blue-400" : "text-foreground/20"
+                  className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-colors duration-100 ${isActive ? "text-purple-400" : "text-foreground/20"
                     }`}
                 />
                 <span className="relative z-10">{tab.label}</span>
@@ -359,7 +359,7 @@ export default function ExperiencesSection({
               <button
                 onClick={() => setSelectedPrice(null)}
                 className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === null
-                  ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                   : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                   }`}
               >
@@ -370,7 +370,7 @@ export default function ExperiencesSection({
                   key={level.id}
                   onClick={() => setSelectedPrice(level.id)}
                   className={`px-4 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === level.id
-                    ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                    ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
                     : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                     }`}
                 >
@@ -384,7 +384,7 @@ export default function ExperiencesSection({
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 rounded-2xl border border-foreground/5 bg-foreground/[0.02] px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-foreground/60">
-          <Bookmark className="h-4 w-4 text-blue-400/80" />
+          <Bookmark className="h-4 w-4 text-purple-400/80" />
           <span>
             {savedForCity.length} saved in {cityName}
           </span>
@@ -399,11 +399,11 @@ export default function ExperiencesSection({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition hover:border-blue-500/30 hover:bg-blue-500/10 hover:text-foreground"
+              className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-colors duration-100 hover:border-purple-500/30 hover:bg-purple-500/10 hover:text-foreground"
             >
-              <BookmarkCheck className="h-4 w-4 text-blue-400/80" />
+              <BookmarkCheck className="h-4 w-4 text-purple-400/80" />
               <span className="line-clamp-1">{item.name}</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 group-hover:text-blue-200">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/40 group-hover:text-purple-200">
                 {item.type}
               </span>
             </motion.a>
@@ -429,7 +429,7 @@ export default function ExperiencesSection({
             return (
               <div
                 key={item.id}
-                className="liquid-glass group/landmark flex flex-col gap-6 rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 transition-all duration-500 hover:bg-foreground/[0.05]"
+                className="liquid-glass group/landmark flex flex-col gap-6 rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 transition-colors duration-100 hover:bg-foreground/[0.05]"
               >
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                   <div className="flex items-start gap-4 md:items-center md:gap-6">
@@ -437,17 +437,17 @@ export default function ExperiencesSection({
                       href={item.googleMapsUri}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02] transition-all group-hover/landmark:border-blue-500/30 group-hover/landmark:bg-blue-500/10 active:scale-95"
+                      className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02] transition-colors duration-100 group-hover/landmark:border-purple-500/30 group-hover/landmark:bg-purple-500/10 active:scale-95"
                       title="View on Google Maps"
                     >
-                      <Compass className="h-5 w-5 text-gray-500 transition-colors group-hover/landmark:text-blue-400" />
+                      <Compass className="h-5 w-5 text-gray-500 transition-colors duration-100 group-hover/landmark:text-purple-400" />
                     </a>
                     <div>
                       <div className="text-lg md:text-xl font-black tracking-tight text-foreground/90">
                         {item.displayName.text}
                       </div>
                       <div className="mt-2 md:mt-3 flex flex-wrap items-center gap-2 md:gap-3">
-                        <div className="rounded-md bg-blue-500/10 px-2 py-0.5 md:px-2.5 md:py-1 text-[9px] md:text-[10px] font-black tracking-[0.1em] text-blue-400/80 uppercase border border-blue-500/20">
+                        <div className="rounded-md bg-purple-500/10 px-2 py-0.5 md:px-2.5 md:py-1 text-[9px] md:text-[10px] font-black tracking-[0.1em] text-purple-400/80 uppercase border border-purple-500/20">
                           {formatType(item.types)}
                         </div>
                         <div className="hidden md:block h-px w-4 bg-foreground/20" />
@@ -473,7 +473,7 @@ export default function ExperiencesSection({
                         </div>
                       )}
                       {item.rating && (
-                        <div className="flex items-center gap-1.5 text-blue-400">
+                        <div className="flex items-center gap-1.5 text-purple-400">
                           <Star className="h-4 w-4 fill-current" />
                           <span className="text-xl font-black tracking-tighter">
                             {item.rating}
@@ -490,8 +490,8 @@ export default function ExperiencesSection({
                       <button
                         onClick={() => toggleSave(item, activeTab)}
                         className={`flex w-28 items-center justify-center gap-2 rounded-xl border py-2 text-[11px] font-black uppercase tracking-[0.15em] transition-all ${savedIds.has(item.id)
-                          ? "border-blue-500/30 bg-blue-500/10 text-blue-200 hover:border-blue-400/50"
-                          : "border-foreground/10 bg-foreground/[0.03] text-foreground/50 hover:border-blue-500/20 hover:text-foreground"
+                          ? "border-purple-500/30 bg-purple-500/10 text-purple-200 hover:border-purple-400/50"
+                          : "border-foreground/10 bg-foreground/[0.03] text-foreground/50 hover:border-purple-500/20 hover:text-foreground"
                           }`}
                         aria-pressed={savedIds.has(item.id)}
                       >
@@ -509,7 +509,7 @@ export default function ExperiencesSection({
                       </button>
                       <button
                         onClick={() => toggleExpand(item.id)}
-                        className="flex w-28 items-center justify-center gap-2 rounded-xl border border-foreground/10 bg-foreground/[0.03] py-2 text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 transition hover:border-blue-500/30 hover:text-foreground"
+                        className="flex w-28 items-center justify-center gap-2 rounded-xl border border-foreground/10 bg-foreground/[0.03] py-2 text-[11px] font-black uppercase tracking-[0.15em] text-foreground/60 transition-colors duration-100 hover:border-purple-500/30 hover:text-foreground"
                         aria-expanded={isExpanded}
                       >
                         {isExpanded ? "Hide notes" : "Add insight"}
@@ -529,8 +529,8 @@ export default function ExperiencesSection({
                       className="w-full space-y-3 border-t border-foreground/5 pt-4"
                     >
                       {savedNote && (
-                        <div className="rounded-2xl border border-blue-500/15 bg-blue-500/5 p-4 text-sm text-blue-100/90">
-                          <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-blue-200/80">
+                        <div className="rounded-2xl border border-purple-500/15 bg-purple-500/5 p-4 text-sm text-purple-100/90">
+                          <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-purple-200/80">
                             Your note
                           </div>
                           <div className="leading-relaxed text-foreground/90">{savedNote}</div>
@@ -554,13 +554,13 @@ export default function ExperiencesSection({
                             }}
                             rows={2}
                             maxLength={280}
-                            className="w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition focus:border-blue-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-blue-500/20"
+                            className="w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition-colors duration-100 focus:border-purple-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-purple-500/20"
                             placeholder="Share a quick tip, vibe, or hidden detail..."
                           />
                           <div className="flex gap-2">
                             <button
                               onClick={() => saveNote(item.id, noteValue)}
-                              className="rounded-xl border border-blue-500/30 bg-blue-500/20 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-blue-50 transition hover:border-blue-400/50 hover:bg-blue-500/30"
+                              className="rounded-xl border border-purple-500/30 bg-purple-500/20 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-purple-50 transition-colors duration-100 hover:border-purple-400/50 hover:bg-purple-500/30"
                               disabled={!notesHydrated}
                             >
                               Save note

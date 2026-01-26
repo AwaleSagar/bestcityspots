@@ -56,7 +56,7 @@ export default function AboutPage() {
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-transparent font-sans text-foreground selection:bg-blue-500/30 selection:text-blue-200"
+      className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
     >
       <script
         type="application/ld+json"
@@ -66,9 +66,9 @@ export default function AboutPage() {
         <nav className="mb-8 md:mb-12">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-all hover:text-foreground py-2"
+            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-colors duration-100 hover:text-foreground py-2"
           >
-            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-all duration-500 group-hover:border-blue-500/40 group-hover:bg-blue-500/20">
+            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
               <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:-translate-x-1" />
             </div>
             <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
@@ -78,15 +78,15 @@ export default function AboutPage() {
         </nav>
 
         <header className="relative space-y-6 overflow-visible py-6">
-          <div className="absolute -top-16 -right-10 -z-10 h-56 w-56 animate-pulse rounded-full bg-blue-600/10 blur-[120px]" />
-          <div className="flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
+          <div className="absolute -top-16 -right-10 -z-10 h-56 w-56 animate-pulse rounded-full bg-purple-600/10 blur-[120px]" />
+          <div className="flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-purple-400 uppercase">
             <Sparkles className="h-4 w-4" />
             Atlas // Index 02
           </div>
           <h1 className="text-5xl leading-[1.1] font-black tracking-tighter text-foreground md:text-7xl">
             About Best City Spots
           </h1>
-          <p className="max-w-2xl text-base md:text-lg leading-relaxed text-foreground/70">
+          <p className="max-w-2xl text-base md:text-lg leading-loose text-foreground/70">
             We combine trusted data sources, spatial intelligence, and human curation to help
             travelers find cities that fit their mood, budget, and rhythm. The goal is simple:
             make discovering your next destination feel effortless.
@@ -118,11 +118,11 @@ export default function AboutPage() {
               key={item.title}
               className="liquid-glass flex flex-col gap-4 rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8 shadow-2xl"
             >
-              <item.icon className="h-5 w-5 text-blue-300" />
+              <item.icon className="h-5 w-5 text-purple-300" />
               <div className="text-lg font-black tracking-tight text-foreground">
                 {item.title}
               </div>
-              <p className="text-sm leading-relaxed text-foreground/60">{item.description}</p>
+              <p className="text-sm leading-loose text-foreground/60">{item.description}</p>
             </div>
           ))}
         </section>
@@ -132,7 +132,7 @@ export default function AboutPage() {
             <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
               Our Mission <span className="h-px flex-1 bg-foreground/5" />
             </h2>
-            <p className="text-base md:text-lg leading-relaxed text-foreground/70">
+            <p className="text-base md:text-lg leading-loose text-foreground/70">
               Best City Spots exists to guide confident travel decisions. We highlight places that
               match your preferences, reduce time spent comparing scattered sources, and surface
               insights that travelers can actually use.
@@ -141,7 +141,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
-              <div className="text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
+              <div className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 What We Track
               </div>
               <ul className="mt-6 space-y-4 text-sm text-foreground/70">
@@ -151,7 +151,7 @@ export default function AboutPage() {
               </ul>
             </div>
             <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
-              <div className="text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
+              <div className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 How We Curate
               </div>
               <ul className="mt-6 space-y-4 text-sm text-foreground/70">
@@ -163,10 +163,10 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-14 rounded-[2.5rem] border border-blue-500/20 bg-blue-500/10 p-10">
+        <section className="mt-14 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/10 p-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="text-xs font-black tracking-[0.3em] text-blue-200 uppercase">
+              <div className="text-xs font-black tracking-[0.3em] text-purple-200 uppercase">
                 Ready to Explore
               </div>
               <p className="mt-4 max-w-xl text-base md:text-lg leading-relaxed text-foreground/80">
@@ -176,7 +176,7 @@ export default function AboutPage() {
             </div>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-full border border-blue-400/40 bg-blue-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-blue-100 transition hover:bg-blue-500/30"
+              className="inline-flex items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-purple-100 transition-colors duration-100 hover:bg-purple-500/30"
             >
               Start Exploring
             </Link>

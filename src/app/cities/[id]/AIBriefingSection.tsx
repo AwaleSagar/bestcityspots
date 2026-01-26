@@ -15,11 +15,11 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
 
   return (
     <section className="space-y-6 rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-6 md:rounded-[3rem] md:p-10 shadow-2xl">
-      <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-blue-300 uppercase">
-        <Sparkles className="h-4 w-4 text-blue-300" />
+      <div className="flex items-center gap-3 text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+        <Sparkles className="h-4 w-4 text-purple-300" />
         AI City Briefing
       </div>
-      <p className="text-base md:text-lg leading-relaxed text-foreground/80">{aiInsight.intro}</p>
+      <p className="text-base md:text-lg leading-loose text-foreground/80">{aiInsight.intro}</p>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-3">
@@ -33,7 +33,7 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
                 className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-4 text-sm text-foreground/80"
               >
                 <div className="text-foreground font-black">{a.name}</div>
-                <div className="mt-1 text-foreground/60 leading-relaxed">{a.why}</div>
+                <div className="mt-1 text-foreground/60 leading-loose">{a.why}</div>
               </div>
             ))}
           </div>
@@ -41,7 +41,7 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
 
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-            <CalendarRange className="h-4 w-4 text-blue-300" />
+            <CalendarRange className="h-4 w-4 text-purple-300" />
             Seasons
           </div>
           <div className="space-y-3">
@@ -56,7 +56,7 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
                     {s.months}
                   </span>
                 </div>
-                <div className="mt-2 text-foreground/60 leading-relaxed">{s.summary}</div>
+                <div className="mt-2 text-foreground/60 leading-loose">{s.summary}</div>
               </div>
             ))}
           </div>
@@ -74,11 +74,11 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-foreground">
                   <span className="font-black">{w.season}</span>
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-300">
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em] text-purple-300">
                     {w.tempC}
                   </span>
                 </div>
-                <div className="mt-2 text-foreground/60 leading-relaxed">{w.notes}</div>
+                <div className="mt-2 text-foreground/60 leading-loose">{w.notes}</div>
               </div>
             ))}
           </div>

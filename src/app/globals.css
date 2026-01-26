@@ -43,6 +43,7 @@
   /* Transition Tokens for Sustainable CPU usage */
   --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-instant: 0.1s ease; /* For immediate button feedback (Tip 59) */
 
   /* New Tokens for Sphere and Effects */
   --color-sphere-tag: rgba(0, 0, 0, 0.6);
@@ -92,6 +93,28 @@
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Base link styles - Links must stand out (Tip 48-54) */
+  /* Only apply to links that aren't styled as buttons or cards */
+  a:not([class*="button"]):not([class*="card"]):not([class*="liquid-glass"]):not([class*="group"]) {
+    color: #3b82f6; /* Blue for links (Tip 48) */
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.1s ease;
+  }
+
+  a:not([class*="button"]):not([class*="card"]):not([class*="liquid-glass"]):not([class*="group"]):hover {
+    color: #2563eb; /* Darker blue on hover */
+  }
+
+  a:not([class*="button"]):not([class*="card"]):not([class*="liquid-glass"]):not([class*="group"]):visited {
+    color: #7c3aed; /* Purple for visited links (Tip 54) */
+  }
+
+  a:not([class*="button"]):not([class*="card"]):not([class*="liquid-glass"]):not([class*="group"]):focus-visible {
+    outline: 2px solid rgba(59, 130, 246, 0.65);
+    outline-offset: 2px;
   }
 }
 

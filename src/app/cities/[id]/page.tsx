@@ -29,6 +29,7 @@ import {
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 async function getWeatherData(lat: number, lng: number) {
   try {
@@ -93,9 +94,9 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
       {metrics.map((item, i) => (
         <div
           key={i}
-          className="space-y-4 rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-8 transition-all duration-500 hover:bg-foreground/[0.04]"
+          className="space-y-4 rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-8 transition-colors duration-100 hover:bg-foreground/[0.04]"
         >
-          <item.icon className="h-5 w-5 text-blue-500/30" />
+          <item.icon className="h-5 w-5 text-purple-500/30" />
           <div>
             <div className="mb-1 text-[9px] font-black tracking-widest text-foreground/40 uppercase">
               {item.label}
@@ -142,20 +143,20 @@ function MetricCard({
     <div className="group/metric relative overflow-hidden rounded-[1.5rem] border border-foreground/5 bg-foreground/[0.02] p-5 flex flex-col gap-4">
       {/* Technical Scan Decoration */}
       <div className="pointer-events-none absolute inset-0 -z-0 opacity-0 transition-opacity duration-700 group-hover/metric:opacity-100">
-        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
       </div>
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/10 bg-foreground/[0.03] transition-all duration-500 group-hover/metric:border-blue-500/30 group-hover/metric:bg-blue-500/10">
-            <Icon className="h-5 w-5 text-blue-300 transition-colors group-hover/metric:text-blue-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover/metric:border-purple-500/30 group-hover/metric:bg-purple-500/10">
+            <Icon className="h-5 w-5 text-purple-300 transition-colors duration-100 group-hover/metric:text-purple-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <div className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
                 {label}
               </div>
-              <div className="hidden text-[8px] font-mono text-blue-500/30 group-hover/metric:block">
+              <div className="hidden text-[8px] font-mono text-purple-500/30 group-hover/metric:block">
                 ID_{debugId}
               </div>
             </div>
@@ -285,16 +286,22 @@ export default async function CityPage({
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-transparent font-sans text-foreground selection:bg-blue-500/30 selection:text-blue-200"
+      className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
     >
       <div className="mx-auto max-w-5xl px-6 py-12">
+        <Breadcrumbs
+          items={[
+            { label: "Cities", href: "/" },
+            { label: city.city },
+          ]}
+        />
         <nav className="mb-8 md:mb-12">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-all hover:text-foreground py-2"
+            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-colors duration-100 hover:text-foreground py-2"
           >
-            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-all duration-500 group-hover:border-blue-500/40 group-hover:bg-blue-500/20">
-              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:-translate-x-1" />
+            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
+              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-100 group-hover:-translate-x-1" />
             </div>
             <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
               Return to Explorer
@@ -306,8 +313,8 @@ export default async function CityPage({
           {/* Main Info Column */}
           <div className="space-y-12 lg:col-span-8">
             <header className="relative space-y-4 py-4 md:space-y-6 md:py-6 overflow-visible">
-              <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-blue-600/10 blur-[120px]" />
-              <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-blue-400 uppercase">
+              <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-purple-600/10 blur-[120px]" />
+              <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-purple-400 uppercase">
                 <Navigation className="h-4 w-4" />
                 {city.iso3} <span className="text-foreground/20">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
@@ -328,10 +335,10 @@ export default async function CityPage({
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-all duration-700 hover:bg-foreground/[0.05]">
+              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-colors duration-100 hover:bg-foreground/[0.05]">
                 <div className="mb-6 flex items-center gap-4 text-foreground/40">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 transition-all group-hover/card:bg-blue-500/20">
-                    <Users className="h-5 w-5 text-blue-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-colors duration-100 group-hover/card:bg-purple-500/20">
+                    <Users className="h-5 w-5 text-purple-400" />
                   </div>
                   <span className="text-[11px] font-black tracking-[0.2em] uppercase">
                     Census Data
@@ -345,7 +352,7 @@ export default async function CityPage({
                 </div>
               </div>
 
-              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-all duration-700 hover:bg-foreground/[0.05]">
+              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-colors duration-100 hover:bg-foreground/[0.05]">
                 <div className="mb-6 flex items-center gap-4 text-foreground/40">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-all group-hover/card:bg-purple-500/20">
                     <MapPin className="h-5 w-5 text-purple-400" />
