@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { supabase } from "./supabase";
+import { supabase, supabaseServer } from "./supabase";
 import { City } from "./cities";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
@@ -83,16 +83,43 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       weather: Array.isArray(parsed.weather) ? parsed.weather.slice(0, 4) : [],
     };
 
-    await supabase.from("city_ai_insights").upsert({
-      city_id: city.id,
-      city_name: city.city,
-      country: city.country,
-      intro: insight.intro,
-      attractions: insight.attractions,
-      seasons: insight.seasons,
-      weather: insight.weather,
-      updated_at: new Date().toISOString(),
-    });
+    // Immediately update cache with 365-day expiry (updated_at timestamp)
+    // Try service role key first, fallback to anon key (requires RLS policy to allow upserts)
+    const updatedAt = new Date().toISOString();
+    const clientToUse = supabaseServer || supabase;
+    
+    const { error: upsertError } = await clientToUse.from("city_ai_insights").upsert(
+      {
+        city_id: city.id,
+        city_name: city.city,
+        country: city.country,
+        intro: insight.intro,
+        attractions: insight.attractions,
+        seasons: insight.seasons,
+        weather: insight.weather,
+        updated_at: updatedAt,
+      },
+      {
+        onConflict: "city_id",
+      }
+    );
+
+    if (upsertError) {
+      if (upsertError.code === "42501") {
+        console.error(
+          `❌ RLS policy blocked cache update for ${city.city}. ` +
+          `Run the SQL in supabase/fix_city_ai_insights_rls.sql or add SUPABASE_SERVICE_ROLE_KEY to .env.local`
+        );
+      } else {
+        console.error(`Failed to cache AI insight for ${city.city}:`, upsertError);
+      }
+      // Still return the insight even if cache update fails
+    } else {
+      const keyType = supabaseServer ? "service role" : "anon";
+      console.info(
+        `✅ Successfully cached AI insight for ${city.city} (expires in 365 days) using ${keyType} key`
+      );
+    }
 
     return insight;
   } catch (e) {
