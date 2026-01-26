@@ -2,12 +2,12 @@
 
 import type { KeyboardEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { searchCities, City } from "@/lib/cities";
+import { searchCities, City, findNearestCity } from "@/lib/cities";
 import { fetchTrendingDestinations } from "@/app/actions";
 import { formatPopulation } from "@/lib/format";
 import { getJsonStorageItem, setJsonStorageItem } from "@/lib/storage";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, ArrowRight, Activity } from "lucide-react";
+import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -16,6 +16,7 @@ export default function Home() {
   const [searchResults, setSearchResults] = useState<City[]>([]);
   const [topCities, setTopCities] = useState<City[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [recentCities, setRecentCities] = useState<City[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
@@ -132,6 +133,37 @@ export default function Home() {
     }
   };
 
+  const handleLocate = () => {
+    if (isLocating || typeof navigator === "undefined" || !navigator.geolocation) {
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const nearest = await findNearestCity(latitude, longitude);
+          if (!nearest) {
+            console.warn("Unable to find nearest city for current location");
+            return;
+          }
+          saveToRecent(nearest);
+          router.push(`/cities/${nearest.id}?lat=${latitude}&lng=${longitude}`);
+        } catch (error) {
+          console.warn("Unable to resolve current location", error);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        console.warn("Unable to access location", error);
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+    );
+  };
+
   const resultsListId = "city-search-results";
   const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
   const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
@@ -207,19 +239,28 @@ export default function Home() {
               aria-expanded={shouldShowResults}
               aria-controls={resultsListId}
               aria-activedescendant={activeOptionId}
-              className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-foreground/10 bg-foreground/[0.03] py-5 md:py-8 pr-6 md:pr-8 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl dark:shadow-black shadow-foreground/5 transition-all duration-700 outline-none hover:bg-foreground/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
+              className="liquid-glass w-full rounded-[2rem] md:rounded-[2.5rem] border border-foreground/10 bg-foreground/[0.03] py-5 md:py-8 pr-16 md:pr-20 pl-16 md:pl-20 text-lg md:text-2xl shadow-2xl dark:shadow-black shadow-foreground/5 transition-all duration-700 outline-none hover:bg-foreground/[0.05] focus:border-blue-500/40 focus:ring-4 focus:ring-blue-500/10"
             />
 
             {/* Principle 4: Contrast - Loading indicator */}
-            {isSearching && (
-              <div className="absolute top-1/2 right-8 -translate-y-1/2">
+            <div className="absolute top-1/2 right-6 md:right-8 -translate-y-1/2 flex items-center gap-2">
+              {(isSearching || isLocating) && (
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="h-8 w-8 rounded-full border-2 border-blue-500/10 border-t-blue-500"
+                  className="h-7 w-7 rounded-full border-2 border-blue-500/10 border-t-blue-500"
                 />
-              </div>
-            )}
+              )}
+              <button
+                type="button"
+                onClick={handleLocate}
+                disabled={isLocating}
+                aria-label="Use current location"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] text-foreground/50 transition hover:border-blue-500/30 hover:text-blue-400 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <LocateFixed className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           <div className="mt-6 flex items-center justify-between px-4">
@@ -243,7 +284,9 @@ export default function Home() {
             </div>
             <div className="text-[11px] font-black tracking-[0.3em] uppercase">
               <div className="text-foreground/40" aria-live="polite">
-                {isSearching ? (
+                {isLocating ? (
+                  <span className="animate-pulse text-blue-400/80">Locating...</span>
+                ) : isSearching ? (
                   <span className="animate-pulse text-blue-400/80">Analyzing Data...</span>
                 ) : shouldShowResults ? (
                   <span className="text-foreground/60">{searchResults.length} matches</span>

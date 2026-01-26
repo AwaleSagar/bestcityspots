@@ -27,6 +27,63 @@ function cityMatchesQuery(c: City, q: string) {
   return city.includes(q) || country.includes(q);
 }
 
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {
+  try {
+    const { data, error } = await supabase
+      .from("cities")
+      .select("id, city, city_ascii, country, population, lat, lng, admin_name, capital")
+      .gte("lat", lat - boxSize)
+      .lte("lat", lat + boxSize)
+      .gte("lng", lng - boxSize)
+      .lte("lng", lng + boxSize)
+      .limit(200);
+
+    if (error) {
+      console.warn("Error fetching nearby cities:", error);
+      return [];
+    }
+    return (data ?? []) as City[];
+  } catch (e) {
+    console.warn("Error fetching nearby cities:", e);
+    return [];
+  }
+}
+
+function findNearest(cities: City[], lat: number, lng: number) {
+  if (cities.length === 0) return null;
+  return cities.reduce((best, city) => {
+    const distance = haversineKm(lat, lng, city.lat, city.lng);
+    if (!best) return { city, distance };
+    return distance < best.distance ? { city, distance } : best;
+  }, null as { city: City; distance: number } | null)?.city ?? null;
+}
+
+export async function findNearestCity(lat: number, lng: number) {
+  const boxSizes = [0.5, 1, 2, 5, 10];
+  for (const boxSize of boxSizes) {
+    const candidates = await queryCitiesInBox(lat, lng, boxSize);
+    const nearest = findNearest(candidates, lat, lng);
+    if (nearest) return nearest;
+  }
+
+  const fallback = await getTopCities(200);
+  return findNearest(fallback, lat, lng);
+}
+
 /**
  * Searches for cities by name.
  * Optimized with column selection and internal caching.
