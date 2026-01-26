@@ -64,6 +64,7 @@ export const metadata: Metadata = {
 
 import Link from "next/link";
 import VisualEffects from "@/components/VisualEffects";
+import FloralAccent from "@/components/FloralAccent";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -99,6 +100,7 @@ export default function RootLayout({
             Skip to content
           </a>
           <VisualEffects />
+          <FloralAccent />
           <div className="relative z-10">{children}</div>
         </ThemeProvider>
       </body>
