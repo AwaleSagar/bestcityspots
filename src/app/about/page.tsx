@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Globe2, Radar, Shield, Sparkles } from "lucide-react";
+import { ArrowLeft, Globe2, Radar, Shield, Sparkles, Heart, BookOpen } from "lucide-react";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const metadata: Metadata = {
   title: "About Best City Spots",
   description:
-    "Learn how Best City Spots blends urban intelligence, live data, and expert signals to help you choose your next destination.",
+    "Transparent overview of how Best City Spots works: our data sources, methodology, and commitment to no paywalls, no dark patterns, and ethical design.",
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "About Best City Spots",
+    title: "About Best City Spots | How We Work & Our Data",
     description:
-      "Learn how Best City Spots blends urban intelligence, live data, and expert signals to help you choose your next destination.",
+      "Transparent overview of our data sources, methodology, and commitment to ethical design.",
     url: "/about",
     type: "website",
     images: [
@@ -28,9 +28,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "About Best City Spots",
-    description:
-      "Learn how Best City Spots blends urban intelligence, live data, and expert signals to help you choose your next destination.",
+    title: "About Best City Spots | How We Work & Our Data",
+    description: "Transparent overview of our data sources and ethical design.",
     images: ["/opengraph-image"],
   },
 };
@@ -89,11 +88,38 @@ export default function AboutPage() {
           <p className="max-w-2xl text-base md:text-lg leading-loose text-foreground/70">
             We combine trusted data sources, spatial intelligence, and human curation to help
             travelers find cities that fit their mood, budget, and rhythm. The goal is simple:
-            make discovering your next destination feel effortless.
+            make discovering your next destination feel effortless—with no paywalls and no dark
+            patterns.
           </p>
         </header>
 
-        <section className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <section className="mt-12 rounded-[2rem] border border-foreground/10 bg-foreground/[0.02] p-8" aria-labelledby="trust-principles-heading">
+          <h2 id="trust-principles-heading" className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
+            <Heart className="h-4 w-4 text-purple-400" aria-hidden />
+            Why we’re different
+          </h2>
+          <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
+            <li className="flex gap-3 text-sm text-foreground/70">
+              <span className="text-purple-400" aria-hidden>✓</span>
+              <span><strong className="text-foreground/90">No paywalls.</strong> All city guides and the free Top 50 list are available without sign-up.</span>
+            </li>
+            <li className="flex gap-3 text-sm text-foreground/70">
+              <span className="text-purple-400" aria-hidden>✓</span>
+              <span><strong className="text-foreground/90">No dark patterns.</strong> We don’t use countdown timers, fake scarcity, or manipulative CTAs.</span>
+            </li>
+            <li className="flex gap-3 text-sm text-foreground/70">
+              <span className="text-purple-400" aria-hidden>✓</span>
+              <span><strong className="text-foreground/90">Transparent data.</strong> We clearly state what we track and how we curate; this page explains it.</span>
+            </li>
+            <li className="flex gap-3 text-sm text-foreground/70">
+              <span className="text-purple-400" aria-hidden>✓</span>
+              <span><strong className="text-foreground/90">Ethical AI.</strong> AI is used only to add context and summaries; core data comes from verified sources.</span>
+            </li>
+          </ul>
+        </section>
+
+        <section className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3" aria-labelledby="how-we-work-heading">
+          <h2 id="how-we-work-heading" className="sr-only">How we work</h2>
           {[
             {
               title: "Global Coverage",
@@ -127,23 +153,23 @@ export default function AboutPage() {
           ))}
         </section>
 
-        <section className="mt-14 space-y-10">
+        <section className="mt-14 space-y-10" aria-labelledby="mission-heading">
           <div className="space-y-4">
-            <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
+            <h2 id="mission-heading" className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
               Our Mission <span className="h-px flex-1 bg-foreground/5" />
             </h2>
             <p className="text-base md:text-lg leading-loose text-foreground/70">
               Best City Spots exists to guide confident travel decisions. We highlight places that
               match your preferences, reduce time spent comparing scattered sources, and surface
-              insights that travelers can actually use.
+              insights that travelers can actually use—without gatekeeping or manipulation.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
-              <div className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+              <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 What We Track
-              </div>
+              </h3>
               <ul className="mt-6 space-y-4 text-sm text-foreground/70">
                 <li>Population momentum and regional influence</li>
                 <li>Climate comfort, air quality, and seasonal patterns</li>
@@ -151,9 +177,9 @@ export default function AboutPage() {
               </ul>
             </div>
             <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
-              <div className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+              <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 How We Curate
-              </div>
+              </h3>
               <ul className="mt-6 space-y-4 text-sm text-foreground/70">
                 <li>Blend AI context with verified data sources</li>
                 <li>Filter for credibility, recency, and relevance</li>
@@ -163,23 +189,35 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-14 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/10 p-10">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <section className="mt-14 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/10 p-10" aria-labelledby="cta-heading">
+          <h2 id="cta-heading" className="text-xs font-black tracking-[0.3em] text-purple-200 uppercase">
+            Ready to Explore
+          </h2>
+          <div className="mt-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <div className="text-xs font-black tracking-[0.3em] text-purple-200 uppercase">
-                Ready to Explore
-              </div>
-              <p className="mt-4 max-w-xl text-base md:text-lg leading-relaxed text-foreground/80">
+              <p className="max-w-xl text-base md:text-lg leading-relaxed text-foreground/80">
                 Dive into the atlas to compare cities, uncover hidden gems, and plan your next
                 journey with confidence.
               </p>
+              <p className="mt-3 text-sm text-foreground/60">
+                Try our free <Link href="/resources/top-cities" className="font-semibold text-purple-300 underline underline-offset-2 hover:text-purple-200">Top 50 Cities guide</Link>—no sign-up required.
+              </p>
             </div>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-purple-100 transition-colors duration-100 hover:bg-purple-500/30"
-            >
-              Start Exploring
-            </Link>
+            <div className="flex flex-shrink-0 flex-wrap gap-3">
+              <Link
+                href="/resources/top-cities"
+                className="inline-flex items-center gap-2 rounded-full border border-foreground/20 bg-foreground/[0.05] px-5 py-3 text-xs font-black uppercase tracking-[0.2em] text-foreground/80 transition-colors hover:bg-foreground/10"
+              >
+                <BookOpen className="h-4 w-4" aria-hidden />
+                Free Guide
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-purple-100 transition-colors duration-100 hover:bg-purple-500/30"
+              >
+                Start Exploring
+              </Link>
+            </div>
           </div>
         </section>
       </div>

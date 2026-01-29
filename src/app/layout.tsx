@@ -16,16 +16,22 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Best City Spots - Explore the World",
-  description: "Discover your next destination with our curated database of world cities.",
+  title: {
+    default: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    template: "%s | Best City Spots",
+  },
+  description:
+    "Discover your next destination with trusted city data, live metrics, and AI-powered insights. Compare cities, explore experiences, and plan trips with clarity—no paywalls, no dark patterns.",
   applicationName: "Best City Spots",
   keywords: [
-    "best cities",
+    "best cities to visit",
     "city guides",
-    "travel inspiration",
     "urban intelligence",
-    "city metrics",
+    "travel inspiration",
+    "city comparison",
     "destination discovery",
+    "city metrics",
+    "where to travel",
   ],
   authors: [{ name: "Best City Spots", url: siteUrl }],
   creator: "Best City Spots",
@@ -38,13 +44,16 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: "Best City Spots - Explore the World",
-    description: "Discover your next destination with our curated database of world cities.",
+    title: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    description:
+      "Discover your next destination with trusted city data and AI-powered insights. Compare cities and plan trips with clarity.",
     type: "website",
     url: "/",
     siteName: "Best City Spots",
+    locale: "en_US",
     images: [
       {
         url: "/opengraph-image",
@@ -56,10 +65,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Best City Spots - Explore the World",
-    description: "Discover your next destination with our curated database of world cities.",
+    title: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    description:
+      "Discover your next destination with trusted city data and AI-powered insights.",
     images: ["/opengraph-image"],
   },
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 import Link from "next/link";
@@ -67,6 +80,29 @@ import VisualEffects from "@/components/VisualEffects";
 import FloralAccent from "@/components/FloralAccent";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import SiteFooter from "@/components/SiteFooter";
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Best City Spots",
+    url: siteUrl,
+    description:
+      "Best City Spots provides trusted urban intelligence and city guides—live metrics, AI insights, and transparent data to help travelers discover and compare cities.",
+    sameAs: [],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Best City Spots",
+    url: siteUrl,
+    description:
+      "Discover your next destination with trusted city data, live metrics, and AI-powered insights.",
+    publisher: { "@id": `${siteUrl}/#organization` },
+    inLanguage: "en-US",
+  },
+];
 
 export default function RootLayout({
   children,
@@ -78,6 +114,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-blue-500/30 selection:text-blue-200`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd[0]) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd[1]) }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
@@ -101,7 +145,10 @@ export default function RootLayout({
           </a>
           <VisualEffects />
           <FloralAccent />
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 flex min-h-screen flex-col">
+            <div className="flex-1 flex flex-col">{children}</div>
+            <SiteFooter />
+          </div>
         </ThemeProvider>
       </body>
     </html>

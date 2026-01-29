@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import TrustIndicators from "@/components/TrustIndicators";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import FreeResourceCTA from "@/components/FreeResourceCTA";
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -482,6 +485,10 @@ export default function Home() {
             )}
           </AnimatePresence>
         </motion.div>
+
+        <TrustIndicators />
+        <FreeResourceCTA />
+        <TestimonialsSection />
       </div>
     </main>
   );
