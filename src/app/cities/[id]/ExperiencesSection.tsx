@@ -137,13 +137,16 @@ export default function ExperiencesSection({
   const [notesHydrated, setNotesHydrated] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 
-  // Load saved places from localStorage on mount
+  // Load saved places from localStorage on mount (defer setState to avoid synchronous update in effect)
   useEffect(() => {
     const parsed = getJsonStorageItem<SavedPlace[]>(STORAGE_KEY, []);
-    if (Array.isArray(parsed)) {
-      setSavedPlaces(parsed);
-    }
-    setIsHydrated(true);
+    const update = () => {
+      if (Array.isArray(parsed)) {
+        setSavedPlaces(parsed);
+      }
+      setIsHydrated(true);
+    };
+    queueMicrotask(update);
   }, []);
 
   // Persist saved places when they change
@@ -152,16 +155,19 @@ export default function ExperiencesSection({
     setJsonStorageItem(STORAGE_KEY, savedPlaces);
   }, [isHydrated, savedPlaces]);
 
-  // Load notes for this city from localStorage
+  // Load notes for this city from localStorage (defer setState to avoid synchronous update in effect)
   useEffect(() => {
     const raw = getStorageItem(NOTES_STORAGE_KEY);
     const safeKey = sanitizeKey(cityName);
     const notesMap = parseStoredNotes(raw);
     const cityNotes = notesMap.get(safeKey) ?? {};
     const safeNotes = sanitizeNotes(cityNotes);
-    setPlaceNotes(safeNotes);
-    setDraftNotes(safeNotes);
-    setNotesHydrated(true);
+    const update = () => {
+      setPlaceNotes(safeNotes);
+      setDraftNotes(safeNotes);
+      setNotesHydrated(true);
+    };
+    queueMicrotask(update);
   }, [cityName]);
 
   const persistCityNotes = (nextNotes: CityNotes) => {

@@ -173,7 +173,10 @@ export default function Home() {
 
   return (
     <main id="main-content" className="min-h-screen bg-transparent font-sans text-foreground">
-      <div className="mx-auto max-w-2xl px-6 py-12">
+      <div
+        className="container-gutter mx-auto max-w-2xl py-12 px-4 sm:px-6"
+        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
+      >
         {/* Principle 1: Hierarchy - Clear Heading */}
         <motion.header
           initial={{ opacity: 0, y: 40 }}
@@ -266,7 +269,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-6 flex items-center justify-between px-4">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 px-2 sm:px-4">
             <div className="flex gap-2">
               {[
                 { id: "megacity", label: "Megacities" },
@@ -274,8 +277,9 @@ export default function Home() {
               ].map((filter) => (
                 <button
                   key={filter.id}
+                  type="button"
                   onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
-                  className={`rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-colors duration-100 border min-h-[44px] ${
+                  className={`touch-target rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-colors duration-100 border min-h-[var(--touch-target-min)] ${
                     activeFilter === filter.id
                       ? "bg-purple-500/10 border-purple-500/40 text-purple-400"
                       : "bg-foreground/[0.03] border-foreground/5 text-foreground/40 hover:text-foreground/60"

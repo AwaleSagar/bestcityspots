@@ -90,11 +90,11 @@ async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
   ];
 
   return (
-    <div className="animate-slow-fade-in grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className="animate-slow-fade-in grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
       {metrics.map((item, i) => (
         <div
           key={i}
-          className="space-y-4 rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-8 transition-colors duration-100 hover:bg-foreground/[0.04]"
+          className="space-y-3 rounded-2xl border border-foreground/5 bg-foreground/[0.01] p-5 transition-colors duration-100 hover:bg-foreground/[0.04] sm:rounded-[2rem] sm:space-y-4 sm:p-8"
         >
           <item.icon className="h-5 w-5 text-purple-500/30" />
           <div>
@@ -288,22 +288,25 @@ export default async function CityPage({
       id="main-content"
       className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
     >
-      <div className="mx-auto max-w-5xl px-6 py-12">
+      <div
+        className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
+        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
+      >
         <Breadcrumbs
           items={[
             { label: "Cities", href: "/" },
             { label: city.city },
           ]}
         />
-        <nav className="mb-8 md:mb-12">
+        <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-colors duration-100 hover:text-foreground py-2"
+            className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors duration-100 hover:text-foreground md:gap-4 py-2"
           >
-            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
-              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform duration-100 group-hover:-translate-x-1" />
+            <div className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20 md:h-12 md:w-12">
+              <ArrowLeft className="h-4 w-4 transition-transform duration-100 group-hover:-translate-x-1 md:h-5 md:w-5" />
             </div>
-            <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] md:text-xs">
               Return to Explorer
             </span>
           </Link>

@@ -58,13 +58,16 @@ export default async function TopCitiesPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListStructuredData) }}
       />
-      <div className="mx-auto max-w-3xl px-6 py-12">
+      <div
+        className="container-gutter mx-auto max-w-3xl px-4 py-12 sm:px-6"
+        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
+      >
         <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 text-foreground/50 transition-colors hover:text-foreground py-2"
+            className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors hover:text-foreground py-2"
           >
-            <span className="liquid-glass flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
+            <span className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
               <ArrowLeft className="h-4 w-4" aria-hidden />
             </span>
             <span className="text-[10px] font-black uppercase tracking-[0.2em]">
@@ -92,7 +95,7 @@ export default async function TopCitiesPage() {
               <li key={city.id}>
                 <Link
                   href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                  className="liquid-glass flex min-h-[56px] items-center gap-4 rounded-2xl border border-foreground/5 px-5 py-4 transition-colors hover:border-foreground/15 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="liquid-glass flex min-h-[var(--touch-target-min)] items-center gap-3 rounded-2xl border border-foreground/5 px-4 py-3 transition-colors hover:border-foreground/15 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-[56px] sm:gap-4 sm:px-5 sm:py-4"
                 >
                   <span
                     className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-foreground/10 bg-foreground/[0.03] text-xs font-bold text-foreground/60"
@@ -126,7 +129,7 @@ export default async function TopCitiesPage() {
           </p>
           <Link
             href="/"
-            className="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-purple-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+            className="touch-target mt-6 inline-flex min-h-[var(--touch-target-min)] items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-purple-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
           >
             Go to Explorer
           </Link>

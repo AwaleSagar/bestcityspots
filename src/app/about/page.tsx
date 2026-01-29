@@ -61,13 +61,16 @@ export default function AboutPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="mx-auto max-w-5xl px-6 py-12">
-        <nav className="mb-8 md:mb-12">
+      <div
+        className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
+        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
+      >
+        <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
           <Link
             href="/"
-            className="group inline-flex items-center gap-3 md:gap-4 text-foreground/50 transition-colors duration-100 hover:text-foreground py-2"
+            className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors duration-100 hover:text-foreground md:gap-4 py-2"
           >
-            <div className="liquid-glass flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20">
+            <div className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20 md:h-12 md:w-12">
               <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:-translate-x-1" />
             </div>
             <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
@@ -93,7 +96,7 @@ export default function AboutPage() {
           </p>
         </header>
 
-        <section className="mt-12 rounded-[2rem] border border-foreground/10 bg-foreground/[0.02] p-8" aria-labelledby="trust-principles-heading">
+        <section className="mt-12 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8" aria-labelledby="trust-principles-heading">
           <h2 id="trust-principles-heading" className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50">
             <Heart className="h-4 w-4 text-purple-400" aria-hidden />
             Why we’re different
@@ -142,7 +145,7 @@ export default function AboutPage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="liquid-glass flex flex-col gap-4 rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8 shadow-2xl"
+              className="liquid-glass flex flex-col gap-4 rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 shadow-2xl sm:rounded-[2.5rem] sm:p-8"
             >
               <item.icon className="h-5 w-5 text-purple-300" />
               <div className="text-lg font-black tracking-tight text-foreground">
@@ -166,7 +169,7 @@ export default function AboutPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
+            <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 sm:rounded-[2.5rem] sm:p-8">
               <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 What We Track
               </h3>
@@ -176,7 +179,7 @@ export default function AboutPage() {
                 <li>Landmark density, cultural signals, and local momentum</li>
               </ul>
             </div>
-            <div className="rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.02] p-8">
+            <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 sm:rounded-[2.5rem] sm:p-8">
               <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
                 How We Curate
               </h3>
@@ -189,7 +192,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mt-14 rounded-[2.5rem] border border-purple-500/20 bg-purple-500/10 p-10" aria-labelledby="cta-heading">
+        <section className="mt-14 rounded-2xl border border-purple-500/20 bg-purple-500/10 p-6 sm:rounded-[2.5rem] sm:p-10" aria-labelledby="cta-heading">
           <h2 id="cta-heading" className="text-xs font-black tracking-[0.3em] text-purple-200 uppercase">
             Ready to Explore
           </h2>
@@ -206,14 +209,14 @@ export default function AboutPage() {
             <div className="flex flex-shrink-0 flex-wrap gap-3">
               <Link
                 href="/resources/top-cities"
-                className="inline-flex items-center gap-2 rounded-full border border-foreground/20 bg-foreground/[0.05] px-5 py-3 text-xs font-black uppercase tracking-[0.2em] text-foreground/80 transition-colors hover:bg-foreground/10"
+                className="touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-2 rounded-full border border-foreground/20 bg-foreground/[0.05] px-5 py-3 text-xs font-black uppercase tracking-[0.2em] text-foreground/80 transition-colors hover:bg-foreground/10"
               >
                 <BookOpen className="h-4 w-4" aria-hidden />
                 Free Guide
               </Link>
               <Link
                 href="/"
-                className="inline-flex items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-purple-100 transition-colors duration-100 hover:bg-purple-500/30"
+                className="touch-target inline-flex min-h-[var(--touch-target-min)] items-center justify-center rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-xs font-black uppercase tracking-[0.2em] text-purple-100 transition-colors duration-100 hover:bg-purple-500/30"
               >
                 Start Exploring
               </Link>

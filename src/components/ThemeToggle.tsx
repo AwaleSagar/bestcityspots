@@ -15,14 +15,18 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="h-10 w-10 rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md" />
+      <div
+        className="rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md touch-target min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)]"
+        aria-hidden
+      />
     );
   }
 
   return (
     <button
+      type="button"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md transition-colors duration-100 hover:bg-foreground/5"
+      className="touch-target relative flex min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md transition-colors duration-100 hover:bg-foreground/5"
       aria-label="Toggle theme"
     >
       <AnimatePresence mode="wait" initial={false}>

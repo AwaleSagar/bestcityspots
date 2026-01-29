@@ -1,6 +1,19 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -75,11 +88,10 @@ export const metadata: Metadata = {
     : undefined,
 };
 
-import Link from "next/link";
 import VisualEffects from "@/components/VisualEffects";
 import FloralAccent from "@/components/FloralAccent";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
 
 const jsonLd = [
@@ -128,18 +140,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="fixed right-4 top-4 z-[200] flex items-center gap-3">
-            <Link
-              href="/about"
-              className="rounded-full border border-foreground/10 bg-foreground/[0.04] px-4 py-2 text-[10px] font-black tracking-[0.2em] text-foreground/70 uppercase transition hover:border-foreground/30 hover:text-foreground"
-            >
-              About
-            </Link>
-            <ThemeToggle />
-          </div>
+          <SiteNav />
           <a
             href="#main-content"
-            className="skip-link pointer-events-auto fixed left-4 top-4 z-[200] rounded-xl border border-foreground/10 bg-background/80 px-4 py-2 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100"
+            className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500/50 sm:left-4 sm:top-4"
+            style={{
+              marginLeft: "env(safe-area-inset-left, 0)",
+              marginTop: "env(safe-area-inset-top, 0)",
+            }}
           >
             Skip to content
           </a>

@@ -4,10 +4,10 @@ import { BookOpen, ArrowRight } from "lucide-react";
 export default function FreeResourceCTA() {
   return (
     <section
-      className="mx-auto max-w-2xl px-6 py-12"
+      className="container-gutter mx-auto max-w-2xl px-4 py-12 sm:px-6"
       aria-labelledby="free-resource-heading"
     >
-      <div className="liquid-glass rounded-[2rem] border border-purple-500/20 bg-purple-500/5 p-8 text-center sm:p-10">
+      <div className="liquid-glass rounded-2xl border border-purple-500/20 bg-purple-500/5 p-6 text-center sm:rounded-[2rem] sm:p-10">
         <h2
           id="free-resource-heading"
           className="mb-2 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-purple-300"

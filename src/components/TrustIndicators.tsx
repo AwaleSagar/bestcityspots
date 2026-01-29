@@ -21,13 +21,13 @@ const indicators = [
 export default function TrustIndicators() {
   return (
     <section
-      className="mx-auto max-w-2xl px-6 py-12"
+      className="container-gutter mx-auto max-w-2xl px-4 py-12 sm:px-6"
       aria-labelledby="trust-heading"
     >
       <h2 id="trust-heading" className="sr-only">
         Why travelers trust Best City Spots
       </h2>
-      <ul className="grid grid-cols-1 gap-6 sm:grid-cols-3" role="list">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6" role="list">
         {indicators.map(({ icon: Icon, label, description }) => (
           <li
             key={label}
