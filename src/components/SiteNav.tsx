@@ -5,11 +5,19 @@ import Link from "next/link";
 import { Menu, X, MapPin, BookOpen, Info } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-const navLinks = [
+type NavLink = {
+  href: string;
+  label: string;
+  short: string;
+  icon: typeof MapPin;
+  cta?: boolean;
+};
+
+const navLinks: NavLink[] = [
   { href: "/", label: "Explore Cities", short: "Explore", icon: MapPin },
-  { href: "/resources/top-cities", label: "Free Guide: Top Cities", short: "Guide", icon: BookOpen },
-  { href: "/about", label: "About", short: "About", icon: Info },
-] as const;
+  { href: "/resources/top-cities", label: "Free Guide: Top Cities", short: "Guide", icon: BookOpen, cta: true },
+  { href: "/about", label: "About Best City Spots", short: "About", icon: Info },
+];
 
 export default function SiteNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,41 +42,56 @@ export default function SiteNav() {
 
   return (
     <>
-      {/* Desktop: horizontal nav (md and up) */}
-      <nav
-        className="fixed right-4 top-4 z-[200] hidden items-center gap-2 md:flex"
-        aria-label="Main navigation"
-      >
-        {navLinks.map(({ href, label, short: shortLabel, icon: Icon }) => (
+      <header className="sticky top-0 z-[200] w-full bg-background/80 backdrop-blur-xl">
+        <div className="container-gutter mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
           <Link
-            key={href}
-            href={href}
-            className="touch-target min-h-[var(--touch-target-min)] rounded-full border border-foreground/10 bg-foreground/[0.04] px-4 py-2 text-[10px] font-black tracking-[0.2em] text-foreground/70 uppercase transition hover:border-foreground/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            href="/"
+            className="group flex items-center gap-3 rounded-full bg-foreground/[0.04] px-4 py-2 text-[10px] font-black tracking-[0.3em] text-foreground/80 uppercase transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label="Best City Spots home"
           >
-            <span className="hidden md:inline lg:hidden">{shortLabel}</span>
-            <span className="hidden lg:inline">{label}</span>
-            <span className="md:hidden">
-              <Icon className="h-4 w-4" aria-hidden />
-            </span>
+            <MapPin className="h-4 w-4 text-purple-400/80" aria-hidden />
+            Best City Spots
           </Link>
-        ))}
-        <ThemeToggle />
-      </nav>
 
-      {/* Mobile: hamburger + overlay menu */}
-      <div className="fixed right-4 top-4 z-[200] flex items-center gap-2 md:hidden">
-        <button
-          type="button"
-          onClick={toggleMobile}
-          className="touch-target flex h-[var(--touch-target-min)] w-[var(--touch-target-min)] items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.04] text-foreground/80 transition hover:border-foreground/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2"
-          aria-expanded={mobileOpen}
-          aria-controls="mobile-nav"
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
-        <ThemeToggle />
-      </div>
+          {/* Desktop: clean text nav (md and up) */}
+          <nav className="hidden items-center gap-6 md:flex" aria-label="Main navigation">
+            {navLinks.map(({ href, short, cta }) => (
+              <Link
+                key={href}
+                href={href}
+                className={
+                  cta
+                    ? "rounded-full bg-purple-500/10 px-5 py-2 text-[11px] font-bold tracking-wide text-purple-400 transition hover:bg-purple-500/20 active:scale-95"
+                    : "text-[11px] font-bold tracking-wide text-foreground/60 transition hover:text-foreground"
+                }
+              >
+                {short}
+              </Link>
+            ))}
+            <div className="ml-2 pl-4 border-l border-foreground/10">
+              <ThemeToggle />
+            </div>
+          </nav>
+
+          {/* Mobile: hamburger */}
+          <div className="flex items-center gap-2 md:hidden">
+            <span className="text-[10px] font-black tracking-[0.3em] text-foreground/40 uppercase">
+              Menu
+            </span>
+            <button
+              type="button"
+              onClick={toggleMobile}
+              className="touch-target flex h-[var(--touch-target-min)] w-[var(--touch-target-min)] items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.04] text-foreground/80 transition hover:border-foreground/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
 
       {/* Mobile overlay + sheet */}
       <div
@@ -97,7 +120,7 @@ export default function SiteNav() {
                 key={href}
                 href={href}
                 onClick={closeMobile}
-                className="touch-target flex min-h-[var(--touch-target-min)] items-center gap-3 rounded-xl border border-foreground/5 bg-foreground/[0.03] px-5 py-3 text-sm font-bold text-foreground/80 transition hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2"
+                className="touch-target flex min-h-[var(--touch-target-min)] items-center gap-3 rounded-xl bg-foreground/[0.03] px-5 py-3 text-sm font-bold text-foreground/80 transition hover:bg-foreground/[0.06] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2"
               >
                 <Icon className="h-5 w-5 text-purple-400/80" aria-hidden />
                 {label}

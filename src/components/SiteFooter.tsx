@@ -48,12 +48,17 @@ export default function SiteFooter() {
           <p className="text-xs text-foreground/40">
             © {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
           </p>
-          <Link
-            href="/about"
-            className="touch-target inline-flex min-h-[var(--touch-target-min)] items-center text-xs font-medium text-foreground/50 underline underline-offset-2 hover:text-foreground/70"
-          >
-            How we work &amp; our data sources
-          </Link>
+          <div className="flex flex-col gap-2 sm:items-end">
+            <p className="text-xs text-foreground/40">
+              Made with ❤️ in Pune · Sagar Awale
+            </p>
+            <Link
+              href="/about"
+              className="touch-target inline-flex min-h-[var(--touch-target-min)] items-center text-xs font-medium text-foreground/50 underline underline-offset-2 hover:text-foreground/70"
+            >
+              How we work &amp; our data sources
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
