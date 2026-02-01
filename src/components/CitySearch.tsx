@@ -142,21 +142,20 @@ export default function CitySearch({ topCities }: CitySearchProps) {
           const nearest = await findNearestCity(latitude, longitude);
           if (!nearest) {
             console.warn("Unable to find nearest city for current location");
+            setIsLocating(false);
             return;
           }
           saveToRecent(nearest);
           router.push(`/cities/${nearest.id}?lat=${latitude}&lng=${longitude}`);
         } catch (error) {
           console.warn("Unable to resolve current location", error);
-        } finally {
-          setIsLocating(false);
+          setIsLocating(false); // Make sure to reset state on error
         }
       },
       (error) => {
-        console.warn("Unable to access location", error);
+        console.warn("Geolocation permission denied or error", error);
         setIsLocating(false);
-      },
-      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      }
     );
   };
 
@@ -212,7 +211,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
               onClick={handleLocate}
               disabled={isLocating}
               aria-label="Use current location"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] text-foreground/50 transition-colors duration-100 hover:border-purple-500/30 hover:text-purple-400 disabled:cursor-not-allowed disabled:opacity-40"
+              className={`flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] text-foreground/50 transition-colors duration-100 hover:border-purple-500/30 hover:text-purple-400 disabled:cursor-not-allowed disabled:opacity-40 ${isLocating ? "animate-pulse text-purple-400 border-purple-500/30" : ""}`}
             >
               <LocateFixed className="h-5 w-5" />
             </button>
