@@ -26,6 +26,7 @@ import {
   Cloud as CloudIcon,
   ThermometerSun,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
@@ -246,6 +247,29 @@ function WeatherSkeleton() {
   );
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const result = cityIdSchema.safeParse(id);
+  if (!result.success) return { title: "City Not Found" };
+
+  const city = await getCityById(result.data);
+  if (!city) return { title: "City Not Found" };
+
+  return {
+    title: `${city.city}, ${city.country} - Travel Guide & Urban Data`,
+    description: `Comprehensive data and AI-powered travel insights for ${city.city}, ${city.country}. Real-time weather, demographics, and top attractions at Best City Spots.`,
+    openGraph: {
+      title: `${city.city} | Best City Spots`,
+      description: `Discover ${city.city} with AI insights and live urban data.`,
+      type: "website",
+    },
+  };
+}
+
 export default async function CityPage({
   params,
   searchParams,
@@ -279,6 +303,24 @@ export default async function CityPage({
     notFound();
   }
 
+  // SEO: Structured Data for the city
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "TouristDestination",
+    name: city.city,
+    description: `Detailed travel metrics and insights for ${city.city}, ${city.country}.`,
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: city.lat,
+      longitude: city.lng,
+    },
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: city.city,
+      addressCountry: city.country,
+    },
+  };
+
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
   const metrics = await getCityMetrics(city);
@@ -288,6 +330,10 @@ export default async function CityPage({
       id="main-content"
       className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}

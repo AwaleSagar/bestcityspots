@@ -88,11 +88,10 @@ export const metadata: Metadata = {
     : undefined,
 };
 
-import VisualEffects from "@/components/VisualEffects";
-import FloralAccent from "@/components/FloralAccent";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import SiteNav from "@/components/SiteNav";
 import SiteFooter from "@/components/SiteFooter";
+import ClientEffects from "@/components/ClientEffects";
 
 const jsonLd = [
   {
@@ -151,8 +150,7 @@ export default function RootLayout({
           >
             Skip to content
           </a>
-          <VisualEffects />
-          <FloralAccent />
+          <ClientEffects />
           <div className="relative z-10 flex min-h-screen flex-col">
             <div className="flex-1 flex flex-col">{children}</div>
             <SiteFooter />

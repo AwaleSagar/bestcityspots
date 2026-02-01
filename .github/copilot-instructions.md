@@ -1,41 +1,66 @@
 # Copilot Instructions for Best City Spots
 
-## Project Overview
-- **Best City Spots** is a Next.js 16 (App Router) platform for real-time urban intelligence, featuring a Liquid Glass UI, AI-powered city briefings, and live data integrations.
-- Major data sources: Google Gemini (AI), Google Places API, Open-Meteo (weather), and Supabase (database, caching, auth).
+## 1. Project Context
+- **Name**: Best City Spots (Atlas // Index 01)
+- **Stack**: Next.js 16 (App Router), Tailwind CSS 4, Supabase, Framer Motion.
+- **Core Value**: High-fidelity urban intelligence using liquid glass UI and AI-driven insights.
 
-## Architecture & Key Patterns
-- **src/app/**: Next.js App Router structure. API endpoints in `api/`, city pages in `cities/`, and resources in `resources/`.
-- **src/lib/**: Core business logic (AI, places, metrics, Supabase, validation). All API integrations and data processing live here.
-- **src/components/**: UI components, including Liquid Glass elements and visual effects.
-- **supabase/**: SQL migrations and RLS security policies. All DB changes must be reflected here.
-- **data/**: Static datasets for cities and candidates.
+## 2. Architecture & Patterns
+- **Directory Structure**:
+  - `src/app`: Routes & Pages. Prefer Server Components.
+  - `src/lib`: **Business Logic Core**. All API calls, Database interactions, and AI generation live here.
+    - `intelligence.ts`: Gemini integration + Supabase caching (Server-Side Cache).
+    - `places.ts`: Google Places API fetcher.
+    - `validation.ts`: Zod schemas for inputs.
+    - `supabase.ts`: Supabase client initialization.
+    - `storage.ts`: LocalStorage wrapper (Client-Side Preference).
+  - `src/components`: UI components using `framer-motion` and "liquid glass" CSS vars.
+  - `supabase/`: SQL migrations. **Always** check existing tables before writing queries.
 
-## Developer Workflows
-- **Setup**: Copy `.env.local` template from README and fill in API keys.
-- **Database**: Run all SQL scripts in `supabase/` to initialize tables and security.
-- **Start Dev Server**: `npm run dev`
-- **Linting**: `npm run lint` (uses `eslint-plugin-security`)
-- **Formatting**: `npm run format` (Prettier)
-- **Build**: `npm run build`
+- **Data Flow**:
+  1. **Server Components** fetch data via `src/lib/` functions.
+  2. **Functions in `src/lib`** (like `intelligence.ts`) check Supabase cache tables first (e.g., `city_ai_insights`).
+  3. **If Stale/Missing**: Fetch external API (Gemini/Google Places) -> Return Data -> Background Upsert to Supabase.
+  4. **Client Components** receive strictly typed props.
 
-## Project-Specific Conventions
-- **Validation**: All API inputs and env vars must use Zod schemas (see `src/lib/validation.ts`).
-- **Caching**: Use Supabase for 24h/7d persistent caching of API results (see `src/lib/storage.ts`).
-- **Security**: Enforce RLS in Supabase and validate all inputs. Never bypass Zod validation.
-- **Styling**: Use Tailwind CSS 4 and custom CSS for Liquid Glass effects. Avoid inline styles.
-- **Animations**: Use Framer Motion for transitions and background effects.
+- **Liquid Glass UI System**:
+  - Defined in `src/app/globals.css`.
+  - Use variables like `--color-glass`, `--liquid-glow-1`, `--shadow-3xl`.
+  - **Do not** hardcode colors; use Tailwind classes or these custom vars.
 
-## Integration & Communication
-- **API Integrations**: All external API logic is in `src/lib/` (e.g., `lib/places.ts`, `lib/intelligence.ts`).
-- **Cross-component Data**: Pass data via props or Next.js server actions. Avoid global state unless necessary.
-- **Security**: Never expose secrets to the client. Only use public keys in client code.
+## 3. Critical Workflows
+- **Development**: `npm run dev`
+- **Linting**: `npm run lint` (includes `eslint-plugin-security`). Fix all security warnings.
+- **Testing**: `npm run test:google-places` for API integration tests.
+- **Database**:
+  - Migrations in `supabase/`.
+  - Verify RLS policies in `supabase/security.sql` when adding tables.
 
-## Examples
-- **City Briefings**: See `src/app/cities/[id]/AIBriefingSection.tsx` for AI-driven content.
-- **API Route**: See `src/app/api/cities/sphere/route.ts` for a typical API handler.
-- **Validation**: See `src/lib/validation.ts` for Zod schemas.
-- **Caching**: See `src/lib/storage.ts` for Supabase caching logic.
+## 4. Coding Conventions
+- **Validation**:
+  - **MUST** use `zod` schemas from `src/lib/validation.ts` for all API inputs.
+  - Example: `uuidSchema.parse(id)`, `cityIdSchema.parse(param)`.
+- **Error Handling**:
+  - Handle errors explicitly in `src/lib`. Return `null` or throw structured errors to be caught by UI.
+- **AI Integration**:
+  - Use `GoogleGenerativeAI` in `src/lib/intelligence.ts`.
+  - **ALWAYS** implement the "Cache-First" pattern: Check DB -> Call AI -> Update DB.
+- **Styling**:
+  - Tailwind 4 + `src/app/globals.css` vars.
+  - Pattern: Glass background + blurred backdrop + fine borders.
 
----
-For more details, see [README.md](../README.md) and the `supabase/` SQL files.
+## 5. Key Integrations
+- **Supabase**:
+  - Use `supabaseServer` (in `src/lib/supabase.ts`) for server ops (bypasses RLS if service key present).
+  - Use `supabase` for client/anon ops.
+- **Google Gemini**:
+  - Model: `gemini-3-flash-preview` (or latest config).
+  - Output: Strict JSON only (strip markdown fencing).
+- **Google Places**:
+  - Use `fetchFromGoogle` in `src/lib/places.ts`. Respected radius limits.
+
+## 6. Common Pitfalls
+- **Confusing Caches**: `storage.ts` is client-side (localStorage). `city_ai_insights` table is server-side AI cache.
+- **Env Vars**: Only expose `NEXT_PUBLIC_` if used in client components.
+- **Security**: Never bypass Zod. Never expose API keys to client (except specific public ones).
+
