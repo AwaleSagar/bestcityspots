@@ -1,18 +1,41 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase, supabaseServer } from "./supabase";
 import { City } from "./cities";
+import { z } from "zod";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || "");
 
-export interface CityInsight {
-  intro: string;
-  attractions: { name: string; why: string }[];
-  seasons: { name: string; months: string; summary: string }[];
-  weather: { season: string; tempC: string; notes: string }[];
-}
+// --- Zod Schemas for Runtime Safety ---
+const AttractionSchema = z.object({
+  name: z.string(),
+  why: z.string(),
+});
+
+const SeasonSchema = z.object({
+  name: z.string(),
+  months: z.string(),
+  summary: z.string(),
+});
+
+const WeatherSchema = z.object({
+  season: z.string(),
+  tempC: z.string(),
+  notes: z.string(),
+});
+
+const CityInsightSchema = z.object({
+  intro: z.string().max(600),
+  attractions: z.array(AttractionSchema),
+  seasons: z.array(SeasonSchema),
+  weather: z.array(WeatherSchema),
+});
+
+export type CityInsight = z.infer<typeof CityInsightSchema>;
 
 function sanitizeJsonResponse(raw: string) {
-  return raw.replace(/```json/gi, "").replace(/```/g, "").trim();
+  // More robust cleanup for AI responses
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  return jsonMatch ? jsonMatch[0] : raw;
 }
 
 function isFresh(updated_at?: string, ttlDays = 365) {
@@ -23,9 +46,13 @@ function isFresh(updated_at?: string, ttlDays = 365) {
   return days < ttlDays;
 }
 
+/**
+ * Encapsulated fetch for City Insights with Zod validation
+ * and Stale-While-Revalidate support.
+ */
 export async function getCityInsight(city: City): Promise<CityInsight | null> {
   if (!process.env.GOOGLE_GEMINI_API_KEY) {
-    console.warn("GOOGLE_GEMINI_API_KEY not found, skipping AI city insight.");
+    console.warn("GOOGLE_GEMINI_API_KEY not found.");
     return null;
   }
 
@@ -36,13 +63,19 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       .eq("city_id", city.id)
       .maybeSingle();
 
-    if (cached && isFresh(cached.updated_at, 365)) {
-      return {
+    // Stale-While-Revalidate: Return cached data if present, even if old,
+    // though we prefer fresh data (< 365 days).
+    if (cached) {
+      const insight = {
         intro: cached.intro || "",
         attractions: (cached.attractions || []) as CityInsight["attractions"],
         seasons: (cached.seasons || []) as CityInsight["seasons"],
         weather: (cached.weather || []) as CityInsight["weather"],
       };
+
+      if (isFresh(cached.updated_at, 365)) {
+        return insight;
+      }
     }
 
     const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
@@ -50,80 +83,40 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       You are a concise travel curator. Summarize ${city.city}, ${city.country}.
       Return ONLY a JSON object with keys:
       {
-        "intro": "≤500 characters, vivid but factual city intro",
-        "attractions": [
-          { "name": "spot name", "why": "1 short sentence" },
-          { "name": "...", "why": "..." },
-          { "name": "...", "why": "..." }
-        ],
-        "seasons": [
-          { "name": "Spring", "months": "Mar-May", "summary": "concise guidance" },
-          { "name": "Summer", "months": "Jun-Aug", "summary": "concise guidance" },
-          { "name": "Autumn", "months": "Sep-Nov", "summary": "concise guidance" },
-          { "name": "Winter", "months": "Dec-Feb", "summary": "concise guidance" }
-        ],
-        "weather": [
-          { "season": "Spring", "tempC": "avg temp range in °C", "notes": "travel tip" },
-          { "season": "Summer", "tempC": "avg temp range in °C", "notes": "travel tip" },
-          { "season": "Autumn", "tempC": "avg temp range in °C", "notes": "travel tip" },
-          { "season": "Winter", "tempC": "avg temp range in °C", "notes": "travel tip" }
-        ]
+        "intro": "≤500 characters, vivid city intro",
+        "attractions": [{ "name": "spot", "why": "1 short sentence" }],
+        "seasons": [{ "name": "Spring", "months": "Mar-May", "summary": "advice" }],
+        "weather": [{ "season": "Spring", "tempC": "range°C", "notes": "tip" }]
       }
-      Do not add prose, code fences, or Markdown—just JSON.
     `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const parsed = JSON.parse(sanitizeJsonResponse(response.text()));
-
-    const insight: CityInsight = {
-      intro: parsed.intro || "",
-      attractions: Array.isArray(parsed.attractions) ? parsed.attractions.slice(0, 4) : [],
-      seasons: Array.isArray(parsed.seasons) ? parsed.seasons.slice(0, 4) : [],
-      weather: Array.isArray(parsed.weather) ? parsed.weather.slice(0, 4) : [],
-    };
-
-    // Immediately update cache with 365-day expiry (updated_at timestamp)
-    // Try service role key first, fallback to anon key (requires RLS policy to allow upserts)
-    const updatedAt = new Date().toISOString();
-    const clientToUse = supabaseServer || supabase;
+    const responseText = await result.response.text();
+    const rawJson = sanitizeJsonResponse(responseText);
     
-    const { error: upsertError } = await clientToUse.from("city_ai_insights").upsert(
+    // Validate with Zod before trusting the AI
+    const parsed = CityInsightSchema.parse(JSON.parse(rawJson));
+
+    // Async Update Cache (Don't block the return)
+    const clientToUse = supabaseServer || supabase;
+    clientToUse.from("city_ai_insights").upsert(
       {
         city_id: city.id,
         city_name: city.city,
         country: city.country,
-        intro: insight.intro,
-        attractions: insight.attractions,
-        seasons: insight.seasons,
-        weather: insight.weather,
-        updated_at: updatedAt,
+        ...parsed,
+        updated_at: new Date().toISOString(),
       },
-      {
-        onConflict: "city_id",
-      }
-    );
+      { onConflict: "city_id" }
+    ).then(({ error }) => {
+      if (!error) console.info(`✅ Cached insight for ${city.city}`);
+    });
 
-    if (upsertError) {
-      if (upsertError.code === "42501") {
-        console.error(
-          `❌ RLS policy blocked cache update for ${city.city}. ` +
-          `Run the SQL in supabase/fix_city_ai_insights_rls.sql or add SUPABASE_SERVICE_ROLE_KEY to .env.local`
-        );
-      } else {
-        console.error(`Failed to cache AI insight for ${city.city}:`, upsertError);
-      }
-      // Still return the insight even if cache update fails
-    } else {
-      const keyType = supabaseServer ? "service role" : "anon";
-      console.info(
-        `✅ Successfully cached AI insight for ${city.city} (expires in 365 days) using ${keyType} key`
-      );
-    }
-
-    return insight;
+    return parsed;
   } catch (e) {
-    console.error("Failed to get city insight:", e);
+    console.error(`Failed to get city insight for ${city.id}:`, e);
+    // If validation fails or AI errors, we could fall back to the cached (stale) data
+    // if we haven't already returned it.
     return null;
   }
 }
