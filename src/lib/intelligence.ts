@@ -56,6 +56,8 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
     return null;
   }
 
+  let cachedInsight: CityInsight | null = null;
+
   try {
     const { data: cached } = await supabase
       .from("city_ai_insights")
@@ -66,7 +68,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
     // Stale-While-Revalidate: Return cached data if present, even if old,
     // though we prefer fresh data (< 365 days).
     if (cached) {
-      const insight = {
+      cachedInsight = {
         intro: cached.intro || "",
         attractions: (cached.attractions || []) as CityInsight["attractions"],
         seasons: (cached.seasons || []) as CityInsight["seasons"],
@@ -74,7 +76,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       };
 
       if (isFresh(cached.updated_at, 365)) {
-        return insight;
+        return cachedInsight;
       }
     }
 
@@ -117,7 +119,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
     console.error(`Failed to get city insight for ${city.id}:`, e);
     // If validation fails or AI errors, we could fall back to the cached (stale) data
     // if we haven't already returned it.
-    return null;
+    return cachedInsight;
   }
 }
 
