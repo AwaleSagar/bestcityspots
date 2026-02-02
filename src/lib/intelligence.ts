@@ -34,8 +34,20 @@ export type CityInsight = z.infer<typeof CityInsightSchema>;
 
 function sanitizeJsonResponse(raw: string) {
   // More robust cleanup for AI responses
-  const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  return jsonMatch ? jsonMatch[0] : raw;
+  const start = raw.indexOf("{");
+  if (start === -1) return raw;
+
+  let depth = 0;
+  for (let i = start; i < raw.length; i += 1) {
+    const char = raw[i];
+    if (char === "{") depth += 1;
+    if (char === "}") depth -= 1;
+    if (depth === 0) {
+      return raw.slice(start, i + 1);
+    }
+  }
+
+  return raw;
 }
 
 function isFresh(updated_at?: string, ttlDays = 365) {
