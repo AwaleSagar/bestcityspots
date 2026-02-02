@@ -80,14 +80,16 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
     // Stale-While-Revalidate: Return cached data if present, even if old,
     // though we prefer fresh data (< 365 days).
     if (cached) {
-      cachedInsight = {
-        intro: cached.intro || "",
-        attractions: (cached.attractions || []) as CityInsight["attractions"],
-        seasons: (cached.seasons || []) as CityInsight["seasons"],
-        weather: (cached.weather || []) as CityInsight["weather"],
+      const cachedCandidate = {
+        intro: (cached.intro || "").slice(0, 600),
+        attractions: cached.attractions || [],
+        seasons: cached.seasons || [],
+        weather: cached.weather || [],
       };
+      const cachedParsed = CityInsightSchema.safeParse(cachedCandidate);
+      cachedInsight = cachedParsed.success ? cachedParsed.data : null;
 
-      if (isFresh(cached.updated_at, 365)) {
+      if (cachedInsight && isFresh(cached.updated_at, 365)) {
         return cachedInsight;
       }
     }
