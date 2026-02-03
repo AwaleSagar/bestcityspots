@@ -1,6 +1,6 @@
 import { City } from "./cities";
 import { z } from "zod";
-import { supabase } from "./supabase";
+import { supabase, supabaseServer } from "./supabase";
 
 const WeatherDataSchema = z.object({
   temp: z.number(),
@@ -31,9 +31,14 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
     return null;
   }
 
+  const db = supabaseServer ?? supabase;
+  if (!supabaseServer) {
+    console.warn("SUPABASE_SERVICE_ROLE_KEY missing; weather cache uses anon key.");
+  }
+
   try {
     // 1. Check Supabase Cache (60-minute TTL)
-    const { data: cached } = await supabase
+    const { data: cached } = await db
       .from("city_weather_cache")
       .select("*")
       .eq("city_id", city.id)
@@ -67,6 +72,8 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
     const weather = await weatherRes.json();
     const aqiData = await aqiRes.json();
 
+    const aqiValue = aqiData.list[0]?.main.aqi || 0;
+
     const normalized: WeatherData = {
       temp: weather.main.temp,
       feels_like: weather.main.feels_like,
@@ -76,21 +83,24 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
       description: weather.weather[0]?.description || "unknown",
       icon: weather.weather[0]?.icon || "",
       wind_speed: weather.wind.speed,
-      aqi: aqiData.list[0]?.main.aqi || 0,
-      aqi_label: AQI_LABELS[aqiData.list[0]?.main.aqi] || "Unknown",
+      aqi: aqiValue,
+      aqi_label: AQI_LABELS[aqiValue] || "Unknown",
       updated_at: new Date().toISOString(),
     };
 
     // 3. Update Cache Background
-    supabase
+    const { error: cacheError } = await db
       .from("city_weather_cache")
-      .upsert({ 
-        city_id: city.id, 
-        ...normalized 
-      }, { onConflict: "city_id" })
-      .then(({ error }) => {
-        if (error) console.error("Weather cache update failed:", error);
-      });
+      .upsert(
+        {
+          city_id: city.id,
+          ...normalized,
+        },
+        { onConflict: "city_id" }
+      );
+    if (cacheError) {
+      console.error("Weather cache update failed:", cacheError);
+    }
 
     return normalized;
   } catch (error) {
