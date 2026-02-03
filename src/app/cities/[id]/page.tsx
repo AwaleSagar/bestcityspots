@@ -2,26 +2,17 @@ import { getCityById } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
 import { getCityMetrics } from "@/lib/metrics";
+import { getCityWeather } from "@/lib/weather";
 import { cityIdSchema, coordinatesSchema } from "@/lib/validation";
 import ExperiencesSection from "./ExperiencesSection";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
+import CityVitals from "@/components/CityVitals";
 import {
   MapPin,
   Users,
   Navigation,
   ArrowLeft,
-  Globe,
-  Wind,
-  Cloud,
-  Thermometer,
-  Sun,
-  CloudSun,
-  CloudFog,
-  CloudDrizzle,
-  CloudRain,
-  CloudSnow,
-  CloudLightning,
   Activity,
   Cloud as CloudIcon,
   ThermometerSun,
@@ -32,80 +23,15 @@ import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
-async function getWeatherData(lat: number, lng: number) {
-  try {
-    const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code,wind_speed_10m&timezone=auto`,
-      { next: { revalidate: 3600 } } // Cache for 1 hour
-    );
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.current;
-  } catch (e) {
-    console.error("Weather fetch failed:", e);
-    return null;
-  }
-}
-
-const weatherCodeMap: Record<
-  number,
-  { label: string; icon: React.ComponentType<{ className?: string }> }
-> = {
-  0: { label: "Clear Sky", icon: Sun },
-  1: { label: "Mainly Clear", icon: CloudSun },
-  2: { label: "Partly Cloudy", icon: CloudSun },
-  3: { label: "Overcast", icon: Cloud },
-  45: { label: "Foggy", icon: CloudFog },
-  48: { label: "Depositing Fog", icon: CloudFog },
-  51: { label: "Light Drizzle", icon: CloudDrizzle },
-  53: { label: "Moderate Drizzle", icon: CloudDrizzle },
-  55: { label: "Dense Drizzle", icon: CloudDrizzle },
-  61: { label: "Slight Rain", icon: CloudRain },
-  63: { label: "Moderate Rain", icon: CloudRain },
-  65: { label: "Heavy Rain", icon: CloudRain },
-  71: { label: "Slight Snow", icon: CloudSnow },
-  73: { icon: CloudSnow, label: "Moderate Snow" },
-  75: { label: "Heavy Snow", icon: CloudSnow },
-  80: { label: "Slight Showers", icon: CloudRain },
-  81: { label: "Moderate Showers", icon: CloudRain },
-  82: { label: "Violent Showers", icon: CloudRain },
-  95: { label: "Thunderstorm", icon: CloudLightning },
-};
-
-async function WeatherSection({ lat, lng }: { lat: number; lng: number }) {
-  const weather = await getWeatherData(lat, lng);
-  const weatherInfo = weather
-    ? weatherCodeMap[weather.weather_code] || { label: "Unknown", icon: Cloud }
-    : null;
-  const WeatherIcon = weatherInfo?.icon || Cloud;
-
-  const metrics = [
-    {
-      icon: Thermometer,
-      label: "Current Temp",
-      value: weather ? `${Math.round(weather.temperature_2m)}°C` : "N/A",
-    },
-    { icon: WeatherIcon, label: "Condition", value: weatherInfo?.label || "Unknown" },
-    { icon: Wind, label: "Wind Speed", value: weather ? `${weather.wind_speed_10m} km/h` : "N/A" },
-    { icon: Globe, label: "Coordinates", value: `${lat.toFixed(2)}°, ${lng.toFixed(2)}°` },
-  ];
-
+function CityVitalsFallback() {
   return (
-    <div className="animate-slow-fade-in grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-      {metrics.map((item, i) => (
-        <div
-          key={i}
-          className="space-y-3 rounded-2xl border border-foreground/5 bg-foreground/[0.01] p-5 transition-colors duration-100 hover:bg-foreground/[0.04] sm:rounded-[2rem] sm:space-y-4 sm:p-8"
-        >
-          <item.icon className="h-5 w-5 text-purple-500/30" />
-          <div>
-            <div className="mb-1 text-[9px] font-black tracking-widest text-foreground/40 uppercase">
-              {item.label}
-            </div>
-            <div className="text-lg font-black tracking-tight text-foreground/80">{item.value}</div>
-          </div>
-        </div>
-      ))}
+    <div className="liquid-glass rounded-[2rem] border border-foreground/5 p-6">
+      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
+        Live City Vitals
+      </div>
+      <p className="mt-4 text-sm font-bold text-foreground/50">
+        Vitals unavailable right now. Please check back soon.
+      </p>
     </div>
   );
 }
@@ -228,21 +154,12 @@ function SectionSkeleton() {
   );
 }
 
-function WeatherSkeleton() {
+function CityVitalsSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="animate-pulse space-y-4 rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-8"
-        >
-          <div className="h-5 w-5 rounded-full bg-foreground/5" />
-          <div className="space-y-2">
-            <div className="h-2 w-12 rounded bg-foreground/5" />
-            <div className="h-4 w-20 rounded bg-foreground/5" />
-          </div>
-        </div>
-      ))}
+    <div className="animate-pulse rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-6">
+      <div className="h-2 w-32 rounded bg-foreground/5" />
+      <div className="mt-4 h-6 w-24 rounded bg-foreground/5" />
+      <div className="mt-6 h-10 w-full rounded bg-foreground/5" />
     </div>
   );
 }
@@ -324,6 +241,7 @@ export default async function CityPage({
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
   const metrics = await getCityMetrics(city);
+  const weather = await getCityWeather(city);
 
   return (
     <main
@@ -424,8 +342,8 @@ export default async function CityPage({
               <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
                 Structural Profile <span className="h-px flex-1 bg-foreground/5" />
               </h2>
-              <Suspense fallback={<WeatherSkeleton />}>
-                <WeatherSection lat={finalLat} lng={finalLng} />
+              <Suspense fallback={<CityVitalsSkeleton />}>
+                {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
               </Suspense>
             </section>
 
