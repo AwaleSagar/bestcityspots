@@ -1,10 +1,20 @@
 import { supabase, supabaseServer } from "./supabase";
 import { rankingEngine } from "./ranking";
+import sharp from "sharp";
+import { encode } from "blurhash";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const BUCKET = "place_images";
 const IMAGE_MAX_WIDTH = 800;
 const IMAGE_MAX_HEIGHT = 600;
+const BLURHASH_COMPONENT_X = 4;
+const BLURHASH_COMPONENT_Y = 3;
+
+// Result type for image resolution with BlurHash
+interface ImageResult {
+  imageUrl: string;
+  blurhash: string;
+}
 
 function haversineKm(
   lat1: number,
@@ -39,6 +49,7 @@ export interface Landmark {
     longitude?: number;
   };
   imageUrl?: string;
+  blurhash?: string;
 }
 
 type GooglePlacePhoto = { name: string };
@@ -47,12 +58,40 @@ type GooglePlace = Landmark & {
   photos?: GooglePlacePhoto[];
 };
 
+// Generate BlurHash from image buffer using sharp
+async function generateBlurhash(imageBuffer: ArrayBuffer): Promise<string | undefined> {
+  try {
+    // Resize to small dimensions for fast BlurHash encoding
+    const { data, info } = await sharp(Buffer.from(imageBuffer))
+      .resize(32, 32, { fit: "inside" })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // Encode to BlurHash
+    const blurhash = encode(
+      new Uint8ClampedArray(data),
+      info.width,
+      info.height,
+      BLURHASH_COMPONENT_X,
+      BLURHASH_COMPONENT_Y
+    );
+
+    return blurhash;
+  } catch (e) {
+    console.warn("[places] Failed to generate blurhash:", e);
+    return undefined;
+  }
+}
+
 // Resolve place photo to Supabase Storage URL (fetch from Google, upload, return public URL)
+// Also generates BlurHash for LQIP placeholder
 async function resolvePlaceImage(
   placeId: string,
   photoName: string,
-  apiKey: string
-): Promise<string | undefined> {
+  apiKey: string,
+  existingBlurhash?: string
+): Promise<ImageResult | undefined> {
   const client = supabaseServer ?? supabase;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!supabaseUrl) return undefined;
@@ -61,14 +100,34 @@ async function resolvePlaceImage(
   const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${storagePath}`;
 
   try {
+    // Check if image already exists in storage
     const headRes = await fetch(publicUrl, { method: "HEAD" });
-    if (headRes.ok) return publicUrl;
+    if (headRes.ok) {
+      // Image exists, but we may need to generate blurhash if not cached
+      if (existingBlurhash) {
+        return { imageUrl: publicUrl, blurhash: existingBlurhash };
+      }
+      // Fetch image to generate blurhash for existing cached images
+      const existingImageRes = await fetch(publicUrl);
+      if (existingImageRes.ok) {
+        const existingBuffer = await existingImageRes.arrayBuffer();
+        const blurhash = await generateBlurhash(existingBuffer);
+        return { imageUrl: publicUrl, blurhash: blurhash ?? "" };
+      }
+      return { imageUrl: publicUrl, blurhash: "" };
+    }
 
+    // Fetch from Google Places API
     const mediaUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${IMAGE_MAX_WIDTH}&maxHeightPx=${IMAGE_MAX_HEIGHT}&key=${apiKey}`;
     const imageRes = await fetch(mediaUrl, { redirect: "follow" });
     if (!imageRes.ok) return undefined;
 
     const arrayBuffer = await imageRes.arrayBuffer();
+
+    // Generate BlurHash before uploading
+    const blurhash = await generateBlurhash(arrayBuffer);
+
+    // Upload to Supabase Storage
     const { error } = await client.storage
       .from(BUCKET)
       .upload(storagePath, arrayBuffer, {
@@ -80,7 +139,8 @@ async function resolvePlaceImage(
       console.warn(`[places] Failed to upload image for ${placeId}:`, error.message);
       return undefined;
     }
-    return publicUrl;
+
+    return { imageUrl: publicUrl, blurhash: blurhash ?? "" };
   } catch (e) {
     console.warn(`[places] Failed to resolve image for ${placeId}:`, e);
     return undefined;
@@ -267,7 +327,7 @@ export async function getTopPlaces(
       });
     }
 
-    // 2b. Enrich places with cached images (fetch from Google, upload to Supabase)
+    // 2b. Enrich places with cached images and BlurHash (fetch from Google, upload to Supabase)
     const BATCH_SIZE = 3;
     for (let i = 0; i < places.length; i += BATCH_SIZE) {
       const batch = places.slice(i, i + BATCH_SIZE);
@@ -275,9 +335,16 @@ export async function getTopPlaces(
         batch.map(async (place) => {
           const photo = place.photos?.[0];
           if (!photo?.name || !place.id) return;
-          const imageUrl = await resolvePlaceImage(place.id, photo.name, API_KEY);
-          if (imageUrl) {
-            (place as Landmark).imageUrl = imageUrl;
+          const landmark = place as Landmark;
+          const result = await resolvePlaceImage(
+            place.id,
+            photo.name,
+            API_KEY,
+            landmark.blurhash
+          );
+          if (result) {
+            landmark.imageUrl = result.imageUrl;
+            landmark.blurhash = result.blurhash;
           }
           delete (place as GooglePlace).photos;
         })

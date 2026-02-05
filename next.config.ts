@@ -12,10 +12,17 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     remotePatterns: [
+      // Standard Supabase Storage URLs
       {
         protocol: "https",
         hostname: supabaseHost,
         pathname: "/storage/v1/object/public/**",
+      },
+      // Supabase Image Transformation URLs (for WebP/resize on-the-fly)
+      {
+        protocol: "https",
+        hostname: supabaseHost,
+        pathname: "/storage/v1/render/image/public/**",
       },
     ],
   },

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { Landmark } from "@/lib/places";
 import { formatPopulation } from "@/lib/format";
 import {
@@ -18,6 +18,8 @@ import {
   Bookmark,
   BookmarkCheck,
   BookmarkPlus,
+  MapPin,
+  ExternalLink,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -454,16 +456,15 @@ export default function ExperiencesSection({
               >
                 {item.imageUrl && (
                   <div className="relative h-40 md:h-52 w-full shrink-0">
-                    <Image
+                    <OptimizedImage
                       src={item.imageUrl}
+                      blurhash={item.blurhash}
                       alt={item.displayName.text}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 800px"
-                      className="object-cover"
-                      loading="lazy"
+                      className="h-full w-full"
+                      objectFit="cover"
                     />
                     <div
-                      className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"
+                      className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-background/90 via-background/20 to-transparent"
                       aria-hidden
                     />
                   </div>
@@ -473,16 +474,13 @@ export default function ExperiencesSection({
                 >
                   <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                     <div className="flex items-start gap-4 md:items-center md:gap-6">
-                      <a
-                      href={item.googleMapsUri}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02] transition-colors duration-100 group-hover/landmark:border-purple-500/30 group-hover/landmark:bg-purple-500/10 active:scale-95"
-                      title="View on Google Maps"
-                    >
-                      <Compass className="h-5 w-5 text-gray-500 transition-colors duration-100 group-hover/landmark:text-purple-400" />
-                    </a>
-                    <div>
+                      <div
+                        className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02]"
+                        aria-hidden="true"
+                      >
+                        <Compass className="h-5 w-5 text-purple-400/60" />
+                      </div>
+                      <div>
                       <div className="text-lg md:text-xl font-black tracking-tight text-foreground/90">
                         {item.displayName.text}
                       </div>
@@ -544,6 +542,18 @@ export default function ExperiencesSection({
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2">
+                      {item.googleMapsUri && (
+                        <a
+                          href={item.googleMapsUri}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-blue-300 transition-all hover:border-blue-400/50 hover:bg-blue-500/20 hover:text-blue-200 active:scale-95"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          <span>Open in Maps</span>
+                          <ExternalLink className="h-3 w-3 opacity-60" />
+                        </a>
+                      )}
                       <button
                         onClick={() => toggleSave(item, activeTab)}
                         className={`flex w-28 items-center justify-center gap-2 rounded-xl border py-2 text-[11px] font-black uppercase tracking-[0.15em] transition-all ${savedIds.has(item.id)
