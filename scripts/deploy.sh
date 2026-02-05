@@ -1,6 +1,44 @@
 #!/usr/bin/env bash
 set -e
 
+# --- Load Node.js Environment ---
+# Support for nvm, fnm, or system-wide Node.js installation
+load_node_env() {
+    # Try nvm first (most common)
+    if [ -s "$HOME/.nvm/nvm.sh" ]; then
+        export NVM_DIR="$HOME/.nvm"
+        source "$NVM_DIR/nvm.sh"
+        return 0
+    fi
+    
+    # Try fnm (fast node manager)
+    if command -v fnm &> /dev/null; then
+        eval "$(fnm env)"
+        return 0
+    fi
+    
+    # Try common Node.js paths
+    for node_path in /usr/local/bin /usr/bin "$HOME/.local/bin"; do
+        if [ -x "$node_path/node" ]; then
+            export PATH="$node_path:$PATH"
+            return 0
+        fi
+    done
+    
+    # Check if npm is already available
+    if command -v npm &> /dev/null; then
+        return 0
+    fi
+    
+    return 1
+}
+
+# Load Node environment
+if ! load_node_env; then
+    echo "ERROR: Could not find Node.js/npm. Please install Node.js or set up nvm."
+    exit 1
+fi
+
 # --- Configuration & Defaults ---
 REPO_DIR="${REPO_DIR:-/var/www/bestcityspots}"
 COMPOSE_PROJECT_DIR="${COMPOSE_PROJECT_DIR:-$REPO_DIR}"
