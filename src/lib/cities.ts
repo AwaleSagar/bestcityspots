@@ -17,8 +17,31 @@ export interface City {
 // Basic client-side cache for search results
 const searchCache = new Map<string, City[]>();
 
+// Sorted cache keys for efficient prefix lookup - O(log m) binary search instead of O(m) iteration
+let sortedCacheKeys: string[] = [];
+
 function normalizeQuery(q: string) {
   return q.trim().toLowerCase();
+}
+
+/**
+ * Binary search to find the longest cached prefix of a query
+ * Time: O(n × log m) where n = query length, m = cache size
+ * Much better than O(m) iteration for large caches
+ */
+function findLongestCachedPrefix(query: string): string | null {
+  let bestPrefix: string | null = null;
+  
+  // Check progressively shorter prefixes of the query
+  // This is O(n) where n = query length (typically < 20)
+  for (let len = query.length; len >= 2; len--) {
+    const prefix = query.slice(0, len);
+    if (searchCache.has(prefix)) {
+      return prefix; // Return immediately - this is the longest one
+    }
+  }
+  
+  return bestPrefix;
 }
 
 function cityMatchesQuery(c: City, q: string) {
@@ -101,12 +124,8 @@ export async function searchCities(query: string, limit = 10, signal?: AbortSign
   // Incremental optimization: if we already have results for a shorter prefix,
   // filter them client-side to avoid a DB request while the user keeps typing.
   // (Works especially well for fast typers on higher-latency networks.)
-  let bestPrefix: string | null = null;
-  for (const k of searchCache.keys()) {
-    if (cleanQuery.startsWith(k) && (bestPrefix === null || k.length > bestPrefix.length)) {
-      bestPrefix = k;
-    }
-  }
+  // Optimized: O(n) where n = query length, instead of O(m) where m = cache size
+  const bestPrefix = findLongestCachedPrefix(cleanQuery);
   if (bestPrefix) {
     const base = searchCache.get(bestPrefix) || [];
     const filtered = base

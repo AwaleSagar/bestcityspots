@@ -91,11 +91,60 @@ function generateStars(count: number, labels: string[]): Star[] {
   return stars;
 }
 
+/**
+ * Grid-based spatial indexing for O(n) connection generation
+ * Instead of O(n²) checking all pairs, we only check nearby cells
+ */
+function buildSpatialGrid(stars: Star[], cellSize: number): Map<string, Star[]> {
+  const grid = new Map<string, Star[]>();
+  for (const star of stars) {
+    const cellX = Math.floor(star.x / cellSize);
+    const cellY = Math.floor(star.y / cellSize);
+    const key = `${cellX},${cellY}`;
+    const cell = grid.get(key);
+    if (cell) {
+      cell.push(star);
+    } else {
+      grid.set(key, [star]);
+    }
+  }
+  return grid;
+}
+
+function getNeighborStars(grid: Map<string, Star[]>, star: Star, cellSize: number): Star[] {
+  const cellX = Math.floor(star.x / cellSize);
+  const cellY = Math.floor(star.y / cellSize);
+  const neighbors: Star[] = [];
+  
+  // Check current cell and 8 adjacent cells
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      const key = `${cellX + dx},${cellY + dy}`;
+      const cell = grid.get(key);
+      if (cell) {
+        for (const other of cell) {
+          if (other.id !== star.id) {
+            neighbors.push(other);
+          }
+        }
+      }
+    }
+  }
+  return neighbors;
+}
+
 function generateConnections(stars: Star[]): Connection[] {
   const connections: Connection[] = [];
   const connectionCounts = new Map<number, number>();
+  // Use Set for O(1) duplicate detection instead of O(c) array.some()
+  const connectionSet = new Set<string>();
 
   stars.forEach((star) => connectionCounts.set(star.id, 0));
+
+  // Grid cell size based on connection distance (in percentage units)
+  // CONNECTION_DISTANCE is 180, scaled by 10 = 18 units
+  const cellSize = CONNECTION_DISTANCE / 10;
+  const grid = buildSpatialGrid(stars, cellSize);
 
   for (let i = 0; i < stars.length; i++) {
     const star = stars[i];
@@ -103,29 +152,34 @@ function generateConnections(stars: Star[]): Connection[] {
 
     if (currentCount >= MAX_CONNECTIONS_PER_STAR) continue;
 
-    // Find nearby stars to connect
-    const nearby = stars
-      .filter((other) => {
-        if (other.id === star.id) return false;
-        const otherCount = connectionCounts.get(other.id) || 0;
-        if (otherCount >= MAX_CONNECTIONS_PER_STAR) return false;
+    // Only check stars in nearby grid cells - O(k) where k is local density
+    const nearbyStars = getNeighborStars(grid, star, cellSize);
+    
+    // Find nearby stars to connect (filter by distance and connection count)
+    const candidates: Star[] = [];
+    for (const other of nearbyStars) {
+      const otherCount = connectionCounts.get(other.id) || 0;
+      if (otherCount >= MAX_CONNECTIONS_PER_STAR) continue;
 
-        const dx = (star.x - other.x) * 10; // Scale for percentage
-        const dy = (star.y - other.y) * 10;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        return distance < CONNECTION_DISTANCE / 10;
-      })
-      .slice(0, MAX_CONNECTIONS_PER_STAR - currentCount);
+      const dx = (star.x - other.x) * 10; // Scale for percentage
+      const dy = (star.y - other.y) * 10;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < CONNECTION_DISTANCE / 10) {
+        candidates.push(other);
+      }
+      
+      if (candidates.length >= MAX_CONNECTIONS_PER_STAR - currentCount) break;
+    }
 
-    nearby.forEach((other) => {
-      // Avoid duplicate connections
-      const exists = connections.some(
-        (c) =>
-          (c.from === star.id && c.to === other.id) ||
-          (c.from === other.id && c.to === star.id)
-      );
-
-      if (!exists) {
+    for (const other of candidates) {
+      // O(1) duplicate check using Set
+      const connKey = star.id < other.id 
+        ? `${star.id}-${other.id}` 
+        : `${other.id}-${star.id}`;
+      
+      if (!connectionSet.has(connKey)) {
+        connectionSet.add(connKey);
+        
         const dx = (star.x - other.x) * 10;
         const dy = (star.y - other.y) * 10;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -142,7 +196,7 @@ function generateConnections(stars: Star[]): Connection[] {
         connectionCounts.set(star.id, (connectionCounts.get(star.id) || 0) + 1);
         connectionCounts.set(other.id, (connectionCounts.get(other.id) || 0) + 1);
       }
-    });
+    }
   }
 
   return connections;

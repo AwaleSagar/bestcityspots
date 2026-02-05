@@ -130,15 +130,25 @@ export default function CitySphereBackground() {
   }, [shouldReduceMotion]);
 
   // Periodically change active labels with more variety
+  // Optimized: Use Set for O(1) membership check instead of O(k) includes()
   useEffect(() => {
     const interval = setInterval(() => {
       const count = Math.floor(Math.random() * 4) + 3; // 3-6 active labels
       setActiveIndices(prev => {
+        // Use Set for O(1) lookups instead of O(k) includes()
+        const activeSet = new Set(prev);
         const next = [...prev];
-        if (next.length > 4) next.shift();
+        if (next.length > 4) {
+          const removed = next.shift();
+          if (removed !== undefined) activeSet.delete(removed);
+        }
         for (let i = 0; i < count; i++) {
           const idx = Math.floor(Math.random() * labels.length);
-          if (!next.includes(idx)) next.push(idx);
+          // O(1) Set.has() instead of O(k) Array.includes()
+          if (!activeSet.has(idx)) {
+            next.push(idx);
+            activeSet.add(idx);
+          }
         }
         return next.slice(-8); // Keep max 8
       });
@@ -194,6 +204,9 @@ export default function CitySphereBackground() {
     };
   }, [shouldReduceMotion]);
 
+  // Pre-compute Set for O(1) active index lookups in render loop
+  const activeIndicesSet = useMemo(() => new Set(activeIndices), [activeIndices]);
+
   return (
     <div className="city-sphere-layer pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
       {/* Aurora gradient background */}
@@ -240,7 +253,8 @@ export default function CitySphereBackground() {
       <div ref={containerRef} className="city-sphere">
         {points.map((p, i) => {
           const label = labels.at(i) ?? "";
-          const isActive = activeIndices.includes(i);
+          // O(1) Set.has() instead of O(k) Array.includes()
+          const isActive = activeIndicesSet.has(i);
           const depth = (p.z / SPHERE_RADIUS + 1) / 2;
           
           // Enhanced visibility with color-based opacity

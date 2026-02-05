@@ -88,6 +88,51 @@ const localPulseTags: Record<string, string[]> = {
 };
 const localPulseMap = new Map<string, string[]>(Object.entries(localPulseTags));
 
+/**
+ * Partial sort to get top K elements - O(n log k) instead of O(n log n)
+ * For small k (like 5), this is much faster than sorting the entire array
+ */
+function topK<T>(arr: T[], k: number, getValue: (item: T) => number): T[] {
+  if (arr.length <= k) {
+    // If array is small enough, just sort it
+    return [...arr].sort((a, b) => getValue(b) - getValue(a));
+  }
+  
+  // Use a simple selection approach for small k
+  // Maintain a sorted array of top k elements
+  const topItems: T[] = [];
+  
+  for (const item of arr) {
+    const value = getValue(item);
+    
+    if (topItems.length < k) {
+      // Still filling up the top k
+      topItems.push(item);
+      // Keep sorted (insertion sort for small k is O(k))
+      for (let i = topItems.length - 1; i > 0; i--) {
+        if (getValue(topItems[i]) > getValue(topItems[i - 1])) {
+          [topItems[i], topItems[i - 1]] = [topItems[i - 1], topItems[i]];
+        } else {
+          break;
+        }
+      }
+    } else if (value > getValue(topItems[k - 1])) {
+      // This item is better than the worst in top k
+      topItems[k - 1] = item;
+      // Bubble up to correct position
+      for (let i = k - 1; i > 0; i--) {
+        if (getValue(topItems[i]) > getValue(topItems[i - 1])) {
+          [topItems[i], topItems[i - 1]] = [topItems[i - 1], topItems[i]];
+        } else {
+          break;
+        }
+      }
+    }
+  }
+  
+  return topItems;
+}
+
 interface ExperiencesSectionProps {
   cityName: string;
   landmarks: Landmark[];
@@ -284,9 +329,8 @@ export default function ExperiencesSection({
     : rawData;
 
   // Always take top 5 based on reviews
-  const displayData = filteredData
-    .sort((a, b) => (b.userRatingCount || 0) - (a.userRatingCount || 0))
-    .slice(0, 5);
+  // Optimized: O(n log k) partial sort instead of O(n log n) full sort
+  const displayData = topK(filteredData, 5, (item) => item.userRatingCount || 0);
 
   const formatType = (types?: string[]) => {
     if (!types || types.length === 0) return "Point of Interest";

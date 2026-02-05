@@ -12,6 +12,19 @@ export interface SphereCategory {
   cities: string[];
 }
 
+/**
+ * Fisher-Yates shuffle algorithm - O(n) time, O(1) extra space (in-place)
+ * Provides unbiased random permutation unlike sort(() => Math.random() - 0.5)
+ */
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const result = [...arr]; // Don't mutate original
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export const SPHERE_CATEGORIES: SphereCategory[] = [
   {
     id: "beaches",
@@ -233,16 +246,17 @@ export const SPHERE_CATEGORIES: SphereCategory[] = [
 /**
  * Get a balanced mix of cities from all categories
  * Ensures diversity by taking cities from each category in rotation
+ * Optimized: Uses Fisher-Yates O(n) shuffle instead of O(n log n) random sort
  */
 export function getMixedCitiesFromCategories(limit: number = 120): string[] {
   const result: string[] = [];
   const usedCities = new Set<string>();
 
-  // Shuffle categories for variety
-  const shuffledCategories = [...SPHERE_CATEGORIES].sort(() => Math.random() - 0.5);
+  // O(n) Fisher-Yates shuffle instead of O(n log n) random sort
+  const shuffledCategories = fisherYatesShuffle(SPHERE_CATEGORIES);
 
   let categoryIndex = 0;
-  let cityIndexPerCategory = new Map<string, number>();
+  const cityIndexPerCategory = new Map<string, number>();
 
   // Initialize city indices
   shuffledCategories.forEach((cat) => cityIndexPerCategory.set(cat.id, 0));
@@ -269,20 +283,28 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
     if (categoryIndex >= shuffledCategories.length * 15) break;
   }
 
-  // Shuffle the final result for visual randomness
-  return result.sort(() => Math.random() - 0.5);
+  // O(n) Fisher-Yates shuffle for visual randomness
+  return fisherYatesShuffle(result);
 }
+
+// Pre-built Map for O(1) category lookup instead of O(c) Array.find()
+const categoryMap = new Map<string, SphereCategory>(
+  SPHERE_CATEGORIES.map(cat => [cat.id, cat])
+);
 
 /**
  * Get cities from a specific category
+ * Optimized: O(1) Map lookup instead of O(c) Array.find()
  */
 export function getCitiesFromCategory(categoryId: string): string[] {
-  const category = SPHERE_CATEGORIES.find((c) => c.id === categoryId);
+  const category = categoryMap.get(categoryId);
   return category?.cities || [];
 }
 
 /**
  * Get all category IDs
+ * Note: This is called infrequently, so O(c) is acceptable
+ * Could cache if called frequently
  */
 export function getCategoryIds(): string[] {
   return SPHERE_CATEGORIES.map((c) => c.id);
