@@ -11,7 +11,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
-    "test:google-places": "tsx test-google-places.ts"
+    "test:google-places": "tsx test-google-places.ts",
+    "warm-cache": "tsx scripts/warm-cache.ts",
+    "warm-cache:trending": "tsx scripts/warm-cache.ts --trending-only",
+    "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
