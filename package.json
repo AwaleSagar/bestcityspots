@@ -14,7 +14,10 @@
     "test:google-places": "tsx test-google-places.ts",
     "warm-cache": "tsx scripts/warm-cache.ts",
     "warm-cache:trending": "tsx scripts/warm-cache.ts --trending-only",
-    "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run"
+    "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run",
+    "analytics": "./scripts/analytics-report.sh",
+    "analytics:csv": "./scripts/analytics-report.sh --export csv",
+    "analytics:json": "./scripts/analytics-report.sh --export json"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
