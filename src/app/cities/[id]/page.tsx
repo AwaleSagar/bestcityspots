@@ -5,6 +5,7 @@ import { getCityMetrics } from "@/lib/metrics";
 import { getCityWeather } from "@/lib/weather";
 import { cityIdSchema, coordinatesSchema } from "@/lib/validation";
 import ExperiencesSection from "./ExperiencesSection";
+import ExperiencesSkeleton from "./ExperiencesSkeleton";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
 import CityVitals from "@/components/features/city/CityVitals";
@@ -129,27 +130,6 @@ async function ExperiencesWrapper({
         restaurants={restaurants}
         hotels={hotels}
       />
-    </div>
-  );
-}
-
-function SectionSkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="h-4 w-48 bg-foreground/5 rounded animate-pulse" />
-      <div className="flex gap-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="h-10 w-24 bg-foreground/5 rounded-2xl animate-pulse" />
-        ))}
-      </div>
-      <div className="grid grid-cols-1 gap-4">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="animate-pulse h-24 rounded-[2.5rem] border border-foreground/5 bg-foreground/[0.01]"
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -348,7 +328,7 @@ export default async function CityPage({
             </section>
 
             {/* Landmarks Section */}
-            <Suspense fallback={<SectionSkeleton />}>
+            <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
           </div>
