@@ -2,6 +2,7 @@ import { City } from "./cities";
 import { z } from "zod";
 import { supabase, supabaseServer } from "./supabase";
 
+// Runtime validation schema for the application's internal weather model
 const WeatherDataSchema = z.object({
   temp: z.number(),
   feels_like: z.number(),
@@ -18,7 +19,16 @@ const WeatherDataSchema = z.object({
 
 export type WeatherData = z.infer<typeof WeatherDataSchema>;
 
-const AQI_LABELS = ["Unknown", "Good", "Fair", "Moderate", "Poor", "Very Poor"];
+function getAqiLabel(aqi: number): string {
+  switch (aqi) {
+    case 1: return "Good";
+    case 2: return "Fair";
+    case 3: return "Moderate";
+    case 4: return "Poor";
+    case 5: return "Very Poor";
+    default: return "Unknown";
+  }
+}
 
 /**
  * Fetches weather and air quality with a 60-minute cache to respect API limits (1,000/day).
@@ -50,7 +60,9 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
       const ageMinutes = (now.getTime() - updatedAt.getTime()) / (1000 * 60);
 
       if (ageMinutes < 60) {
-        return cached as WeatherData;
+        // Validate cached data structure
+        const parsed = WeatherDataSchema.safeParse(cached);
+        if (parsed.success) return parsed.data;
       }
     }
 
@@ -65,28 +77,37 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
     ]);
 
     if (!weatherRes.ok || !aqiRes.ok) {
-        if (cached) return cached as WeatherData; // Fallback to stale on API error
-        return null;
+      if (cached) {
+        const parsed = WeatherDataSchema.safeParse(cached);
+        if (parsed.success) return parsed.data;
+      }
+      return null; // Fallback to stale on API error
     }
 
     const weather = await weatherRes.json();
     const aqiData = await aqiRes.json();
 
-    const aqiValue = aqiData.list[0]?.main.aqi || 0;
+    // Safe access for AQI
+    const rawAqi = aqiData.list?.[0]?.main?.aqi;
+    const aqiValue = typeof rawAqi === 'number' ? rawAqi : 0;
+    const aqiLabel = getAqiLabel(aqiValue);
 
     const normalized: WeatherData = {
-      temp: weather.main.temp,
-      feels_like: weather.main.feels_like,
-      temp_min: weather.main.temp_min,
-      temp_max: weather.main.temp_max,
-      humidity: weather.main.humidity,
-      description: weather.weather[0]?.description || "unknown",
-      icon: weather.weather[0]?.icon || "",
-      wind_speed: weather.wind.speed,
+      temp: weather.main?.temp || 0,
+      feels_like: weather.main?.feels_like || 0,
+      temp_min: weather.main?.temp_min || 0,
+      temp_max: weather.main?.temp_max || 0,
+      humidity: weather.main?.humidity || 0,
+      description: weather.weather?.[0]?.description || "unknown",
+      icon: weather.weather?.[0]?.icon || "",
+      wind_speed: weather.wind?.speed || 0,
       aqi: aqiValue,
-      aqi_label: AQI_LABELS[aqiValue] || "Unknown",
+      aqi_label: aqiLabel,
       updated_at: new Date().toISOString(),
     };
+
+    // Runtime validation of fresh data
+    const validData = WeatherDataSchema.parse(normalized);
 
     // 3. Update Cache Background
     const { error: cacheError } = await db
@@ -94,7 +115,7 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
       .upsert(
         {
           city_id: city.id,
-          ...normalized,
+          ...validData,
         },
         { onConflict: "city_id" }
       );
@@ -102,7 +123,7 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
       console.error("Weather cache update failed:", cacheError);
     }
 
-    return normalized;
+    return validData;
   } catch (error) {
     console.error("Failed to fetch city weather:", error);
     return null;

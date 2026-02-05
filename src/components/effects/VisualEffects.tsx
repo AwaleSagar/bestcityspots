@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Shield, Cpu, Activity, Database, Globe } from "lucide-react";
 import { usePathname } from "next/navigation";
-import CitySphereBackground from "@/components/CitySphereBackground";
+import CitySphereBackground from "@/components/features/city/CitySphereBackground";
 
 export default function VisualEffects() {
   const shouldReduceMotion = useReducedMotion();

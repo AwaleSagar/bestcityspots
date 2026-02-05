@@ -7,7 +7,7 @@ import { cityIdSchema, coordinatesSchema } from "@/lib/validation";
 import ExperiencesSection from "./ExperiencesSection";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
-import CityVitals from "@/components/CityVitals";
+import CityVitals from "@/components/features/city/CityVitals";
 import {
   MapPin,
   Users,
@@ -21,7 +21,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React, { Suspense } from "react";
-import Breadcrumbs from "@/components/Breadcrumbs";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 function CityVitalsFallback() {
   return (

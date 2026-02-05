@@ -1,9 +1,9 @@
 import { fetchTrendingDestinations } from "@/app/actions";
-import CitySearch from "@/components/CitySearch";
-import HeroHeader from "@/components/HeroHeader";
-import TrustIndicators from "@/components/TrustIndicators";
-import TestimonialsSection from "@/components/TestimonialsSection";
-import FreeResourceCTA from "@/components/FreeResourceCTA";
+import CitySearch from "@/components/features/city/CitySearch";
+import HeroHeader from "@/components/sections/HeroHeader";
+import TrustIndicators from "@/components/sections/TrustIndicators";
+import TestimonialsSection from "@/components/sections/TestimonialsSection";
+import FreeResourceCTA from "@/components/sections/FreeResourceCTA";
 
 export const metadata = {
   title: "Best City Spots | Urban Intelligence & Discovery",
@@ -21,7 +21,7 @@ export default async function Home() {
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
       >
         <HeroHeader />
-        
+
         {/* Search Experience */}
         <CitySearch topCities={topCities} />
 

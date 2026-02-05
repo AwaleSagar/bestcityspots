@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Landmark } from "@/lib/places";
 import { formatPopulation } from "@/lib/format";
 import {
@@ -74,44 +75,16 @@ const parseStoredNotes = (raw: string | null): Map<string, CityNotes> => {
   );
 };
 
-const communitySnippets: Record<string, string[]> = {
-  TOURIST_ATTRACTION: [
-    "Arrive early to skip queues",
-    "Best light just after sunrise",
-    "Buy tickets online to avoid lines",
-  ],
-  MUSEUM: [
-    "Free entry on select weekdays—check before going",
-    "Audio guide is worth it for hidden stories",
-    "Start at the top floor and work down",
-  ],
-  PARK: [
-    "Pack a snack; vendors are pricey inside",
-    "Shady spots on the north side at midday",
-    "Golden hour picnics are unmatched",
-  ],
-  AQUARIUM: [
-    "Touch pool is great for kids—go first before crowds",
-    "Plan 90 mins to see everything without rushing",
-    "Check feeding schedule on arrival",
-  ],
-  RESTAURANT: [
-    "Reserve ahead for dinner; walk-ins easier at lunch",
-    "Chef’s special changes daily—ask for it",
-    "Counter seats have the best view of the kitchen",
-  ],
-  CAFE: [
-    "Order at the counter first; grab window seating",
-    "Best latte art before noon",
-    "Try the seasonal pastry—locals favorite",
-  ],
-  HOTEL: [
-    "Ask for a high floor for quieter nights",
-    "Late checkout often available if you ask kindly",
-    "Lobby bar is quieter before 7pm",
-  ],
+const localPulseTags: Record<string, string[]> = {
+  TOURIST_ATTRACTION: ["Must See Icon", "Historic Photo Spot", "Worth The Wait"],
+  MUSEUM: ["Quiet Culture Escape", "Story Rich Halls", "Afternoon Slow Walk"],
+  PARK: ["Sunset Picnic Spot", "Shaded Chill Loop", "Golden Hour Lawn"],
+  AQUARIUM: ["Family Wonder Zone", "Rainy Day Win", "Calm Blue Glow"],
+  RESTAURANT: ["Local Favorite Bites", "Crowded But Worth", "Chef Driven Menu"],
+  CAFE: ["Slow Morning Sips", "Laptop Friendly Nook", "Pastry First Stop"],
+  HOTEL: ["Sleep Well Base", "Walkable City Hub", "Late Night Quiet"],
 };
-const communitySnippetsMap = new Map<string, string[]>(Object.entries(communitySnippets));
+const localPulseMap = new Map<string, string[]>(Object.entries(localPulseTags));
 
 interface ExperiencesSectionProps {
   cityName: string;
@@ -228,15 +201,55 @@ export default function ExperiencesSection({
     });
   };
 
-  const getCommunityInsights = (types?: string[]) => {
-    if (!types || types.length === 0) return [];
-    const primary = types.at(0);
-    if (!primary) return ["Locals love off-peak hours here", "Great photo spot near the entrance"];
-    const normalizedKey = primary.toUpperCase();
-    const fallbacks = communitySnippetsMap.get(normalizedKey) || communitySnippetsMap.get(primary);
-    if (fallbacks && fallbacks.length > 0) return fallbacks.slice(0, 2);
-    // Generic fallback
-    return ["Locals love off-peak hours here", "Great photo spot near the entrance"];
+  const getLocalPulseTags = (place: Landmark) => {
+    const tags = new Set<string>();
+    const primary = place.types?.at(0);
+    if (primary) {
+      const normalizedKey = primary.toUpperCase();
+      const fallbacks = localPulseMap.get(normalizedKey) || localPulseMap.get(primary);
+      fallbacks?.forEach((tag) => tags.add(tag));
+    }
+
+    const rating = place.rating ?? 0;
+    const reviews = place.userRatingCount ?? 0;
+    if (rating >= 4.6 && reviews >= 1000) tags.add("Crowded But Worth");
+    if (rating >= 4.7 && reviews > 0 && reviews <= 200) tags.add("Hidden Gem Spot");
+    if (reviews >= 500) tags.add("Always Lively Here");
+    if (place.priceLevel === "PRICE_LEVEL_VERY_EXPENSIVE") tags.add("High End Treat");
+
+    return Array.from(tags).slice(0, 3);
+  };
+
+  const getNeighborhood = (address?: string) => address?.split(",")[0]?.trim();
+
+  const getInsiderTips = (place: Landmark) => {
+    const tips: string[] = [];
+    const name = place.displayName.text;
+    const neighborhood = getNeighborhood(place.formattedAddress);
+    const reviews = place.userRatingCount ?? 0;
+
+    if (reviews >= 1000) {
+      tips.push(`Arrive early at ${name} to beat the rush.`);
+    } else {
+      tips.push(`Quietest moments at ${name} are just after opening.`);
+    }
+
+    if (neighborhood) {
+      tips.push(`Best entry is from the ${neighborhood} side.`);
+    } else {
+      tips.push(`Look for the calmer side entrance at ${name}.`);
+    }
+
+    if (
+      place.types?.some((type) => {
+        const normalized = type.toLowerCase();
+        return normalized.includes("restaurant") || normalized.includes("food");
+      })
+    ) {
+      tips.push(`Ask about the daily special at ${name}.`);
+    }
+
+    return tips.slice(0, 2);
   };
 
   const tabs = [
@@ -431,15 +444,36 @@ export default function ExperiencesSection({
             const noteValue = draftNotesMap.get(safePlaceId) ?? "";
             const savedNote = placeNotesMap.get(safePlaceId);
             const isExpanded = expandedCards.has(item.id) || !!savedNote || !!noteValue;
+            const pulseTags = getLocalPulseTags(item);
+            const insiderTips = getInsiderTips(item);
 
             return (
               <div
                 key={item.id}
-                className="liquid-glass group/landmark flex flex-col gap-6 rounded-2xl md:rounded-[2.5rem] p-6 md:p-8 transition-colors duration-100 hover:bg-foreground/[0.05]"
+                className="liquid-glass group/landmark flex flex-col gap-6 overflow-hidden rounded-2xl md:rounded-[2.5rem] transition-colors duration-100 hover:bg-foreground/[0.05]"
               >
-                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="flex items-start gap-4 md:items-center md:gap-6">
-                    <a
+                {item.imageUrl && (
+                  <div className="relative h-40 md:h-52 w-full shrink-0">
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.displayName.text}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 800px"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"
+                      aria-hidden
+                    />
+                  </div>
+                )}
+                <div
+                  className={`flex flex-col gap-6 px-6 pb-6 md:px-8 md:pb-8 ${item.imageUrl ? "pt-0" : "pt-6 md:pt-8"}`}
+                >
+                  <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="flex items-start gap-4 md:items-center md:gap-6">
+                      <a
                       href={item.googleMapsUri}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -460,12 +494,12 @@ export default function ExperiencesSection({
                         <div className="text-[10px] md:text-[11px] font-bold text-foreground/50 uppercase tracking-widest">
                           {item.formattedAddress.split(",")[0]}
                         </div>
-                        {getCommunityInsights(item.types).map((tip, idx) => (
+                        {pulseTags.map((tag) => (
                           <span
-                            key={idx}
+                            key={tag}
                             className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-2 py-0.5 md:px-3 md:py-1 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/50"
                           >
-                            {tip}
+                            {tag}
                           </span>
                         ))}
                       </div>
@@ -488,8 +522,25 @@ export default function ExperiencesSection({
                       )}
                     </div>
                     {item.userRatingCount && (
-                      <div className="text-[11px] font-black text-foreground/40 uppercase tracking-widest mt-1">
-                        {formatPopulation(item.userRatingCount)} Reviews
+                      <>
+                        <div className="text-[11px] font-black text-foreground/40 uppercase tracking-widest mt-1">
+                          {formatPopulation(item.userRatingCount)} Reviews
+                        </div>
+                        <div className="text-[10px] font-black text-purple-300/70 uppercase tracking-[0.2em]">
+                          {formatPopulation(item.userRatingCount)} Travelers Interested
+                        </div>
+                      </>
+                    )}
+                    {insiderTips.length > 0 && (
+                      <div className="w-full rounded-2xl border border-purple-500/15 bg-purple-500/5 p-3 text-[11px] text-purple-50/90">
+                        <div className="mb-2 text-[9px] font-black uppercase tracking-[0.2em] text-purple-200/70">
+                          Insider tips
+                        </div>
+                        <div className="space-y-1 text-foreground/80">
+                          {insiderTips.map((tip) => (
+                            <div key={tip}>{tip}</div>
+                          ))}
+                        </div>
                       </div>
                     )}
                     <div className="flex flex-wrap gap-2">
@@ -524,16 +575,16 @@ export default function ExperiencesSection({
                   </div>
                 </div>
 
-                <AnimatePresence initial={false}>
-                  {isExpanded && (
-                    <motion.div
-                      key="notes"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="w-full space-y-3 border-t border-foreground/5 pt-4"
-                    >
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        key="notes"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="w-full space-y-3 border-t border-foreground/5 pt-4"
+                      >
                       {savedNote && (
                         <div className="rounded-2xl border border-purple-500/15 bg-purple-500/5 p-4 text-sm text-purple-100/90">
                           <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-purple-200/80">
@@ -584,6 +635,7 @@ export default function ExperiencesSection({
                     </motion.div>
                   )}
                 </AnimatePresence>
+                </div>
               </div>
             );
           })}

@@ -88,10 +88,10 @@ export const metadata: Metadata = {
     : undefined,
 };
 
-import { ThemeProvider } from "@/components/ThemeProvider";
-import SiteNav from "@/components/SiteNav";
-import SiteFooter from "@/components/SiteFooter";
-import ClientEffects from "@/components/ClientEffects";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import SiteNav from "@/components/layout/SiteNav";
+import SiteFooter from "@/components/layout/SiteFooter";
+import ClientEffects from "@/components/effects/ClientEffects";
 
 const jsonLd = [
   {

@@ -1,8 +1,24 @@
 import type { NextConfig } from "next";
 
+let supabaseHost = "supabase.co";
+try {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (url) supabaseHost = new URL(url).hostname;
+} catch {
+  // fallback: supabase.co matches *.supabase.co subdomains in some setups
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: supabaseHost,
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {

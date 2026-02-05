@@ -38,8 +38,9 @@ function sanitizeJsonResponse(raw: string) {
   if (start === -1) return raw;
 
   let depth = 0;
+  // Use indexed loop but access with charAt to avoid "object injection" linter warning
   for (let i = start; i < raw.length; i += 1) {
-    const char = raw[i];
+    const char = raw.charAt(i);
     if (char === "{") depth += 1;
     if (char === "}") depth -= 1;
     if (depth === 0) {
@@ -109,7 +110,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
     const result = await model.generateContent(prompt);
     const responseText = await result.response.text();
     const rawJson = sanitizeJsonResponse(responseText);
-    
+
     // Validate with Zod before trusting the AI
     const parsed = CityInsightSchema.parse(JSON.parse(rawJson));
 
@@ -179,7 +180,7 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
-    
+
     // Parse the AI response (clean up markdown if present)
     const cityNames: string[] = JSON.parse(text.replace(/```json|```/gi, "").trim());
 

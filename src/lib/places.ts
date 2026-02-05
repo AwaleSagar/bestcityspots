@@ -1,7 +1,10 @@
-import { supabase } from "./supabase";
+import { supabase, supabaseServer } from "./supabase";
 import { rankingEngine } from "./ranking";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const BUCKET = "place_images";
+const IMAGE_MAX_WIDTH = 800;
+const IMAGE_MAX_HEIGHT = 600;
 
 function haversineKm(
   lat1: number,
@@ -35,6 +38,53 @@ export interface Landmark {
     latitude?: number;
     longitude?: number;
   };
+  imageUrl?: string;
+}
+
+type GooglePlacePhoto = { name: string };
+
+type GooglePlace = Landmark & {
+  photos?: GooglePlacePhoto[];
+};
+
+// Resolve place photo to Supabase Storage URL (fetch from Google, upload, return public URL)
+async function resolvePlaceImage(
+  placeId: string,
+  photoName: string,
+  apiKey: string
+): Promise<string | undefined> {
+  const client = supabaseServer ?? supabase;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return undefined;
+
+  const storagePath = `${placeId}.jpg`;
+  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${storagePath}`;
+
+  try {
+    const headRes = await fetch(publicUrl, { method: "HEAD" });
+    if (headRes.ok) return publicUrl;
+
+    const mediaUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${IMAGE_MAX_WIDTH}&maxHeightPx=${IMAGE_MAX_HEIGHT}&key=${apiKey}`;
+    const imageRes = await fetch(mediaUrl, { redirect: "follow" });
+    if (!imageRes.ok) return undefined;
+
+    const arrayBuffer = await imageRes.arrayBuffer();
+    const { error } = await client.storage
+      .from(BUCKET)
+      .upload(storagePath, arrayBuffer, {
+        contentType: "image/jpeg",
+        upsert: true,
+      });
+
+    if (error) {
+      console.warn(`[places] Failed to upload image for ${placeId}:`, error.message);
+      return undefined;
+    }
+    return publicUrl;
+  } catch (e) {
+    console.warn(`[places] Failed to resolve image for ${placeId}:`, e);
+    return undefined;
+  }
 }
 
 // Helper to fetch from Google Places API
@@ -43,7 +93,7 @@ async function fetchFromGoogle(
   queryText: string,
   apiKey: string,
   opts?: { lat?: number; lng?: number; effectiveRadiusKm?: number }
-): Promise<Landmark[]> {
+): Promise<GooglePlace[]> {
   try {
     const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
       method: "POST",
@@ -51,7 +101,7 @@ async function fetchFromGoogle(
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location",
+          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location,places.photos",
       },
       body: JSON.stringify({
         textQuery: queryText,
@@ -77,7 +127,7 @@ async function fetchFromGoogle(
     }
 
     const data = await response.json();
-    return (data.places || []) as Landmark[];
+    return (data.places || []) as GooglePlace[];
   } catch (e) {
     console.error(`[places] Failed to fetch for query "${queryText}":`, e);
     return [];
@@ -125,11 +175,18 @@ export async function getTopPlaces(
         const hasBudget = cachedPlaces.some(
           (p) => p.priceLevel === "PRICE_LEVEL_INEXPENSIVE" || p.priceLevel === "PRICE_LEVEL_FREE"
         );
+        const hasImages = cachedPlaces.some((p) => !!p.imageUrl);
 
-        if (!isBudgetSensitive || hasBudget) {
+        if ((!isBudgetSensitive || hasBudget) && hasImages) {
           return cachedPlaces;
         }
-        console.info(`[places] Cache hit but missing budget options for ${type}. Forcing refetch...`);
+        if (!hasImages) {
+          console.info(`[places] Cache hit but missing images for ${type}. Forcing refetch...`);
+        } else {
+          console.info(
+            `[places] Cache hit but missing budget options for ${type}. Forcing refetch...`
+          );
+        }
       }
     }
 
@@ -184,9 +241,9 @@ export async function getTopPlaces(
 
     // Merge and Deduplicate
     const allPlaces = results.flat();
-    const uniqueMap = new Map<string, Landmark>();
+    const uniqueMap = new Map<string, GooglePlace>();
     allPlaces.forEach((p) => uniqueMap.set(p.id, p));
-    let places = Array.from(uniqueMap.values());
+    let places: GooglePlace[] = Array.from(uniqueMap.values());
 
     // Filter out obvious outliers when we have coordinates
     if (hasCoords) {
@@ -208,6 +265,23 @@ export async function getTopPlaces(
         cityName,
         type,
       });
+    }
+
+    // 2b. Enrich places with cached images (fetch from Google, upload to Supabase)
+    const BATCH_SIZE = 3;
+    for (let i = 0; i < places.length; i += BATCH_SIZE) {
+      const batch = places.slice(i, i + BATCH_SIZE);
+      await Promise.all(
+        batch.map(async (place) => {
+          const photo = place.photos?.[0];
+          if (!photo?.name || !place.id) return;
+          const imageUrl = await resolvePlaceImage(place.id, photo.name, API_KEY);
+          if (imageUrl) {
+            (place as Landmark).imageUrl = imageUrl;
+          }
+          delete (place as GooglePlace).photos;
+        })
+      );
     }
 
     // 3. Save ALL results back to Supabase
