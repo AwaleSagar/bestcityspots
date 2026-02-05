@@ -4,12 +4,12 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Terminal, Shield, Cpu, Activity, Database, Globe } from "lucide-react";
 import { usePathname } from "next/navigation";
-import CitySphereBackground from "@/components/features/city/CitySphereBackground";
+import ConstellationBackground from "@/components/features/city/ConstellationBackground";
 
 export default function VisualEffects() {
   const shouldReduceMotion = useReducedMotion();
   const pathname = usePathname();
-  const showCitySphere = pathname === "/";
+  const showConstellation = pathname === "/";
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isAtlasMode, setIsAtlasMode] = useState(false);
   const inputBufferRef = useRef("");
@@ -43,22 +43,22 @@ export default function VisualEffects() {
 
   useEffect(() => {
     // Respect reduced motion: no parallax tracking
-    if (!shouldReduceMotion && !showCitySphere) {
+    if (!shouldReduceMotion && !showConstellation) {
       window.addEventListener("mousemove", handleMouseMove, { passive: true });
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
-      if (!shouldReduceMotion && !showCitySphere) {
+      if (!shouldReduceMotion && !showConstellation) {
         window.removeEventListener("mousemove", handleMouseMove);
       }
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleMouseMove, handleKeyDown, shouldReduceMotion, showCitySphere]);
+  }, [handleMouseMove, handleKeyDown, shouldReduceMotion, showConstellation]);
 
   return (
     <>
-      {showCitySphere ? (
-        <CitySphereBackground />
+      {showConstellation ? (
+        <ConstellationBackground />
       ) : (
         /* Parallax Orbs Background */
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">

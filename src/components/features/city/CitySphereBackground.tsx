@@ -5,16 +5,24 @@ import { useReducedMotion } from "framer-motion";
 
 type Point3 = { x: number; y: number; z: number };
 
-const MAX_CITIES = 120; // More points for a "network" look
-const SPHERE_RADIUS = 400;
+const MAX_CITIES = 120;
+const SPHERE_RADIUS = 420;
+const PARTICLE_COUNT = 50;
+
+// Aurora-inspired color palette
+const COLORS = {
+  primary: { r: 139, g: 92, b: 246 },   // Purple
+  secondary: { r: 6, g: 182, b: 212 },   // Cyan
+  accent: { r: 236, g: 72, b: 153 },     // Pink
+  warm: { r: 251, g: 146, b: 60 },       // Orange
+};
 
 function fibonacciSphere(n: number, radius: number): Point3[] {
-  // Even distribution on a sphere (Fibonacci lattice)
   const pts: Point3[] = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 
   for (let i = 0; i < n; i++) {
-    const y = 1 - (i / Math.max(1, n - 1)) * 2; // 1..-1
+    const y = 1 - (i / Math.max(1, n - 1)) * 2;
     const r = Math.sqrt(Math.max(0, 1 - y * y));
     const theta = goldenAngle * i;
     const x = Math.cos(theta) * r;
@@ -22,6 +30,52 @@ function fibonacciSphere(n: number, radius: number): Point3[] {
     pts.push({ x: x * radius, y: y * radius, z: z * radius });
   }
   return pts;
+}
+
+// Get color based on position for aurora effect
+function getNodeColor(index: number, total: number, isActive: boolean) {
+  const t = index / total;
+  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
+  const colorIndex = Math.floor(t * colorKeys.length) % colorKeys.length;
+  const color = COLORS[colorKeys[colorIndex]];
+  
+  if (isActive) {
+    return `rgb(${color.r}, ${color.g}, ${color.b})`;
+  }
+  return `rgba(${color.r}, ${color.g}, ${color.b}, 0.6)`;
+}
+
+function getGlowColor(index: number, total: number) {
+  const t = index / total;
+  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
+  const colorIndex = Math.floor(t * colorKeys.length) % colorKeys.length;
+  const color = COLORS[colorKeys[colorIndex]];
+  return `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`;
+}
+
+// Floating particle component
+function FloatingParticle({ delay, duration }: { delay: number; duration: number }) {
+  const size = Math.random() * 3 + 1;
+  const startX = Math.random() * 100;
+  const startY = Math.random() * 100;
+  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
+  const color = COLORS[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
+  
+  return (
+    <div
+      className="absolute rounded-full animate-float-particle"
+      style={{
+        width: size,
+        height: size,
+        left: `${startX}%`,
+        top: `${startY}%`,
+        background: `rgba(${color.r}, ${color.g}, ${color.b}, 0.4)`,
+        boxShadow: `0 0 ${size * 2}px rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`,
+        animationDelay: `${delay}s`,
+        animationDuration: `${duration}s`,
+      }}
+    />
+  );
 }
 
 export default function CitySphereBackground() {
@@ -60,14 +114,14 @@ export default function CitySphereBackground() {
     };
   }, []);
 
-  // Handle mouse movement for subtle parallax
+  // Handle mouse movement for parallax
   useEffect(() => {
     if (shouldReduceMotion) return;
     
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = {
-        x: (e.clientX / window.innerWidth - 0.5) * 40,
-        y: (e.clientY / window.innerHeight - 0.5) * 40,
+        x: (e.clientX / window.innerWidth - 0.5) * 50,
+        y: (e.clientY / window.innerHeight - 0.5) * 50,
       };
     };
 
@@ -75,21 +129,20 @@ export default function CitySphereBackground() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [shouldReduceMotion]);
 
-  // Periodically change which labels are "pulsing" or active
+  // Periodically change active labels with more variety
   useEffect(() => {
     const interval = setInterval(() => {
-      const count = Math.floor(Math.random() * 3) + 2; // 2-4 active labels
+      const count = Math.floor(Math.random() * 4) + 3; // 3-6 active labels
       setActiveIndices(prev => {
         const next = [...prev];
-        // Remove one old, add one or two new
-        if (next.length > 3) next.shift();
+        if (next.length > 4) next.shift();
         for (let i = 0; i < count; i++) {
           const idx = Math.floor(Math.random() * labels.length);
           if (!next.includes(idx)) next.push(idx);
         }
-        return next.slice(-6); // Keep max 6
+        return next.slice(-8); // Keep max 8
       });
-    }, 3000);
+    }, 2500);
     return () => clearInterval(interval);
   }, [labels.length]);
 
@@ -97,6 +150,16 @@ export default function CitySphereBackground() {
     const n = Math.max(0, Math.min(MAX_CITIES, labels.length || 0));
     return fibonacciSphere(n, SPHERE_RADIUS);
   }, [labels]);
+
+  // Generate particles once
+  const particles = useMemo(() => {
+    if (shouldReduceMotion) return [];
+    return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+      id: i,
+      delay: Math.random() * 10,
+      duration: 15 + Math.random() * 20,
+    }));
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -111,16 +174,14 @@ export default function CitySphereBackground() {
     let currentY = 0;
 
     const tick = () => {
-      // Extremely slow, atmospheric drift
-      t += 0.0008;
+      t += 0.0006; // Slower, more elegant rotation
       
-      // Smooth interpolation for mouse drift
-      currentX += (mouseRef.current.y - currentX) * 0.05;
-      currentY += (mouseRef.current.x - currentY) * 0.05;
+      currentX += (mouseRef.current.y - currentX) * 0.03;
+      currentY += (mouseRef.current.x - currentY) * 0.03;
 
-      const rotY = t * 8 + currentY;
-      const rotX = 10 + Math.sin(t * 0.3) * 4 - currentX;
-      const rotZ = Math.cos(t * 0.2) * 2;
+      const rotY = t * 6 + currentY;
+      const rotX = 8 + Math.sin(t * 0.25) * 5 - currentX;
+      const rotZ = Math.cos(t * 0.15) * 1.5;
       
       el.style.transform = `translate(-50%, -50%) rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`;
       rafRef.current = requestAnimationFrame(tick);
@@ -135,53 +196,129 @@ export default function CitySphereBackground() {
 
   return (
     <div className="city-sphere-layer pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
-      {/* Deep space grain/starfield effect */}
-      <div className="absolute inset-0 opacity-20 dark:opacity-20 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--color-foreground) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
+      {/* Aurora gradient background */}
+      <div 
+        className="absolute inset-0 opacity-30 dark:opacity-40"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.15), transparent 50%),
+            radial-gradient(ellipse 60% 40% at 80% 60%, rgba(6, 182, 212, 0.12), transparent 50%),
+            radial-gradient(ellipse 50% 30% at 50% 80%, rgba(236, 72, 153, 0.1), transparent 50%)
+          `,
+        }}
+      />
+      
+      {/* Animated starfield */}
+      <div 
+        className="absolute inset-0 opacity-40 dark:opacity-50" 
+        style={{ 
+          backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 0.5px, transparent 0)', 
+          backgroundSize: '40px 40px',
+          color: 'var(--color-foreground)',
+        }} 
+      />
+      
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden">
+        {particles.map((p) => (
+          <FloatingParticle key={p.id} delay={p.delay} duration={p.duration} />
+        ))}
+      </div>
+
+      {/* Connection lines layer (subtle grid effect) */}
+      <div 
+        className="absolute inset-0 opacity-5 dark:opacity-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px',
+        }}
+      />
       
       <div ref={containerRef} className="city-sphere">
         {points.map((p, i) => {
           const label = labels.at(i) ?? "";
           const isActive = activeIndices.includes(i);
-          const depth = (p.z / SPHERE_RADIUS + 1) / 2; // 0 (back) to 1 (front)
+          const depth = (p.z / SPHERE_RADIUS + 1) / 2;
           
-          // Points are always visible but very subtle
-          const dotOpacity = 0.04 + depth * 0.12;
-          const labelOpacity = isActive ? (0.2 + depth * 0.6) : 0;
+          // Enhanced visibility with color-based opacity
+          const baseOpacity = 0.08 + depth * 0.25;
+          const activeOpacity = 0.4 + depth * 0.6;
+          const dotOpacity = isActive ? activeOpacity : baseOpacity;
+          const labelOpacity = isActive ? (0.5 + depth * 0.5) : 0;
           
-          const scale = 0.5 + depth * 0.5;
-          const blurValue = isActive ? 0 : Math.max(0, (0.75 - depth) * 5);
+          const scale = 0.6 + depth * 0.5;
+          const dotSize = isActive ? 6 : 2 + depth * 2;
+          
+          const nodeColor = getNodeColor(i, points.length, isActive);
+          const glowColor = getGlowColor(i, points.length);
 
           return (
             <div
               key={`${label}-${i}`}
-              className="absolute top-0 left-0 flex items-center gap-2"
+              className="absolute top-0 left-0 flex items-center gap-3"
               style={{
                 transform: `translate3d(${p.x}px, ${p.y}px, ${p.z}px) scale(${scale})`,
-                transition: "transform 1s cubic-bezier(0.2, 0, 0.2, 1)",
+                transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
                 backfaceVisibility: "hidden",
                 zIndex: Math.floor(depth * 100),
                 willChange: 'transform',
               }}
             >
-              {/* The "Node" or Dot with glow */}
+              {/* Node with multi-layer glow */}
               <div className="relative flex items-center justify-center">
-                <div 
-                  className={`h-1 w-1 rounded-full bg-blue-400 transition-all duration-1000 ${isActive ? 'scale-150 shadow-[0_0_12px_rgba(59,130,246,1)]' : ''}`}
-                  style={{ opacity: isActive ? 1 : dotOpacity }}
-                />
+                {/* Outer glow ring */}
                 {isActive && (
-                  <div className="absolute h-4 w-4 rounded-full border border-blue-500/30 animate-ping" />
+                  <>
+                    <div 
+                      className="absolute rounded-full animate-pulse"
+                      style={{
+                        width: dotSize * 4,
+                        height: dotSize * 4,
+                        background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+                        opacity: 0.6,
+                      }}
+                    />
+                    <div 
+                      className="absolute rounded-full animate-ping"
+                      style={{
+                        width: dotSize * 2.5,
+                        height: dotSize * 2.5,
+                        border: `1px solid ${glowColor}`,
+                        opacity: 0.4,
+                      }}
+                    />
+                  </>
                 )}
+                
+                {/* Core dot */}
+                <div 
+                  className="rounded-full transition-all duration-700"
+                  style={{ 
+                    width: dotSize,
+                    height: dotSize,
+                    background: nodeColor,
+                    opacity: dotOpacity,
+                    boxShadow: isActive 
+                      ? `0 0 ${dotSize * 3}px ${glowColor}, 0 0 ${dotSize * 6}px ${glowColor}`
+                      : `0 0 ${dotSize}px ${glowColor}`,
+                  }}
+                />
               </div>
               
-              {/* The Label - only visible if active */}
+              {/* Label with glow effect */}
               <span
-                className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground transition-all duration-1000"
+                className="text-[11px] font-black uppercase tracking-[0.15em] transition-all duration-700 whitespace-nowrap"
                 style={{
                   opacity: labelOpacity,
-                  filter: blurValue > 0 ? `blur(${blurValue}px)` : undefined,
-                  transform: `translateX(${isActive ? 0 : -8}px)`,
-                  textShadow: isActive ? '0 0 10px var(--color-background)' : 'none',
+                  transform: `translateX(${isActive ? 0 : -12}px)`,
+                  color: isActive ? nodeColor : 'var(--color-foreground)',
+                  textShadow: isActive 
+                    ? `0 0 8px ${glowColor}, 0 0 16px ${glowColor}, 0 0 24px ${glowColor}` 
+                    : 'none',
+                  filter: isActive ? 'none' : 'blur(2px)',
                 }}
               >
                 {label}
@@ -190,14 +327,28 @@ export default function CitySphereBackground() {
           );
         })}
       </div>
-      {/* Central vignette to keep the search area clean */}
+
+      {/* Central vignette with color tint */}
       <div 
         className="absolute inset-0 z-10 pointer-events-none" 
         style={{
-          background: 'radial-gradient(circle at center, transparent 0%, var(--color-background) 30%, var(--color-vignette-outer) 100%)'
+          background: `
+            radial-gradient(circle at center, transparent 0%, transparent 20%, var(--color-background) 45%, var(--color-vignette-outer) 100%)
+          `,
         }}
       />
-      <div className="city-sphere-vignette absolute inset-0 z-10 backdrop-blur-[0.5px]" />
+      
+      {/* Subtle color overlay vignette */}
+      <div 
+        className="city-sphere-vignette absolute inset-0 z-10"
+        style={{
+          background: `
+            radial-gradient(ellipse 120% 60% at 50% 35%, rgba(139, 92, 246, 0.08), transparent 50%),
+            radial-gradient(ellipse 100% 50% at 30% 70%, rgba(6, 182, 212, 0.06), transparent 50%),
+            radial-gradient(ellipse 80% 40% at 70% 60%, rgba(236, 72, 153, 0.05), transparent 50%)
+          `,
+        }}
+      />
     </div>
   );
 }
