@@ -22,6 +22,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 const STORAGE_KEY = "atlas_saved_places";
 const NOTES_STORAGE_KEY = "atlas_place_notes";
@@ -156,6 +157,7 @@ export default function ExperiencesSection({
   const [draftNotes, setDraftNotes] = useState<CityNotes>({});
   const [notesHydrated, setNotesHydrated] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const { trackAction } = useAnalytics();
 
   // Load saved places from localStorage on mount (defer setState to avoid synchronous update in effect)
   useEffect(() => {
@@ -222,6 +224,7 @@ export default function ExperiencesSection({
     updatePlaceNotes((map) => {
       if (trimmed) {
         map.set(safeId, trimmed);
+        trackAction("add_note");
       } else {
         map.delete(safeId);
       }
@@ -230,10 +233,16 @@ export default function ExperiencesSection({
 
   const clearNote = (placeId: string) => {
     const safeId = sanitizeKey(placeId);
+    const hadNote = placeNotesMap.has(safeId);
     updateDraftNotes((map) => {
       map.delete(safeId);
     });
-    saveNote(placeId, "");
+    updatePlaceNotes((map) => {
+      map.delete(safeId);
+    });
+    if (hadNote) {
+      trackAction("delete_note");
+    }
   };
 
   const toggleExpand = (placeId: string) => {
@@ -359,9 +368,11 @@ export default function ExperiencesSection({
     setSavedPlaces((prev) => {
       const exists = prev.some((p) => p.id === place.id && p.city === cityName);
       if (exists) {
+        trackAction("remove_save");
         return prev.filter((p) => !(p.id === place.id && p.city === cityName));
       }
 
+      trackAction("save_place");
       const nextPlace: SavedPlace = {
         id: place.id,
         city: cityName,
@@ -591,6 +602,7 @@ export default function ExperiencesSection({
                           href={item.googleMapsUri}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => trackAction("click_maps_link")}
                           className="flex items-center justify-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-blue-300 transition-all hover:border-blue-400/50 hover:bg-blue-500/20 hover:text-blue-200 active:scale-95"
                         >
                           <MapPin className="h-4 w-4" />

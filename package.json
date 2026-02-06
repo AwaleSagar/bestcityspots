@@ -15,9 +15,9 @@
     "warm-cache": "tsx scripts/warm-cache.ts",
     "warm-cache:trending": "tsx scripts/warm-cache.ts --trending-only",
     "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run",
-    "analytics": "./scripts/analytics-report.sh",
-    "analytics:csv": "./scripts/analytics-report.sh --export csv",
-    "analytics:json": "./scripts/analytics-report.sh --export json"
+    "analytics": "tsx scripts/analytics-report.ts",
+    "analytics:30d": "tsx scripts/analytics-report.ts --days 30",
+    "analytics:json": "tsx scripts/analytics-report.ts --json"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

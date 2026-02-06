@@ -9,6 +9,7 @@ import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react"
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { useAnalytics } from "@/lib/useAnalytics";
 
 interface CitySearchProps {
   topCities: City[];
@@ -23,6 +24,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { trackAction } = useAnalytics();
+  const hasTrackedSearch = useRef(false);
 
   const { recentCities, addRecentCity } = useRecentSearches();
 
@@ -45,11 +48,18 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         setSearchResults(results.slice(0, 10));
         setActiveIndex(-1);
         setIsSearching(false);
+
+        // Track search action (once per search session)
+        if (!hasTrackedSearch.current && results.length > 0) {
+          trackAction("search");
+          hasTrackedSearch.current = true;
+        }
       } else {
         controller.abort();
         setSearchResults([]);
         setActiveIndex(-1);
         setIsSearching(false);
+        hasTrackedSearch.current = false; // Reset for next search
       }
     }, 200);
 
@@ -57,7 +67,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [searchQuery, activeFilter]);
+  }, [searchQuery, activeFilter, trackAction]);
 
   const shouldShowResults = searchQuery.trim().length >= 2;
 

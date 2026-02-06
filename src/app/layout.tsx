@@ -92,6 +92,11 @@ import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import SiteNav from "@/components/layout/SiteNav";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ClientEffects from "@/components/effects/ClientEffects";
+import {
+  AnalyticsProvider,
+  PageTracker,
+  GeoConsentBanner,
+} from "@/components/analytics";
 
 const jsonLd = [
   {
@@ -139,22 +144,26 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SiteNav />
-          <a
-            href="#main-content"
-            className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500/50 sm:left-4 sm:top-4"
-            style={{
-              marginLeft: "env(safe-area-inset-left, 0)",
-              marginTop: "env(safe-area-inset-top, 0)",
-            }}
-          >
-            Skip to content
-          </a>
-          <ClientEffects />
-          <div className="relative z-10 flex min-h-screen flex-col">
-            <div className="flex-1 flex flex-col">{children}</div>
-            <SiteFooter />
-          </div>
+          <AnalyticsProvider>
+            <PageTracker />
+            <SiteNav />
+            <a
+              href="#main-content"
+              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500/50 sm:left-4 sm:top-4"
+              style={{
+                marginLeft: "env(safe-area-inset-left, 0)",
+                marginTop: "env(safe-area-inset-top, 0)",
+              }}
+            >
+              Skip to content
+            </a>
+            <ClientEffects />
+            <div className="relative z-10 flex min-h-screen flex-col">
+              <div className="flex-1 flex flex-col">{children}</div>
+              <SiteFooter />
+            </div>
+            <GeoConsentBanner />
+          </AnalyticsProvider>
         </ThemeProvider>
       </body>
     </html>
