@@ -19,6 +19,11 @@ const WeatherDataSchema = z.object({
 
 export type WeatherData = z.infer<typeof WeatherDataSchema>;
 
+function parseCachedWeather(cached: unknown): WeatherData | null {
+  const parsed = WeatherDataSchema.safeParse(cached);
+  return parsed.success ? parsed.data : null;
+}
+
 function getAqiLabel(aqi: number): string {
   switch (aqi) {
     case 1: return "Good";
@@ -61,8 +66,8 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
 
       if (ageMinutes < 60) {
         // Validate cached data structure
-        const parsed = WeatherDataSchema.safeParse(cached);
-        if (parsed.success) return parsed.data;
+        const validCached = parseCachedWeather(cached);
+        if (validCached) return validCached;
       }
     }
 
@@ -78,8 +83,8 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
 
     if (!weatherRes.ok || !aqiRes.ok) {
       if (cached) {
-        const parsed = WeatherDataSchema.safeParse(cached);
-        if (parsed.success) return parsed.data;
+        const validCached = parseCachedWeather(cached);
+        if (validCached) return validCached;
       }
       return null; // Fallback to stale on API error
     }

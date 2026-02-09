@@ -88,17 +88,9 @@ export class RankingEngine {
      * Returns a new array, does not mutate original.
      */
     public rank(places: Landmark[]): Landmark[] {
-        // 1. Map to score
-        const scored = places.map((p) => ({
-            place: p,
-            score: this.getScore(p),
-        }));
-
-        // 2. Sort
-        scored.sort((a, b) => b.score - a.score);
-
-        // 3. Return original objects
-        return scored.map((s) => s.place);
+        return [...places].sort(
+            (a, b) => this.getScore(b) - this.getScore(a)
+        );
     }
 }
 

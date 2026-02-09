@@ -126,7 +126,11 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       },
       { onConflict: "city_id" }
     ).then(({ error }) => {
-      if (!error) console.info(`✅ Cached insight for ${city.city}`);
+      if (error) {
+        console.error(`Failed to cache insight for ${city.city}:`, error);
+      } else {
+        console.info(`✅ Cached insight for ${city.city}`);
+      }
     });
 
     return parsed;
@@ -182,7 +186,13 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
     const text = response.text();
 
     // Parse the AI response (clean up markdown if present)
-    const cityNames: string[] = JSON.parse(text.replace(/```json|```/gi, "").trim());
+    let cityNames: string[];
+    try {
+      cityNames = JSON.parse(text.replace(/```json|```/gi, "").trim());
+    } catch {
+      console.error("Failed to parse AI trending cities response");
+      return [];
+    }
 
     if (!Array.isArray(cityNames)) {
       return [];
