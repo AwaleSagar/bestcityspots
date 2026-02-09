@@ -261,9 +261,11 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
   // Initialize city indices
   shuffledCategories.forEach((cat) => cityIndexPerCategory.set(cat.id, 0));
 
-  // Maximum number of full rotations through all categories before stopping.
-  // This prevents infinite loops when the limit exceeds total unique cities.
-  const maxCategoryRotations = shuffledCategories.length * 15;
+  // Maximum full rotations through all categories before stopping.
+  // Each category has ~15 cities, so this ensures we exhaust all cities
+  // before giving up, even if many are duplicates across categories.
+  const ROTATIONS_PER_CATEGORY = 15;
+  const maxCategoryRotations = shuffledCategories.length * ROTATIONS_PER_CATEGORY;
 
   while (result.length < limit) {
     const category = shuffledCategories[categoryIndex % shuffledCategories.length];

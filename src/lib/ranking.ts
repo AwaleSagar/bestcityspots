@@ -86,11 +86,15 @@ export class RankingEngine {
     /**
      * Sorts a list of landmarks by their calculated score (descending).
      * Returns a new array, does not mutate original.
+     * Scores are pre-computed once per element to avoid redundant calculations during sort.
      */
     public rank(places: Landmark[]): Landmark[] {
-        return [...places].sort(
-            (a, b) => this.getScore(b) - this.getScore(a)
-        );
+        const scored = places.map((p) => ({
+            place: p,
+            score: this.getScore(p),
+        }));
+        scored.sort((a, b) => b.score - a.score);
+        return scored.map((s) => s.place);
     }
 }
 
