@@ -52,8 +52,10 @@
   --color-selection-bg: rgba(59, 130, 246, 0.2);
   --color-selection-text: #1d4ed8;
 
-  /* Mobile-first: touch target minimum (WCAG 2.2) */
-  --touch-target-min: 44px;
+  /* Mobile-first: touch target minimum (Google recommendation for mobile) */
+  --touch-target-min: 48px;
+  /* Space for mobile bottom navigation bar */
+  --mobile-bottom-nav-height: 56px;
   /* Fluid typography scale (mobile-first) */
   --text-fluid-xs: clamp(0.6875rem, 0.65rem + 0.2vw, 0.75rem);
   --text-fluid-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.875rem);
@@ -603,5 +605,45 @@ video {
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+/* ========================================
+   Mobile-First Enhancements
+   ======================================== */
+
+/* Bottom nav spacer: prevent content from being hidden behind the fixed bottom nav on mobile */
+@media (max-width: 767px) {
+  .mobile-bottom-spacer {
+    padding-bottom: calc(var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Optimize rendering for cellular networks: use content-visibility on off-screen sections */
+@media (max-width: 767px) {
+  .content-lazy {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 300px;
+  }
+}
+
+/* Larger tap targets on touch devices for all interactive elements */
+@media (hover: none) and (pointer: coarse) {
+  .touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+}
+
+/* Chrome & Safari: smooth momentum scrolling and overscroll behavior */
+html {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safari-specific: prevent text resize on orientation change */
+@supports (-webkit-touch-callout: none) {
+  body {
+    -webkit-text-size-adjust: 100%;
   }
 }
