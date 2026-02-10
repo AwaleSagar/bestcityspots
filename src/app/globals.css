@@ -638,7 +638,6 @@ video {
 /* Chrome & Safari: smooth momentum scrolling and overscroll behavior */
 html {
   overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Safari-specific: prevent text resize on orientation change */

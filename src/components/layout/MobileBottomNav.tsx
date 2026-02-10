@@ -24,13 +24,13 @@ export default function MobileBottomNav() {
           const isActive =
             href === "/"
               ? pathname === "/"
-              : pathname.startsWith(href);
+              : pathname === href || pathname.startsWith(href + "/");
 
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 min-h-[56px] text-center transition-colors ${
+                className={`flex flex-col items-center justify-center gap-1 px-2 py-3 min-h-[var(--mobile-bottom-nav-height)] text-center transition-colors ${
                   isActive
                     ? "text-purple-400"
                     : "text-foreground/50 active:text-foreground/80"
