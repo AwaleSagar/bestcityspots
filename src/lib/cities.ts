@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { haversineKm } from "./geo";
 
 export interface City {
   id: number;
@@ -17,9 +18,6 @@ export interface City {
 // Basic client-side cache for search results
 const searchCache = new Map<string, City[]>();
 
-// Sorted cache keys for efficient prefix lookup - O(log m) binary search instead of O(m) iteration
-let sortedCacheKeys: string[] = [];
-
 function normalizeQuery(q: string) {
   return q.trim().toLowerCase();
 }
@@ -30,8 +28,6 @@ function normalizeQuery(q: string) {
  * Much better than O(m) iteration for large caches
  */
 function findLongestCachedPrefix(query: string): string | null {
-  let bestPrefix: string | null = null;
-  
   // Check progressively shorter prefixes of the query
   // This is O(n) where n = query length (typically < 20)
   for (let len = query.length; len >= 2; len--) {
@@ -41,27 +37,13 @@ function findLongestCachedPrefix(query: string): string | null {
     }
   }
   
-  return bestPrefix;
+  return null;
 }
 
 function cityMatchesQuery(c: City, q: string) {
   const city = (c.city_ascii || c.city || "").toLowerCase();
   const country = (c.country || "").toLowerCase();
   return city.includes(q) || country.includes(q);
-}
-
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
 }
 
 async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {

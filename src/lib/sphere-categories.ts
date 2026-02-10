@@ -261,6 +261,12 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
   // Initialize city indices
   shuffledCategories.forEach((cat) => cityIndexPerCategory.set(cat.id, 0));
 
+  // Maximum full rotations through all categories before stopping.
+  // Each category has ~15 cities, so this ensures we exhaust all cities
+  // before giving up, even if many are duplicates across categories.
+  const ROTATIONS_PER_CATEGORY = 15;
+  const maxCategoryRotations = shuffledCategories.length * ROTATIONS_PER_CATEGORY;
+
   while (result.length < limit) {
     const category = shuffledCategories[categoryIndex % shuffledCategories.length];
     const cityIdx = cityIndexPerCategory.get(category.id) || 0;
@@ -280,7 +286,7 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
     categoryIndex++;
 
     // Break if we've exhausted all categories
-    if (categoryIndex >= shuffledCategories.length * 15) break;
+    if (categoryIndex >= maxCategoryRotations) break;
   }
 
   // O(n) Fisher-Yates shuffle for visual randomness
