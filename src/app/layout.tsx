@@ -91,6 +91,7 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import SiteNav from "@/components/layout/SiteNav";
 import SiteFooter from "@/components/layout/SiteFooter";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ClientEffects from "@/components/effects/ClientEffects";
 import {
   AnalyticsProvider,
@@ -158,10 +159,11 @@ export default function RootLayout({
               Skip to content
             </a>
             <ClientEffects />
-            <div className="relative z-10 flex min-h-screen flex-col">
+            <div className="relative z-10 flex min-h-screen flex-col mobile-bottom-spacer">
               <div className="flex-1 flex flex-col">{children}</div>
               <SiteFooter />
             </div>
+            <MobileBottomNav />
             <GeoConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>
