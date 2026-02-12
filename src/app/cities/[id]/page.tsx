@@ -340,14 +340,14 @@ export default async function CityPage({
                 Explore The Urban <br /> Essence
               </h3>
               <p className="text-sm leading-relaxed font-black tracking-wide text-foreground/60">
-                Grab a custom-tailored, fun-filled itinerary for {city.city}—just <span className="text-xl italic text-foreground">$0.99!</span> Unlock hidden gems and local secrets instantly.
+                Dive deeper into {city.city} with AI-powered briefings, live weather data, and curated local experiences—all free, no sign-up required.
               </p>
-              <button
-                disabled
-                className="w-full rounded-[2rem] border border-foreground/10 bg-foreground/5 py-5 md:py-6 text-base md:text-lg font-black text-foreground/30 shadow-xl cursor-not-allowed"
+              <Link
+                href="/resources/top-cities"
+                className="block w-full rounded-[2rem] border border-purple-400/40 bg-purple-500/20 py-5 md:py-6 text-center text-base md:text-lg font-black text-foreground transition-colors hover:bg-purple-500/30"
               >
-                Coming Soon
-              </button>
+                Browse Free City Guide
+              </Link>
             </div>
 
             <div className="liquid-glass space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10">

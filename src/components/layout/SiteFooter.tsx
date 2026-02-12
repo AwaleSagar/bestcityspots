@@ -40,7 +40,7 @@ export default function SiteFooter() {
           <div className="text-sm text-foreground/50">
             <p className="font-medium text-foreground/70">Best City Spots</p>
             <p className="mt-1 max-w-xs">
-              Urban intelligence and trusted city data. No paywalls, no dark patterns.
+              Urban intelligence powered by Google Places, public census data, and AI-assisted summaries. No paywalls, no dark patterns.
             </p>
           </div>
         </div>
@@ -56,7 +56,7 @@ export default function SiteFooter() {
               href="/about"
               className="touch-target inline-flex min-h-[var(--touch-target-min)] items-center text-xs font-medium text-foreground/50 underline underline-offset-2 hover:text-foreground/70"
             >
-              How we work &amp; our data sources
+              Our data sources &amp; methodology
             </Link>
           </div>
         </div>
