@@ -15,6 +15,11 @@ interface CitySearchProps {
   topCities: City[];
 }
 
+// Constants for mobile keyboard handling
+const KEYBOARD_ANIMATION_DELAY = 300; // ms - delay to allow keyboard animation to start
+const DROPDOWN_MAX_HEIGHT = "40vh";
+const DROPDOWN_MAX_HEIGHT = "40vh";
+
 export default function CitySearch({ topCities }: CitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<City[]>([]);
@@ -22,12 +27,50 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { trackAction } = useAnalytics();
   const hasTrackedSearch = useRef(false);
 
   const { recentCities, addRecentCity } = useRecentSearches();
+
+  // Handle keyboard visibility detection for mobile
+  // Handle keyboard visibility detection for mobile
+  useEffect(() => {
+    const inputElement = inputRef.current;
+    if (!inputElement) return;
+
+    const handleFocus = () => {
+      setIsKeyboardVisible(true);
+      // Scroll input into view when keyboard appears on mobile
+      setTimeout(() => {
+        if (inputRef.current && containerRef.current) {
+          // Scroll the container into view with padding at the top
+          containerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, KEYBOARD_ANIMATION_DELAY);
+    };
+
+    const handleBlur = () => {
+      // Delay hiding to allow click events on dropdown items to register first
+      setTimeout(() => {
+        setIsKeyboardVisible(false);
+      }, 150);
+    };
+
+    inputElement.addEventListener("focus", handleFocus);
+    inputElement.addEventListener("blur", handleBlur);
+
+    return () => {
+      inputElement.removeEventListener("focus", handleFocus);
+      inputElement.removeEventListener("blur", handleBlur);
+    };
+  }, []);
 
   // Handle search with faster debounce
   useEffect(() => {
@@ -160,6 +203,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
@@ -312,13 +356,17 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="mt-8 space-y-4"
+            className={`mt-8 space-y-4 ${isKeyboardVisible ? "pb-[50vh]" : ""}`}
+            style={{
+              // Ensure dropdown is visible on mobile when keyboard is open
+              maxHeight: isKeyboardVisible ? DROPDOWN_MAX_HEIGHT : "none",
+            }}
           >
             <ul
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className="glass-dropdown shadow-3xl divide-y divide-foreground/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]"
+              className={`glass-dropdown shadow-3xl divide-y divide-foreground/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem] ${isKeyboardVisible ? "overflow-y-auto max-h-[40vh]" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
