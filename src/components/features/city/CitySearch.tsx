@@ -15,6 +15,11 @@ interface CitySearchProps {
   topCities: City[];
 }
 
+// Constants for mobile keyboard handling
+const KEYBOARD_ANIMATION_DELAY = 300; // ms - delay to allow keyboard animation to start
+const DROPDOWN_MAX_HEIGHT = "40vh";
+const DROPDOWN_BOTTOM_PADDING = "50vh";
+
 export default function CitySearch({ topCities }: CitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<City[]>([]);
@@ -44,11 +49,14 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             block: "start",
           });
         }
-      }, 300); // Delay to allow keyboard animation to start
+      }, KEYBOARD_ANIMATION_DELAY);
     };
 
     const handleBlur = () => {
-      setIsKeyboardVisible(false);
+      // Delay hiding to allow click events on dropdown items to register first
+      setTimeout(() => {
+        setIsKeyboardVisible(false);
+      }, 150);
     };
 
     const inputElement = inputRef.current;
@@ -352,7 +360,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             className={`mt-8 space-y-4 ${isKeyboardVisible ? "pb-[50vh]" : ""}`}
             style={{
               // Ensure dropdown is visible on mobile when keyboard is open
-              maxHeight: isKeyboardVisible ? "40vh" : "none",
+              maxHeight: isKeyboardVisible ? DROPDOWN_MAX_HEIGHT : "none",
             }}
           >
             <ul
