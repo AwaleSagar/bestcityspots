@@ -18,7 +18,7 @@ interface CitySearchProps {
 // Constants for mobile keyboard handling
 const KEYBOARD_ANIMATION_DELAY = 300; // ms - delay to allow keyboard animation to start
 const DROPDOWN_MAX_HEIGHT = "40vh";
-const DROPDOWN_BOTTOM_PADDING = "50vh";
+const DROPDOWN_MAX_HEIGHT = "40vh";
 
 export default function CitySearch({ topCities }: CitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
