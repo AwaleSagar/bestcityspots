@@ -25,7 +25,7 @@ export default async function Home() {
         {/* Search Experience */}
         <CitySearch topCities={topCities} />
 
-        {/* Social Proof & Trust */}
+        {/* Trust & Features */}
         <div className="mt-20 space-y-20 content-lazy">
           <TrustIndicators />
           <FreeResourceCTA />

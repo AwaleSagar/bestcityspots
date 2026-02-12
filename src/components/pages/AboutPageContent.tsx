@@ -12,6 +12,7 @@ import {
   Heart,
   BookOpen,
   ArrowRight,
+  Database,
 } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
@@ -75,6 +76,25 @@ const howWeCurate = [
   "Blend AI context with verified data sources",
   "Filter for credibility, recency, and relevance",
   "Continuously learn from traveler behavior",
+];
+
+const dataSources = [
+  {
+    name: "Google Places API",
+    description: "Landmarks, restaurants, hotels, ratings, and reviews from Google\u2019s global point-of-interest database.",
+  },
+  {
+    name: "OpenWeather & Weather APIs",
+    description: "Real-time weather conditions, forecasts, air quality (PM2.5), and climate comfort indices.",
+  },
+  {
+    name: "Public Census & Demographics",
+    description: "Population figures, administrative regions, and geographic coordinates from open government datasets.",
+  },
+  {
+    name: "Google Gemini AI",
+    description: "AI-generated city briefings and summaries. These are clearly marked as AI content and are not presented as editorial opinions.",
+  },
 ];
 
 export default function AboutPageContent() {
@@ -270,11 +290,71 @@ export default function AboutPageContent() {
             ))}
           </section>
 
-          {/* Chapter 3: Our Mission */}
+          {/* Chapter 3: Data Sources */}
           <div className="chapter-divider mt-16">
             <ScrollReveal animation="scale">
               <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
                 Chapter 03
+              </span>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal animation="fade-up">
+            <section
+              className="mt-8 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8 interactive-card"
+              aria-labelledby="data-sources-heading"
+            >
+              <h2
+                id="data-sources-heading"
+                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50"
+              >
+                <Database className="h-4 w-4 text-purple-400" aria-hidden />
+                Data Sources &amp; Methodology
+              </h2>
+
+              <p className="mt-4 text-sm leading-relaxed text-foreground/60">
+                Every metric on Best City Spots comes from a verifiable source. We believe in full transparency so you can cross-check any data point we present.
+              </p>
+
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
+                {dataSources.map((source, index) => (
+                  <ScrollReveal
+                    key={source.name}
+                    animation="fade-left"
+                    staggerIndex={index}
+                    staggerDelay={0.15}
+                  >
+                    <li className="flex gap-3 text-sm text-foreground/70">
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
+                        className="text-purple-400 flex-shrink-0"
+                        aria-hidden
+                      >
+                        ✓
+                      </motion.span>
+                      <span>
+                        <strong className="text-foreground/90">{source.name}.</strong>{" "}
+                        {source.description}
+                      </span>
+                    </li>
+                  </ScrollReveal>
+                ))}
+              </ul>
+
+              <p className="mt-6 text-xs leading-relaxed text-foreground/40">
+                AI-generated content is always labeled. We do not fabricate reviews or testimonials. All ratings and reviews shown are sourced directly from Google Places.
+              </p>
+            </section>
+          </ScrollReveal>
+
+          {/* Chapter 4: Our Mission */}
+          <div className="chapter-divider mt-16">
+            <ScrollReveal animation="scale">
+              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+                Chapter 04
               </span>
             </ScrollReveal>
           </div>
