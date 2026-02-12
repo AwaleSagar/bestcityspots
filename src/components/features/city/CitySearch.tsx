@@ -37,7 +37,11 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const { recentCities, addRecentCity } = useRecentSearches();
 
   // Handle keyboard visibility detection for mobile
+  // Handle keyboard visibility detection for mobile
   useEffect(() => {
+    const inputElement = inputRef.current;
+    if (!inputElement) return;
+
     const handleFocus = () => {
       setIsKeyboardVisible(true);
       // Scroll input into view when keyboard appears on mobile
@@ -59,17 +63,12 @@ export default function CitySearch({ topCities }: CitySearchProps) {
       }, 150);
     };
 
-    const inputElement = inputRef.current;
-    if (inputElement) {
-      inputElement.addEventListener("focus", handleFocus);
-      inputElement.addEventListener("blur", handleBlur);
-    }
+    inputElement.addEventListener("focus", handleFocus);
+    inputElement.addEventListener("blur", handleBlur);
 
     return () => {
-      if (inputElement) {
-        inputElement.removeEventListener("focus", handleFocus);
-        inputElement.removeEventListener("blur", handleBlur);
-      }
+      inputElement.removeEventListener("focus", handleFocus);
+      inputElement.removeEventListener("blur", handleBlur);
     };
   }, []);
 
