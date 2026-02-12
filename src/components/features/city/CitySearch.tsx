@@ -22,12 +22,48 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { trackAction } = useAnalytics();
   const hasTrackedSearch = useRef(false);
 
   const { recentCities, addRecentCity } = useRecentSearches();
+
+  // Handle keyboard visibility detection for mobile
+  useEffect(() => {
+    const handleFocus = () => {
+      setIsKeyboardVisible(true);
+      // Scroll input into view when keyboard appears on mobile
+      setTimeout(() => {
+        if (inputRef.current && containerRef.current) {
+          // Scroll the container into view with padding at the top
+          containerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 300); // Delay to allow keyboard animation to start
+    };
+
+    const handleBlur = () => {
+      setIsKeyboardVisible(false);
+    };
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener("focus", handleFocus);
+      inputElement.addEventListener("blur", handleBlur);
+    }
+
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener("focus", handleFocus);
+        inputElement.removeEventListener("blur", handleBlur);
+      }
+    };
+  }, []);
 
   // Handle search with faster debounce
   useEffect(() => {
@@ -160,6 +196,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
@@ -312,13 +349,17 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="mt-8 space-y-4"
+            className={`mt-8 space-y-4 ${isKeyboardVisible ? "pb-[50vh]" : ""}`}
+            style={{
+              // Ensure dropdown is visible on mobile when keyboard is open
+              maxHeight: isKeyboardVisible ? "40vh" : "none",
+            }}
           >
             <ul
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className="glass-dropdown shadow-3xl divide-y divide-foreground/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem]"
+              className={`glass-dropdown shadow-3xl divide-y divide-foreground/5 overflow-hidden rounded-[2rem] md:rounded-[2.5rem] ${isKeyboardVisible ? "overflow-y-auto max-h-[40vh]" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
