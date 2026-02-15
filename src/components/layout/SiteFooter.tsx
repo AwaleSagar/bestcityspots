@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { MapPin, BookOpen, Info } from "lucide-react";
+import { MapPin, BookOpen, Info, Compass } from "lucide-react";
 
 const internalLinks = [
   { href: "/", label: "Explore Cities", icon: MapPin },
-  { href: "/resources/top-cities", label: "Free Guide: Top Cities", icon: BookOpen },
+  { href: "/resources/top-cities", label: "Top Cities Guide", icon: BookOpen },
+  { href: "/resources/top-cities#plan", label: "Plan Your Trip", icon: Compass },
   { href: "/about", label: "About", icon: Info },
 ] as const;
 
@@ -40,7 +41,7 @@ export default function SiteFooter() {
           <div className="text-sm text-foreground/50">
             <p className="font-medium text-foreground/70">Best City Spots</p>
             <p className="mt-1 max-w-xs">
-              Urban intelligence powered by Google Places, public census data, and AI-assisted summaries. No paywalls, no dark patterns.
+              Urban intelligence powered by Google Places, public census data, and AI-assisted summaries. No paywalls, no dark patterns. All data sources are transparent and verified.
             </p>
           </div>
         </div>
