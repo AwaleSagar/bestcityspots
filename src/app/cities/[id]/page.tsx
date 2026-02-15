@@ -340,8 +340,8 @@ export default async function CityPage({
                   </div>
                   <p className="text-sm leading-relaxed text-foreground/60">
                     {city.admin_name
-                      ? `The ${city.admin_name} region of ${city.city} features diverse neighborhoods worth exploring. Search for specific areas in the landmarks section below.`
-                      : `${city.city} features diverse neighborhoods worth exploring. Search for specific areas in the landmarks section below.`}
+                      ? `Explore the diverse neighborhoods across the ${city.admin_name} region of ${city.city}. Browse landmarks below for specific areas.`
+                      : `Explore the diverse neighborhoods of ${city.city}. Browse landmarks below for specific areas.`}
                   </p>
                 </div>
                 <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
