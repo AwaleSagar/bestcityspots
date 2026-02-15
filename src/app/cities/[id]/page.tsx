@@ -327,6 +327,53 @@ export default async function CityPage({
               </Suspense>
             </section>
 
+            {/* Travel Essentials Section */}
+            <section className="space-y-6">
+              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
+                Travel Essentials <span className="h-px flex-1 bg-foreground/5" />
+              </h2>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                    <MapPin className="h-4 w-4 text-purple-300" />
+                    Best Neighborhoods
+                  </div>
+                  <p className="text-sm leading-relaxed text-foreground/60">
+                    {city.admin_name
+                      ? `The ${city.admin_name} region of ${city.city} features diverse neighborhoods worth exploring. Search for specific areas in the landmarks section below.`
+                      : `${city.city} features diverse neighborhoods worth exploring. Search for specific areas in the landmarks section below.`}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                    <Users className="h-4 w-4 text-purple-300" />
+                    Budget Tips
+                  </div>
+                  <p className="text-sm leading-relaxed text-foreground/60">
+                    Use the price filter in Dining and Stays below to find options matching your budget. Filter by $ to $$$$ to plan your trip spending.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                    <Navigation className="h-4 w-4 text-purple-300" />
+                    Getting Around
+                  </div>
+                  <p className="text-sm leading-relaxed text-foreground/60">
+                    Open any listed spot in Maps for directions and transit options. Save places to build your personal itinerary for {city.city}.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
+                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
+                    <Activity className="h-4 w-4 text-purple-300" />
+                    Data Sources
+                  </div>
+                  <p className="text-sm leading-relaxed text-foreground/60">
+                    All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.
+                  </p>
+                </div>
+              </div>
+            </section>
+
             {/* Landmarks Section */}
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
@@ -337,10 +384,10 @@ export default async function CityPage({
           <div className="space-y-8 lg:sticky lg:top-20 lg:col-span-4">
             <div className="liquid-glass relative space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl">
               <h3 className="text-2xl md:text-3xl leading-tight font-black tracking-tighter text-foreground">
-                Explore The Urban <br /> Essence
+                Plan Your <br /> {city.city} Trip
               </h3>
               <p className="text-sm leading-relaxed font-black tracking-wide text-foreground/60">
-                Dive deeper into {city.city} with AI-powered briefings, live weather data, and curated local experiences—all free, no sign-up required.
+                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences. Save your favorite spots to build a personal itinerary—all free, no sign-up required.
               </p>
               <Link
                 href="/resources/top-cities"

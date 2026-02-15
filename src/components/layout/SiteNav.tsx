@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MapPin, BookOpen, Info } from "lucide-react";
+import { MapPin, BookOpen, Info, Compass } from "lucide-react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
 type NavLink = {
@@ -12,7 +12,8 @@ type NavLink = {
 
 const navLinks: NavLink[] = [
   { href: "/", label: "Explore Cities", short: "Explore", icon: MapPin },
-  { href: "/resources/top-cities", label: "Free Guide: Top Cities", short: "Guide", icon: BookOpen, cta: true },
+  { href: "/resources/top-cities", label: "Free Guide: Top Cities", short: "Top Cities", icon: BookOpen, cta: true },
+  { href: "/resources/top-cities#plan", label: "Plan Your Trip", short: "Plan", icon: Compass },
   { href: "/about", label: "About Best City Spots", short: "About", icon: Info },
 ];
 

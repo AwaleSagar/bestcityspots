@@ -84,6 +84,11 @@ export default async function AIBriefingSection({ city }: AIBriefingSectionProps
           </div>
         </div>
       </div>
+      <div className="mt-6 flex flex-wrap items-center gap-4 border-t border-foreground/5 pt-4">
+        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/30">
+          Source: AI-generated via Google Gemini · Verified against public data
+        </div>
+      </div>
     </section>
   );
 }

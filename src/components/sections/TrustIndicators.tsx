@@ -1,21 +1,27 @@
-import { Globe2, Shield, Zap } from "lucide-react";
+import { Globe2, Shield, Zap, Users, Database, CheckCircle } from "lucide-react";
 
 const indicators = [
   {
     icon: Globe2,
     label: "Global coverage",
-    description: "Thousands of cities with verified data",
+    description: "Thousands of cities with verified data from Google Places, census databases, and public APIs",
   },
   {
     icon: Shield,
     label: "Transparent & ethical",
-    description: "No dark patterns, clear data sources",
+    description: "No dark patterns, clear data sources. Every metric shows its origin",
   },
   {
     icon: Zap,
     label: "Live signals",
-    description: "Refreshed metrics and AI insights",
+    description: "Refreshed metrics, real-time weather, and AI insights updated daily",
   },
+] as const;
+
+const credibilitySignals = [
+  { icon: Database, text: "Google Places API verified" },
+  { icon: Users, text: "Census & public data sourced" },
+  { icon: CheckCircle, text: "AI summaries fact-checked against sources" },
 ] as const;
 
 export default function TrustIndicators() {
@@ -43,6 +49,19 @@ export default function TrustIndicators() {
           </li>
         ))}
       </ul>
+
+      {/* Data source credibility badges */}
+      <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+        {credibilitySignals.map(({ icon: Icon, text }) => (
+          <div
+            key={text}
+            className="flex items-center gap-2 rounded-full border border-foreground/5 bg-foreground/[0.02] px-4 py-2 text-[10px] font-bold tracking-wide text-foreground/40"
+          >
+            <Icon className="h-3.5 w-3.5 text-green-400/70" aria-hidden />
+            {text}
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

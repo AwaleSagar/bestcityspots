@@ -6,7 +6,7 @@ import { MapPin, BookOpen, Info } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Explore", icon: MapPin },
-  { href: "/resources/top-cities", label: "Guide", icon: BookOpen },
+  { href: "/resources/top-cities", label: "Top Cities", icon: BookOpen },
   { href: "/about", label: "About", icon: Info },
 ] as const;
 
