@@ -23,11 +23,34 @@ const WeatherSchema = z.object({
   notes: z.string(),
 });
 
+const ProsConsSchema = z.object({
+  pros: z.array(z.string()),
+  cons: z.array(z.string()),
+});
+
+const BudgetSchema = z.object({
+  backpacker: z.string(),
+  midRange: z.string(),
+  luxury: z.string(),
+  currency: z.string(),
+});
+
+const SafetySchema = z.object({
+  rating: z.string(),
+  tips: z.array(z.string()),
+});
+
 const CityInsightSchema = z.object({
   intro: z.string().max(600),
   attractions: z.array(AttractionSchema),
   seasons: z.array(SeasonSchema),
   weather: z.array(WeatherSchema),
+  prosCons: ProsConsSchema.optional(),
+  bestFor: z.array(z.string()).optional(),
+  budget: BudgetSchema.optional(),
+  safety: SafetySchema.optional(),
+  bestMonths: z.string().optional(),
+  avoidMonths: z.string().optional(),
 });
 
 export type CityInsight = z.infer<typeof CityInsightSchema>;
@@ -74,7 +97,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
   try {
     const { data: cached } = await supabase
       .from("city_ai_insights")
-      .select("intro, attractions, seasons, weather, updated_at")
+      .select("intro, attractions, seasons, weather, prosCons:pros_cons, bestFor:best_for, budget, safety, bestMonths:best_months, avoidMonths:avoid_months, updated_at")
       .eq("city_id", city.id)
       .maybeSingle();
 
@@ -86,6 +109,12 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
         attractions: cached.attractions || [],
         seasons: cached.seasons || [],
         weather: cached.weather || [],
+        prosCons: cached.prosCons || undefined,
+        bestFor: cached.bestFor || undefined,
+        budget: cached.budget || undefined,
+        safety: cached.safety || undefined,
+        bestMonths: cached.bestMonths || undefined,
+        avoidMonths: cached.avoidMonths || undefined,
       };
       const cachedParsed = CityInsightSchema.safeParse(cachedCandidate);
       cachedInsight = cachedParsed.success ? cachedParsed.data : null;
@@ -103,7 +132,13 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
         "intro": "≤500 characters, vivid city intro",
         "attractions": [{ "name": "spot", "why": "1 short sentence" }],
         "seasons": [{ "name": "Spring", "months": "Mar-May", "summary": "advice" }],
-        "weather": [{ "season": "Spring", "tempC": "range°C", "notes": "tip" }]
+        "weather": [{ "season": "Spring", "tempC": "range°C", "notes": "tip" }],
+        "prosCons": { "pros": ["3-4 genuine advantages"], "cons": ["3-4 honest drawbacks"] },
+        "bestFor": ["budget travelers", "digital nomads", "families", etc. - pick 2-4 that fit],
+        "budget": { "backpacker": "$X-Y/day", "midRange": "$X-Y/day", "luxury": "$X-Y/day", "currency": "local currency name" },
+        "safety": { "rating": "Very Safe/Safe/Moderate/Exercise Caution", "tips": ["2-3 practical safety tips"] },
+        "bestMonths": "e.g. March to May, September to November",
+        "avoidMonths": "e.g. June to August (extreme heat)"
       }
     `;
 
@@ -122,6 +157,10 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
         city_name: city.city,
         country: city.country,
         ...parsed,
+        pros_cons: parsed.prosCons,
+        best_for: parsed.bestFor,
+        best_months: parsed.bestMonths,
+        avoid_months: parsed.avoidMonths,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "city_id" }

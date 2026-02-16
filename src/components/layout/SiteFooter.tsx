@@ -6,6 +6,7 @@ const internalLinks = [
   { href: "/resources/top-cities", label: "Top Cities Guide", icon: BookOpen },
   { href: "/resources/top-cities#plan", label: "Plan Your Trip", icon: Compass },
   { href: "/about", label: "About", icon: Info },
+  { href: "/privacy", label: "Privacy Policy", icon: Info },
 ] as const;
 
 export default function SiteFooter() {
@@ -42,6 +43,14 @@ export default function SiteFooter() {
             <p className="font-medium text-foreground/70">Best City Spots</p>
             <p className="mt-1 max-w-xs">
               Urban intelligence powered by Google Places, public census data, and AI-assisted summaries. No paywalls, no dark patterns. All data sources are transparent and verified.
+            </p>
+            <p className="mt-2">
+              <a
+                href="mailto:hello@bestcityspots.com"
+                className="text-foreground/60 underline underline-offset-2 hover:text-foreground/80 transition-colors"
+              >
+                hello@bestcityspots.com
+              </a>
             </p>
           </div>
         </div>

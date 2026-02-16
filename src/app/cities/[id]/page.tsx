@@ -218,6 +218,47 @@ export default async function CityPage({
     },
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What are the top attractions in ${city.city}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `${city.city} offers a variety of attractions including landmarks, restaurants, and cultural sites. Visit our detailed city guide for AI-curated recommendations with ratings and reviews from Google Places.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `What is the best time to visit ${city.city}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The best time to visit ${city.city} depends on your preferences. Check our seasonal guide and AI briefing for detailed month-by-month advice on weather, events, and travel conditions.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `How much does it cost to visit ${city.city}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Travel costs in ${city.city} vary by travel style. Our AI-powered budget estimates cover backpacker, mid-range, and luxury daily budgets to help you plan your trip.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Is ${city.city} safe for travelers?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Check our safety insights section for ${city.city}, which includes an overall safety rating and practical tips for travelers based on current conditions.`,
+        },
+      },
+    ],
+  };
+
+  const lastUpdated = new Date().toISOString();
+
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
   const metrics = await getCityMetrics(city);
@@ -231,6 +272,10 @@ export default async function CityPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
@@ -276,6 +321,22 @@ export default async function CityPage({
                 <div className="h-px flex-1 bg-gradient-to-r from-foreground/20 to-transparent" />
               </div>
             </header>
+
+            {/* Author & Last Updated */}
+            <div className="flex flex-wrap items-center gap-4 text-[10px] font-bold text-foreground/40">
+              <div className="flex items-center gap-2">
+                <div className="h-6 w-6 rounded-full bg-purple-500/20 flex items-center justify-center text-[9px] font-black text-purple-300">
+                  SA
+                </div>
+                <span>Curated by <strong className="text-foreground/60">Sagar Awale</strong></span>
+              </div>
+              <span className="text-foreground/20">·</span>
+              <time dateTime={lastUpdated} className="uppercase tracking-[0.15em]">
+                Updated {new Date(lastUpdated).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </time>
+              <span className="text-foreground/20">·</span>
+              <span className="uppercase tracking-[0.15em]">AI-assisted research</span>
+            </div>
 
             <Suspense fallback={<AIBriefingSkeleton />}>
               <AIBriefingSection city={city} />
@@ -365,11 +426,14 @@ export default async function CityPage({
                 <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
                   <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
                     <Activity className="h-4 w-4 text-purple-300" />
-                    Data Sources
+                    Data Sources &amp; Citations
                   </div>
-                  <p className="text-sm leading-relaxed text-foreground/60">
-                    All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.
-                  </p>
+                  <ul className="space-y-1.5 text-sm leading-relaxed text-foreground/60">
+                    <li>📍 Landmarks &amp; reviews: Google Places API</li>
+                    <li>🌤️ Weather &amp; air quality: OpenWeather API</li>
+                    <li>👥 Population: Public census databases</li>
+                    <li>🤖 City briefing: Google Gemini AI (labeled)</li>
+                  </ul>
                 </div>
               </div>
             </section>

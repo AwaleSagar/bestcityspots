@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { MapPin, Compass, TrendingUp } from "lucide-react";
 
 const featuredHighlights = [
-  { icon: MapPin, text: "Hidden Local Gems" },
-  { icon: Compass, text: "Insider Itineraries" },
-  { icon: TrendingUp, text: "Real-Time City Data" },
+  { icon: MapPin, text: "Pros & Cons for Every City" },
+  { icon: Compass, text: "Daily Budget Estimates" },
+  { icon: TrendingUp, text: "Safety & Seasonal Advice" },
 ] as const;
 
 export default function HeroHeader() {
@@ -36,7 +36,7 @@ export default function HeroHeader() {
 
       <div className="mx-auto max-w-lg space-y-4">
         <p className="text-base md:text-xl leading-snug font-medium tracking-tight text-foreground/40">
-          Discover <span className="text-foreground/90 italic">authentic travel experiences</span> with local insights, budget tips, and curated guides for the world&apos;s most <span className="text-foreground/90">vibrant cities</span>.
+          Your free, AI-powered city intelligence platform. Get <span className="text-foreground/90 italic">honest pros &amp; cons</span>, budget estimates, safety tips, and curated local picks for <span className="text-foreground/90">every destination</span>.
         </p>
         <div className="flex items-center justify-center gap-2 pt-1">
           <span className="h-1.5 w-1.5 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(147,51,234,0.8)]" />

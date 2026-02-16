@@ -447,6 +447,133 @@ export default function AboutPageContent() {
           <div className="chapter-divider mt-16">
             <ScrollReveal animation="scale">
               <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+                Chapter 05
+              </span>
+            </ScrollReveal>
+          </div>
+
+          {/* Team & Contact */}
+          <ScrollReveal animation="fade-up">
+            <section
+              className="mt-8 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8 interactive-card"
+              aria-labelledby="team-heading"
+            >
+              <h2
+                id="team-heading"
+                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50"
+              >
+                <Heart className="h-4 w-4 text-purple-400" aria-hidden />
+                Team &amp; Contact
+              </h2>
+
+              <div className="mt-6 grid gap-6 sm:grid-cols-2">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-purple-500/20 flex items-center justify-center text-sm font-black text-purple-300">
+                      SA
+                    </div>
+                    <div>
+                      <div className="text-sm font-black text-foreground/90">Sagar Awale</div>
+                      <div className="text-xs text-foreground/50">Founder &amp; Developer</div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-foreground/60">
+                    Full-stack developer based in Pune, India. Building Best City Spots to make
+                    city discovery transparent, data-driven, and accessible to everyone.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+                    Get in Touch
+                  </h3>
+                  <ul className="space-y-2 text-sm text-foreground/70">
+                    <li>
+                      <strong className="text-foreground/90">General:</strong>{" "}
+                      <a
+                        href="mailto:hello@bestcityspots.com"
+                        className="text-purple-400 underline underline-offset-2 hover:text-purple-300 transition-colors"
+                      >
+                        hello@bestcityspots.com
+                      </a>
+                    </li>
+                    <li>
+                      <strong className="text-foreground/90">Privacy:</strong>{" "}
+                      <a
+                        href="mailto:privacy@bestcityspots.com"
+                        className="text-purple-400 underline underline-offset-2 hover:text-purple-300 transition-colors"
+                      >
+                        privacy@bestcityspots.com
+                      </a>
+                    </li>
+                    <li>
+                      <strong className="text-foreground/90">Privacy Policy:</strong>{" "}
+                      <Link
+                        href="/privacy"
+                        className="text-purple-400 underline underline-offset-2 hover:text-purple-300 transition-colors"
+                      >
+                        Read our privacy policy
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* Monetization Disclosure */}
+          <div className="chapter-divider mt-16">
+            <ScrollReveal animation="scale">
+              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+                Chapter 06
+              </span>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal animation="fade-up">
+            <section
+              className="mt-8 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8 interactive-card"
+              aria-labelledby="monetization-heading"
+            >
+              <h2
+                id="monetization-heading"
+                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50"
+              >
+                <Shield className="h-4 w-4 text-purple-400" aria-hidden />
+                How We Sustain This Project
+              </h2>
+
+              <div className="mt-4 space-y-4 text-sm text-foreground/70">
+                <p>
+                  Best City Spots is an independent project. We believe in being transparent
+                  about how we sustain our work:
+                </p>
+                <ul className="space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-400/60" />
+                    All core city data, guides, and AI briefings are <strong className="text-foreground/90">completely free</strong> with no sign-up required.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-400/60" />
+                    We may introduce optional premium features in the future (such as personalized AI trip planning), but core content will always remain free.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-400/60" />
+                    We do not run display ads, sell user data, or use affiliate links that compromise our recommendations.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-purple-400/60" />
+                    Our recommendations are algorithmically generated and not influenced by paid placements.
+                  </li>
+                </ul>
+              </div>
+            </section>
+          </ScrollReveal>
+
+          {/* Ready CTA */}
+          <div className="chapter-divider mt-16">
+            <ScrollReveal animation="scale">
+              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
                 Ready?
               </span>
             </ScrollReveal>
