@@ -10,36 +10,48 @@ const guideHighlights = [
 export default function FreeResourceCTA() {
   return (
     <section
-      className="container-gutter mx-auto max-w-2xl px-4 py-12 sm:px-6"
+      className="mx-auto max-w-3xl px-4 sm:px-6"
       aria-labelledby="free-resource-heading"
     >
-      <div className="liquid-glass rounded-2xl border border-purple-500/20 bg-purple-500/5 p-6 text-center sm:rounded-[2rem] sm:p-10">
+      <div className="liquid-glass relative overflow-hidden rounded-2xl border border-purple-500/15 bg-gradient-to-br from-purple-500/[0.04] to-transparent p-8 text-center sm:rounded-3xl sm:p-12">
+        {/* Ambient glow */}
+        <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-purple-500/[0.06] blur-[80px]" />
+
+        <div className="mb-3 flex items-center justify-center gap-2">
+          <span className="badge-featured rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
+            Free Guide
+          </span>
+        </div>
+
         <h2
           id="free-resource-heading"
-          className="mb-2 flex items-center justify-center gap-2 text-sm font-black uppercase tracking-[0.2em] text-purple-300"
+          className="mb-3 text-xl font-bold tracking-tight text-foreground/90 sm:text-2xl"
         >
-          <BookOpen className="h-4 w-4" aria-hidden />
-          Free resource
+          Your Next Adventure Starts Here
         </h2>
-        <p className="mb-4 text-lg font-medium text-foreground/90">
-          Top 50 cities to explore—curated list with quick links to full guides, insider tips, and budget planning. No sign-up required.
+
+        <p className="mx-auto mb-6 max-w-md text-sm leading-relaxed text-foreground/50 sm:text-base">
+          50 handpicked cities with insider tips, budget planning, and quick links to full guides. No sign-up required.
         </p>
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-3">
+
+        <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
           {guideHighlights.map(({ icon: Icon, text }) => (
             <div
               key={text}
-              className="flex items-center gap-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1.5 text-[10px] font-bold tracking-wide text-purple-300/80"
+              className="flex items-center gap-1.5 rounded-full border border-purple-500/15 bg-purple-500/[0.06] px-3.5 py-2 text-[11px] font-semibold tracking-wide text-purple-300/80"
             >
-              <Icon className="h-3 w-3" aria-hidden />
+              <Icon className="h-3.5 w-3.5" aria-hidden />
               {text}
             </div>
           ))}
         </div>
+
         <Link
           href="/resources/top-cities"
-          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/20 px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-purple-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="btn-primary"
         >
-          View the guide
+          <BookOpen className="h-4 w-4" aria-hidden />
+          Explore the Guide
           <ArrowRight className="h-4 w-4" aria-hidden />
         </Link>
       </div>

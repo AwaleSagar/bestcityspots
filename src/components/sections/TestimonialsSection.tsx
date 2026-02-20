@@ -2,22 +2,22 @@ import { Lightbulb, Eye, Shield, MapPin, Wallet, Route } from "lucide-react";
 
 const highlights = [
   {
-    text: "Real metrics\u2014population, climate, air quality\u2014without sign-up walls. Compare cities side by side using verified data from Google Places and public databases.",
-    label: "Open data access",
+    text: "Real metrics—population, climate, air quality—without sign-up walls. Compare cities side by side with data you can trust.",
+    label: "Open Data Access",
     icon: Eye,
-    color: "bg-blue-500/20 text-blue-400",
+    color: "bg-blue-500/10 text-blue-400",
   },
   {
-    text: "AI-generated briefings summarize each city in seconds, covering attractions, seasons, and weather. All factual data comes from verified third-party sources.",
-    label: "AI-assisted summaries",
+    text: "AI-curated briefings that summarize each city in seconds—attractions, best seasons, and local weather, all from verified sources.",
+    label: "Smart City Briefings",
     icon: Lightbulb,
-    color: "bg-purple-500/20 text-purple-400",
+    color: "bg-purple-500/10 text-purple-400",
   },
   {
-    text: "No pop-ups, no dark patterns, no paywalls. Our About page explains exactly how we source and curate data. Every metric shows its origin.",
-    label: "Transparent by design",
+    text: "No pop-ups, no dark patterns, no paywalls. We believe great travel tools should be honest and straightforward.",
+    label: "Transparent by Design",
     icon: Shield,
-    color: "bg-teal-500/20 text-teal-400",
+    color: "bg-emerald-500/10 text-emerald-400",
   },
 ] as const;
 
@@ -25,48 +25,52 @@ const uniqueFeatures = [
   {
     icon: MapPin,
     title: "Hidden Local Gems",
-    description: "Discover places only locals know about\u2014quiet parks, neighborhood caf\u00e9s, and offbeat landmarks beyond the tourist trail.",
+    description: "Go beyond the tourist trail. Discover quiet parks, neighborhood cafés, and offbeat landmarks that only locals know about.",
   },
   {
     icon: Wallet,
     title: "Budget-Smart Planning",
-    description: "Filter dining and stays by price level. See cost indicators for every recommendation so you can plan within your budget.",
+    description: "See cost indicators for every recommendation. Filter by price level to plan experiences that fit your budget perfectly.",
   },
   {
     icon: Route,
     title: "Insider Itinerary Tips",
-    description: "Get arrival timing tips, best entry points, and daily specials from our AI-curated insider knowledge for every listed spot.",
+    description: "Arrival timing, best entry points, daily specials—AI-curated insider knowledge that turns a good trip into a great one.",
   },
 ] as const;
 
 export default function TestimonialsSection() {
   return (
     <section
-      className="border-t border-foreground/5 bg-foreground/[0.02] py-12 sm:py-16"
+      className="rounded-3xl border border-foreground/[0.04] bg-foreground/[0.015] py-14 sm:py-20"
       aria-labelledby="highlights-heading"
     >
-      <div className="container-gutter mx-auto max-w-4xl px-4 sm:px-6">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
         <h2
           id="highlights-heading"
-          className="mb-8 text-center text-sm font-black uppercase tracking-[0.2em] text-foreground/50 sm:mb-10"
+          className="mb-2 text-center section-heading sm:mb-3"
         >
-          How we help you explore
+          How We Help You Explore
         </h2>
-        <ul className="grid gap-6 sm:grid-cols-3 sm:gap-8" role="list">
+        <p className="mb-10 text-center text-sm text-foreground/40 sm:mb-12">
+          Everything you need to plan with confidence and discover with delight.
+        </p>
+
+        <ul className="grid gap-5 sm:grid-cols-3 sm:gap-6" role="list">
           {highlights.map(({ text, label, icon: Icon, color }) => (
             <li
               key={label}
-              className="liquid-glass flex flex-col gap-4 rounded-2xl border border-foreground/5 p-5 sm:p-6 transition-all hover:scale-[1.02]"
+              className="liquid-glass group flex flex-col gap-4 rounded-2xl border border-foreground/[0.06] p-6 transition-all duration-300 hover:border-purple-500/15 hover:shadow-lg hover:-translate-y-0.5"
             >
               <div className="flex items-center gap-3">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-full ${color}`}>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${color}`}>
                   <Icon className="h-4 w-4" aria-hidden />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-wider text-foreground/70">
+                <span className="text-sm font-bold tracking-tight text-foreground/75">
                   {label}
                 </span>
               </div>
-              <p className="text-sm leading-relaxed text-foreground/70">
+              <p className="text-sm leading-relaxed text-foreground/45">
                 {text}
               </p>
             </li>
@@ -74,23 +78,27 @@ export default function TestimonialsSection() {
         </ul>
 
         {/* Unique value propositions */}
-        <div className="mt-12 sm:mt-16">
-          <h3 className="mb-8 text-center text-sm font-black uppercase tracking-[0.2em] text-foreground/50 sm:mb-10">
-            What makes us different
+        <div className="mt-16 sm:mt-20">
+          <h3 className="mb-2 text-center section-heading sm:mb-3">
+            What Makes Us Different
           </h3>
-          <ul className="grid gap-6 sm:grid-cols-3 sm:gap-8" role="list">
+          <p className="mb-10 text-center text-sm text-foreground/40 sm:mb-12">
+            Curated, not scraped. Every recommendation is intentional.
+          </p>
+
+          <ul className="grid gap-5 sm:grid-cols-3 sm:gap-6" role="list">
             {uniqueFeatures.map(({ icon: Icon, title, description }) => (
               <li
                 key={title}
-                className="flex flex-col gap-3 rounded-2xl border border-purple-500/10 bg-purple-500/[0.03] p-5 sm:p-6"
+                className="group flex flex-col gap-4 rounded-2xl border border-purple-500/[0.08] bg-purple-500/[0.02] p-6 transition-all duration-300 hover:border-purple-500/20 hover:shadow-lg hover:-translate-y-0.5"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/15 bg-purple-500/[0.06] transition-colors duration-300 group-hover:bg-purple-500/10">
                   <Icon className="h-5 w-5 text-purple-400" aria-hidden />
                 </div>
-                <span className="text-sm font-black tracking-tight text-foreground/80">
+                <span className="text-sm font-bold tracking-tight text-foreground/80">
                   {title}
                 </span>
-                <p className="text-sm leading-relaxed text-foreground/50">
+                <p className="text-sm leading-relaxed text-foreground/45">
                   {description}
                 </p>
               </li>

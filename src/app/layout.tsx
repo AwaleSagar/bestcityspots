@@ -30,20 +30,20 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    default: "Best City Spots | Curated City Experiences for Modern Explorers",
     template: "%s | Best City Spots",
   },
   description:
-    "Discover your next destination with trusted city data, live metrics, and AI-powered insights. Compare cities, explore experiences, and plan trips with clarity—no paywalls, no dark patterns.",
+    "Discover hidden gems, plan smarter trips, and explore the world's most vibrant cities with curated guides, insider tips, and AI-powered insights.",
   applicationName: "Best City Spots",
   keywords: [
     "best cities to visit",
     "city guides",
-    "urban intelligence",
+    "curated travel experiences",
     "travel inspiration",
-    "city comparison",
+    "city exploration",
     "destination discovery",
-    "city metrics",
+    "hidden gems",
     "where to travel",
   ],
   authors: [{ name: "Best City Spots", url: siteUrl }],
@@ -60,9 +60,9 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true },
   },
   openGraph: {
-    title: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    title: "Best City Spots | Curated City Experiences for Modern Explorers",
     description:
-      "Discover your next destination with trusted city data and AI-powered insights. Compare cities and plan trips with clarity.",
+      "Discover hidden gems, plan smarter trips, and explore the world's most vibrant cities with curated guides and AI-powered insights.",
     type: "website",
     url: "/",
     siteName: "Best City Spots",
@@ -78,9 +78,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Best City Spots | Trusted Urban Intelligence & City Guides",
+    title: "Best City Spots | Curated City Experiences for Modern Explorers",
     description:
-      "Discover your next destination with trusted city data and AI-powered insights.",
+      "Discover hidden gems, plan smarter trips, and explore cities with curated guides and AI-powered insights.",
     images: ["/opengraph-image"],
   },
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
@@ -106,7 +106,7 @@ const jsonLd = [
     name: "Best City Spots",
     url: siteUrl,
     description:
-      "Best City Spots provides trusted urban intelligence and city guides—live metrics, AI insights, and transparent data to help travelers discover and compare cities.",
+      "Best City Spots provides curated city experiences for modern explorers—discover hidden gems, plan smarter trips, and explore with confidence.",
     sameAs: [],
   },
   {
@@ -115,7 +115,7 @@ const jsonLd = [
     name: "Best City Spots",
     url: siteUrl,
     description:
-      "Discover your next destination with trusted city data, live metrics, and AI-powered insights.",
+      "Discover hidden gems, plan smarter trips, and explore the world's most vibrant cities with curated guides and AI-powered insights.",
     publisher: { "@id": `${siteUrl}/#organization` },
     inLanguage: "en-US",
   },
@@ -129,7 +129,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-blue-500/30 selection:text-blue-200`}
+        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-purple-500/20 selection:text-purple-200`}
       >
         <script
           type="application/ld+json"
