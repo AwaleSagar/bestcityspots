@@ -681,7 +681,7 @@ video {
 
 /* Section heading style */
 .section-heading {
-  font-size: var(--text-fluid-xs);
+  font-size: var(--text-fluid-sm);
   font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
