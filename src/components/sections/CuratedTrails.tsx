@@ -17,8 +17,9 @@ const trailThemes = [
   "Budget Friendly",
 ] as const;
 
-function getTrailTheme(index: number): string {
-  return trailThemes[index % trailThemes.length];
+function getTrailTheme(city: City): string {
+  // Use city ID to deterministically assign a theme that persists across renders
+  return trailThemes[city.id % trailThemes.length];
 }
 
 export default function CuratedTrails({ cities }: CuratedTrailsProps) {
@@ -97,7 +98,7 @@ export default function CuratedTrails({ cities }: CuratedTrailsProps) {
         aria-label="Curated city trails, swipe to browse"
         tabIndex={0}
       >
-        {cities.map((city, idx) => (
+        {cities.map((city) => (
           <Link
             key={city.id}
             href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
@@ -105,7 +106,7 @@ export default function CuratedTrails({ cities }: CuratedTrailsProps) {
           >
             <div>
               <span className="mb-2 inline-block rounded-full border border-purple-500/15 bg-purple-500/[0.06] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-purple-400/80">
-                {getTrailTheme(idx)}
+                {getTrailTheme(city)}
               </span>
               <h3 className="mt-2 text-lg font-bold tracking-tight text-foreground/90 group-hover:text-foreground">
                 {city.city}

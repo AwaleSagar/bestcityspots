@@ -46,7 +46,7 @@ export default function HeroVideo() {
       () => {
         // Silently use default if permission denied
       },
-      { timeout: 5000, maximumAge: 300000 }
+      { timeout: 5000, maximumAge: 3600000 }
     );
   }, []);
 

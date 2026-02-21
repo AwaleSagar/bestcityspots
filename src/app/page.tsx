@@ -28,7 +28,7 @@ export default async function Home() {
 
         {/* Curated Trails — swipe-friendly horizontal scroll */}
         {topCities.length > 0 && (
-          <div className="mt-16">
+          <div style={{ marginTop: "var(--space-16)" }}>
             <CuratedTrails cities={topCities} />
           </div>
         )}
