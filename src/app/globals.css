@@ -73,6 +73,23 @@
   --touch-target-min: 48px;
   --mobile-bottom-nav-height: 56px;
 
+  /* Whitespace / Spacing Tokens */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Grid System */
+  --grid-gap: var(--space-6);
+  --grid-gap-lg: var(--space-8);
+
   /* Fluid typography scale (mobile-first) */
   --text-fluid-xs: clamp(0.6875rem, 0.65rem + 0.2vw, 0.75rem);
   --text-fluid-sm: clamp(0.8125rem, 0.75rem + 0.3vw, 0.875rem);
@@ -757,5 +774,160 @@ html {
 @supports (-webkit-touch-callout: none) {
   body {
     -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* ========================================
+   CSS Grid Framework (mobile-first)
+   ======================================== */
+
+.grid-layout {
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .grid-layout {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-layout {
+    gap: var(--grid-gap-lg);
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.grid-layout-full-bleed {
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+}
+
+/* ========================================
+   Full-bleed Hero Container
+   ======================================== */
+
+.hero-full-bleed {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.hero-video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    var(--background) 100%
+  );
+}
+
+.dark .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    var(--background) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 48rem;
+  padding: var(--space-6);
+}
+
+/* ========================================
+   Interactive Expandable Spot Cards
+   ======================================== */
+
+.spot-card {
+  will-change: transform;
+  transform: translateZ(0);
+  transition:
+    transform 0.3s var(--transition-fluid),
+    box-shadow 0.3s var(--transition-fluid);
+}
+
+.spot-card:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: var(--shadow-lg);
+}
+
+.spot-card:active {
+  transform: translateY(0) translateZ(0);
+}
+
+.spot-card-details {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--transition-fluid);
+  overflow: hidden;
+}
+
+.spot-card-details[aria-hidden="false"] {
+  grid-template-rows: 1fr;
+}
+
+.spot-card-details-inner {
+  overflow: hidden;
+}
+
+/* ========================================
+   Curated Trails — Horizontal Scroll
+   ======================================== */
+
+.trails-scroll {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-inline: var(--space-4);
+  padding-block: var(--space-2);
+  scrollbar-width: none;
+}
+
+.trails-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.trail-card {
+  flex: 0 0 80%;
+  max-width: 20rem;
+  scroll-snap-align: start;
+  min-height: var(--touch-target-min);
+}
+
+@media (min-width: 640px) {
+  .trail-card {
+    flex: 0 0 45%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .trail-card {
+    flex: 0 0 30%;
   }
 }
