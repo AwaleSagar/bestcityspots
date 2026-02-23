@@ -27,5 +27,7 @@ export function generateSizes(maxWidth: number = 800): string {
  * Maps network quality tier to Next.js Image quality prop
  */
 export function getQualityValue(quality: QualityTier): number {
+  // quality is typed as keyof typeof QUALITY_PRESETS - object injection is not a risk
+  // eslint-disable-next-line security/detect-object-injection
   return QUALITY_PRESETS[quality];
 }

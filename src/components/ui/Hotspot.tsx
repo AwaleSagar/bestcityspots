@@ -85,7 +85,13 @@ export default function Hotspot({
     }
   }, [handleToggle, isOpen]);
 
+  // position is a typed TooltipPosition union - key access is safe
+  // eslint-disable-next-line security/detect-object-injection
   const animation = tooltipAnimations[position];
+  // eslint-disable-next-line security/detect-object-injection
+  const sizeClass = sizeClasses[size];
+  // eslint-disable-next-line security/detect-object-injection
+  const tooltipPositionClass = tooltipPositionStyles[position];
 
   return (
     <span
@@ -103,7 +109,7 @@ export default function Hotspot({
         aria-expanded={isOpen}
         className={`
           ${inline ? "ml-1" : ""}
-          ${sizeClasses[size]}
+          ${sizeClass}
           relative cursor-pointer rounded-full
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50
           touch-target
@@ -129,7 +135,7 @@ export default function Hotspot({
 
         {/* Main indicator dot */}
         <span
-          className={`absolute inset-0 flex items-center justify-center rounded-full ${sizeClasses[size]}`}
+          className={`absolute inset-0 flex items-center justify-center rounded-full ${sizeClass}`}
           style={{ backgroundColor: color }}
         >
           <Info className="h-2 w-2 text-white" />
@@ -146,7 +152,7 @@ export default function Hotspot({
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
             className={`
               absolute z-50
-              ${tooltipPositionStyles[position]}
+              ${tooltipPositionClass}
               w-64 max-w-[calc(100vw-2rem)]
             `}
             role="tooltip"

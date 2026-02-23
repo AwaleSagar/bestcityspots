@@ -20,6 +20,8 @@ function fisherYatesShuffle<T>(arr: T[]): T[] {
   const result = [...arr]; // Don't mutate original
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+    // Indices i and j are bounded numeric loop variables - access is safe
+    // eslint-disable-next-line security/detect-object-injection
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
@@ -272,6 +274,8 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
     const cityIdx = cityIndexPerCategory.get(category.id) || 0;
 
     if (cityIdx < category.cities.length) {
+      // cityIdx is a bounded counter - array access is safe
+      // eslint-disable-next-line security/detect-object-injection
       const city = category.cities[cityIdx];
 
       // Avoid duplicates (some cities appear in multiple categories)

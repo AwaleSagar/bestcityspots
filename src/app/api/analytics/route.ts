@@ -20,17 +20,8 @@ const ActionType = z.enum([
   "download_itinerary",
 ]);
 
-const SourceType = z.enum([
-  "organic",
-  "social",
-  "referral",
-  "direct",
-  "paid",
-  "email",
-  "other",
-]);
-
-const DeviceType = z.enum(["desktop", "mobile", "tablet", "other"]);
+type SourceTypeValue = "organic" | "social" | "referral" | "direct" | "paid" | "email" | "other";
+type DeviceTypeValue = "desktop" | "mobile" | "tablet" | "other";
 
 // Analytics event schema
 const AnalyticsEventSchema = z.object({
@@ -62,14 +53,14 @@ function getToday(): string {
 }
 
 function parseUserAgent(ua: string): {
-  deviceType: z.infer<typeof DeviceType>;
+  deviceType: DeviceTypeValue;
   browser: string | null;
   os: string | null;
 } {
   const uaLower = ua.toLowerCase();
 
   // Device type detection
-  let deviceType: z.infer<typeof DeviceType> = "desktop";
+  let deviceType: DeviceTypeValue = "desktop";
   if (/mobile|android|iphone|ipod|blackberry|windows phone/i.test(ua)) {
     deviceType = "mobile";
   } else if (/tablet|ipad|playbook|silk/i.test(ua)) {
@@ -96,7 +87,7 @@ function parseUserAgent(ua: string): {
 }
 
 function parseReferrer(referrer: string | null): {
-  sourceType: z.infer<typeof SourceType>;
+  sourceType: SourceTypeValue;
   sourceName: string;
 } {
   if (!referrer || referrer === "") {
@@ -211,7 +202,7 @@ async function updateDailyVisitorStats(
 
 async function updateTrafficSources(
   date: string,
-  sourceType: z.infer<typeof SourceType>,
+  sourceType: SourceTypeValue,
   sourceName: string,
   uniqueVisitors: number
 ) {
@@ -232,7 +223,7 @@ async function updateTrafficSources(
 
 async function updateDeviceStats(
   date: string,
-  deviceType: z.infer<typeof DeviceType>,
+  deviceType: DeviceTypeValue,
   browser: string | null,
   os: string | null
 ) {

@@ -61,6 +61,7 @@ const colors = {
 };
 
 const c = (color: keyof typeof colors, text: string) =>
+  // eslint-disable-next-line security/detect-object-injection
   jsonOutput ? text : `${colors[color]}${text}${colors.reset}`;
 
 // =============================================================================
