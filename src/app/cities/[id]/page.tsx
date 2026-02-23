@@ -120,10 +120,15 @@ async function ExperiencesWrapper({
   ]);
 
   return (
-    <div className="space-y-8">
-      <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
-        Top Experiences <span className="h-px flex-1 bg-foreground/5" />
-      </h2>
+    <div className="space-y-10">
+      <div className="space-y-3">
+        <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
+          Top Experiences <span className="h-px flex-1 bg-foreground/5" />
+        </h2>
+        <p className="text-sm font-bold text-foreground/40 tracking-wide max-w-lg">
+          Curated landmarks, dining, and stays — ranked by traveler interest and local pulse.
+        </p>
+      </div>
       <ExperiencesSection
         cityName={cityName}
         landmarks={landmarks}
