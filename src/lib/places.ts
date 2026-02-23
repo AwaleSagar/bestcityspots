@@ -1,3 +1,4 @@
+import "server-only";
 import { supabase, supabaseServer } from "./supabase";
 import { rankingEngine } from "./ranking";
 import { haversineKm } from "./geo";
@@ -83,14 +84,14 @@ async function resolvePlaceImage(
 
   try {
     // Check if image already exists in storage
-    const headRes = await fetch(publicUrl, { method: "HEAD" });
+    const headRes = await fetch(publicUrl, { method: "HEAD", signal: AbortSignal.timeout(5_000) });
     if (headRes.ok) {
       // Image exists, but we may need to generate blurhash if not cached
       if (existingBlurhash) {
         return { imageUrl: publicUrl, blurhash: existingBlurhash };
       }
       // Fetch image to generate blurhash for existing cached images
-      const existingImageRes = await fetch(publicUrl);
+      const existingImageRes = await fetch(publicUrl, { signal: AbortSignal.timeout(10_000) });
       if (existingImageRes.ok) {
         const existingBuffer = await existingImageRes.arrayBuffer();
         const blurhash = await generateBlurhash(existingBuffer);
@@ -101,7 +102,7 @@ async function resolvePlaceImage(
 
     // Fetch from Google Places API
     const mediaUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${IMAGE_MAX_WIDTH}&maxHeightPx=${IMAGE_MAX_HEIGHT}&key=${apiKey}`;
-    const imageRes = await fetch(mediaUrl, { redirect: "follow" });
+    const imageRes = await fetch(mediaUrl, { redirect: "follow", signal: AbortSignal.timeout(15_000) });
     if (!imageRes.ok) return undefined;
 
     const arrayBuffer = await imageRes.arrayBuffer();
@@ -158,6 +159,7 @@ async function fetchFromGoogle(
             }
             : undefined,
       }),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok) {

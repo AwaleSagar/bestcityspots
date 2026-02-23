@@ -1,3 +1,4 @@
+import "server-only";
 import { City } from "./cities";
 import { z } from "zod";
 import { supabase, supabaseServer } from "./supabase";
@@ -74,10 +75,12 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
     // 2. Cache expired or missing, fetch fresh data
     const [weatherRes, aqiRes] = await Promise.all([
       fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`
+        `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`,
+        { signal: AbortSignal.timeout(10_000) }
       ),
       fetch(
-        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`
+        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`,
+        { signal: AbortSignal.timeout(10_000) }
       ),
     ]);
 

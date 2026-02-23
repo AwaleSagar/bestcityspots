@@ -111,7 +111,9 @@ function topK<T>(arr: T[], k: number, getValue: (item: T) => number): T[] {
       topItems.push(item);
       // Keep sorted (insertion sort for small k is O(k))
       for (let i = topItems.length - 1; i > 0; i--) {
+        // eslint-disable-next-line security/detect-object-injection
         if (getValue(topItems[i]) > getValue(topItems[i - 1])) {
+          // eslint-disable-next-line security/detect-object-injection
           [topItems[i], topItems[i - 1]] = [topItems[i - 1], topItems[i]];
         } else {
           break;
@@ -122,7 +124,9 @@ function topK<T>(arr: T[], k: number, getValue: (item: T) => number): T[] {
       topItems[k - 1] = item;
       // Bubble up to correct position
       for (let i = k - 1; i > 0; i--) {
+        // eslint-disable-next-line security/detect-object-injection
         if (getValue(topItems[i]) > getValue(topItems[i - 1])) {
+          // eslint-disable-next-line security/detect-object-injection
           [topItems[i], topItems[i - 1]] = [topItems[i - 1], topItems[i]];
         } else {
           break;
@@ -362,7 +366,7 @@ export default function ExperiencesSection({
   const savedIds = useMemo(() => new Set(savedForCity.map((place) => place.id)), [savedForCity]);
 
   const draftNotesMap = useMemo(() => toNoteMap(draftNotes), [draftNotes]);
-  const placeNotesMap = useMemo(() => toNoteMap(placeNotes), [placeNotes]);
+  const placeNotesMap = toNoteMap(placeNotes);
 
   const toggleSave = (place: Landmark, type: "landmarks" | "restaurants" | "hotels") => {
     setSavedPlaces((prev) => {

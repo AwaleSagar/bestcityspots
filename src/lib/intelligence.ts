@@ -1,3 +1,4 @@
+import "server-only";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase, supabaseServer } from "./supabase";
 import { City } from "./cities";

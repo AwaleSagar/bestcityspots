@@ -1,3 +1,4 @@
+import "server-only";
 import { supabase } from "./supabase";
 import type { City } from "./cities";
 
@@ -15,7 +16,7 @@ export interface CityMetrics {
 async function getOpenMeteoAirQuality(lat: number, lng: number) {
   try {
     const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm2_5&past_days=1&forecast_days=1&timezone=auto`;
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
     if (!res.ok) return null;
     const data = await res.json();
     const values: number[] | undefined = data?.hourly?.pm2_5;
@@ -31,7 +32,7 @@ async function getOpenMeteoAirQuality(lat: number, lng: number) {
 async function getOpenMeteoWeather(lat: number, lng: number) {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m&timezone=auto`;
-    const res = await fetch(url, { cache: "no-store" });
+    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
     if (!res.ok) return null;
     const data = await res.json();
     const temp = data?.current?.temperature_2m;

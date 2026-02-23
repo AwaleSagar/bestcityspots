@@ -17,6 +17,22 @@ const COLORS = {
   warm: { r: 251, g: 146, b: 60 },       // Orange
 };
 
+// Pre-computed color values array for safe indexed access
+const COLOR_VALUES = Object.values(COLORS);
+
+// Pre-generate particle data at module level to avoid impure calls during render
+const PARTICLE_DATA = (() => {
+  return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+    id: i,
+    delay: Math.random() * 10,
+    duration: 15 + Math.random() * 20,
+    size: Math.random() * 3 + 1,
+    startX: Math.random() * 100,
+    startY: Math.random() * 100,
+    colorIndex: Math.floor(Math.random() * COLOR_VALUES.length),
+  }));
+})();
+
 function fibonacciSphere(n: number, radius: number): Point3[] {
   const pts: Point3[] = [];
   const goldenAngle = Math.PI * (3 - Math.sqrt(5));
@@ -35,10 +51,9 @@ function fibonacciSphere(n: number, radius: number): Point3[] {
 // Get color based on position for aurora effect
 function getNodeColor(index: number, total: number, isActive: boolean) {
   const t = index / total;
-  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
-  const colorIndex = Math.floor(t * colorKeys.length) % colorKeys.length;
-  const color = COLORS[colorKeys[colorIndex]];
-  
+  const colorIndex = Math.floor(t * COLOR_VALUES.length) % COLOR_VALUES.length;
+  const color = COLOR_VALUES[colorIndex % COLOR_VALUES.length];
+
   if (isActive) {
     return `rgb(${color.r}, ${color.g}, ${color.b})`;
   }
@@ -47,20 +62,29 @@ function getNodeColor(index: number, total: number, isActive: boolean) {
 
 function getGlowColor(index: number, total: number) {
   const t = index / total;
-  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
-  const colorIndex = Math.floor(t * colorKeys.length) % colorKeys.length;
-  const color = COLORS[colorKeys[colorIndex]];
+  const colorIndex = Math.floor(t * COLOR_VALUES.length) % COLOR_VALUES.length;
+  const color = COLOR_VALUES[colorIndex % COLOR_VALUES.length];
   return `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`;
 }
 
 // Floating particle component
-function FloatingParticle({ delay, duration }: { delay: number; duration: number }) {
-  const size = Math.random() * 3 + 1;
-  const startX = Math.random() * 100;
-  const startY = Math.random() * 100;
-  const colorKeys = Object.keys(COLORS) as (keyof typeof COLORS)[];
-  const color = COLORS[colorKeys[Math.floor(Math.random() * colorKeys.length)]];
-  
+function FloatingParticle({
+  delay,
+  duration,
+  size,
+  startX,
+  startY,
+  colorIndex,
+}: {
+  delay: number;
+  duration: number;
+  size: number;
+  startX: number;
+  startY: number;
+  colorIndex: number;
+}) {
+  const color = COLOR_VALUES[colorIndex % COLOR_VALUES.length];
+
   return (
     <div
       className="absolute rounded-full animate-float-particle"
@@ -161,15 +185,8 @@ export default function CitySphereBackground() {
     return fibonacciSphere(n, SPHERE_RADIUS);
   }, [labels]);
 
-  // Generate particles once
-  const particles = useMemo(() => {
-    if (shouldReduceMotion) return [];
-    return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
-      id: i,
-      delay: Math.random() * 10,
-      duration: 15 + Math.random() * 20,
-    }));
-  }, [shouldReduceMotion]);
+  // Use pre-generated particle data (computed at module level to keep render pure)
+  const particles = shouldReduceMotion ? [] : PARTICLE_DATA;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -234,7 +251,15 @@ export default function CitySphereBackground() {
       {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden">
         {particles.map((p) => (
-          <FloatingParticle key={p.id} delay={p.delay} duration={p.duration} />
+          <FloatingParticle
+            key={p.id}
+            delay={p.delay}
+            duration={p.duration}
+            size={p.size}
+            startX={p.startX}
+            startY={p.startY}
+            colorIndex={p.colorIndex}
+          />
         ))}
       </div>
 

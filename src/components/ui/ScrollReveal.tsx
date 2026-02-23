@@ -86,6 +86,7 @@ export default function ScrollReveal({
 
   // Use no animation if user prefers reduced motion
   const selectedAnimation = shouldReduceMotion ? "none" : animation;
+  // eslint-disable-next-line security/detect-object-injection
   const variants = animations[selectedAnimation];
 
   return (

@@ -93,6 +93,12 @@ export default function InteractiveButton({
     [disabled, loading, onClick, shouldReduceMotion]
   );
 
+  // variant and size are typed union types - key access is safe
+  // eslint-disable-next-line security/detect-object-injection
+  const variantClass = variantStyles[variant];
+  // eslint-disable-next-line security/detect-object-injection
+  const sizeClass = sizeStyles[size];
+
   const baseClasses = `
     touch-target relative inline-flex min-h-[var(--touch-target-min)]
     items-center justify-center overflow-hidden rounded-full border
@@ -100,8 +106,8 @@ export default function InteractiveButton({
     transition-colors duration-150
     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background
     disabled:pointer-events-none disabled:opacity-50
-    ${variantStyles[variant]}
-    ${sizeStyles[size]}
+    ${variantClass}
+    ${sizeClass}
     ${fullWidth ? "w-full" : ""}
     ${className}
   `;

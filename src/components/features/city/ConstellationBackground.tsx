@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 interface Star {
@@ -147,6 +147,7 @@ function generateConnections(stars: Star[]): Connection[] {
   const grid = buildSpatialGrid(stars, cellSize);
 
   for (let i = 0; i < stars.length; i++) {
+    // eslint-disable-next-line security/detect-object-injection
     const star = stars[i];
     const currentCount = connectionCounts.get(star.id) || 0;
 
@@ -263,109 +264,109 @@ export default function ConstellationBackground() {
   }, [shouldReduceMotion]);
 
   // Canvas animation
-  const animate = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas || !ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const width = canvas.offsetWidth;
-    const height = canvas.offsetHeight;
-
-    // Resize canvas if needed
-    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
-    }
-
-    ctx.clearRect(0, 0, width, height);
-
-    timeRef.current += 0.008; // Slower animation for breathing effect
-    const time = timeRef.current;
-
-    // Parallax offset based on mouse
-    const parallaxX = (mouseRef.current.x - 0.5) * 20;
-    const parallaxY = (mouseRef.current.y - 0.5) * 20;
-
-    // Draw connections first
-    connections.forEach((conn) => {
-      const fromStar = stars[conn.from];
-      const toStar = stars[conn.to];
-      if (!fromStar || !toStar) return;
-
-      const x1 = (fromStar.x / 100) * width + parallaxX * (fromStar.brightness * 0.5);
-      const y1 = (fromStar.y / 100) * height + parallaxY * (fromStar.brightness * 0.5);
-      const x2 = (toStar.x / 100) * width + parallaxX * (toStar.brightness * 0.5);
-      const y2 = (toStar.y / 100) * height + parallaxY * (toStar.brightness * 0.5);
-
-      // Subtle pulse on connections - slower breathing
-      const pulse = 0.8 + Math.sin(time * 0.3 + conn.from * 0.1) * 0.2;
-
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.strokeStyle = `rgba(150, 180, 255, ${conn.opacity * pulse * 0.4})`;
-      ctx.lineWidth = 0.5;
-      ctx.stroke();
-    });
-
-    // Draw stars
-    stars.forEach((star) => {
-      const x = (star.x / 100) * width + parallaxX * (star.brightness * 0.5);
-      const y = (star.y / 100) * height + parallaxY * (star.brightness * 0.5);
-
-      // Twinkling effect
-      const twinkle = shouldReduceMotion
-        ? 1
-        : 0.6 + Math.sin(time * star.twinkleSpeed + star.twinkleOffset) * 0.4;
-      const currentBrightness = star.brightness * twinkle;
-      const currentSize = star.size * (0.8 + twinkle * 0.2);
-
-      // Outer glow
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, currentSize * 4);
-      gradient.addColorStop(0, `rgba(200, 220, 255, ${currentBrightness * 0.3})`);
-      gradient.addColorStop(0.5, `rgba(180, 200, 255, ${currentBrightness * 0.1})`);
-      gradient.addColorStop(1, "transparent");
-
-      ctx.beginPath();
-      ctx.arc(x, y, currentSize * 4, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-
-      // Core star
-      ctx.beginPath();
-      ctx.arc(x, y, currentSize, 0, Math.PI * 2);
-      ctx.fillStyle = getStarColor(currentBrightness);
-      ctx.fill();
-
-      // Draw label if exists - colorful, bigger, bolder
-      if (star.label && currentBrightness > 0.4) {
-        const labelOpacity = Math.min(1, (currentBrightness - 0.4) * 1.8);
-        const colorIndex = star.id % LABEL_COLORS.length;
-        
-        // Draw glow behind text
-        ctx.font = "800 14px system-ui, -apple-system, sans-serif";
-        ctx.shadowColor = getLabelGlow(colorIndex);
-        ctx.shadowBlur = 12;
-        ctx.fillStyle = getLabelColor(colorIndex, labelOpacity * 0.9);
-        ctx.textAlign = "left";
-        ctx.fillText(star.label.toUpperCase(), x + currentSize * 3 + 6, y + 4);
-        
-        // Reset shadow
-        ctx.shadowBlur = 0;
-      }
-    });
-
-    rafRef.current = requestAnimationFrame(animate);
-  }, [stars, connections, shouldReduceMotion]);
-
   useEffect(() => {
+    const animate = () => {
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext("2d");
+      if (!canvas || !ctx) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.offsetWidth;
+      const height = canvas.offsetHeight;
+
+      // Resize canvas if needed
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.scale(dpr, dpr);
+      }
+
+      ctx.clearRect(0, 0, width, height);
+
+      timeRef.current += 0.008; // Slower animation for breathing effect
+      const time = timeRef.current;
+
+      // Parallax offset based on mouse
+      const parallaxX = (mouseRef.current.x - 0.5) * 20;
+      const parallaxY = (mouseRef.current.y - 0.5) * 20;
+
+      // Draw connections first
+      connections.forEach((conn) => {
+        const fromStar = stars[conn.from];
+        const toStar = stars[conn.to];
+        if (!fromStar || !toStar) return;
+
+        const x1 = (fromStar.x / 100) * width + parallaxX * (fromStar.brightness * 0.5);
+        const y1 = (fromStar.y / 100) * height + parallaxY * (fromStar.brightness * 0.5);
+        const x2 = (toStar.x / 100) * width + parallaxX * (toStar.brightness * 0.5);
+        const y2 = (toStar.y / 100) * height + parallaxY * (toStar.brightness * 0.5);
+
+        // Subtle pulse on connections - slower breathing
+        const pulse = 0.8 + Math.sin(time * 0.3 + conn.from * 0.1) * 0.2;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = `rgba(150, 180, 255, ${conn.opacity * pulse * 0.4})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      });
+
+      // Draw stars
+      stars.forEach((star) => {
+        const x = (star.x / 100) * width + parallaxX * (star.brightness * 0.5);
+        const y = (star.y / 100) * height + parallaxY * (star.brightness * 0.5);
+
+        // Twinkling effect
+        const twinkle = shouldReduceMotion
+          ? 1
+          : 0.6 + Math.sin(time * star.twinkleSpeed + star.twinkleOffset) * 0.4;
+        const currentBrightness = star.brightness * twinkle;
+        const currentSize = star.size * (0.8 + twinkle * 0.2);
+
+        // Outer glow
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, currentSize * 4);
+        gradient.addColorStop(0, `rgba(200, 220, 255, ${currentBrightness * 0.3})`);
+        gradient.addColorStop(0.5, `rgba(180, 200, 255, ${currentBrightness * 0.1})`);
+        gradient.addColorStop(1, "transparent");
+
+        ctx.beginPath();
+        ctx.arc(x, y, currentSize * 4, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Core star
+        ctx.beginPath();
+        ctx.arc(x, y, currentSize, 0, Math.PI * 2);
+        ctx.fillStyle = getStarColor(currentBrightness);
+        ctx.fill();
+
+        // Draw label if exists - colorful, bigger, bolder
+        if (star.label && currentBrightness > 0.4) {
+          const labelOpacity = Math.min(1, (currentBrightness - 0.4) * 1.8);
+          const colorIndex = star.id % LABEL_COLORS.length;
+
+          // Draw glow behind text
+          ctx.font = "800 14px system-ui, -apple-system, sans-serif";
+          ctx.shadowColor = getLabelGlow(colorIndex);
+          ctx.shadowBlur = 12;
+          ctx.fillStyle = getLabelColor(colorIndex, labelOpacity * 0.9);
+          ctx.textAlign = "left";
+          ctx.fillText(star.label.toUpperCase(), x + currentSize * 3 + 6, y + 4);
+
+          // Reset shadow
+          ctx.shadowBlur = 0;
+        }
+      });
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
     rafRef.current = requestAnimationFrame(animate);
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [animate]);
+  }, [stars, connections, shouldReduceMotion]);
 
   return (
     <div
