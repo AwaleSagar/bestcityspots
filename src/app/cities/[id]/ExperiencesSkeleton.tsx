@@ -11,100 +11,85 @@ function Shimmer() {
 }
 
 // Skeleton for a single experience card
-function ExperienceCardSkeleton({ index }: { index: number }) {
+function ExperienceCardSkeleton({ index, isFeatured }: { index: number; isFeatured: boolean }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.4 }}
-      className="liquid-glass overflow-hidden rounded-2xl md:rounded-[2.5rem]"
+      transition={{ delay: index * 0.08, duration: 0.4 }}
+      className={`liquid-glass overflow-hidden rounded-2xl md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
     >
-      {/* Image skeleton */}
-      <div className="relative h-40 md:h-52 w-full bg-foreground/[0.03] overflow-hidden">
+      {/* Image skeleton with overlaid elements */}
+      <div className={`relative w-full overflow-hidden bg-foreground/[0.03] ${isFeatured ? "h-52 md:h-72" : "h-40 md:h-48"}`}>
         <Shimmer />
-        {/* Gradient overlay like real cards */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
-      </div>
-
-      {/* Content skeleton */}
-      <div className="flex flex-col gap-6 px-6 pb-6 md:px-8 md:pb-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          {/* Left side - icon and title */}
-          <div className="flex items-start gap-4 md:items-center md:gap-6">
-            {/* Icon placeholder */}
-            <div className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl md:rounded-2xl border border-foreground/5 bg-foreground/[0.02]">
-              <Compass className="h-5 w-5 text-foreground/10" />
-            </div>
-
-            <div className="space-y-3">
-              {/* Title skeleton */}
-              <div className="relative h-6 w-48 overflow-hidden rounded-lg bg-foreground/[0.05]">
-                <Shimmer />
-              </div>
-
-              {/* Tags skeleton */}
-              <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                <div className="relative h-5 w-20 overflow-hidden rounded-md bg-purple-500/10">
-                  <Shimmer />
-                </div>
-                <div className="hidden md:block h-px w-4 bg-foreground/10" />
-                <div className="relative h-4 w-24 overflow-hidden rounded bg-foreground/[0.03]">
-                  <Shimmer />
-                </div>
-                <div className="relative h-5 w-28 overflow-hidden rounded-full bg-foreground/[0.03]">
-                  <Shimmer />
-                </div>
-              </div>
-            </div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {/* Rating badge skeleton */}
+        <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/10">
+          <Star className="h-3.5 w-3.5 text-white/20" />
+          <div className="relative h-4 w-6 overflow-hidden rounded bg-white/10">
+            <Shimmer />
           </div>
-
-          {/* Right side - rating and actions */}
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            {/* Rating skeleton */}
-            <div className="flex items-center gap-3">
-              <div className="relative h-4 w-10 overflow-hidden rounded bg-foreground/[0.03]">
-                <Shimmer />
-              </div>
-              <div className="flex items-center gap-1.5 text-foreground/10">
-                <Star className="h-4 w-4" />
-                <div className="relative h-6 w-8 overflow-hidden rounded bg-foreground/[0.03]">
-                  <Shimmer />
-                </div>
-              </div>
-            </div>
-
-            {/* Reviews skeleton */}
-            <div className="relative h-3 w-20 overflow-hidden rounded bg-foreground/[0.03]">
+        </div>
+        {/* Title overlay skeleton */}
+        <div className="absolute bottom-0 left-0 right-0 z-30 p-4 md:p-6">
+          <div className="flex items-center gap-2 mb-1.5">
+            <div className="relative h-5 w-20 overflow-hidden rounded-md bg-purple-500/20">
               <Shimmer />
             </div>
-
-            {/* Insider tips skeleton */}
-            <div className="w-full rounded-2xl border border-purple-500/10 bg-purple-500/[0.02] p-3">
-              <div className="relative mb-2 h-2 w-16 overflow-hidden rounded bg-purple-500/10">
-                <Shimmer />
-              </div>
-              <div className="space-y-1">
-                <div className="relative h-3 w-full overflow-hidden rounded bg-foreground/[0.02]">
-                  <Shimmer />
-                </div>
-                <div className="relative h-3 w-3/4 overflow-hidden rounded bg-foreground/[0.02]">
-                  <Shimmer />
-                </div>
-              </div>
+            <div className="relative h-3 w-24 overflow-hidden rounded bg-white/10">
+              <Shimmer />
             </div>
+          </div>
+          <div className={`relative overflow-hidden rounded-lg bg-white/10 ${isFeatured ? "h-7 w-56" : "h-6 w-44"}`}>
+            <Shimmer />
+          </div>
+        </div>
+      </div>
 
-            {/* Action buttons skeleton */}
-            <div className="flex flex-wrap gap-2">
-              <div className="relative h-9 w-32 overflow-hidden rounded-xl bg-blue-500/10">
-                <Shimmer />
-              </div>
-              <div className="relative h-9 w-24 overflow-hidden rounded-xl bg-foreground/[0.03]">
-                <Shimmer />
-              </div>
-              <div className="relative h-9 w-28 overflow-hidden rounded-xl bg-foreground/[0.03]">
-                <Shimmer />
-              </div>
+      {/* Card body skeleton */}
+      <div className="flex flex-col gap-4 px-5 pb-5 md:px-6 md:pb-6 pt-4">
+        {/* Pulse tags skeleton */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative h-6 w-28 overflow-hidden rounded-full bg-foreground/[0.03]">
+            <Shimmer />
+          </div>
+          <div className="relative h-6 w-24 overflow-hidden rounded-full bg-foreground/[0.03]">
+            <Shimmer />
+          </div>
+          <div className="ml-auto relative h-3 w-16 overflow-hidden rounded bg-foreground/[0.03]">
+            <Shimmer />
+          </div>
+        </div>
+
+        {/* Insider tips skeleton */}
+        <div className="rounded-xl border border-purple-500/10 bg-purple-500/[0.02] p-3.5">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Compass className="h-3 w-3 text-purple-500/20" />
+            <div className="relative h-2 w-14 overflow-hidden rounded bg-purple-500/10">
+              <Shimmer />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <div className="relative h-3 w-full overflow-hidden rounded bg-foreground/[0.02]">
+              <Shimmer />
+            </div>
+            <div className="relative h-3 w-3/4 overflow-hidden rounded bg-foreground/[0.02]">
+              <Shimmer />
+            </div>
+          </div>
+        </div>
+
+        {/* Action buttons skeleton */}
+        <div className="flex flex-wrap gap-2 pt-1">
+          <div className="relative h-9 w-24 overflow-hidden rounded-xl bg-blue-500/8">
+            <Shimmer />
+          </div>
+          <div className="relative h-9 w-20 overflow-hidden rounded-xl bg-foreground/[0.03]">
+            <Shimmer />
+          </div>
+          <div className="relative h-9 w-24 overflow-hidden rounded-xl bg-foreground/[0.03]">
+            <Shimmer />
           </div>
         </div>
       </div>
@@ -120,34 +105,38 @@ export default function ExperiencesSkeleton() {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="relative h-4 w-40 overflow-hidden rounded bg-foreground/[0.05]">
+    <div className="space-y-10">
+      {/* Header skeleton */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-4">
+          <div className="relative h-4 w-40 overflow-hidden rounded bg-foreground/[0.05]">
+            <Shimmer />
+          </div>
+          <div className="h-px flex-1 bg-foreground/5" />
+        </div>
+        <div className="relative h-4 w-72 overflow-hidden rounded bg-foreground/[0.03]">
           <Shimmer />
         </div>
-        <div className="h-px flex-1 bg-foreground/5" />
       </div>
 
-      {/* Tabs skeleton */}
-      <div className="space-y-6">
+      <div className="space-y-8">
+        {/* Tab switcher skeleton */}
         <div className="flex flex-col gap-4">
-          {/* Tab switcher */}
-          <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl md:rounded-[1.5rem] bg-foreground/[0.02] border border-foreground/5 w-fit">
+          <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl md:rounded-[1.5rem] bg-foreground/[0.02] border border-foreground/5 w-fit">
             {tabs.map((tab, index) => {
               const Icon = tab.icon;
               const isFirst = index === 0;
               return (
                 <div
                   key={tab.id}
-                  className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-6 py-2 md:py-2.5 rounded-xl md:rounded-2xl ${
+                  className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl ${
                     isFirst
                       ? "bg-purple-500/10 border border-purple-500/20"
                       : ""
                   }`}
                 >
                   <Icon
-                    className={`w-3 h-3 md:w-3.5 md:h-3.5 ${
+                    className={`w-3.5 h-3.5 md:w-4 md:h-4 ${
                       isFirst ? "text-purple-400" : "text-foreground/20"
                     }`}
                   />
@@ -158,6 +147,11 @@ export default function ExperiencesSkeleton() {
                   >
                     {tab.label}
                   </span>
+                  <span className={`rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black ${
+                    isFirst ? "bg-purple-500/20 text-purple-300" : "bg-foreground/5 text-foreground/25"
+                  }`}>
+                    ···
+                  </span>
                 </div>
               );
             })}
@@ -165,8 +159,8 @@ export default function ExperiencesSkeleton() {
 
           {/* Saved places skeleton */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 rounded-2xl border border-foreground/5 bg-foreground/[0.02] px-4 py-2">
-              <div className="relative h-4 w-4 overflow-hidden rounded bg-purple-400/20">
+            <div className="flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3.5 py-2">
+              <div className="relative h-3.5 w-3.5 overflow-hidden rounded bg-purple-400/20">
                 <Shimmer />
               </div>
               <div className="relative h-3 w-24 overflow-hidden rounded bg-foreground/[0.05]">
@@ -186,9 +180,9 @@ export default function ExperiencesSkeleton() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="h-2 w-2 rounded-full bg-purple-400"
+                className="h-1.5 w-1.5 rounded-full bg-purple-400"
                 animate={{
-                  scale: [1, 1.2, 1],
+                  scale: [1, 1.3, 1],
                   opacity: [0.3, 1, 0.3],
                 }}
                 transition={{
@@ -204,10 +198,10 @@ export default function ExperiencesSkeleton() {
           </span>
         </motion.div>
 
-        {/* Experience cards skeleton */}
-        <div className="grid grid-cols-1 gap-4">
+        {/* Cards skeleton — featured + grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
           {[0, 1, 2].map((index) => (
-            <ExperienceCardSkeleton key={index} index={index} />
+            <ExperienceCardSkeleton key={index} index={index} isFeatured={index === 0} />
           ))}
         </div>
       </div>
