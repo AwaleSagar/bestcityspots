@@ -428,7 +428,7 @@ export default function ExperiencesSection({
             {/* Gradient overlay */}
             <div
               className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
-              aria-hidden
+              aria-hidden="true"
             />
             {/* Rating badge on image */}
             {item.rating && (
@@ -724,7 +724,7 @@ export default function ExperiencesSection({
               className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-all duration-200 hover:border-purple-500/30 hover:bg-purple-500/8 hover:text-foreground"
             >
               <BookmarkCheck className="h-3.5 w-3.5 text-purple-400/70" />
-              <span className="line-clamp-1 max-w-[120px]">{item.name}</span>
+              <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
               <span className="text-[9px] uppercase tracking-[0.15em] text-foreground/30 group-hover:text-purple-300">
                 {item.type}
               </span>
