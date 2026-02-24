@@ -9,6 +9,7 @@ import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "luc
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
+import { useDeviceType } from "@/hooks/useDeviceType";
 import { useAnalytics } from "@/lib/useAnalytics";
 
 interface CitySearchProps {
@@ -33,7 +34,6 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -42,6 +42,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const hasTrackedSearch = useRef(false);
 
   const { recentCities, addRecentCity } = useRecentSearches();
+  const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
+  const isTouchDevice = isMobile || isTablet;
 
   // Rotate placeholder hints
   useEffect(() => {
@@ -58,41 +60,17 @@ export default function CitySearch({ topCities }: CitySearchProps) {
     return null;
   }, []);
 
+  // Scroll search container into view when virtual keyboard opens on touch devices
   useEffect(() => {
-    const inputElement = inputRef.current;
-    if (!inputElement) return;
-
-    const handleFocus = () => {
-      setIsKeyboardVisible(true);
-      // Only scroll into view on mobile where the on-screen keyboard pushes content
-      const isMobile = window.matchMedia("(max-width: 768px)").matches;
-      if (isMobile) {
-        setTimeout(() => {
-          if (containerRef.current) {
-            containerRef.current.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            });
-          }
-        }, KEYBOARD_ANIMATION_DELAY);
-      }
-    };
-
-    const handleBlur = () => {
-      // Delay hiding to allow click events on dropdown items to register first
-      setTimeout(() => {
-        setIsKeyboardVisible(false);
-      }, 150);
-    };
-
-    inputElement.addEventListener("focus", handleFocus);
-    inputElement.addEventListener("blur", handleBlur);
-
-    return () => {
-      inputElement.removeEventListener("focus", handleFocus);
-      inputElement.removeEventListener("blur", handleBlur);
-    };
-  }, []);
+    if (!isVirtualKeyboardOpen || !isTouchDevice) return;
+    const timeout = setTimeout(() => {
+      containerRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }, KEYBOARD_ANIMATION_DELAY);
+    return () => clearTimeout(timeout);
+  }, [isVirtualKeyboardOpen, isTouchDevice]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -389,16 +367,16 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            className={`mt-6 space-y-4 ${isKeyboardVisible ? "pb-[50vh]" : ""}`}
+            className={`mt-6 space-y-4 ${isVirtualKeyboardOpen ? "pb-[50vh]" : ""}`}
             style={{
-              maxHeight: isKeyboardVisible ? DROPDOWN_MAX_HEIGHT : "none",
+              maxHeight: isVirtualKeyboardOpen ? DROPDOWN_MAX_HEIGHT : "none",
             }}
           >
             <ul
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className={`glass-dropdown divide-y divide-foreground/[0.04] overflow-hidden rounded-2xl md:rounded-3xl shadow-xl ${isKeyboardVisible ? "overflow-y-auto max-h-[40vh]" : ""}`}
+              className={`glass-dropdown divide-y divide-foreground/[0.04] overflow-hidden rounded-2xl md:rounded-3xl shadow-xl ${isVirtualKeyboardOpen ? "overflow-y-auto max-h-[40vh]" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
