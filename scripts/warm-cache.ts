@@ -10,8 +10,11 @@
  * Options:
  *   --trending-only     Only warm trending destinations
  *   --top-cities=N      Warm top N cities by population (default: 100)
+ *   --traffic           Prioritize cities with real site traffic
  *   --places            Warm places cache (landmarks, restaurants, hotels)
  *   --insights          Warm AI insights cache
+ *   --weather           Warm weather + AQI cache
+ *   --metrics           Warm city metrics cache
  *   --all               Warm all caches (default)
  *   --concurrency=N     Parallel requests per cache type (default: 3)
  *   --dry-run           Show what would be warmed without making API calls
@@ -23,6 +26,7 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  *   GOOGLE_PLACES_API_KEY
  *   GOOGLE_GEMINI_API_KEY
+ *   OPENWEATHERMAP_API_KEY
  */
 
 import { config } from "dotenv";
@@ -33,6 +37,7 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 import { TRENDING_2026, CITY_ALIASES } from "./trending-destinations";
+import { CACHE_TTL } from "../src/lib/cache-config";
 
 // ============================================================================
 // Types
@@ -52,6 +57,8 @@ interface City {
 interface WarmOptions {
   places: boolean;
   insights: boolean;
+  weather: boolean;
+  metrics: boolean;
   dryRun: boolean;
   concurrency: number;
 }
@@ -64,6 +71,12 @@ interface CityWarmResult {
   insightsWarmed: boolean;
   insightsCached: boolean;
   insightsError: boolean;
+  weatherWarmed: boolean;
+  weatherCached: boolean;
+  weatherError: boolean;
+  metricsWarmed: boolean;
+  metricsCached: boolean;
+  metricsError: boolean;
   duration: number;
 }
 
@@ -76,6 +89,12 @@ interface WarmStats {
   insightsWarmed: number;
   insightsCached: number;
   insightsErrors: number;
+  weatherWarmed: number;
+  weatherCached: number;
+  weatherErrors: number;
+  metricsWarmed: number;
+  metricsCached: number;
+  metricsErrors: number;
   startTime: number;
 }
 
@@ -84,8 +103,10 @@ interface WarmStats {
 // ============================================================================
 
 const PLACE_TYPES = ["landmarks", "restaurants", "hotels"] as const;
-const PLACES_CACHE_TTL_DAYS = 5; // Warm if older than 5 days (TTL is 7)
-const INSIGHTS_CACHE_TTL_DAYS = 330; // Warm if older than 330 days (TTL is 365)
+const PLACES_WARM_THRESHOLD_DAYS = CACHE_TTL.PLACES_SOFT_REFRESH_DAYS; // Warm if past soft-refresh window
+const INSIGHTS_WARM_THRESHOLD_DAYS = CACHE_TTL.INSIGHTS_FRESH_DAYS - 35; // Warm 35 days before expiry
+const WEATHER_WARM_THRESHOLD_MINUTES = CACHE_TTL.WEATHER_FRESH_MINUTES - 10; // Warm 10 min before expiry
+const METRICS_WARM_THRESHOLD_MINUTES = CACHE_TTL.METRICS_FRESH_MINUTES - 10;
 
 // ============================================================================
 // Supabase Client
@@ -117,6 +138,9 @@ interface CliArgs {
   topCities: number;
   places: boolean;
   insights: boolean;
+  weather: boolean;
+  metrics: boolean;
+  traffic: boolean;
   all: boolean;
   concurrency: number;
   dryRun: boolean;
@@ -130,6 +154,9 @@ function parseArgs(): CliArgs {
     topCities: 100,
     places: false,
     insights: false,
+    weather: false,
+    metrics: false,
+    traffic: false,
     all: false,
     concurrency: 3,
     dryRun: false,
@@ -147,6 +174,12 @@ function parseArgs(): CliArgs {
       result.places = true;
     } else if (arg === "--insights") {
       result.insights = true;
+    } else if (arg === "--weather") {
+      result.weather = true;
+    } else if (arg === "--metrics") {
+      result.metrics = true;
+    } else if (arg === "--traffic") {
+      result.traffic = true;
     } else if (arg === "--all") {
       result.all = true;
     } else if (arg.startsWith("--concurrency=")) {
@@ -157,13 +190,15 @@ function parseArgs(): CliArgs {
   }
 
   // Default to --all if no specific cache type specified
-  if (!result.places && !result.insights) {
+  if (!result.places && !result.insights && !result.weather && !result.metrics) {
     result.all = true;
   }
 
   if (result.all) {
     result.places = true;
     result.insights = true;
+    result.weather = true;
+    result.metrics = true;
   }
 
   return result;
@@ -178,18 +213,26 @@ Pre-populates cache layers for priority cities to reduce cold-start latency.
 
 Usage: npx tsx scripts/warm-cache.ts [options]
 
-Options:
-  --trending-only     Only warm trending destinations (10 cities)
+City Selection:
+  --trending-only     Only warm trending destinations (~30 cities)
   --top-cities=N      Warm top N cities by population (default: 100)
+  --traffic           Also warm cities with real user traffic (from city_views_daily)
+
+Cache Types (default: --all):
   --places            Warm places cache (landmarks, restaurants, hotels)
-  --insights          Warm AI insights cache
-  --all               Warm all caches (default if no specific cache specified)
-  --concurrency=N     Parallel requests per cache type (default: 3)
+  --insights          Warm AI insights cache (Gemini)
+  --weather           Warm weather + AQI cache (OpenWeatherMap)
+  --metrics           Warm city metrics cache (Open-Meteo)
+  --all               Warm all cache types
+
+Other:
+  --concurrency=N     Parallel city processing (default: 3)
   --dry-run           Show what would be warmed without making API calls
   --help, -h          Show this help message
 
 Examples:
   npx tsx scripts/warm-cache.ts --trending-only --places
+  npx tsx scripts/warm-cache.ts --traffic --weather --metrics
   npx tsx scripts/warm-cache.ts --top-cities=50 --all
   npx tsx scripts/warm-cache.ts --dry-run
 
@@ -198,6 +241,7 @@ Environment Variables Required:
   NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY)
   GOOGLE_PLACES_API_KEY (for --places)
   GOOGLE_GEMINI_API_KEY (for --insights)
+  OPENWEATHERMAP_API_KEY (for --weather)
 `);
 }
 
@@ -278,10 +322,37 @@ async function getTopCitiesByPopulation(supabase: SupabaseClient, limit: number)
   return (data || []) as City[];
 }
 
+async function getTopCitiesByTraffic(supabase: SupabaseClient, limit: number): Promise<City[]> {
+  const { data, error } = await supabase.rpc("get_cities_by_traffic", { result_limit: limit });
+
+  if (error) {
+    // Fallback: run a manual join if the RPC doesn't exist
+    console.warn("  RPC get_cities_by_traffic not found, using manual query...");
+    const { data: fallback, error: fbErr } = await supabase
+      .from("city_views_daily")
+      .select("city_id, views")
+      .order("views", { ascending: false })
+      .limit(limit * 2);
+
+    if (fbErr || !fallback?.length) return [];
+
+    const cityIds = [...new Set(fallback.map((r: { city_id: number }) => r.city_id))].slice(0, limit);
+    const { data: cities } = await supabase
+      .from("cities")
+      .select("id, city, city_ascii, country, lat, lng, population, admin_name")
+      .in("id", cityIds);
+
+    return (cities || []) as City[];
+  }
+
+  return (data || []) as City[];
+}
+
 async function resolveCities(
   supabase: SupabaseClient,
   trendingOnly: boolean,
-  topCitiesLimit: number
+  topCitiesLimit: number,
+  includeTraffic: boolean
 ): Promise<City[]> {
   console.log("\nResolving cities...");
 
@@ -293,26 +364,31 @@ async function resolveCities(
     return trendingCities;
   }
 
-  // Get top cities by population
-  const topCities = await getTopCitiesByPopulation(supabase, topCitiesLimit);
-
   // Merge and deduplicate by city ID
   const cityMap = new Map<number, City>();
 
-  // Add trending first (higher priority)
+  // Add trending first (highest priority)
   for (const city of trendingCities) {
     cityMap.set(city.id, city);
   }
 
-  // Add top cities
-  for (const city of topCities) {
-    if (!cityMap.has(city.id)) {
-      cityMap.set(city.id, city);
+  // Add traffic-based cities (cities real users are visiting)
+  if (includeTraffic) {
+    const trafficCities = await getTopCitiesByTraffic(supabase, 50);
+    const beforeTraffic = cityMap.size;
+    for (const city of trafficCities) {
+      if (!cityMap.has(city.id)) cityMap.set(city.id, city);
     }
+    console.log(`  - Added ${cityMap.size - beforeTraffic} cities from site traffic`);
   }
 
-  const uniqueCount = cityMap.size - trendingCities.length;
-  console.log(`  - Added ${uniqueCount} unique top cities by population`);
+  // Fill remaining slots with top cities by population
+  const topCities = await getTopCitiesByPopulation(supabase, topCitiesLimit);
+  const beforePop = cityMap.size;
+  for (const city of topCities) {
+    if (!cityMap.has(city.id)) cityMap.set(city.id, city);
+  }
+  console.log(`  - Added ${cityMap.size - beforePop} unique top cities by population`);
   console.log(`  - Total: ${cityMap.size} cities to warm`);
 
   return Array.from(cityMap.values());
@@ -343,7 +419,7 @@ async function checkPlacesCacheStatus(
   const ageInDays = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
 
   return {
-    isFresh: ageInDays < PLACES_CACHE_TTL_DAYS,
+    isFresh: ageInDays < PLACES_WARM_THRESHOLD_DAYS,
     ageInDays: Math.round(ageInDays * 10) / 10,
   };
 }
@@ -367,7 +443,7 @@ async function checkInsightsCacheStatus(
   const ageInDays = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
 
   return {
-    isFresh: ageInDays < INSIGHTS_CACHE_TTL_DAYS,
+    isFresh: ageInDays < INSIGHTS_WARM_THRESHOLD_DAYS,
     ageInDays: Math.round(ageInDays * 10) / 10,
   };
 }
@@ -483,7 +559,7 @@ async function warmInsightsCache(
     // Use the Google Generative AI SDK
     const { GoogleGenerativeAI } = await import("@google/generative-ai");
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
 
     const prompt = `
       You are a concise travel curator. Summarize ${city.city}, ${city.country}.
@@ -531,6 +607,137 @@ async function warmInsightsCache(
   }
 }
 
+async function checkWeatherCacheStatus(
+  supabase: SupabaseClient,
+  cityId: number
+): Promise<{ isFresh: boolean; ageInMinutes: number | null }> {
+  const { data } = await supabase
+    .from("city_weather_cache")
+    .select("updated_at")
+    .eq("city_id", cityId)
+    .maybeSingle();
+
+  if (!data?.updated_at) return { isFresh: false, ageInMinutes: null };
+
+  const ageMs = Date.now() - new Date(data.updated_at).getTime();
+  const ageInMinutes = ageMs / (1000 * 60);
+  return { isFresh: ageInMinutes < WEATHER_WARM_THRESHOLD_MINUTES, ageInMinutes: Math.round(ageInMinutes) };
+}
+
+async function warmWeatherCache(
+  supabase: SupabaseClient,
+  city: City,
+  dryRun: boolean
+): Promise<{ warmed: boolean; cached: boolean; error: boolean }> {
+  const status = await checkWeatherCacheStatus(supabase, city.id);
+  if (status.isFresh) return { warmed: false, cached: true, error: false };
+  if (dryRun) return { warmed: true, cached: false, error: false };
+
+  const apiKey = process.env.OPENWEATHERMAP_API_KEY;
+  if (!apiKey) {
+    console.error("    Error: OPENWEATHERMAP_API_KEY not set");
+    return { warmed: false, cached: false, error: true };
+  }
+
+  try {
+    const [weatherRes, aqiRes] = await Promise.all([
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`, { signal: AbortSignal.timeout(10_000) }),
+      fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`, { signal: AbortSignal.timeout(10_000) }),
+    ]);
+
+    if (!weatherRes.ok || !aqiRes.ok) return { warmed: false, cached: false, error: true };
+
+    const weather = await weatherRes.json();
+    const aqiData = await aqiRes.json();
+    const rawAqi = aqiData.list?.[0]?.main?.aqi;
+    const aqiLabels: Record<number, string> = { 1: "Good", 2: "Fair", 3: "Moderate", 4: "Poor", 5: "Very Poor" };
+
+    const row = {
+      city_id: city.id,
+      temp: weather.main?.temp || 0,
+      feels_like: weather.main?.feels_like || 0,
+      temp_min: weather.main?.temp_min || 0,
+      temp_max: weather.main?.temp_max || 0,
+      humidity: weather.main?.humidity || 0,
+      description: weather.weather?.[0]?.description || "unknown",
+      icon: weather.weather?.[0]?.icon || "",
+      wind_speed: weather.wind?.speed || 0,
+      aqi: typeof rawAqi === "number" ? rawAqi : 0,
+      aqi_label: aqiLabels[rawAqi] || "Unknown",
+      updated_at: new Date().toISOString(),
+    };
+
+    await supabase.from("city_weather_cache").upsert(row, { onConflict: "city_id" });
+    return { warmed: true, cached: false, error: false };
+  } catch (err) {
+    console.error("    Error warming weather:", err);
+    return { warmed: false, cached: false, error: true };
+  }
+}
+
+async function checkMetricsCacheStatus(
+  supabase: SupabaseClient,
+  cityId: number
+): Promise<{ isFresh: boolean; ageInMinutes: number | null }> {
+  const { data } = await supabase
+    .from("city_metrics")
+    .select("updated_at")
+    .eq("city_id", cityId)
+    .maybeSingle();
+
+  if (!data?.updated_at) return { isFresh: false, ageInMinutes: null };
+
+  const ageMs = Date.now() - new Date(data.updated_at).getTime();
+  const ageInMinutes = ageMs / (1000 * 60);
+  return { isFresh: ageInMinutes < METRICS_WARM_THRESHOLD_MINUTES, ageInMinutes: Math.round(ageInMinutes) };
+}
+
+async function warmMetricsCache(
+  supabase: SupabaseClient,
+  city: City,
+  dryRun: boolean
+): Promise<{ warmed: boolean; cached: boolean; error: boolean }> {
+  const status = await checkMetricsCacheStatus(supabase, city.id);
+  if (status.isFresh) return { warmed: false, cached: true, error: false };
+  if (dryRun) return { warmed: true, cached: false, error: false };
+
+  try {
+    const [aqRes, tempRes] = await Promise.all([
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lng}&hourly=pm2_5&past_days=1&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(10_000) }),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m&timezone=auto`, { signal: AbortSignal.timeout(10_000) }),
+    ]);
+
+    let pm25: number | null = null;
+    let comfort: string | null = null;
+
+    if (aqRes.ok) {
+      const aq = await aqRes.json();
+      const vals: number[] | undefined = aq?.hourly?.pm2_5;
+      if (vals?.length) pm25 = vals[vals.length - 1] ?? null;
+    }
+    if (tempRes.ok) {
+      const w = await tempRes.json();
+      const t = w?.current?.temperature_2m;
+      if (typeof t === "number") {
+        comfort = t >= 30 ? "Hot" : t >= 22 ? "Warm" : t >= 15 ? "Mild" : t >= 5 ? "Cool" : "Cold";
+      }
+    }
+
+    await supabase.from("city_metrics").upsert({
+      city_id: city.id,
+      pollution_pm25: pm25,
+      climate_comfort: comfort,
+      updated_at: new Date().toISOString(),
+      source: { pollution: "open-meteo/air-quality", climate: "open-meteo/weather" },
+    }, { onConflict: "city_id" });
+
+    return { warmed: true, cached: false, error: false };
+  } catch (err) {
+    console.error("    Error warming metrics:", err);
+    return { warmed: false, cached: false, error: true };
+  }
+}
+
 // ============================================================================
 // Main Cache Warmer with Concurrency Control
 // ============================================================================
@@ -551,53 +758,63 @@ async function warmCacheForCity(
     insightsWarmed: false,
     insightsCached: false,
     insightsError: false,
+    weatherWarmed: false,
+    weatherCached: false,
+    weatherError: false,
+    metricsWarmed: false,
+    metricsCached: false,
+    metricsError: false,
     duration: 0,
   };
 
   console.log(`\n[${index + 1}/${total}] ${city.city}, ${city.country}`);
 
-  // Warm places cache
+  // Warm places cache (all three types in parallel)
   if (options.places) {
-    const placeResults: string[] = [];
+    const placeResults = await Promise.all(
+      PLACE_TYPES.map((pt) => warmPlacesCache(supabase, city, pt, options.dryRun).then((r) => ({ type: pt, ...r })))
+    );
 
-    for (const placeType of PLACE_TYPES) {
-      const placeResult = await warmPlacesCache(supabase, city, placeType, options.dryRun);
-
-      if (placeResult.cached) {
-        result.placesCached++;
-        placeResults.push(`${placeType}: cached`);
-      } else if (placeResult.warmed) {
-        result.placesWarmed++;
-        placeResults.push(`${placeType}: ${options.dryRun ? "would warm" : "warmed"}`);
-      } else if (placeResult.error) {
-        result.placesErrors++;
-        placeResults.push(`${placeType}: error`);
-      }
-
-      // Small delay between place type requests to avoid rate limiting
-      if (!options.dryRun) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-      }
+    const labels: string[] = [];
+    for (const pr of placeResults) {
+      if (pr.cached) { result.placesCached++; labels.push(`${pr.type}: cached`); }
+      else if (pr.warmed) { result.placesWarmed++; labels.push(`${pr.type}: ${options.dryRun ? "would warm" : "warmed"}`); }
+      else if (pr.error) { result.placesErrors++; labels.push(`${pr.type}: error`); }
     }
-
-    console.log(`  - Places: ${placeResults.join(", ")}`);
+    console.log(`  Places: ${labels.join(", ")}`);
   }
 
-  // Warm insights cache
+  // Warm insights, weather, metrics in parallel
+  const parallel: Promise<void>[] = [];
+
   if (options.insights) {
-    const insightResult = await warmInsightsCache(supabase, city, options.dryRun);
-
-    if (insightResult.cached) {
-      result.insightsCached = true;
-      console.log(`  - Insights: cached`);
-    } else if (insightResult.warmed) {
-      result.insightsWarmed = true;
-      console.log(`  - Insights: ${options.dryRun ? "would warm" : "warmed"}`);
-    } else if (insightResult.error) {
-      result.insightsError = true;
-      console.log(`  - Insights: error`);
-    }
+    parallel.push(
+      warmInsightsCache(supabase, city, options.dryRun).then((r) => {
+        result.insightsCached = r.cached; result.insightsWarmed = r.warmed; result.insightsError = r.error;
+        console.log(`  Insights: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+      })
+    );
   }
+
+  if (options.weather) {
+    parallel.push(
+      warmWeatherCache(supabase, city, options.dryRun).then((r) => {
+        result.weatherCached = r.cached; result.weatherWarmed = r.warmed; result.weatherError = r.error;
+        console.log(`  Weather: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+      })
+    );
+  }
+
+  if (options.metrics) {
+    parallel.push(
+      warmMetricsCache(supabase, city, options.dryRun).then((r) => {
+        result.metricsCached = r.cached; result.metricsWarmed = r.warmed; result.metricsError = r.error;
+        console.log(`  Metrics: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+      })
+    );
+  }
+
+  await Promise.all(parallel);
 
   result.duration = Date.now() - startTime;
   return result;
@@ -646,12 +863,18 @@ function printSummary(results: CityWarmResult[], startTime: number, dryRun: bool
     insightsWarmed: results.filter((r) => r.insightsWarmed).length,
     insightsCached: results.filter((r) => r.insightsCached).length,
     insightsErrors: results.filter((r) => r.insightsError).length,
+    weatherWarmed: results.filter((r) => r.weatherWarmed).length,
+    weatherCached: results.filter((r) => r.weatherCached).length,
+    weatherErrors: results.filter((r) => r.weatherError).length,
+    metricsWarmed: results.filter((r) => r.metricsWarmed).length,
+    metricsCached: results.filter((r) => r.metricsCached).length,
+    metricsErrors: results.filter((r) => r.metricsError).length,
     startTime,
   };
 
-  const minutes = Math.floor(totalDuration / 60000);
-  const seconds = Math.floor((totalDuration % 60000) / 1000);
-  const durationStr = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+  const mins = Math.floor(totalDuration / 60000);
+  const secs = Math.floor((totalDuration % 60000) / 1000);
+  const durationStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
 
   console.log(`
 ================================================================================
@@ -659,24 +882,21 @@ Summary${dryRun ? " (DRY RUN)" : ""}
 ================================================================================
 Cities processed: ${stats.citiesProcessed}
 
-Places Cache:
-  - Warmed: ${stats.placesWarmed}
-  - Already cached: ${stats.placesCached}
-  - Errors: ${stats.placesErrors}
-
-AI Insights Cache:
-  - Warmed: ${stats.insightsWarmed}
-  - Already cached: ${stats.insightsCached}
-  - Errors: ${stats.insightsErrors}
+Places Cache:     ${stats.placesWarmed} warmed | ${stats.placesCached} cached | ${stats.placesErrors} errors
+AI Insights:      ${stats.insightsWarmed} warmed | ${stats.insightsCached} cached | ${stats.insightsErrors} errors
+Weather:          ${stats.weatherWarmed} warmed | ${stats.weatherCached} cached | ${stats.weatherErrors} errors
+Metrics:          ${stats.metricsWarmed} warmed | ${stats.metricsCached} cached | ${stats.metricsErrors} errors
 
 Duration: ${durationStr}
 ================================================================================
 `);
 
-  // Exit with error code if too many failures
-  const totalErrors = stats.placesErrors + stats.insightsErrors;
+  const totalErrors = stats.placesErrors + stats.insightsErrors + stats.weatherErrors + stats.metricsErrors;
   const totalAttempts =
-    stats.placesWarmed + stats.placesCached + stats.placesErrors + stats.insightsWarmed + stats.insightsCached + stats.insightsErrors;
+    stats.placesWarmed + stats.placesCached + stats.placesErrors +
+    stats.insightsWarmed + stats.insightsCached + stats.insightsErrors +
+    stats.weatherWarmed + stats.weatherCached + stats.weatherErrors +
+    stats.metricsWarmed + stats.metricsCached + stats.metricsErrors;
   const errorRate = totalAttempts > 0 ? totalErrors / totalAttempts : 0;
 
   if (errorRate > 0.1) {
@@ -697,12 +917,19 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  const cacheTypes = [
+    args.places && "places",
+    args.insights && "insights",
+    args.weather && "weather",
+    args.metrics && "metrics",
+  ].filter(Boolean).join(", ");
+
   console.log(`
 ================================================================================
 Warm Cache CLI
 ================================================================================
-Mode: ${args.trendingOnly ? "trending only" : `trending + top ${args.topCities} cities`}
-Caches: ${[args.places && "places", args.insights && "insights"].filter(Boolean).join(", ")}
+Mode: ${args.trendingOnly ? "trending only" : `trending${args.traffic ? " + traffic" : ""} + top ${args.topCities} cities`}
+Caches: ${cacheTypes}
 Concurrency: ${args.concurrency}
 ${args.dryRun ? "DRY RUN - No actual API calls will be made" : ""}
 `);
@@ -727,7 +954,7 @@ ${args.dryRun ? "DRY RUN - No actual API calls will be made" : ""}
   const startTime = Date.now();
 
   // Resolve cities
-  const cities = await resolveCities(supabase, args.trendingOnly, args.topCities);
+  const cities = await resolveCities(supabase, args.trendingOnly, args.topCities, args.traffic);
 
   if (cities.length === 0) {
     console.error("Error: No cities found to warm");
@@ -739,6 +966,8 @@ ${args.dryRun ? "DRY RUN - No actual API calls will be made" : ""}
   const results = await warmCachesWithConcurrency(supabase, cities, {
     places: args.places,
     insights: args.insights,
+    weather: args.weather,
+    metrics: args.metrics,
     dryRun: args.dryRun,
     concurrency: args.concurrency,
   });

@@ -1,6 +1,7 @@
 import "server-only";
-import { supabase } from "./supabase";
+import { supabase, supabaseServer } from "./supabase";
 import type { City } from "./cities";
+import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
 
 export interface CityMetrics {
   cost_index: number | null;
@@ -52,8 +53,52 @@ function comfortFromTemp(temp: number | null): string | null {
   return "Cold";
 }
 
+function toMetrics(data: Record<string, unknown>): CityMetrics {
+  return {
+    cost_index: (data.cost_index as number) ?? null,
+    connectivity_mbps: (data.connectivity_mbps as number) ?? null,
+    safety_score: (data.safety_score as number) ?? null,
+    pollution_pm25: (data.pollution_pm25 as number) ?? null,
+    climate_comfort: (data.climate_comfort as string) ?? null,
+    health_access_per_100k: (data.health_access_per_100k as number) ?? null,
+    updated_at: (data.updated_at as string) ?? null,
+    source: (data.source as Record<string, unknown>) ?? null,
+  };
+}
+
+async function fetchAndCacheMetrics(city: City): Promise<CityMetrics> {
+  const [pm25, temp] = await Promise.all([
+    getOpenMeteoAirQuality(city.lat, city.lng),
+    getOpenMeteoWeather(city.lat, city.lng),
+  ]);
+
+  const metrics: CityMetrics = {
+    cost_index: null,
+    connectivity_mbps: null,
+    safety_score: null,
+    pollution_pm25: pm25,
+    climate_comfort: comfortFromTemp(temp),
+    health_access_per_100k: null,
+    updated_at: new Date().toISOString(),
+    source: { pollution: "open-meteo/air-quality", climate: "open-meteo/weather" },
+  };
+
+  const db = supabaseServer ?? supabase;
+  db.from("city_metrics")
+    .upsert(
+      { city_id: city.id, ...metrics },
+      { onConflict: "city_id" },
+    )
+    .then(({ error }) => {
+      if (error) console.error("metrics cache write failed:", error);
+    });
+
+  return metrics;
+}
+
 export async function getCityMetrics(city: City): Promise<CityMetrics | null> {
-  // 1) Try cached metrics from Supabase
+  const ttlMs = minutes(CACHE_TTL.METRICS_FRESH_MINUTES);
+
   try {
     const { data, error } = await supabase
       .from("city_metrics")
@@ -64,39 +109,25 @@ export async function getCityMetrics(city: City): Promise<CityMetrics | null> {
       .maybeSingle();
 
     if (!error && data) {
-      return {
-        cost_index: data.cost_index ?? null,
-        connectivity_mbps: data.connectivity_mbps ?? null,
-        safety_score: data.safety_score ?? null,
-        pollution_pm25: data.pollution_pm25 ?? null,
-        climate_comfort: data.climate_comfort ?? null,
-        health_access_per_100k: data.health_access_per_100k ?? null,
-        updated_at: data.updated_at ?? null,
-        source: data.source ?? null,
-      };
+      const cached = toMetrics(data as Record<string, unknown>);
+
+      if (isCacheFresh(cached.updated_at, ttlMs)) {
+        return cached;
+      }
+
+      // Stale-while-revalidate: return stale data, refresh in background
+      fetchAndCacheMetrics(city).catch(() => {});
+      return cached;
     }
   } catch (e) {
     console.warn("city_metrics fetch failed", e);
   }
 
-  // 2) Fallback to live open APIs (pollution + temp-based comfort)
-  const [pm25, temp] = await Promise.all([
-    getOpenMeteoAirQuality(city.lat, city.lng),
-    getOpenMeteoWeather(city.lat, city.lng),
-  ]);
-
-  return {
-    cost_index: null,
-    connectivity_mbps: null,
-    safety_score: null,
-    pollution_pm25: pm25,
-    climate_comfort: comfortFromTemp(temp),
-    health_access_per_100k: null,
-    updated_at: new Date().toISOString(),
-    source: {
-      pollution: "open-meteo/air-quality",
-      climate: "open-meteo/weather",
-      cache: "live-fallback",
-    },
-  };
+  // No cache at all -- fetch fresh (blocking)
+  try {
+    return await fetchAndCacheMetrics(city);
+  } catch (e) {
+    console.error("live metrics fetch failed", e);
+    return null;
+  }
 }

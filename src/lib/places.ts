@@ -4,6 +4,7 @@ import { rankingEngine } from "./ranking";
 import { haversineKm } from "./geo";
 import sharp from "sharp";
 import { encode } from "blurhash";
+import { CACHE_TTL } from "./cache-config";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const BUCKET = "place_images";
@@ -178,10 +179,26 @@ async function fetchFromGoogle(
   }
 }
 
+/**
+ * Fire-and-forget background refresh for the soft-refresh SWR window (7-30 days).
+ * Re-invokes getTopPlaces with a flag to skip the cache read and force a fresh fetch.
+ */
+async function refreshPlacesInBackground(
+  cityName: string,
+  type: "landmarks" | "restaurants" | "hotels",
+  opts?: { lat?: number; lng?: number; radiusKm?: number },
+): Promise<void> {
+  try {
+    await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
+  } catch (e) {
+    console.warn(`[places] Background refresh failed for ${cityName}/${type}:`, e);
+  }
+}
+
 export async function getTopPlaces(
   cityName: string,
   type: "landmarks" | "restaurants" | "hotels",
-  opts?: { lat?: number; lng?: number; radiusKm?: number }
+  opts?: { lat?: number; lng?: number; radiusKm?: number; _bypassCache?: boolean }
 ): Promise<Landmark[]> {
   if (!API_KEY) {
     console.warn(`[places] Missing API key; returning empty for ${cityName} / ${type}`);
@@ -196,8 +213,9 @@ export async function getTopPlaces(
     const centerLng = opts?.lng;
     const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
 
-    // 1. Check Supabase Cache first
-    const { data: cache } = await supabase
+    // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
+    const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
+    const { data: cache } = bypassCache ? { data: null } : await supabase
       .from("city_places_cache")
       .select("places_data, updated_at")
       .eq("city_name", cityName)
@@ -209,19 +227,22 @@ export async function getTopPlaces(
       const now = new Date();
       const daysSinceUpdate = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
 
-      if (daysSinceUpdate < 7) {
+      if (daysSinceUpdate < CACHE_TTL.PLACES_FRESH_DAYS) {
         const cachedPlaces = (cache.places_data || []) as Landmark[];
 
-        // SMART CACHE VALIDATION:
-        // If we are looking for dining/stays, ensuring we don't serve "luxury-only" stale data.
-        // We check if we have ANY budget options. If not, we treat cache as stale to force a refresh with the new logic.
         const isBudgetSensitive = type === "restaurants" || type === "hotels";
         const hasBudget = cachedPlaces.some(
           (p) => p.priceLevel === "PRICE_LEVEL_INEXPENSIVE" || p.priceLevel === "PRICE_LEVEL_FREE"
         );
         const hasImages = cachedPlaces.some((p) => !!p.imageUrl);
 
-        if ((!isBudgetSensitive || hasBudget) && hasImages) {
+        const isQualityOk = (!isBudgetSensitive || hasBudget) && hasImages;
+
+        if (isQualityOk) {
+          if (daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS) {
+            // 7-30 day window: serve stale, refresh in background (fire-and-forget)
+            refreshPlacesInBackground(cityName, type, opts).catch(() => {});
+          }
           return cachedPlaces;
         }
         if (!hasImages) {

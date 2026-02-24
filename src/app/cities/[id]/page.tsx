@@ -225,8 +225,10 @@ export default async function CityPage({
 
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
-  const metrics = await getCityMetrics(city);
-  const weather = await getCityWeather(city);
+  const [metrics, weather] = await Promise.all([
+    getCityMetrics(city),
+    getCityWeather(city),
+  ]);
 
   return (
     <main

@@ -2,6 +2,7 @@ import "server-only";
 import { City } from "./cities";
 import { z } from "zod";
 import { supabase, supabaseServer } from "./supabase";
+import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
 
 // Runtime validation schema for the application's internal weather model
 const WeatherDataSchema = z.object({
@@ -36,9 +37,58 @@ function getAqiLabel(aqi: number): string {
   }
 }
 
+async function fetchFreshWeather(city: City, apiKey: string): Promise<WeatherData | null> {
+  const db = supabaseServer ?? supabase;
+
+  const [weatherRes, aqiRes] = await Promise.all([
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`,
+      { signal: AbortSignal.timeout(10_000) }
+    ),
+    fetch(
+      `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`,
+      { signal: AbortSignal.timeout(10_000) }
+    ),
+  ]);
+
+  if (!weatherRes.ok || !aqiRes.ok) return null;
+
+  const weather = await weatherRes.json();
+  const aqiData = await aqiRes.json();
+
+  const rawAqi = aqiData.list?.[0]?.main?.aqi;
+  const aqiValue = typeof rawAqi === "number" ? rawAqi : 0;
+
+  const normalized: WeatherData = {
+    temp: weather.main?.temp || 0,
+    feels_like: weather.main?.feels_like || 0,
+    temp_min: weather.main?.temp_min || 0,
+    temp_max: weather.main?.temp_max || 0,
+    humidity: weather.main?.humidity || 0,
+    description: weather.weather?.[0]?.description || "unknown",
+    icon: weather.weather?.[0]?.icon || "",
+    wind_speed: weather.wind?.speed || 0,
+    aqi: aqiValue,
+    aqi_label: getAqiLabel(aqiValue),
+    updated_at: new Date().toISOString(),
+  };
+
+  const validData = WeatherDataSchema.parse(normalized);
+
+  db.from("city_weather_cache")
+    .upsert({ city_id: city.id, ...validData }, { onConflict: "city_id" })
+    .then(({ error }) => {
+      if (error) console.error("Weather cache update failed:", error);
+    });
+
+  return validData;
+}
+
 /**
- * Fetches weather and air quality with a 60-minute cache to respect API limits (1,000/day).
- * API key is pulled from process.env.OPENWEATHERMAP_API_KEY
+ * Fetches weather and air quality with stale-while-revalidate caching:
+ *  - Fresh (< 60 min): return cached immediately
+ *  - Stale (>= 60 min): return stale data, fire async background refresh
+ *  - Missing: block on fresh fetch
  */
 export async function getCityWeather(city: City): Promise<WeatherData | null> {
   const apiKey = process.env.OPENWEATHERMAP_API_KEY;
@@ -52,8 +102,9 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
     console.warn("SUPABASE_SERVICE_ROLE_KEY missing; weather cache uses anon key.");
   }
 
+  const ttlMs = minutes(CACHE_TTL.WEATHER_FRESH_MINUTES);
+
   try {
-    // 1. Check Supabase Cache (60-minute TTL)
     const { data: cached } = await db
       .from("city_weather_cache")
       .select("*")
@@ -61,77 +112,27 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
       .maybeSingle();
 
     if (cached) {
-      const updatedAt = new Date(cached.updated_at);
-      const now = new Date();
-      const ageMinutes = (now.getTime() - updatedAt.getTime()) / (1000 * 60);
-
-      if (ageMinutes < 60) {
-        // Validate cached data structure
-        const validCached = parseCachedWeather(cached);
-        if (validCached) return validCached;
+      const validCached = parseCachedWeather(cached);
+      if (validCached) {
+        if (isCacheFresh(cached.updated_at, ttlMs)) {
+          return validCached;
+        }
+        // Stale-while-revalidate: serve stale, refresh in background
+        fetchFreshWeather(city, apiKey).catch(() => {});
+        return validCached;
       }
     }
 
-    // 2. Cache expired or missing, fetch fresh data
-    const [weatherRes, aqiRes] = await Promise.all([
-      fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`,
-        { signal: AbortSignal.timeout(10_000) }
-      ),
-      fetch(
-        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`,
-        { signal: AbortSignal.timeout(10_000) }
-      ),
-    ]);
+    // No usable cache -- block on fresh fetch
+    const fresh = await fetchFreshWeather(city, apiKey);
+    if (fresh) return fresh;
 
-    if (!weatherRes.ok || !aqiRes.ok) {
-      if (cached) {
-        const validCached = parseCachedWeather(cached);
-        if (validCached) return validCached;
-      }
-      return null; // Fallback to stale on API error
+    // Last resort: return any stale data we can parse
+    if (cached) {
+      const fallback = parseCachedWeather(cached);
+      if (fallback) return fallback;
     }
-
-    const weather = await weatherRes.json();
-    const aqiData = await aqiRes.json();
-
-    // Safe access for AQI
-    const rawAqi = aqiData.list?.[0]?.main?.aqi;
-    const aqiValue = typeof rawAqi === 'number' ? rawAqi : 0;
-    const aqiLabel = getAqiLabel(aqiValue);
-
-    const normalized: WeatherData = {
-      temp: weather.main?.temp || 0,
-      feels_like: weather.main?.feels_like || 0,
-      temp_min: weather.main?.temp_min || 0,
-      temp_max: weather.main?.temp_max || 0,
-      humidity: weather.main?.humidity || 0,
-      description: weather.weather?.[0]?.description || "unknown",
-      icon: weather.weather?.[0]?.icon || "",
-      wind_speed: weather.wind?.speed || 0,
-      aqi: aqiValue,
-      aqi_label: aqiLabel,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Runtime validation of fresh data
-    const validData = WeatherDataSchema.parse(normalized);
-
-    // 3. Update Cache Background
-    const { error: cacheError } = await db
-      .from("city_weather_cache")
-      .upsert(
-        {
-          city_id: city.id,
-          ...validData,
-        },
-        { onConflict: "city_id" }
-      );
-    if (cacheError) {
-      console.error("Weather cache update failed:", cacheError);
-    }
-
-    return validData;
+    return null;
   } catch (error) {
     console.error("Failed to fetch city weather:", error);
     return null;
