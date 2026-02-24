@@ -1,11 +1,11 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { searchCities, City, findNearestCity } from "@/lib/cities";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react";
+import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
@@ -15,18 +15,26 @@ interface CitySearchProps {
   topCities: City[];
 }
 
-// Constants for mobile keyboard handling
-const KEYBOARD_ANIMATION_DELAY = 300; // ms - delay to allow keyboard animation to start
+const KEYBOARD_ANIMATION_DELAY = 300;
 const DROPDOWN_MAX_HEIGHT = "40vh";
+
+const PLACEHOLDER_HINTS = [
+  "Where do you want to explore?",
+  "Try 'NYC' or 'Bangkok'...",
+  "Search 'beaches' or 'gastronomy'...",
+  "Try 'Eiffel Tower' or 'Colosseum'...",
+  "Search by city, country, or attraction...",
+];
 
 export default function CitySearch({ topCities }: CitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<City[]>([]);
+  const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+  const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -35,8 +43,21 @@ export default function CitySearch({ topCities }: CitySearchProps) {
 
   const { recentCities, addRecentCity } = useRecentSearches();
 
-  // Handle keyboard visibility detection for mobile
-  // Handle keyboard visibility detection for mobile
+  // Rotate placeholder hints
+  useEffect(() => {
+    if (searchQuery) return;
+    const interval = setInterval(() => {
+      setPlaceholderIdx((prev) => (prev + 1) % PLACEHOLDER_HINTS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [searchQuery]);
+
+  const matchTypeLabel = useCallback((r: CitySearchResult) => {
+    if (r.match_type === "fuzzy") return "Similar match";
+    if (r.match_type === "alias") return "Also known as";
+    return null;
+  }, []);
+
   useEffect(() => {
     const inputElement = inputRef.current;
     if (!inputElement) return;
@@ -71,7 +92,6 @@ export default function CitySearch({ topCities }: CitySearchProps) {
     };
   }, []);
 
-  // Handle search with faster debounce
   useEffect(() => {
     const controller = new AbortController();
     const timer = setTimeout(async () => {
@@ -79,7 +99,6 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         setIsSearching(true);
         let results = await searchCities(searchQuery, 15, controller.signal);
 
-        // Apply frontend filters if active
         if (activeFilter === "megacity") {
           results = results.filter(c => c.population > 5000000);
         } else if (activeFilter === "capital") {
@@ -91,7 +110,6 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         setActiveIndex(-1);
         setIsSearching(false);
 
-        // Track search action (once per search session)
         if (!hasTrackedSearch.current && results.length > 0) {
           trackAction("search");
           hasTrackedSearch.current = true;
@@ -101,7 +119,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         setSearchResults([]);
         setActiveIndex(-1);
         setIsSearching(false);
-        hasTrackedSearch.current = false; // Reset for next search
+        hasTrackedSearch.current = false;
       }
     }, 200);
 
@@ -112,6 +130,15 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   }, [searchQuery, activeFilter, trackAction]);
 
   const shouldShowResults = searchQuery.trim().length >= 2;
+
+  const topFuzzyHint = useMemo(() => {
+    if (!shouldShowResults || searchResults.length === 0) return null;
+    const first = searchResults[0];
+    if (first.match_type === "fuzzy" || first.match_type === "alias") {
+      return first.city;
+    }
+    return null;
+  }, [shouldShowResults, searchResults]);
 
   const highlightMatch = useMemo(() => {
     const highlightFn = (text: string, query: string) => {
@@ -226,7 +253,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             if (val.length <= 100) setSearchQuery(val);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Where do you want to explore?"
+          placeholder={PLACEHOLDER_HINTS[placeholderIdx]}
           role="combobox"
           aria-autocomplete="list"
           aria-expanded={shouldShowResults}
@@ -281,6 +308,13 @@ export default function CitySearch({ topCities }: CitySearchProps) {
               <span className="animate-pulse text-purple-400/80">Finding your location...</span>
             ) : isSearching ? (
               <span className="animate-pulse text-purple-400/80">Searching...</span>
+            ) : shouldShowResults && topFuzzyHint ? (
+              <span className="text-foreground/50 flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-purple-400/60" />
+                Did you mean <span className="font-bold text-purple-400">{topFuzzyHint}</span>?
+                <span className="opacity-40 ml-1">·</span>
+                <span className="opacity-60">{searchResults.length} results</span>
+              </span>
             ) : shouldShowResults ? (
               <span className="text-foreground/50">{searchResults.length} results</span>
             ) : null}
@@ -426,6 +460,12 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                             <>
                               <span className="opacity-40">·</span>
                               <span className="opacity-80">{city.admin_name}</span>
+                            </>
+                          )}
+                          {matchTypeLabel(city) && (
+                            <>
+                              <span className="opacity-40">·</span>
+                              <span className="italic opacity-70">{matchTypeLabel(city)}</span>
                             </>
                           )}
                         </div>

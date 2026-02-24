@@ -15,35 +15,15 @@ export interface City {
   population: number;
 }
 
-// Basic client-side cache for search results
-const searchCache = new Map<string, City[]>();
+export interface CitySearchResult extends City {
+  rank_score: number;
+  match_type: "fts" | "fuzzy" | "alias";
+}
+
+const searchCache = new Map<string, CitySearchResult[]>();
 
 function normalizeQuery(q: string) {
   return q.trim().toLowerCase();
-}
-
-/**
- * Binary search to find the longest cached prefix of a query
- * Time: O(n × log m) where n = query length, m = cache size
- * Much better than O(m) iteration for large caches
- */
-function findLongestCachedPrefix(query: string): string | null {
-  // Check progressively shorter prefixes of the query
-  // This is O(n) where n = query length (typically < 20)
-  for (let len = query.length; len >= 2; len--) {
-    const prefix = query.slice(0, len);
-    if (searchCache.has(prefix)) {
-      return prefix; // Return immediately - this is the longest one
-    }
-  }
-  
-  return null;
-}
-
-function cityMatchesQuery(c: City, q: string) {
-  const city = (c.city_ascii || c.city || "").toLowerCase();
-  const country = (c.country || "").toLowerCase();
-  return city.includes(q) || country.includes(q);
 }
 
 async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {
@@ -90,45 +70,29 @@ export async function findNearestCity(lat: number, lng: number) {
 }
 
 /**
- * Searches for cities by name.
- * Optimized with column selection and internal caching.
+ * Elastic search: FTS + trigram fuzzy + alias matching via PostgreSQL RPC.
+ * Results are ranked by relevance (match quality + population boost).
  */
-export async function searchCities(query: string, limit = 10, signal?: AbortSignal) {
+export async function searchCities(
+  query: string,
+  limit = 10,
+  signal?: AbortSignal,
+): Promise<CitySearchResult[]> {
   const cleanQuery = normalizeQuery(query);
-  if (!cleanQuery || cleanQuery.length < 2) return [];
+  if (!cleanQuery || cleanQuery.length < 1) return [];
   if (signal?.aborted) return [];
 
-  // Check cache first
   if (searchCache.has(cleanQuery)) {
     return searchCache.get(cleanQuery) || [];
-  }
-
-  // Incremental optimization: if we already have results for a shorter prefix,
-  // filter them client-side to avoid a DB request while the user keeps typing.
-  // (Works especially well for fast typers on higher-latency networks.)
-  // Optimized: O(n) where n = query length, instead of O(m) where m = cache size
-  const bestPrefix = findLongestCachedPrefix(cleanQuery);
-  if (bestPrefix) {
-    const base = searchCache.get(bestPrefix) || [];
-    const filtered = base
-      .filter((c) => cityMatchesQuery(c, cleanQuery))
-      .slice(0, Math.max(1, Math.min(50, limit)));
-    if (filtered.length > 0) {
-      searchCache.set(cleanQuery, filtered);
-      return filtered;
-    }
   }
 
   try {
     const safeLimit = Math.max(1, Math.min(50, limit));
 
-    // Note: supabase-js doesn't support AbortSignal directly; we guard by ignoring results if aborted.
-    const { data, error } = await supabase
-      .from("cities")
-      .select("id, city, city_ascii, country, population, lat, lng, admin_name, capital")
-      .or(`city_ascii.ilike.%${cleanQuery}%,country.ilike.%${cleanQuery}%,admin_name.ilike.%${cleanQuery}%`)
-      .order("population", { ascending: false, nullsFirst: false })
-      .limit(safeLimit);
+    const { data, error } = await supabase.rpc("search_cities_elastic", {
+      query: cleanQuery,
+      result_limit: safeLimit,
+    });
 
     if (signal?.aborted) return [];
     if (error) {
@@ -136,18 +100,15 @@ export async function searchCities(query: string, limit = 10, signal?: AbortSign
       return [];
     }
 
-    // Cache the result
-    if (data) {
-      searchCache.set(cleanQuery, data as City[]);
+    const results = (data ?? []) as CitySearchResult[];
 
-      // Keep cache size manageable
-      if (searchCache.size > 100) {
-        const firstKey = searchCache.keys().next().value;
-        if (firstKey !== undefined) searchCache.delete(firstKey);
-      }
+    searchCache.set(cleanQuery, results);
+    if (searchCache.size > 100) {
+      const firstKey = searchCache.keys().next().value;
+      if (firstKey !== undefined) searchCache.delete(firstKey);
     }
 
-    return data as City[];
+    return results;
   } catch (e) {
     if (signal?.aborted) return [];
     console.error("Error searching cities:", e);
