@@ -64,16 +64,18 @@ export default function CitySearch({ topCities }: CitySearchProps) {
 
     const handleFocus = () => {
       setIsKeyboardVisible(true);
-      // Scroll input into view when keyboard appears on mobile
-      setTimeout(() => {
-        if (inputRef.current && containerRef.current) {
-          // Scroll the container into view with padding at the top
-          containerRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      }, KEYBOARD_ANIMATION_DELAY);
+      // Only scroll into view on mobile where the on-screen keyboard pushes content
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      if (isMobile) {
+        setTimeout(() => {
+          if (containerRef.current) {
+            containerRef.current.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+        }, KEYBOARD_ANIMATION_DELAY);
+      }
     };
 
     const handleBlur = () => {
@@ -233,7 +235,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="relative"
+      className="relative scroll-mt-20"
     >
       {/* Accessibility - Proper labels */}
       <label htmlFor="city-search" className="sr-only">
