@@ -26,11 +26,11 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 
 function CityVitalsFallback() {
   return (
-    <div className="liquid-glass rounded-[2rem] border border-foreground/5 p-6">
-      <div className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
+    <div className="rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/35">
         Live City Vitals
       </div>
-      <p className="mt-4 text-sm font-bold text-foreground/50">
+      <p className="mt-4 text-sm text-foreground/45">
         Vitals unavailable right now. Please check back soon.
       </p>
     </div>
@@ -53,14 +53,14 @@ function MetricCard({
   const isEmpty = value === null || value === undefined || value === "";
   const debugId = label.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase() || "METRIC";
   const display = isEmpty ? (
-    <span className="text-foreground/30">N/A</span>
+    <span className="text-foreground/25">N/A</span>
   ) : (
     <div className="flex flex-col items-start leading-tight">
-      <span className="text-2xl font-black tracking-tight text-foreground">
+      <span className="text-2xl font-bold tracking-tight text-foreground">
         {typeof value === "number" ? value.toLocaleString() : value}
       </span>
       {unit && (
-        <span className="text-xs font-black uppercase tracking-widest text-foreground/60">
+        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/45">
           {unit}
         </span>
       )}
@@ -68,23 +68,22 @@ function MetricCard({
   );
 
   return (
-    <div className="group/metric relative overflow-hidden rounded-[1.5rem] border border-foreground/5 bg-foreground/[0.02] p-5 flex flex-col gap-4">
-      {/* Technical Scan Decoration */}
+    <div className="group/metric relative overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-5 flex flex-col gap-4 transition-all duration-500 hover:border-purple-500/10">
       <div className="pointer-events-none absolute inset-0 -z-0 opacity-0 transition-opacity duration-700 group-hover/metric:opacity-100">
-        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-purple-500/50 to-transparent" />
+        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
       </div>
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover/metric:border-purple-500/30 group-hover/metric:bg-purple-500/10">
-            <Icon className="h-5 w-5 text-purple-300 transition-colors duration-100 group-hover/metric:text-purple-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover/metric:border-purple-500/20 group-hover/metric:bg-purple-500/[0.06]">
+            <Icon className="h-5 w-5 text-purple-400/60 transition-colors duration-300 group-hover/metric:text-purple-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/40">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/35">
                 {label}
               </div>
-              <div className="hidden text-[8px] font-mono text-purple-500/30 group-hover/metric:block">
+              <div className="hidden text-[8px] font-mono text-purple-500/25 group-hover/metric:block">
                 ID_{debugId}
               </div>
             </div>
@@ -92,11 +91,11 @@ function MetricCard({
           </div>
         </div>
       </div>
-      <div className="relative z-10 flex items-center justify-between border-t border-foreground/5 pt-3">
-        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/20">
+      <div className="relative z-10 flex items-center justify-between border-t border-foreground/[0.04] pt-3">
+        <div className="text-[9px] font-semibold uppercase tracking-[0.15em] text-foreground/20">
           Data Source
         </div>
-        <div className="text-[9px] font-black uppercase tracking-[0.1em] text-foreground/40 text-right max-w-[120px] leading-relaxed">
+        <div className="text-[9px] font-semibold uppercase tracking-[0.1em] text-foreground/35 text-right max-w-[120px] leading-relaxed">
           {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
         </div>
       </div>
@@ -122,10 +121,10 @@ async function ExperiencesWrapper({
   return (
     <div className="space-y-10">
       <div className="space-y-3">
-        <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
-          Top Experiences <span className="h-px flex-1 bg-foreground/5" />
+        <h2 className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-foreground/35 uppercase">
+          Top Experiences <span className="h-px flex-1 bg-foreground/[0.04]" />
         </h2>
-        <p className="text-sm font-bold text-foreground/40 tracking-wide max-w-lg">
+        <p className="text-sm text-foreground/40 tracking-wide max-w-lg">
           Curated landmarks, dining, and stays — ranked by traveler interest and local pulse.
         </p>
       </div>
@@ -141,10 +140,10 @@ async function ExperiencesWrapper({
 
 function CityVitalsSkeleton() {
   return (
-    <div className="animate-pulse rounded-[2rem] border border-foreground/5 bg-foreground/[0.01] p-6">
-      <div className="h-2 w-32 rounded bg-foreground/5" />
-      <div className="mt-4 h-6 w-24 rounded bg-foreground/5" />
-      <div className="mt-6 h-10 w-full rounded bg-foreground/5" />
+    <div className="animate-pulse rounded-2xl border border-foreground/[0.04] bg-foreground/[0.01] p-7 md:rounded-3xl md:p-8">
+      <div className="h-2 w-32 rounded bg-foreground/[0.04]" />
+      <div className="mt-4 h-6 w-24 rounded bg-foreground/[0.04]" />
+      <div className="mt-6 h-10 w-full rounded bg-foreground/[0.04]" />
     </div>
   );
 }
@@ -182,17 +181,14 @@ export default async function CityPage({
   const { id } = await params;
   const { lat, lng } = await searchParams;
 
-  // Validate Inputs (Security: Input Validation)
   const idResult = cityIdSchema.safeParse(id);
   const coordsResult = coordinatesSchema.safeParse({ lat, lng });
 
   if (!idResult.success) {
-    notFound(); // Invalid ID format
+    notFound();
   }
 
   if (!coordsResult.success) {
-    // If coordinates are invalid (e.g. out of range or not numbers), just ignore them
-    // and let the code fallback to city defaults below.
     console.warn("Invalid coordinates provided:", coordsResult.error);
   }
 
@@ -205,7 +201,6 @@ export default async function CityPage({
     notFound();
   }
 
-  // SEO: Structured Data for the city
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TouristDestination",
@@ -233,7 +228,7 @@ export default async function CityPage({
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
+      className="min-h-screen bg-transparent font-sans text-foreground"
     >
       <script
         type="application/ld+json"
@@ -249,38 +244,38 @@ export default async function CityPage({
             { label: city.city },
           ]}
         />
-        <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
+        <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
           <Link
             href="/"
-            className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors duration-100 hover:text-foreground md:gap-4 py-2"
+            className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/45 transition-colors duration-300 hover:text-foreground md:gap-4 py-2"
           >
-            <div className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20 md:h-12 md:w-12">
-              <ArrowLeft className="h-4 w-4 transition-transform duration-100 group-hover:-translate-x-1 md:h-5 md:w-5" />
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/30 group-hover:bg-purple-500/10 md:h-11 md:w-11">
+              <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5 md:h-[18px] md:w-[18px]" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] md:text-xs">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.15em] md:text-xs">
               Return to Explorer
             </span>
           </Link>
         </nav>
 
-        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
-          <div className="space-y-12 lg:col-span-8">
-            <header className="relative space-y-4 py-4 md:space-y-6 md:py-6 overflow-visible">
-              <div className="absolute -top-20 -left-20 -z-10 h-64 w-64 animate-pulse bg-purple-600/10 blur-[120px]" />
-              <div className="flex items-center gap-4 text-[10px] font-black tracking-[0.4em] text-purple-400 uppercase">
+          <div className="space-y-14 lg:col-span-8">
+            <header className="relative space-y-5 py-4 md:space-y-6 md:py-6 overflow-visible">
+              <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-purple-600/[0.05] blur-[150px] animate-pulse-glow" />
+              <div className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-purple-400/60 uppercase">
                 <Navigation className="h-4 w-4" />
-                {city.iso3} <span className="text-foreground/20">/&#47;</span>{" "}
+                {city.iso3} <span className="text-foreground/15">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
               </div>
-              <h1 className="text-5xl leading-[1.1] font-black tracking-tighter text-foreground md:text-8xl break-words block pb-4">
+              <h1 className="text-5xl leading-[1.05] font-bold tracking-[-0.03em] text-foreground md:text-7xl lg:text-8xl break-words block pb-2">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
-                <p className="text-3xl font-black tracking-tight text-foreground/40 italic md:text-5xl">
+                <p className="text-2xl font-bold tracking-tight text-foreground/30 md:text-4xl">
                   {city.country}
                 </p>
-                <div className="h-px flex-1 bg-gradient-to-r from-foreground/20 to-transparent" />
+                <div className="h-px flex-1 bg-gradient-to-r from-foreground/15 to-transparent" />
               </div>
             </header>
 
@@ -288,124 +283,118 @@ export default async function CityPage({
               <AIBriefingSection city={city} />
             </Suspense>
 
-            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-colors duration-100 hover:bg-foreground/[0.05]">
-                <div className="mb-6 flex items-center gap-4 text-foreground/40">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-colors duration-100 group-hover/card:bg-purple-500/20">
-                    <Users className="h-5 w-5 text-purple-400" />
+            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
+              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-purple-500/10 hover:shadow-xl">
+                <div className="mb-6 flex items-center gap-4 text-foreground/35">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors duration-300 group-hover/card:bg-purple-500/10">
+                    <Users className="h-5 w-5 text-purple-400/70 transition-colors group-hover/card:text-purple-400" />
                   </div>
-                  <span className="text-[11px] font-black tracking-[0.2em] uppercase">
+                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
                     Census Data
                   </span>
                 </div>
-                <div className="mb-2 text-4xl md:text-5xl font-black tracking-tighter text-foreground">
+                <div className="mb-2 text-4xl md:text-5xl font-bold tracking-[-0.02em] text-foreground">
                   {formatPopulation(city.population)}
                 </div>
-                <div className="text-xs font-bold tracking-widest text-foreground/40 uppercase">
+                <div className="text-[11px] font-medium tracking-[0.15em] text-foreground/35 uppercase">
                   Global Residents
                 </div>
               </div>
 
-              <div className="liquid-glass group/card rounded-[2.5rem] p-8 md:rounded-[3rem] md:p-10 shadow-2xl transition-colors duration-100 hover:bg-foreground/[0.05]">
-                <div className="mb-6 flex items-center gap-4 text-foreground/40">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-all group-hover/card:bg-purple-500/20">
-                    <MapPin className="h-5 w-5 text-purple-400" />
+              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-purple-500/10 hover:shadow-xl">
+                <div className="mb-6 flex items-center gap-4 text-foreground/35">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors group-hover/card:bg-purple-500/10">
+                    <MapPin className="h-5 w-5 text-purple-400/70 transition-colors group-hover/card:text-purple-400" />
                   </div>
-                  <span className="text-[11px] font-black tracking-[0.2em] uppercase">
+                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
                     Territory
                   </span>
                 </div>
-                <div className="mb-2 text-2xl md:text-3xl leading-tight font-black tracking-tight text-foreground">
+                <div className="mb-2 text-2xl md:text-3xl leading-tight font-bold tracking-tight text-foreground">
                   {city.admin_name || "Autonomous"}
                 </div>
-                <div className="text-xs font-bold tracking-widest text-foreground/40 uppercase">
+                <div className="text-[11px] font-medium tracking-[0.15em] text-foreground/35 uppercase">
                   Regional Hub
                 </div>
               </div>
             </section>
 
-            {/* Geographic Profile Section */}
             <section className="space-y-10">
-              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
-                Structural Profile <span className="h-px flex-1 bg-foreground/5" />
+              <h2 className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-foreground/35 uppercase">
+                Structural Profile <span className="h-px flex-1 bg-foreground/[0.04]" />
               </h2>
               <Suspense fallback={<CityVitalsSkeleton />}>
                 {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
               </Suspense>
             </section>
 
-            {/* Travel Essentials Section */}
             <section className="space-y-6">
-              <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
-                Travel Essentials <span className="h-px flex-1 bg-foreground/5" />
+              <h2 className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-foreground/35 uppercase">
+                Travel Essentials <span className="h-px flex-1 bg-foreground/[0.04]" />
               </h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                    <MapPin className="h-4 w-4 text-purple-300" />
-                    Best Neighborhoods
-                  </div>
-                  <p className="text-sm leading-relaxed text-foreground/60">
-                    {city.admin_name
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5">
+                {[
+                  {
+                    icon: MapPin,
+                    title: "Best Neighborhoods",
+                    text: city.admin_name
                       ? `Explore the diverse neighborhoods across the ${city.admin_name} region of ${city.city}. Browse landmarks below for specific areas.`
-                      : `Explore the diverse neighborhoods of ${city.city}. Browse landmarks below for specific areas.`}
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                    <Users className="h-4 w-4 text-purple-300" />
-                    Budget Tips
+                      : `Explore the diverse neighborhoods of ${city.city}. Browse landmarks below for specific areas.`,
+                  },
+                  {
+                    icon: Users,
+                    title: "Budget Tips",
+                    text: "Use the price filter in Dining and Stays below to find options matching your budget. Filter by $ to $$$$ to plan your trip spending.",
+                  },
+                  {
+                    icon: Navigation,
+                    title: "Getting Around",
+                    text: `Open any listed spot in Maps for directions and transit options. Save places to build your personal itinerary for ${city.city}.`,
+                  },
+                  {
+                    icon: Activity,
+                    title: "Data Sources",
+                    text: "All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.",
+                  },
+                ].map(({ icon: ItemIcon, title, text }) => (
+                  <div
+                    key={title}
+                    className="rounded-2xl border border-foreground/[0.04] bg-foreground/[0.01] p-5 transition-all duration-500 hover:border-foreground/[0.08]"
+                  >
+                    <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground/40">
+                      <ItemIcon className="h-4 w-4 text-purple-400/60" />
+                      {title}
+                    </div>
+                    <p className="text-sm leading-relaxed text-foreground/45">{text}</p>
                   </div>
-                  <p className="text-sm leading-relaxed text-foreground/60">
-                    Use the price filter in Dining and Stays below to find options matching your budget. Filter by $ to $$$$ to plan your trip spending.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                    <Navigation className="h-4 w-4 text-purple-300" />
-                    Getting Around
-                  </div>
-                  <p className="text-sm leading-relaxed text-foreground/60">
-                    Open any listed spot in Maps for directions and transit options. Save places to build your personal itinerary for {city.city}.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-5">
-                  <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-foreground/50">
-                    <Activity className="h-4 w-4 text-purple-300" />
-                    Data Sources
-                  </div>
-                  <p className="text-sm leading-relaxed text-foreground/60">
-                    All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.
-                  </p>
-                </div>
+                ))}
               </div>
             </section>
 
-            {/* Landmarks Section */}
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
           </div>
 
-          {/* Sidebar / Quick Actions */}
+          {/* Sidebar */}
           <div className="space-y-8 lg:sticky lg:top-20 lg:col-span-4">
-            <div className="liquid-glass relative space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 shadow-2xl">
-              <h3 className="text-2xl md:text-3xl leading-tight font-black tracking-tighter text-foreground">
+            <div className="relative space-y-8 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10">
+              <h3 className="text-2xl md:text-3xl leading-tight font-bold tracking-[-0.02em] text-foreground">
                 Plan Your <br /> {city.city} Trip
               </h3>
-              <p className="text-sm leading-relaxed font-black tracking-wide text-foreground/60">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences. Save your favorite spots to build a personal itinerary—all free, no sign-up required.
+              <p className="text-sm leading-relaxed text-foreground/45">
+                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences. Save your favorite spots to build a personal itinerary — all free, no sign-up required.
               </p>
               <Link
                 href="/resources/top-cities"
-                className="block w-full rounded-[2rem] border border-purple-400/40 bg-purple-500/20 py-5 md:py-6 text-center text-base md:text-lg font-black text-foreground transition-colors hover:bg-purple-500/30"
+                className="block w-full rounded-2xl border border-purple-400/25 bg-purple-500/10 py-5 md:py-6 text-center text-base font-semibold text-foreground transition-all duration-300 hover:bg-purple-500/15 hover:border-purple-400/35 hover:shadow-lg hover:shadow-purple-500/5"
               >
                 Browse Free City Guide
               </Link>
             </div>
 
-            <div className="liquid-glass space-y-8 rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10">
-              <h4 className="text-[11px] font-black tracking-[0.3em] text-foreground/40 uppercase">
+            <div className="space-y-8 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10">
+              <h4 className="text-[11px] font-semibold tracking-[0.25em] text-foreground/35 uppercase">
                 Core Metrics
               </h4>
               <div className="grid grid-cols-1 gap-4">
@@ -423,8 +412,8 @@ export default async function CityPage({
                   source={metrics?.source?.climate as string | undefined}
                 />
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30">
-                <Activity className="h-4 w-4" />
+              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/25">
+                <Activity className="h-3.5 w-3.5" />
                 {metrics?.updated_at ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}` : "Pending data"}
               </div>
             </div>
