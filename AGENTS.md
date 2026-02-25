@@ -28,3 +28,5 @@ Additional API keys (`GOOGLE_PLACES_API_KEY`, `GOOGLE_GEMINI_API_KEY`, `OPENWEAT
 - **Build warnings are expected**: During `npm run build`, Supabase fetch errors and Gemini API errors appear in the console when placeholder credentials are used. These are logged warnings from static page generation — the build still succeeds.
 - **Node.js version**: The README specifies Node.js 20.x+. The Dockerfile uses `node:20-alpine`, but Node.js 22.x also works without issues.
 - **Package manager**: This project uses **npm** (there is a `package-lock.json`). Do not use yarn/pnpm.
+- **Dev server lock file**: If `npm run dev` fails with "Unable to acquire lock", remove `/workspace/.next/dev/lock` and kill stale `next-server` processes before retrying.
+- **`.env.local` is gitignored**: Secrets are injected as environment variables; the `.env.local` file must be (re)generated from them at the start of each session if real API connectivity is needed.
