@@ -15,40 +15,40 @@ const companyLinks = [
 export default function SiteFooter() {
   return (
     <footer
-      className="border-t border-foreground/[0.04] bg-foreground/[0.015]"
+      className="relative border-t border-foreground/[0.04] bg-foreground/[0.01]"
       role="contentinfo"
       aria-label="Site footer"
     >
       <div
-        className="container-gutter mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16"
+        className="container-gutter mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20"
         style={{ paddingBottom: "max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))" }}
       >
-        <div className="grid gap-10 sm:grid-cols-3">
+        <div className="grid gap-12 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <div className="mb-3 flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10">
-                <MapPin className="h-3.5 w-3.5 text-purple-400" aria-hidden />
+            <div className="mb-4 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5">
+                <MapPin className="h-4 w-4 text-purple-400" aria-hidden />
               </div>
-              <span className="text-sm font-bold text-foreground/90">Best City Spots</span>
+              <span className="text-sm font-bold tracking-tight text-foreground/90">Best City Spots</span>
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-foreground/40">
+            <p className="max-w-xs text-sm leading-relaxed text-foreground/35">
               Curated city experiences for modern explorers. Powered by verified data and AI-assisted insights.
             </p>
           </div>
 
           {/* Explore */}
           <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-foreground/30">
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/25">
               Explore
             </h3>
             <nav aria-label="Footer explore navigation">
-              <ul className="space-y-3">
+              <ul className="space-y-3.5">
                 {exploreLinks.map(({ href, label, icon: Icon }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="touch-target inline-flex items-center gap-2 text-sm font-medium text-foreground/55 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
                     >
                       <Icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
                       {label}
@@ -61,16 +61,16 @@ export default function SiteFooter() {
 
           {/* Company */}
           <div>
-            <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-foreground/30">
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/25">
               Company
             </h3>
             <nav aria-label="Footer company navigation">
-              <ul className="space-y-3">
+              <ul className="space-y-3.5">
                 {companyLinks.map(({ href, label }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="touch-target inline-flex items-center text-sm font-medium text-foreground/55 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+                      className="link touch-target inline-flex items-center text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
                     >
                       {label}
                     </Link>
@@ -81,12 +81,12 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-foreground/[0.04] pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-foreground/30">
-            © {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
+        <div className="mt-16 flex flex-col gap-3 border-t border-foreground/[0.04] pt-8 md:flex-row md:items-center md:justify-between">
+          <p className="text-xs text-foreground/25">
+            &copy; {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
           </p>
-          <p className="text-xs text-foreground/30">
-            Made with ❤️ in Pune · Sagar Awale
+          <p className="text-xs text-foreground/25">
+            Made with ❤️ in Pune &middot; Sagar Awale
           </p>
         </div>
       </div>

@@ -1,86 +1,125 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Compass, MapPin } from "lucide-react";
+import { Sparkles, ArrowDown } from "lucide-react";
 import Link from "next/link";
 
-const featuredHighlights = [
-  { icon: MapPin, text: "Curated Local Gems" },
-  { icon: Compass, text: "Insider Itineraries" },
-  { icon: Sparkles, text: "AI-Powered Insights" },
-] as const;
+const stagger = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.3 },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 60, filter: "blur(10px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 export default function HeroHeader() {
   return (
     <motion.header
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-      className="mb-10 text-center"
+      variants={stagger}
+      initial="hidden"
+      animate="visible"
+      className="relative flex min-h-[70vh] flex-col items-center justify-center text-center md:min-h-[80vh]"
     >
-      {/* Brand accent */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-        className="mb-6 flex items-center justify-center gap-3"
-      >
-        <span className="section-heading">
-          Best City Spots
+      {/* Ambient glows */}
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          className="absolute top-1/4 left-1/2 h-[500px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/[0.06] blur-[150px]"
+        />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 2, delay: 0.5 }}
+          className="absolute bottom-0 right-1/4 h-[300px] w-[400px] rounded-full bg-amber-500/[0.04] blur-[120px]"
+        />
+      </div>
+
+      {/* Eyebrow */}
+      <motion.div variants={fadeUp} className="mb-8">
+        <span className="inline-flex items-center gap-2.5 rounded-full border border-foreground/[0.06] bg-foreground/[0.02] px-5 py-2.5 text-[11px] font-semibold tracking-[0.2em] text-foreground/40 uppercase backdrop-blur-sm">
+          <Sparkles className="h-3.5 w-3.5 text-purple-400/70" aria-hidden />
+          Urban Intelligence Platform
         </span>
       </motion.div>
 
-      <h1 className="relative mb-6 block py-2 md:py-4 overflow-visible">
-        <span className="text-4xl leading-[1.08] font-black tracking-tight text-foreground sm:text-5xl md:text-7xl block">
-          Explore Cities Like
-          <span className="block bg-gradient-to-r from-purple-500 via-purple-400 to-violet-400 bg-clip-text text-transparent">
-            a Local
-          </span>
+      {/* Main heading */}
+      <motion.h1 variants={fadeUp} className="relative mb-8">
+        <span className="block text-[clamp(2.5rem,5vw+1rem,5.5rem)] font-black leading-[0.95] tracking-[-0.04em] text-foreground">
+          Discover the World&apos;s
         </span>
-        {/* Ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -z-10 h-64 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/[0.04] blur-[100px]" />
-      </h1>
+        <span className="mt-2 block text-[clamp(2.5rem,5vw+1rem,5.5rem)] font-black leading-[0.95] tracking-[-0.04em]">
+          <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
+            Most Vibrant
+          </span>{" "}
+          Cities
+        </span>
+      </motion.h1>
 
-      <div className="mx-auto max-w-lg space-y-6">
-        <p className="text-base md:text-lg leading-relaxed font-medium text-foreground/50">
-          Curated city experiences for modern explorers. Discover hidden gems,
-          plan smarter trips, and feel confident wherever you go.
-        </p>
+      {/* Subtitle */}
+      <motion.p
+        variants={fadeUp}
+        className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-foreground/45 md:text-lg"
+      >
+        AI-powered insights, real-time data, and curated experiences for
+        the modern explorer. No paywalls. No dark patterns.
+      </motion.p>
 
-        {/* Primary & Secondary CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link
-            href="#city-search"
-            className="btn-primary w-full sm:w-auto"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById("city-search")?.focus();
-            }}
-          >
-            <Sparkles className="h-4 w-4" aria-hidden />
-            Start Exploring
-          </Link>
-          <Link
-            href="/resources/top-cities"
-            className="btn-secondary w-full sm:w-auto"
-          >
-            Browse Top 50 Cities
-          </Link>
-        </div>
+      {/* CTAs */}
+      <motion.div
+        variants={scaleIn}
+        className="flex flex-col items-center gap-4 sm:flex-row"
+      >
+        <Link
+          href="#city-search"
+          className="btn-primary group"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("city-search")?.focus();
+          }}
+        >
+          Start Exploring
+          <Sparkles className="h-4 w-4 transition-transform group-hover:rotate-12" aria-hidden />
+        </Link>
+        <Link href="/resources/top-cities" className="btn-secondary">
+          Browse Top 50
+        </Link>
+      </motion.div>
 
-        {/* Feature highlights */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          {featuredHighlights.map(({ icon: Icon, text }) => (
-            <div
-              key={text}
-              className="flex items-center gap-1.5 rounded-full border border-foreground/[0.06] bg-foreground/[0.02] px-3.5 py-2 text-[11px] font-semibold tracking-wide text-foreground/50"
-            >
-              <Icon className="h-3.5 w-3.5 text-purple-400/70" aria-hidden />
-              {text}
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2, duration: 1 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ArrowDown className="h-5 w-5 text-foreground/20" />
+        </motion.div>
+      </motion.div>
     </motion.header>
   );
 }
