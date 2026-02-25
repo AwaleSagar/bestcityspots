@@ -16,16 +16,18 @@ export default async function Home() {
   return (
     <main id="main-content" className="min-h-screen bg-transparent font-sans text-foreground">
       <div
-        className="container-gutter mx-auto max-w-3xl py-16 px-4 sm:px-6"
-        style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
+        className="container-gutter mx-auto max-w-5xl px-4 sm:px-6"
+        style={{ paddingTop: "max(2rem, calc(env(safe-area-inset-top, 0px) + 3rem))" }}
       >
         <HeroHeader />
 
         {/* Search Experience */}
-        <CitySearch topCities={topCities} />
+        <div className="mx-auto max-w-3xl">
+          <CitySearch topCities={topCities} />
+        </div>
 
         {/* Trust & Features */}
-        <div className="mt-24 space-y-24 content-lazy">
+        <div className="mt-32 space-y-32 content-lazy md:mt-40 md:space-y-40">
           <TrustIndicators />
           <FreeResourceCTA />
           <TestimonialsSection />

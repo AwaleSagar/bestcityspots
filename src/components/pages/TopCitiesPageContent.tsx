@@ -22,8 +22,6 @@ interface TopCitiesPageContentProps {
   cities: City[];
 }
 
-// Pre-generate confetti random values at module level to maintain React purity
-// Using a simple seeded random for deterministic but varied values
 function seededRandom(seed: number): number {
   const x = Math.sin(seed) * 10000;
   return x - Math.floor(x);
@@ -39,13 +37,12 @@ const CONFETTI_PARTICLES = Array.from({ length: 50 }).map((_, i) => ({
   isRound: seededRandom(i * 7) > 0.5,
 }));
 
-// Chapter definitions
 const chapters = [
   {
     id: "elite",
     title: "The Elite",
     subtitle: "Top 10 Global Destinations",
-    description: "The world's most iconic cities—cultural powerhouses that define modern travel.",
+    description: "The world's most iconic cities — cultural powerhouses that define modern travel.",
     icon: Trophy,
     range: [0, 10],
     color: "from-amber-400 to-orange-500",
@@ -54,7 +51,7 @@ const chapters = [
     id: "rising",
     title: "Rising Stars",
     subtitle: "Ranks 11-25",
-    description: "Cities gaining momentum—vibrant destinations on every traveler's radar.",
+    description: "Cities gaining momentum — vibrant destinations on every traveler's radar.",
     icon: Star,
     range: [10, 25],
     color: "from-purple-400 to-pink-500",
@@ -63,20 +60,19 @@ const chapters = [
     id: "gems",
     title: "Hidden Gems",
     subtitle: "Ranks 26-50",
-    description: "Discover the unexpected—cities brimming with untold stories and local charm.",
+    description: "Discover the unexpected — cities brimming with untold stories and local charm.",
     icon: Gem,
     range: [25, 50],
     color: "from-blue-400 to-cyan-500",
   },
 ];
 
-// Confetti particle component - uses pre-computed random values for React purity
-function ConfettiParticle({ 
-  delay, 
-  color, 
-  randomValues 
-}: { 
-  delay: number; 
+function ConfettiParticle({
+  delay,
+  color,
+  randomValues
+}: {
+  delay: number;
   color: string;
   randomValues: {
     left: number;
@@ -110,11 +106,10 @@ function ConfettiParticle({
   );
 }
 
-// City card component
 function CityCard({
   city,
   index,
-  formatPopulation,
+  formatPopulation: formatPop,
   onVisible,
 }: {
   city: City;
@@ -135,13 +130,13 @@ function CityCard({
   return (
     <motion.li
       ref={ref}
-      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
       animate={
         isInView
-          ? { opacity: 1, y: 0, scale: 1 }
+          ? { opacity: 1, y: 0 }
           : shouldReduceMotion
           ? { opacity: 1 }
-          : { opacity: 0, y: 20, scale: 0.95 }
+          : { opacity: 0, y: 16 }
       }
       transition={{
         duration: 0.5,
@@ -151,42 +146,41 @@ function CityCard({
     >
       <Link
         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-        className="liquid-glass city-card-glow flex min-h-[var(--touch-target-min)] items-center gap-3 rounded-2xl border border-foreground/5 px-4 py-3 transition-all duration-300 hover:border-foreground/15 hover:bg-foreground/[0.04] hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-[56px] sm:gap-4 sm:px-5 sm:py-4"
+        className="group city-card-glow flex min-h-[var(--touch-target-min)] items-center gap-3 rounded-xl border border-foreground/[0.04] bg-foreground/[0.01] px-4 py-3.5 transition-all duration-400 hover:border-foreground/[0.08] hover:bg-foreground/[0.025] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:min-h-[56px] sm:gap-4 sm:px-5 sm:py-4 md:rounded-2xl"
       >
         <motion.span
           initial={shouldReduceMotion ? {} : { scale: 0 }}
           animate={isInView ? { scale: 1 } : {}}
           transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
-          className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-xs font-bold ${
+          className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-xs font-semibold ${
             index < 10
-              ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+              ? "border-amber-500/25 bg-amber-500/8 text-amber-400"
               : index < 25
-              ? "border-purple-500/30 bg-purple-500/10 text-purple-400"
-              : "border-blue-500/30 bg-blue-500/10 text-blue-400"
+              ? "border-purple-500/25 bg-purple-500/8 text-purple-400"
+              : "border-blue-500/25 bg-blue-500/8 text-blue-400"
           }`}
           aria-hidden
         >
           {index + 1}
         </motion.span>
-        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center text-foreground/40">
+        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center text-foreground/30">
           <MapPin className="h-4 w-4" aria-hidden />
         </span>
-        <span className="min-w-0 flex-1 font-semibold text-foreground">{city.city}</span>
-        <span className="text-sm text-foreground/50">{city.country}</span>
-        <span className="text-right text-sm font-medium text-foreground/40">
-          {formatPopulation(city.population)}
+        <span className="min-w-0 flex-1 font-medium text-foreground/80 group-hover:text-foreground transition-colors">{city.city}</span>
+        <span className="text-sm text-foreground/40">{city.country}</span>
+        <span className="text-right text-sm font-medium text-foreground/30">
+          {formatPop(city.population)}
         </span>
       </Link>
     </motion.li>
   );
 }
 
-// Chapter header component
 function ChapterHeader({ index }: { index: number }) {
   return (
-    <div className="chapter-divider mt-12 first:mt-0">
+    <div className="chapter-divider mt-14 first:mt-0">
       <ScrollReveal animation="scale">
-        <span className="text-[10px] font-black tracking-[0.4em] text-foreground/30 uppercase">
+        <span className="text-[10px] font-semibold tracking-[0.3em] text-foreground/25 uppercase">
           Chapter {String(index + 1).padStart(2, "0")}
         </span>
       </ScrollReveal>
@@ -206,13 +200,11 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
     setVisibleCount((prev) => Math.max(prev, index + 1));
   }, []);
 
-  // Trigger confetti when user reaches the end
   /* eslint-disable react-hooks/set-state-in-effect -- valid pattern for one-time triggered animation */
   useEffect(() => {
     if (completionInView && visibleCount >= 45 && !confettiTriggered) {
       setConfettiTriggered(true);
       setShowConfetti(true);
-      // Auto-hide confetti after animation
       const timer = setTimeout(() => {
         setShowConfetti(false);
       }, 4000);
@@ -222,18 +214,17 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const confettiColors = [
-    "rgb(147, 51, 234)", // purple
-    "rgb(59, 130, 246)", // blue
-    "rgb(251, 191, 36)", // amber
-    "rgb(236, 72, 153)", // pink
-    "rgb(34, 197, 94)", // green
+    "rgb(147, 51, 234)",
+    "rgb(59, 130, 246)",
+    "rgb(212, 168, 67)",
+    "rgb(236, 72, 153)",
+    "rgb(34, 197, 94)",
   ];
 
   return (
     <>
       <ScrollProgress />
 
-      {/* Confetti celebration */}
       <AnimatePresence>
         {showConfetti && !shouldReduceMotion && (
           <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
@@ -249,7 +240,6 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
         )}
       </AnimatePresence>
 
-      {/* Progress counter */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -260,13 +250,13 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
           key={visibleCount}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
-          className="text-purple-400 font-black"
+          className="text-purple-400 font-bold"
         >
           {visibleCount}
         </motion.span>
-        <span className="text-foreground/50">of</span>
+        <span className="text-foreground/40">of</span>
         <span>{cities.length}</span>
-        <span className="text-foreground/50">cities explored</span>
+        <span className="text-foreground/40">explored</span>
       </motion.div>
 
       <main id="main-content" className="min-h-screen bg-transparent font-sans text-foreground">
@@ -274,34 +264,32 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
           className="container-gutter mx-auto max-w-3xl px-4 py-12 sm:px-6"
           style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
         >
-          {/* Navigation */}
           <ScrollReveal animation="fade-down" delay={0.1}>
-            <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
+            <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
               <Link
                 href="/"
-                className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors hover:text-foreground py-2"
+                className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/45 transition-colors duration-300 hover:text-foreground py-2"
               >
                 <motion.span
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
-                  className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors group-hover:border-purple-500/40 group-hover:bg-purple-500/20"
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/30 group-hover:bg-purple-500/10"
                 >
-                  <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden />
+                  <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" aria-hidden />
                 </motion.span>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.15em]">
                   Back to Explorer
                 </span>
               </Link>
             </nav>
           </ScrollReveal>
 
-          {/* Header */}
-          <header className="mb-12">
+          <header className="mb-14 md:mb-18">
             <ScrollReveal animation="fade-up" delay={0.2}>
-              <div className="flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-purple-400 uppercase mb-4">
+              <div className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.3em] text-purple-400/60 uppercase mb-5">
                 <motion.div
                   animate={shouldReduceMotion ? {} : { rotate: [0, 360] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
                 >
                   <Sparkles className="h-4 w-4" />
                 </motion.div>
@@ -310,8 +298,8 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
             </ScrollReveal>
 
             <ScrollReveal animation="fade-up" delay={0.3}>
-              <h1 className="text-4xl font-black tracking-tight text-foreground md:text-5xl">
-                <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold tracking-[-0.02em] text-foreground md:text-5xl">
+                <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
                   Top 50 Cities
                 </span>{" "}
                 to Explore
@@ -319,15 +307,14 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
             </ScrollReveal>
 
             <ScrollReveal animation="blur" delay={0.4}>
-              <p className="mt-4 text-base leading-relaxed text-foreground/70 md:text-lg">
+              <p className="mt-5 text-base leading-relaxed text-foreground/50 md:text-lg">
                 Scroll through our curated collection of world cities. Each one reveals as you
-                explore—making discovery feel like an adventure.{" "}
-                <strong className="text-foreground/90">No sign-up required.</strong>
+                explore — making discovery feel like an adventure.{" "}
+                <strong className="text-foreground/80">No sign-up required.</strong>
               </p>
             </ScrollReveal>
           </header>
 
-          {/* Cities by Chapter */}
           <section aria-labelledby="cities-list-heading">
             <h2 id="cities-list-heading" className="sr-only">
               List of top 50 cities with links to city guides
@@ -341,30 +328,28 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                 <div key={chapter.id}>
                   <ChapterHeader index={chapterIndex} />
 
-                  {/* Chapter intro card */}
                   <ScrollReveal animation="fade-up" delay={0.1}>
-                    <div className="mt-6 mb-6 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6">
+                    <div className="mt-6 mb-6 rounded-2xl border border-foreground/[0.06] bg-foreground/[0.015] p-6 md:p-7">
                       <div className="flex items-start gap-4">
                         <motion.div
-                          whileHover={shouldReduceMotion ? {} : { rotate: 15, scale: 1.1 }}
+                          whileHover={shouldReduceMotion ? {} : { rotate: 10, scale: 1.05 }}
                           className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${chapter.color} text-white shadow-lg`}
                         >
                           <Icon className="h-6 w-6" />
                         </motion.div>
                         <div>
-                          <h3 className="text-xl font-black tracking-tight text-foreground">
+                          <h3 className="text-xl font-bold tracking-tight text-foreground">
                             {chapter.title}
                           </h3>
-                          <p className="text-xs font-bold uppercase tracking-widest text-foreground/40 mt-1">
+                          <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-foreground/35 mt-1">
                             {chapter.subtitle}
                           </p>
-                          <p className="text-sm text-foreground/60 mt-2">{chapter.description}</p>
+                          <p className="text-sm text-foreground/45 mt-2">{chapter.description}</p>
                         </div>
                       </div>
                     </div>
                   </ScrollReveal>
 
-                  {/* Cities list */}
                   <ol className="space-y-2" start={chapter.range[0] + 1}>
                     {chapterCities.map((city, index) => (
                       <CityCard
@@ -381,10 +366,9 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
             })}
           </section>
 
-          {/* Completion celebration */}
-          <div ref={completionRef} className="chapter-divider mt-16">
+          <div ref={completionRef} className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Journey Complete
               </span>
             </ScrollReveal>
@@ -392,21 +376,20 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
 
           <ScrollReveal animation="fade-up">
             <section
-              className="mt-8 rounded-2xl border border-purple-500/20 bg-purple-500/10 p-8 relative overflow-hidden"
+              className="noise-overlay mt-8 rounded-2xl border border-purple-500/15 bg-gradient-to-br from-purple-500/[0.06] via-purple-500/[0.03] to-transparent p-8 md:p-10 relative overflow-hidden"
               aria-labelledby="cta-heading"
             >
-              {/* Animated background */}
               <motion.div
                 animate={
                   shouldReduceMotion
                     ? {}
                     : {
-                        scale: [1, 1.3, 1],
-                        opacity: [0.1, 0.25, 0.1],
+                        scale: [1, 1.2, 1],
+                        opacity: [0.08, 0.18, 0.08],
                       }
                 }
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-purple-500/20 blur-[80px]"
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-purple-500/15 blur-[100px]"
               />
 
               <div className="relative">
@@ -417,21 +400,21 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                   transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
                   className="flex items-center gap-3 mb-4"
                 >
-                  <PartyPopper className="h-6 w-6 text-purple-300" />
+                  <PartyPopper className="h-6 w-6 text-purple-300/80" />
                   <h2
                     id="cta-heading"
-                    className="text-sm font-black uppercase tracking-[0.2em] text-purple-300"
+                    className="text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-300/70"
                   >
                     You explored all 50 cities!
                   </h2>
                 </motion.div>
 
-                <p className="mt-2 text-foreground/80 max-w-xl">
+                <p className="mt-2 text-foreground/60 max-w-xl leading-relaxed">
                   Each city has a full guide with metrics, AI briefings, and experiences. Click any city
                   above to dive deeper, or start fresh from the homepage.
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-8 flex flex-wrap gap-3">
                   <InteractiveButton href="/" variant="primary" iconAfter={<ArrowRight className="h-4 w-4" />}>
                     Go to Explorer
                   </InteractiveButton>

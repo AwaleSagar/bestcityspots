@@ -108,7 +108,7 @@ export default function AboutPageContent() {
 
       <main
         id="main-content"
-        className="min-h-screen bg-transparent font-sans text-foreground selection:bg-purple-500/30 selection:text-purple-200"
+        className="min-h-screen bg-transparent font-sans text-foreground"
       >
         <div
           className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
@@ -116,19 +116,19 @@ export default function AboutPageContent() {
         >
           {/* Navigation */}
           <ScrollReveal animation="fade-down" delay={0.1}>
-            <nav className="mb-8 md:mb-12" aria-label="Breadcrumb">
+            <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
               <Link
                 href="/"
-                className="group touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/50 transition-colors duration-100 hover:text-foreground md:gap-4 py-2"
+                className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/45 transition-colors duration-300 hover:text-foreground md:gap-4 py-2"
               >
                 <motion.div
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
-                  className="liquid-glass flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/10 bg-foreground/[0.03] transition-colors duration-100 group-hover:border-purple-500/40 group-hover:bg-purple-500/20 md:h-12 md:w-12"
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/30 group-hover:bg-purple-500/10 md:h-11 md:w-11"
                 >
-                  <ArrowLeft className="h-4 w-4 md:h-5 md:w-5 transition-transform group-hover:-translate-x-1" />
+                  <ArrowLeft className="h-4 w-4 md:h-[18px] md:w-[18px] transition-transform duration-300 group-hover:-translate-x-0.5" />
                 </motion.div>
-                <span className="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">
+                <span className="text-[11px] md:text-xs font-semibold tracking-[0.15em] uppercase">
                   Return to Explorer
                 </span>
               </Link>
@@ -136,20 +136,19 @@ export default function AboutPageContent() {
           </ScrollReveal>
 
           {/* Hero Header */}
-          <header ref={heroRef} className="relative space-y-6 overflow-visible py-6">
-            {/* Animated background glow */}
+          <header ref={heroRef} className="relative space-y-6 overflow-visible py-6 md:py-10">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={heroInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -top-16 -right-10 -z-10 h-56 w-56 rounded-full bg-purple-600/10 blur-[120px]"
+              transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute -top-20 -right-10 -z-10 h-64 w-64 rounded-full bg-purple-600/[0.06] blur-[150px]"
             />
 
             <ScrollReveal animation="fade-up" delay={0.2}>
-              <div className="flex items-center gap-3 text-[10px] font-black tracking-[0.4em] text-purple-400 uppercase">
+              <div className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.3em] text-purple-400/60 uppercase">
                 <motion.div
                   animate={shouldReduceMotion ? {} : { rotate: [0, 360] }}
-                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
                 >
                   <Sparkles className="h-4 w-4" />
                 </motion.div>
@@ -158,7 +157,7 @@ export default function AboutPageContent() {
             </ScrollReveal>
 
             <ScrollReveal animation="fade-up" delay={0.3}>
-              <h1 className="text-5xl leading-[1.1] font-black tracking-tighter text-foreground md:text-7xl">
+              <h1 className="text-4xl leading-[1.08] font-bold tracking-[-0.03em] text-foreground md:text-6xl lg:text-7xl">
                 <motion.span
                   initial={{ opacity: 0, y: 20 }}
                   animate={heroInView ? { opacity: 1, y: 0 } : {}}
@@ -171,7 +170,7 @@ export default function AboutPageContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={heroInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.5 }}
-                  className="inline-block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
+                  className="inline-block bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent"
                 >
                   Best City Spots
                 </motion.span>
@@ -179,20 +178,20 @@ export default function AboutPageContent() {
             </ScrollReveal>
 
             <ScrollReveal animation="blur" delay={0.5}>
-              <p className="max-w-2xl text-base md:text-lg leading-loose text-foreground/70">
+              <p className="max-w-2xl text-base md:text-lg leading-relaxed text-foreground/50">
                 We combine trusted data sources, spatial intelligence, and human curation to help
                 travelers find cities that fit their mood, budget, and rhythm. The goal is simple:
-                make discovering your next destination feel effortless—with{" "}
-                <strong className="text-foreground/90">no paywalls</strong> and{" "}
-                <strong className="text-foreground/90">no dark patterns</strong>.
+                make discovering your next destination feel effortless — with{" "}
+                <strong className="text-foreground/80">no paywalls</strong> and{" "}
+                <strong className="text-foreground/80">no dark patterns</strong>.
               </p>
             </ScrollReveal>
           </header>
 
           {/* Chapter 1: Trust Principles */}
-          <div className="chapter-divider mt-16">
+          <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Chapter 01
               </span>
             </ScrollReveal>
@@ -200,43 +199,43 @@ export default function AboutPageContent() {
 
           <ScrollReveal animation="fade-up">
             <section
-              className="mt-8 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8 interactive-card"
+              className="mt-8 rounded-2xl border border-foreground/[0.06] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-10 interactive-card"
               aria-labelledby="trust-principles-heading"
             >
               <h2
                 id="trust-principles-heading"
-                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50"
+                className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/40"
               >
                 <motion.div
-                  animate={shouldReduceMotion ? {} : { scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  animate={shouldReduceMotion ? {} : { scale: [1, 1.15, 1] }}
+                  transition={{ duration: 2.5, repeat: Infinity }}
                 >
-                  <Heart className="h-4 w-4 text-purple-400" aria-hidden />
+                  <Heart className="h-4 w-4 text-purple-400/70" aria-hidden />
                 </motion.div>
                 Why we&apos;re different
               </h2>
 
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
+              <ul className="mt-8 grid gap-5 md:grid-cols-2" role="list">
                 {trustPrinciples.map((principle, index) => (
                   <ScrollReveal
                     key={principle.title}
                     animation="fade-left"
                     staggerIndex={index}
-                    staggerDelay={0.15}
+                    staggerDelay={0.12}
                   >
-                    <li className="flex gap-3 text-sm text-foreground/70">
+                    <li className="flex gap-3.5 text-sm text-foreground/55">
                       <motion.span
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
-                        className="text-purple-400 flex-shrink-0"
+                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-[10px] text-purple-400"
                         aria-hidden
                       >
                         ✓
                       </motion.span>
                       <span>
-                        <strong className="text-foreground/90">{principle.title}</strong>{" "}
+                        <strong className="text-foreground/80">{principle.title}</strong>{" "}
                         {principle.description}
                         <Hotspot tip={principle.tip} position="bottom" />
                       </span>
@@ -248,15 +247,15 @@ export default function AboutPageContent() {
           </ScrollReveal>
 
           {/* Chapter 2: How We Work */}
-          <div className="chapter-divider mt-16">
+          <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Chapter 02
               </span>
             </ScrollReveal>
           </div>
 
-          <section className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3" aria-labelledby="how-we-work-heading">
+          <section className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8" aria-labelledby="how-we-work-heading">
             <h2 id="how-we-work-heading" className="sr-only">
               How we work
             </h2>
@@ -265,35 +264,32 @@ export default function AboutPageContent() {
                 key={item.title}
                 animation="fade-up"
                 staggerIndex={index}
-                staggerDelay={0.2}
+                staggerDelay={0.15}
               >
                 <motion.div
-                  whileHover={shouldReduceMotion ? {} : { y: -8, scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="liquid-glass city-card-glow flex flex-col gap-4 rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 shadow-2xl sm:rounded-[2.5rem] sm:p-8 h-full"
+                  whileHover={shouldReduceMotion ? {} : { y: -6 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="group city-card-glow flex flex-col gap-5 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full transition-all duration-500 hover:border-purple-500/12 hover:shadow-xl"
                 >
-                  <motion.div
-                    whileHover={shouldReduceMotion ? {} : { rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <item.icon className="h-5 w-5 text-purple-300" />
-                  </motion.div>
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors duration-300 group-hover:bg-purple-500/10">
+                    <item.icon className="h-5 w-5 text-purple-400/70 transition-colors group-hover:text-purple-400" />
+                  </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-black tracking-tight text-foreground">
+                    <span className="text-lg font-bold tracking-tight text-foreground">
                       {item.title}
                     </span>
                     <Hotspot tip={item.tip} position="right" size="sm" />
                   </div>
-                  <p className="text-sm leading-loose text-foreground/60">{item.description}</p>
+                  <p className="text-sm leading-relaxed text-foreground/45">{item.description}</p>
                 </motion.div>
               </ScrollReveal>
             ))}
           </section>
 
           {/* Chapter 3: Data Sources */}
-          <div className="chapter-divider mt-16">
+          <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Chapter 03
               </span>
             </ScrollReveal>
@@ -301,42 +297,42 @@ export default function AboutPageContent() {
 
           <ScrollReveal animation="fade-up">
             <section
-              className="mt-8 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-6 sm:rounded-[2rem] sm:p-8 interactive-card"
+              className="mt-8 rounded-2xl border border-foreground/[0.06] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-10 interactive-card"
               aria-labelledby="data-sources-heading"
             >
               <h2
                 id="data-sources-heading"
-                className="flex items-center gap-3 text-sm font-black uppercase tracking-[0.2em] text-foreground/50"
+                className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/40"
               >
-                <Database className="h-4 w-4 text-purple-400" aria-hidden />
+                <Database className="h-4 w-4 text-purple-400/70" aria-hidden />
                 Data Sources &amp; Methodology
               </h2>
 
-              <p className="mt-4 text-sm leading-relaxed text-foreground/60">
+              <p className="mt-5 text-sm leading-relaxed text-foreground/50">
                 Every metric on Best City Spots comes from a verifiable source. We believe in full transparency so you can cross-check any data point we present.
               </p>
 
-              <ul className="mt-6 grid gap-4 sm:grid-cols-2" role="list">
+              <ul className="mt-8 grid gap-5 md:grid-cols-2" role="list">
                 {dataSources.map((source, index) => (
                   <ScrollReveal
                     key={source.name}
                     animation="fade-left"
                     staggerIndex={index}
-                    staggerDelay={0.15}
+                    staggerDelay={0.12}
                   >
-                    <li className="flex gap-3 text-sm text-foreground/70">
+                    <li className="flex gap-3.5 text-sm text-foreground/55">
                       <motion.span
                         initial={{ scale: 0 }}
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
-                        className="text-purple-400 flex-shrink-0"
+                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-[10px] text-purple-400"
                         aria-hidden
                       >
                         ✓
                       </motion.span>
                       <span>
-                        <strong className="text-foreground/90">{source.name}.</strong>{" "}
+                        <strong className="text-foreground/80">{source.name}.</strong>{" "}
                         {source.description}
                       </span>
                     </li>
@@ -344,16 +340,16 @@ export default function AboutPageContent() {
                 ))}
               </ul>
 
-              <p className="mt-6 text-xs leading-relaxed text-foreground/40">
+              <p className="mt-8 text-xs leading-relaxed text-foreground/30">
                 AI-generated content is always labeled. We do not fabricate reviews or testimonials. All ratings and reviews shown are sourced directly from Google Places.
               </p>
             </section>
           </ScrollReveal>
 
           {/* Chapter 4: Our Mission */}
-          <div className="chapter-divider mt-16">
+          <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Chapter 04
               </span>
             </ScrollReveal>
@@ -361,31 +357,32 @@ export default function AboutPageContent() {
 
           <section className="mt-8 space-y-10" aria-labelledby="mission-heading">
             <ScrollReveal animation="fade-up">
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <h2
                   id="mission-heading"
-                  className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase"
+                  className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-foreground/35 uppercase"
                 >
-                  Our Mission <span className="h-px flex-1 bg-foreground/5" />
+                  Our Mission <span className="h-px flex-1 bg-foreground/[0.04]" />
                 </h2>
-                <p className="text-base md:text-lg leading-loose text-foreground/70">
+                <p className="text-base md:text-lg leading-relaxed text-foreground/55">
                   Best City Spots exists to guide confident travel decisions. We highlight places that
                   match your preferences, reduce time spent comparing scattered sources, and surface
-                  insights that travelers can actually use—without gatekeeping or manipulation.
+                  insights that travelers can actually use — without gatekeeping or manipulation.
                 </p>
               </div>
             </ScrollReveal>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               <ScrollReveal animation="fade-right">
                 <motion.div
-                  whileHover={shouldReduceMotion ? {} : { x: -4 }}
-                  className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 sm:rounded-[2.5rem] sm:p-8 h-full"
+                  whileHover={shouldReduceMotion ? {} : { x: -3 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full"
                 >
-                  <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-purple-400/60 uppercase">
                     What We Track
                   </h3>
-                  <ul className="mt-6 space-y-4 text-sm text-foreground/70">
+                  <ul className="mt-6 space-y-4 text-sm text-foreground/50">
                     {whatWeTrack.map((item, index) => (
                       <ScrollReveal
                         key={item}
@@ -393,13 +390,13 @@ export default function AboutPageContent() {
                         staggerIndex={index}
                         staggerDelay={0.1}
                       >
-                        <li className="flex items-start gap-2">
+                        <li className="flex items-start gap-3">
                           <motion.span
                             initial={{ width: 0 }}
                             whileInView={{ width: "0.5rem" }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 + index * 0.1 }}
-                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-purple-400/50"
+                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-purple-400/40"
                           />
                           {item}
                         </li>
@@ -411,13 +408,14 @@ export default function AboutPageContent() {
 
               <ScrollReveal animation="fade-left">
                 <motion.div
-                  whileHover={shouldReduceMotion ? {} : { x: 4 }}
-                  className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-6 sm:rounded-[2.5rem] sm:p-8 h-full"
+                  whileHover={shouldReduceMotion ? {} : { x: 3 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  className="rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full"
                 >
-                  <h3 className="text-xs font-black tracking-[0.3em] text-purple-300 uppercase">
+                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-purple-400/60 uppercase">
                     How We Curate
                   </h3>
-                  <ul className="mt-6 space-y-4 text-sm text-foreground/70">
+                  <ul className="mt-6 space-y-4 text-sm text-foreground/50">
                     {howWeCurate.map((item, index) => (
                       <ScrollReveal
                         key={item}
@@ -425,13 +423,13 @@ export default function AboutPageContent() {
                         staggerIndex={index}
                         staggerDelay={0.1}
                       >
-                        <li className="flex items-start gap-2">
+                        <li className="flex items-start gap-3">
                           <motion.span
                             initial={{ width: 0 }}
                             whileInView={{ width: "0.5rem" }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 + index * 0.1 }}
-                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-blue-400/50"
+                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-violet-400/40"
                           />
                           {item}
                         </li>
@@ -444,9 +442,9 @@ export default function AboutPageContent() {
           </section>
 
           {/* Final CTA */}
-          <div className="chapter-divider mt-16">
+          <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-black tracking-[0.4em] text-purple-400/60 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
                 Ready?
               </span>
             </ScrollReveal>
@@ -454,41 +452,40 @@ export default function AboutPageContent() {
 
           <ScrollReveal animation="fade-up">
             <section
-              className="mt-8 rounded-2xl border border-purple-500/20 bg-purple-500/10 p-6 sm:rounded-[2.5rem] sm:p-10 relative overflow-hidden"
+              className="noise-overlay mt-8 rounded-2xl border border-purple-500/15 bg-gradient-to-br from-purple-500/[0.06] via-purple-500/[0.03] to-transparent p-8 md:rounded-3xl md:p-12 relative overflow-hidden"
               aria-labelledby="cta-heading"
             >
-              {/* Animated background */}
               <motion.div
-                animate={shouldReduceMotion ? {} : { 
-                  scale: [1, 1.2, 1],
-                  opacity: [0.1, 0.2, 0.1],
+                animate={shouldReduceMotion ? {} : {
+                  scale: [1, 1.15, 1],
+                  opacity: [0.08, 0.15, 0.08],
                 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-purple-500/20 blur-[80px]"
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-purple-500/15 blur-[100px]"
               />
 
               <h2
                 id="cta-heading"
-                className="relative text-xs font-black tracking-[0.3em] text-purple-200 uppercase"
+                className="relative text-[11px] font-semibold tracking-[0.25em] text-purple-300/70 uppercase"
               >
                 Ready to Explore
               </h2>
 
               <div className="relative mt-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <p className="max-w-xl text-base md:text-lg leading-relaxed text-foreground/80">
+                  <p className="max-w-xl text-base md:text-lg leading-relaxed text-foreground/70">
                     Dive into the atlas to compare cities, uncover hidden gems, and plan your next
                     journey with confidence.
                   </p>
-                  <p className="mt-3 text-sm text-foreground/60">
+                  <p className="mt-3 text-sm text-foreground/45">
                     Try our free{" "}
                     <Link
                       href="/resources/top-cities"
-                      className="font-semibold text-purple-300 underline underline-offset-2 hover:text-purple-200 transition-colors"
+                      className="font-semibold text-purple-300 underline underline-offset-3 hover:text-purple-200 transition-colors"
                     >
                       Top 50 Cities guide
                     </Link>
-                    —no sign-up required.
+                    &nbsp;&mdash; no sign-up required.
                   </p>
                 </div>
 

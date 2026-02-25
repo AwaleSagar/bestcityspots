@@ -129,7 +129,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-purple-500/20 selection:text-purple-200`}
+        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-purple-500/15 selection:text-purple-200`}
       >
         <script
           type="application/ld+json"
