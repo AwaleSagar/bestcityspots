@@ -126,7 +126,7 @@ export async function getTopCities(limit = 10) {
     const safeLimit = Math.max(1, Math.min(200, limit));
     const { data, error } = await supabase
       .from("cities")
-      .select("id, city, country, population, lat, lng")
+      .select("id, city, city_ascii, country, iso3, admin_name, capital, population, lat, lng")
       .order("population", { ascending: false, nullsFirst: false })
       .limit(safeLimit);
 
