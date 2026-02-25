@@ -18,7 +18,7 @@ const fadeUp = {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -27,7 +27,7 @@ const scaleIn = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
