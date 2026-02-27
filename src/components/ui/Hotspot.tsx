@@ -110,7 +110,7 @@ export default function Hotspot({
         className={`
           ${inline ? "ml-1" : ""}
           ${sizeClass}
-          relative cursor-pointer rounded-full
+          relative flex items-center justify-center cursor-pointer rounded-full
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50
           touch-target
         `}
@@ -119,11 +119,11 @@ export default function Hotspot({
         {/* Pulsing glow effect */}
         {!shouldReduceMotion && (
           <motion.span
-            className="absolute inset-0 rounded-full"
+            className={`absolute rounded-full ${sizeClass}`}
             style={{ backgroundColor: color }}
             animate={{
-              scale: [1, 1.8, 1],
-              opacity: [0.6, 0, 0.6],
+              scale: [1, 2.2, 1],
+              opacity: [0.5, 0, 0.5],
             }}
             transition={{
               duration: 2,
@@ -135,7 +135,7 @@ export default function Hotspot({
 
         {/* Main indicator dot */}
         <span
-          className={`absolute inset-0 flex items-center justify-center rounded-full ${sizeClass}`}
+          className={`relative z-10 flex items-center justify-center rounded-full ${sizeClass}`}
           style={{ backgroundColor: color }}
         >
           <Info className="h-2 w-2 text-white" />

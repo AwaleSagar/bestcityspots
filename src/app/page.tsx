@@ -27,7 +27,7 @@ export default async function Home() {
         </div>
 
         {/* Trust & Features */}
-        <div className="mt-32 space-y-32 content-lazy md:mt-40 md:space-y-40">
+        <div className="mt-32 mb-32 space-y-32 content-lazy md:mt-40 md:mb-40 md:space-y-40">
           <TrustIndicators />
           <FreeResourceCTA />
           <TestimonialsSection />
