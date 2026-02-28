@@ -15,7 +15,7 @@ const companyLinks = [
 export default function SiteFooter() {
   return (
     <footer
-      className="relative border-t border-foreground/[0.04] bg-foreground/[0.01]"
+      className="relative border-t border-foreground/[0.05] bg-foreground/[0.015]"
       role="contentinfo"
       aria-label="Site footer"
     >
@@ -27,8 +27,8 @@ export default function SiteFooter() {
           {/* Brand */}
           <div>
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5">
-                <MapPin className="h-4 w-4 text-purple-400" aria-hidden />
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/25 to-amber-500/10">
+                <MapPin className="h-4 w-4 text-orange-400" aria-hidden />
               </div>
               <span className="text-sm font-bold tracking-tight text-foreground/90">Best City Spots</span>
             </div>
@@ -48,7 +48,7 @@ export default function SiteFooter() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
                     >
                       <Icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
                       {label}
@@ -70,7 +70,7 @@ export default function SiteFooter() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+                      className="link touch-target inline-flex items-center text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
                     >
                       {label}
                     </Link>
@@ -81,7 +81,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-3 border-t border-foreground/[0.04] pt-8 md:flex-row md:items-center md:justify-between">
+        <div className="mt-16 flex flex-col gap-3 border-t border-foreground/[0.05] pt-8 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-foreground/25">
             &copy; {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
           </p>

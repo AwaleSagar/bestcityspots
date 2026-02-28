@@ -65,7 +65,7 @@ export function GeoConsentBanner() {
         >
           <div className="relative overflow-hidden rounded-2xl border border-foreground/10 bg-background/95 p-5 shadow-2xl backdrop-blur-xl">
             {/* Gradient accent */}
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-orange-500 to-pink-500" />
 
             {/* Close button */}
             <button
@@ -79,7 +79,7 @@ export function GeoConsentBanner() {
             {/* Content */}
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-orange-500/20">
                   <MapPin className="h-5 w-5 text-blue-400" />
                 </div>
               </div>
@@ -103,7 +103,7 @@ export function GeoConsentBanner() {
                 <div className="mt-4 flex gap-2">
                   <button
                     onClick={handleAccept}
-                    className="rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-xs font-medium text-white transition-all hover:from-blue-500 hover:to-purple-500 hover:shadow-lg hover:shadow-purple-500/25"
+                    className="rounded-lg bg-gradient-to-r from-blue-600 to-orange-600 px-4 py-2 text-xs font-medium text-white transition-all hover:from-blue-500 hover:to-orange-600 hover:shadow-lg hover:shadow-orange-500/25"
                   >
                     Allow
                   </button>

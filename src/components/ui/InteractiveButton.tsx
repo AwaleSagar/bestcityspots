@@ -35,8 +35,8 @@ interface InteractiveButtonProps {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: `
-    border-purple-400/40 bg-purple-500/20 text-purple-100
-    hover:bg-purple-500/30 hover:border-purple-400/60
+    border-orange-500/40 bg-orange-500/20 text-orange-400
+    hover:bg-orange-500/30 hover:border-orange-500/60
   `,
   secondary: `
     border-foreground/20 bg-foreground/[0.05] text-foreground/80
@@ -104,7 +104,7 @@ export default function InteractiveButton({
     items-center justify-center overflow-hidden rounded-full border
     font-bold uppercase tracking-[0.15em]
     transition-colors duration-150
-    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background
     disabled:pointer-events-none disabled:opacity-50
     ${variantClass}
     ${sizeClass}
@@ -146,7 +146,7 @@ export default function InteractiveButton({
       {/* Glow effect on hover */}
       {variant === "primary" && !shouldReduceMotion && (
         <motion.span
-          className="pointer-events-none absolute inset-0 rounded-full bg-purple-500/20 blur-xl"
+          className="pointer-events-none absolute inset-0 rounded-full bg-orange-500/20 blur-xl"
           initial={{ opacity: 0 }}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.3 }}

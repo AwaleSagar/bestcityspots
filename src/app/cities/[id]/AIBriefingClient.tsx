@@ -50,7 +50,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
       {/* Section Heading — matches "Structural Profile" / "Top Experiences" style */}
       <div className="space-y-3">
         <h2 className="flex items-center gap-4 text-sm font-black tracking-[0.4em] text-foreground/40 uppercase">
-          <Sparkles className="h-4 w-4 text-purple-400" />
+          <Sparkles className="h-4 w-4 text-orange-400" />
           AI City Briefing
           <span className="h-px flex-1 bg-foreground/5" />
         </h2>
@@ -78,13 +78,13 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
               {isActive && (
                 <motion.div
                   layoutId="ai-briefing-tab"
-                  className="absolute inset-0 bg-purple-500/10 border border-purple-500/20 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(124,58,237,0.06)]"
+                  className="absolute inset-0 bg-orange-500/10 border border-orange-500/20 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(124,58,237,0.06)]"
                   transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                 />
               )}
               <Icon
                 className={`relative z-10 w-3.5 h-3.5 md:w-4 md:h-4 transition-colors duration-200 ${
-                  isActive ? "text-purple-400" : "text-foreground/20"
+                  isActive ? "text-orange-400" : "text-foreground/20"
                 }`}
               />
               <span className="relative z-10">{tab.label}</span>
@@ -92,7 +92,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                 <span
                   className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black tabular-nums transition-colors duration-200 ${
                     isActive
-                      ? "bg-purple-500/20 text-purple-300"
+                      ? "bg-orange-500/20 text-orange-400"
                       : "bg-foreground/5 text-foreground/25"
                   }`}
                 >
@@ -120,7 +120,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                 {insight.intro}
               </p>
               <div className="mt-6 flex items-center gap-2 border-t border-foreground/5 pt-5">
-                <div className="h-1.5 w-1.5 rounded-full bg-purple-400/50 animate-pulse" />
+                <div className="h-1.5 w-1.5 rounded-full bg-orange-500/50 animate-pulse" />
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-foreground/25">
                   AI-generated via Google Gemini · Verified against public data
                 </span>
@@ -149,21 +149,21 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
               >
                 <div className="flex flex-col gap-4 p-5 md:p-6">
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-colors duration-100 group-hover/card:bg-purple-500/20">
-                      <MapPin className="h-5 w-5 text-purple-400" />
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 transition-colors duration-100 group-hover/card:bg-orange-500/20">
+                      <MapPin className="h-5 w-5 text-orange-400" />
                     </div>
                     <div>
                       <h3 className="text-base font-black tracking-tight text-foreground/90 leading-tight">
                         {a.name}
                       </h3>
-                      <span className="mt-1 inline-block rounded-md bg-purple-500/10 px-2 py-0.5 text-[9px] font-black tracking-[0.1em] text-purple-400/80 uppercase border border-purple-500/20">
+                      <span className="mt-1 inline-block rounded-md bg-orange-500/10 px-2 py-0.5 text-[9px] font-black tracking-[0.1em] text-orange-400/80 uppercase border border-orange-500/20">
                         Must Visit
                       </span>
                     </div>
                   </div>
 
-                  <div className="rounded-xl border border-purple-500/10 bg-purple-500/[0.04] p-3.5">
-                    <div className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-purple-300/70">
+                  <div className="rounded-xl border border-orange-500/10 bg-orange-500/[0.04] p-3.5">
+                    <div className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-orange-400/70">
                       <Compass className="h-3 w-3" />
                       Why visit
                     </div>
@@ -199,8 +199,8 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                   {/* Season Header */}
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-purple-500/20 bg-purple-500/10 transition-colors duration-100 group-hover/card:bg-purple-500/20">
-                        <CalendarRange className="h-5 w-5 text-purple-400" />
+                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 transition-colors duration-100 group-hover/card:bg-orange-500/20">
+                        <CalendarRange className="h-5 w-5 text-orange-400" />
                       </div>
                       <div>
                         <h3 className="text-base font-black tracking-tight text-foreground/90 leading-tight">
@@ -211,9 +211,9 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1.5">
-                      <ThermometerSun className="h-3.5 w-3.5 text-purple-400" />
-                      <span className="text-[10px] font-black tracking-wider text-purple-300">
+                    <div className="flex items-center gap-1.5 rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1.5">
+                      <ThermometerSun className="h-3.5 w-3.5 text-orange-400" />
+                      <span className="text-[10px] font-black tracking-wider text-orange-400">
                         {s.tempC}
                       </span>
                     </div>

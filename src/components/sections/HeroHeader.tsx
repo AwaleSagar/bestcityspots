@@ -1,33 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, ArrowDown } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Link from "next/link";
 
 const stagger = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.3 },
+    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
   },
 };
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 60, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 50, filter: "blur(8px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
+  hidden: { opacity: 0, scale: 0.92 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 1, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -37,88 +37,70 @@ export default function HeroHeader() {
       variants={stagger}
       initial="hidden"
       animate="visible"
-      className="relative flex min-h-[70vh] flex-col items-center justify-center text-center md:min-h-[80vh]"
+      className="relative flex min-h-[52vh] flex-col items-center justify-center text-center md:min-h-[60vh]"
     >
-      {/* Ambient glows */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 2, ease: "easeOut" }}
-          className="absolute top-1/4 left-1/2 h-[500px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/[0.06] blur-[150px]"
-        />
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2, delay: 0.5 }}
-          className="absolute bottom-0 right-1/4 h-[300px] w-[400px] rounded-full bg-amber-500/[0.04] blur-[120px]"
-        />
-      </div>
-
       {/* Eyebrow */}
       <motion.div variants={fadeUp} className="mb-8">
-        <span className="inline-flex items-center gap-2.5 rounded-full border border-foreground/[0.06] bg-foreground/[0.02] px-5 py-2.5 text-[11px] font-semibold tracking-[0.2em] text-foreground/40 uppercase backdrop-blur-sm">
-          <Sparkles className="h-3.5 w-3.5 text-purple-400/70" aria-hidden />
-          Urban Intelligence Platform
+        <span className="inline-flex items-center gap-2.5 rounded-full border border-orange-500/[0.2] bg-orange-500/[0.07] px-5 py-2.5 text-[11px] font-semibold tracking-[0.16em] text-orange-300 uppercase backdrop-blur-sm">
+          <MapPin className="h-3.5 w-3.5 text-orange-300" aria-hidden />
+          AI-Powered City Discovery
         </span>
       </motion.div>
 
       {/* Main heading */}
-      <motion.h1 variants={fadeUp} className="relative mb-8">
-        <span className="block text-[clamp(2.5rem,5vw+1rem,5.5rem)] font-black leading-[0.95] tracking-[-0.04em] text-foreground">
-          Discover the World&apos;s
+      <motion.h1 variants={fadeUp} className="relative mb-6 px-2 leading-[1.12]">
+        <span className="block text-[clamp(2.1rem,4.5vw+0.7rem,4.4rem)] font-semibold leading-[1.12] tracking-[-0.02em] text-foreground">
+          Find Your Next
         </span>
-        <span className="mt-2 block text-[clamp(2.5rem,5vw+1rem,5.5rem)] font-black leading-[0.95] tracking-[-0.04em]">
-          <span className="bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent">
-            Most Vibrant
-          </span>{" "}
-          Cities
+        <span className="mt-2 block text-[clamp(2.1rem,4.5vw+0.7rem,4.4rem)] font-semibold leading-[1.12] tracking-[-0.02em]">
+          <span className="inline-block bg-gradient-to-r from-orange-400 via-amber-300 to-orange-300 bg-clip-text pb-[0.04em] text-transparent">City</span> Faster
         </span>
       </motion.h1>
 
       {/* Subtitle */}
       <motion.p
         variants={fadeUp}
-        className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-foreground/45 md:text-lg"
+        className="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-foreground/55 md:text-base"
       >
-        AI-powered insights, real-time data, and curated experiences for
-        the modern explorer. No paywalls. No dark patterns.
+        Search cities by name, vibe, or destination intent in seconds.
       </motion.p>
 
       {/* CTAs */}
       <motion.div
         variants={scaleIn}
-        className="flex flex-col items-center gap-4 sm:flex-row"
+        className="flex flex-col items-center gap-3 sm:flex-row"
       >
         <Link
           href="#city-search"
-          className="btn-primary group"
+          className="btn-primary btn-primary-accent group"
           onClick={(e) => {
             e.preventDefault();
             document.getElementById("city-search")?.focus();
           }}
         >
           Start Exploring
-          <Sparkles className="h-4 w-4 transition-transform group-hover:rotate-12" aria-hidden />
+          <MapPin className="h-4 w-4 transition-transform group-hover:scale-110" aria-hidden />
         </Link>
         <Link href="/resources/top-cities" className="btn-secondary">
-          Browse Top 50
+          Browse Top 50 Cities
         </Link>
       </motion.div>
 
-      {/* Scroll indicator */}
+      {/* Stats row */}
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        variants={fadeUp}
+        className="mt-8 flex flex-wrap items-center justify-center gap-6 border-t border-foreground/[0.06] pt-6 md:mt-10 md:gap-10 md:pt-7"
       >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <ArrowDown className="h-5 w-5 text-foreground/20" />
-        </motion.div>
+        {[
+          { value: "10,000+", label: "Cities covered" },
+          { value: "24/7", label: "Live data" },
+          { value: "100%", label: "Free access" },
+        ].map(({ value, label }) => (
+          <div key={label} className="flex flex-col items-center gap-1">
+            <span className="text-2xl font-semibold tracking-tight text-foreground">{value}</span>
+            <span className="text-[11px] font-medium text-foreground/35 uppercase tracking-[0.14em]">{label}</span>
+          </div>
+        ))}
       </motion.div>
     </motion.header>
   );

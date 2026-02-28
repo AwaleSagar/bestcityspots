@@ -34,7 +34,7 @@ function ExperienceCardSkeleton({ index, isFeatured }: { index: number; isFeatur
         {/* Title overlay skeleton */}
         <div className="absolute bottom-0 left-0 right-0 z-30 p-4 md:p-6">
           <div className="flex items-center gap-2 mb-1.5">
-            <div className="relative h-5 w-20 overflow-hidden rounded-md bg-purple-500/20">
+            <div className="relative h-5 w-20 overflow-hidden rounded-md bg-orange-500/20">
               <Shimmer />
             </div>
             <div className="relative h-3 w-24 overflow-hidden rounded bg-white/10">
@@ -63,10 +63,10 @@ function ExperienceCardSkeleton({ index, isFeatured }: { index: number; isFeatur
         </div>
 
         {/* Insider tips skeleton */}
-        <div className="rounded-xl border border-purple-500/10 bg-purple-500/[0.02] p-3.5">
+        <div className="rounded-xl border border-orange-500/10 bg-orange-500/[0.02] p-3.5">
           <div className="flex items-center gap-1.5 mb-2">
-            <Compass className="h-3 w-3 text-purple-500/20" />
-            <div className="relative h-2 w-14 overflow-hidden rounded bg-purple-500/10">
+            <Compass className="h-3 w-3 text-orange-400/20" />
+            <div className="relative h-2 w-14 overflow-hidden rounded bg-orange-500/10">
               <Shimmer />
             </div>
           </div>
@@ -131,13 +131,13 @@ export default function ExperiencesSkeleton() {
                   key={tab.id}
                   className={`relative flex items-center gap-2 md:gap-2.5 px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl ${
                     isFirst
-                      ? "bg-purple-500/10 border border-purple-500/20"
+                      ? "bg-orange-500/10 border border-orange-500/20"
                       : ""
                   }`}
                 >
                   <Icon
                     className={`w-3.5 h-3.5 md:w-4 md:h-4 ${
-                      isFirst ? "text-purple-400" : "text-foreground/20"
+                      isFirst ? "text-orange-400" : "text-foreground/20"
                     }`}
                   />
                   <span
@@ -148,7 +148,7 @@ export default function ExperiencesSkeleton() {
                     {tab.label}
                   </span>
                   <span className={`rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black ${
-                    isFirst ? "bg-purple-500/20 text-purple-300" : "bg-foreground/5 text-foreground/25"
+                    isFirst ? "bg-orange-500/20 text-orange-400" : "bg-foreground/5 text-foreground/25"
                   }`}>
                     ···
                   </span>
@@ -160,7 +160,7 @@ export default function ExperiencesSkeleton() {
           {/* Saved places skeleton */}
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3.5 py-2">
-              <div className="relative h-3.5 w-3.5 overflow-hidden rounded bg-purple-400/20">
+              <div className="relative h-3.5 w-3.5 overflow-hidden rounded bg-orange-500/20">
                 <Shimmer />
               </div>
               <div className="relative h-3 w-24 overflow-hidden rounded bg-foreground/[0.05]">
@@ -180,7 +180,7 @@ export default function ExperiencesSkeleton() {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="h-1.5 w-1.5 rounded-full bg-purple-400"
+                className="h-1.5 w-1.5 rounded-full bg-orange-400"
                 animate={{
                   scale: [1, 1.3, 1],
                   opacity: [0.3, 1, 0.3],

@@ -42,7 +42,7 @@ export default function TrustIndicators() {
     >
       <ScrollReveal animation="fade-up">
         <div className="mb-12 text-center md:mb-16">
-          <span className="mb-4 inline-block text-[11px] font-semibold tracking-[0.25em] text-purple-400/60 uppercase">
+          <span className="mb-4 inline-block text-[11px] font-bold tracking-[0.25em] text-orange-400/80 uppercase">
             Built on Trust
           </span>
           <h2 id="trust-heading" className="text-3xl font-bold tracking-[-0.02em] text-foreground md:text-4xl">
@@ -55,26 +55,26 @@ export default function TrustIndicators() {
         {indicators.map(({ icon: Icon, label, stat, statLabel, description }, idx) => (
           <ScrollReveal key={label} animation="fade-up" staggerIndex={idx} staggerDelay={0.15}>
             <motion.li
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -6 }}
               transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              className="group relative overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 transition-all duration-500 hover:border-purple-500/15 hover:shadow-xl md:rounded-3xl md:p-8"
+              className="group relative overflow-hidden rounded-2xl border border-foreground/[0.07] bg-foreground/[0.03] p-7 transition-all duration-500 hover:border-orange-500/25 hover:shadow-xl hover:bg-foreground/[0.05] md:rounded-3xl md:p-8"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-purple-500/[0.04] blur-[60px] transition-opacity duration-500 group-hover:opacity-100 opacity-0" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-orange-500/[0.08] blur-[60px] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
               <div className="relative">
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-500/[0.06] transition-colors duration-300 group-hover:bg-purple-500/[0.1]">
-                  <Icon className="h-5.5 w-5.5 text-purple-400/80 transition-colors duration-300 group-hover:text-purple-400" aria-hidden />
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/[0.1] transition-colors duration-300 group-hover:bg-orange-500/[0.18] border border-orange-500/[0.1]">
+                  <Icon className="h-5.5 w-5.5 text-orange-400/90 transition-colors duration-300 group-hover:text-orange-400" aria-hidden />
                 </div>
 
                 <div className="mb-4">
                   <span className="text-3xl font-black tracking-tight text-foreground">{stat}</span>
-                  <span className="ml-1.5 text-sm font-medium text-foreground/40">{statLabel}</span>
+                  <span className="ml-1.5 text-sm font-semibold text-orange-400/70">{statLabel}</span>
                 </div>
 
-                <h3 className="mb-3 text-sm font-bold tracking-tight text-foreground/80">
+                <h3 className="mb-3 text-sm font-bold tracking-tight text-foreground/90">
                   {label}
                 </h3>
-                <p className="text-sm leading-relaxed text-foreground/40">{description}</p>
+                <p className="text-sm leading-relaxed text-foreground/45">{description}</p>
               </div>
             </motion.li>
           </ScrollReveal>
@@ -86,9 +86,9 @@ export default function TrustIndicators() {
           {credibilitySignals.map(({ icon: Icon, text }) => (
             <div
               key={text}
-              className="flex items-center gap-2 rounded-full border border-foreground/[0.05] bg-foreground/[0.02] px-4 py-2.5 text-xs font-medium text-foreground/40 transition-colors duration-300 hover:border-emerald-500/15 hover:text-foreground/55"
+              className="flex items-center gap-2 rounded-full border border-foreground/[0.07] bg-foreground/[0.03] px-4 py-2.5 text-xs font-medium text-foreground/50 transition-colors duration-300 hover:border-emerald-500/20 hover:text-foreground/70"
             >
-              <Icon className="h-3.5 w-3.5 text-emerald-400/60" aria-hidden />
+              <Icon className="h-3.5 w-3.5 text-emerald-400/70" aria-hidden />
               {text}
             </div>
           ))}

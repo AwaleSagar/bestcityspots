@@ -124,7 +124,7 @@ export default function AboutPageContent() {
                 <motion.div
                   whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
-                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/30 group-hover:bg-purple-500/10 md:h-11 md:w-11"
+                  className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-orange-500/30 group-hover:bg-orange-500/10 md:h-11 md:w-11"
                 >
                   <ArrowLeft className="h-4 w-4 md:h-[18px] md:w-[18px] transition-transform duration-300 group-hover:-translate-x-0.5" />
                 </motion.div>
@@ -141,11 +141,11 @@ export default function AboutPageContent() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={heroInView ? { opacity: 1, scale: 1 } : {}}
               transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
-              className="absolute -top-20 -right-10 -z-10 h-64 w-64 rounded-full bg-purple-600/[0.06] blur-[150px]"
+              className="absolute -top-20 -right-10 -z-10 h-64 w-64 rounded-full bg-orange-500/[0.06] blur-[150px]"
             />
 
             <ScrollReveal animation="fade-up" delay={0.2}>
-              <div className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.3em] text-purple-400/60 uppercase">
+              <div className="flex items-center gap-3 text-[11px] font-semibold tracking-[0.3em] text-orange-400/60 uppercase">
                 <motion.div
                   animate={shouldReduceMotion ? {} : { rotate: [0, 360] }}
                   transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
@@ -170,7 +170,7 @@ export default function AboutPageContent() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={heroInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.8, delay: 0.5 }}
-                  className="inline-block bg-gradient-to-r from-purple-400 via-violet-400 to-purple-300 bg-clip-text text-transparent"
+                  className="inline-block bg-gradient-to-r from-orange-500 via-violet-400 to-orange-600 bg-clip-text text-transparent"
                 >
                   Best City Spots
                 </motion.span>
@@ -191,7 +191,7 @@ export default function AboutPageContent() {
           {/* Chapter 1: Trust Principles */}
           <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-orange-400/50 uppercase">
                 Chapter 01
               </span>
             </ScrollReveal>
@@ -210,7 +210,7 @@ export default function AboutPageContent() {
                   animate={shouldReduceMotion ? {} : { scale: [1, 1.15, 1] }}
                   transition={{ duration: 2.5, repeat: Infinity }}
                 >
-                  <Heart className="h-4 w-4 text-purple-400/70" aria-hidden />
+                  <Heart className="h-4 w-4 text-orange-400/70" aria-hidden />
                 </motion.div>
                 Why we&apos;re different
               </h2>
@@ -229,7 +229,7 @@ export default function AboutPageContent() {
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
-                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-[10px] text-purple-400"
+                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-[10px] text-orange-400"
                         aria-hidden
                       >
                         ✓
@@ -249,7 +249,7 @@ export default function AboutPageContent() {
           {/* Chapter 2: How We Work */}
           <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-orange-400/50 uppercase">
                 Chapter 02
               </span>
             </ScrollReveal>
@@ -269,10 +269,10 @@ export default function AboutPageContent() {
                 <motion.div
                   whileHover={shouldReduceMotion ? {} : { y: -6 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="group city-card-glow flex flex-col gap-5 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full transition-all duration-500 hover:border-purple-500/12 hover:shadow-xl"
+                  className="group city-card-glow flex flex-col gap-5 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full transition-all duration-500 hover:border-orange-500/12 hover:shadow-xl"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors duration-300 group-hover:bg-purple-500/10">
-                    <item.icon className="h-5 w-5 text-purple-400/70 transition-colors group-hover:text-purple-400" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/[0.06] transition-colors duration-300 group-hover:bg-orange-500/10">
+                    <item.icon className="h-5 w-5 text-orange-400/70 transition-colors group-hover:text-orange-400" />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-bold tracking-tight text-foreground">
@@ -289,7 +289,7 @@ export default function AboutPageContent() {
           {/* Chapter 3: Data Sources */}
           <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-orange-400/50 uppercase">
                 Chapter 03
               </span>
             </ScrollReveal>
@@ -304,7 +304,7 @@ export default function AboutPageContent() {
                 id="data-sources-heading"
                 className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/40"
               >
-                <Database className="h-4 w-4 text-purple-400/70" aria-hidden />
+                <Database className="h-4 w-4 text-orange-400/70" aria-hidden />
                 Data Sources &amp; Methodology
               </h2>
 
@@ -326,7 +326,7 @@ export default function AboutPageContent() {
                         whileInView={{ scale: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.2 + index * 0.1, type: "spring" }}
-                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-purple-500/10 text-[10px] text-purple-400"
+                        className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-orange-500/10 text-[10px] text-orange-400"
                         aria-hidden
                       >
                         ✓
@@ -349,7 +349,7 @@ export default function AboutPageContent() {
           {/* Chapter 4: Our Mission */}
           <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-orange-400/50 uppercase">
                 Chapter 04
               </span>
             </ScrollReveal>
@@ -379,7 +379,7 @@ export default function AboutPageContent() {
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                   className="rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full"
                 >
-                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-purple-400/60 uppercase">
+                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-orange-400/60 uppercase">
                     What We Track
                   </h3>
                   <ul className="mt-6 space-y-4 text-sm text-foreground/50">
@@ -396,7 +396,7 @@ export default function AboutPageContent() {
                             whileInView={{ width: "0.5rem" }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 + index * 0.1 }}
-                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-purple-400/40"
+                            className="mt-2 h-0.5 flex-shrink-0 rounded-full bg-orange-500/40"
                           />
                           {item}
                         </li>
@@ -412,7 +412,7 @@ export default function AboutPageContent() {
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
                   className="rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-7 md:rounded-3xl md:p-8 h-full"
                 >
-                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-purple-400/60 uppercase">
+                  <h3 className="text-[11px] font-semibold tracking-[0.25em] text-orange-400/60 uppercase">
                     How We Curate
                   </h3>
                   <ul className="mt-6 space-y-4 text-sm text-foreground/50">
@@ -444,7 +444,7 @@ export default function AboutPageContent() {
           {/* Final CTA */}
           <div className="chapter-divider mt-20">
             <ScrollReveal animation="scale">
-              <span className="text-[10px] font-semibold tracking-[0.3em] text-purple-400/50 uppercase">
+              <span className="text-[10px] font-semibold tracking-[0.3em] text-orange-400/50 uppercase">
                 Ready?
               </span>
             </ScrollReveal>
@@ -452,7 +452,7 @@ export default function AboutPageContent() {
 
           <ScrollReveal animation="fade-up">
             <section
-              className="noise-overlay mt-8 rounded-2xl border border-purple-500/15 bg-gradient-to-br from-purple-500/[0.06] via-purple-500/[0.03] to-transparent p-8 md:rounded-3xl md:p-12 relative overflow-hidden"
+              className="noise-overlay mt-8 rounded-2xl border border-orange-500/15 bg-gradient-to-br from-orange-500/[0.06] via-orange-500/[0.03] to-transparent p-8 md:rounded-3xl md:p-12 relative overflow-hidden"
               aria-labelledby="cta-heading"
             >
               <motion.div
@@ -461,12 +461,12 @@ export default function AboutPageContent() {
                   opacity: [0.08, 0.15, 0.08],
                 }}
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-purple-500/15 blur-[100px]"
+                className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-orange-500/15 blur-[100px]"
               />
 
               <h2
                 id="cta-heading"
-                className="relative text-[11px] font-semibold tracking-[0.25em] text-purple-300/70 uppercase"
+                className="relative text-[11px] font-semibold tracking-[0.25em] text-orange-400/70 uppercase"
               >
                 Ready to Explore
               </h2>
@@ -481,7 +481,7 @@ export default function AboutPageContent() {
                     Try our free{" "}
                     <Link
                       href="/resources/top-cities"
-                      className="font-semibold text-purple-300 underline underline-offset-3 hover:text-purple-200 transition-colors"
+                      className="font-semibold text-orange-400 underline underline-offset-3 hover:text-orange-400 transition-colors"
                     >
                       Top 50 Cities guide
                     </Link>

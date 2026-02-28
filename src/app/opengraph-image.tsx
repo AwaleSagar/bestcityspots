@@ -49,7 +49,7 @@ export default async function Image() {
                         width: "500px",
                         height: "500px",
                         borderRadius: "50%",
-                        backgroundColor: "rgba(147, 51, 234, 0.2)", // purple-600
+                        backgroundColor: "rgba(234, 88, 12, 0.2)", // orange-600
                         filter: "blur(80px)",
                     }}
                 />

@@ -448,7 +448,7 @@ export default function ExperiencesSection({
             {/* Title overlay on image */}
             <div className="absolute bottom-0 left-0 right-0 z-30 p-4 md:p-6">
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="rounded-md bg-purple-500/30 px-2 py-0.5 text-[9px] md:text-[10px] font-black tracking-[0.1em] text-purple-200 uppercase border border-purple-400/20 backdrop-blur-sm">
+                <span className="rounded-md bg-orange-500/30 px-2 py-0.5 text-[9px] md:text-[10px] font-black tracking-[0.1em] text-orange-400 uppercase border border-orange-500/20 backdrop-blur-sm">
                   {formatType(item.types)}
                 </span>
                 <span className="text-[10px] md:text-[11px] font-bold text-white/60 uppercase tracking-widest truncate">
@@ -468,14 +468,14 @@ export default function ExperiencesSection({
           {!item.imageUrl && (
             <div className="flex items-start gap-4">
               <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-foreground/5 bg-foreground/[0.02]" aria-hidden="true">
-                <Compass className="h-5 w-5 text-purple-400/60" />
+                <Compass className="h-5 w-5 text-orange-400/60" />
               </div>
               <div>
                 <h3 className="text-lg font-black tracking-tight text-foreground/90">
                   {item.displayName.text}
                 </h3>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <span className="rounded-md bg-purple-500/10 px-2 py-0.5 text-[9px] font-black tracking-[0.1em] text-purple-400/80 uppercase border border-purple-500/20">
+                  <span className="rounded-md bg-orange-500/10 px-2 py-0.5 text-[9px] font-black tracking-[0.1em] text-orange-400/80 uppercase border border-orange-500/20">
                     {formatType(item.types)}
                   </span>
                   <span className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest">
@@ -491,7 +491,7 @@ export default function ExperiencesSection({
             {pulseTags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-2.5 py-1 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/50 transition-colors duration-200 group-hover/card:border-purple-500/15 group-hover/card:text-foreground/60"
+                className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-2.5 py-1 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/50 transition-colors duration-200 group-hover/card:border-orange-500/15 group-hover/card:text-foreground/60"
               >
                 {tag}
               </span>
@@ -505,15 +505,15 @@ export default function ExperiencesSection({
 
           {/* Insider Tips */}
           {insiderTips.length > 0 && (
-            <div className="rounded-xl border border-purple-500/10 bg-purple-500/[0.04] p-3.5">
-              <div className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-purple-300/70">
+            <div className="rounded-xl border border-orange-500/10 bg-orange-500/[0.04] p-3.5">
+              <div className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-orange-400/70">
                 <Compass className="h-3 w-3" />
                 Insider tips
               </div>
               <div className="space-y-1 text-[11px] leading-relaxed text-foreground/70">
                 {insiderTips.map((tip) => (
                   <div key={tip} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-purple-400/40" />
+                    <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-orange-500/40" />
                     <span>{tip}</span>
                   </div>
                 ))}
@@ -539,8 +539,8 @@ export default function ExperiencesSection({
             <button
               onClick={() => toggleSave(item, activeTab)}
               className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-all active:scale-95 ${savedIds.has(item.id)
-                ? "border-purple-500/30 bg-purple-500/10 text-purple-200 hover:border-purple-400/40"
-                : "border-foreground/10 bg-foreground/[0.03] text-foreground/50 hover:border-purple-500/20 hover:text-foreground"
+                ? "border-orange-500/30 bg-orange-500/10 text-orange-400 hover:border-orange-500/40"
+                : "border-foreground/10 bg-foreground/[0.03] text-foreground/50 hover:border-orange-500/20 hover:text-foreground"
                 }`}
               aria-pressed={savedIds.has(item.id)}
             >
@@ -558,7 +558,7 @@ export default function ExperiencesSection({
             </button>
             <button
               onClick={() => toggleExpand(item.id)}
-              className="flex items-center gap-2 rounded-xl border border-foreground/10 bg-foreground/[0.03] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-foreground/50 transition-all hover:border-purple-500/20 hover:text-foreground active:scale-95"
+              className="flex items-center gap-2 rounded-xl border border-foreground/10 bg-foreground/[0.03] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-foreground/50 transition-all hover:border-orange-500/20 hover:text-foreground active:scale-95"
               aria-expanded={isExpanded}
             >
               {isExpanded ? "Hide notes" : "Add insight"}
@@ -577,8 +577,8 @@ export default function ExperiencesSection({
                 className="w-full space-y-3 border-t border-foreground/5 pt-4"
               >
                 {savedNote && (
-                  <div className="rounded-xl border border-purple-500/15 bg-purple-500/5 p-4 text-sm text-purple-100/90">
-                    <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-purple-200/80">
+                  <div className="rounded-xl border border-orange-500/15 bg-orange-500/5 p-4 text-sm text-orange-400/90">
+                    <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400/80">
                       Your note
                     </div>
                     <div className="leading-relaxed text-foreground/90">{savedNote}</div>
@@ -602,13 +602,13 @@ export default function ExperiencesSection({
                       }}
                       rows={2}
                       maxLength={280}
-                      className="w-full rounded-xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition-colors duration-100 focus:border-purple-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-purple-500/20"
+                      className="w-full rounded-xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition-colors duration-100 focus:border-orange-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-orange-500/20"
                       placeholder="Share a quick tip, vibe, or hidden detail..."
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => saveNote(item.id, noteValue)}
-                        className="rounded-xl border border-purple-500/30 bg-purple-500/20 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-purple-50 transition-colors duration-100 hover:border-purple-400/50 hover:bg-purple-500/30"
+                        className="rounded-xl border border-orange-500/30 bg-orange-500/20 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-orange-400 transition-colors duration-100 hover:border-orange-500/50 hover:bg-orange-500/30"
                         disabled={!notesHydrated}
                       >
                         Save note
@@ -652,15 +652,15 @@ export default function ExperiencesSection({
                 {isActive && (
                   <motion.div
                     layoutId="active-tab"
-                    className="absolute inset-0 bg-purple-500/10 border border-purple-500/20 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(124,58,237,0.06)]"
+                    className="absolute inset-0 bg-orange-500/10 border border-orange-500/20 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(124,58,237,0.06)]"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                   />
                 )}
                 <Icon
-                  className={`relative z-10 w-3.5 h-3.5 md:w-4 md:h-4 transition-colors duration-200 ${isActive ? "text-purple-400" : "text-foreground/20"}`}
+                  className={`relative z-10 w-3.5 h-3.5 md:w-4 md:h-4 transition-colors duration-200 ${isActive ? "text-orange-400" : "text-foreground/20"}`}
                 />
                 <span className="relative z-10">{tab.label}</span>
-                <span className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black tabular-nums transition-colors duration-200 ${isActive ? "bg-purple-500/20 text-purple-300" : "bg-foreground/5 text-foreground/25"}`}>
+                <span className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black tabular-nums transition-colors duration-200 ${isActive ? "bg-orange-500/20 text-orange-400" : "bg-foreground/5 text-foreground/25"}`}>
                   {count}
                 </span>
               </button>
@@ -680,7 +680,7 @@ export default function ExperiencesSection({
               <button
                 onClick={() => setSelectedPrice(null)}
                 className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === null
-                  ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                  ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
                   : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                   }`}
               >
@@ -691,7 +691,7 @@ export default function ExperiencesSection({
                   key={level.id}
                   onClick={() => setSelectedPrice(level.id)}
                   className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === level.id
-                    ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                    ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
                     : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                     }`}
                 >
@@ -706,7 +706,7 @@ export default function ExperiencesSection({
       {/* Saved Places */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-foreground/50">
-          <Bookmark className="h-3.5 w-3.5 text-purple-400/70" />
+          <Bookmark className="h-3.5 w-3.5 text-orange-400/70" />
           <span>
             {savedForCity.length} saved in {cityName}
           </span>
@@ -721,11 +721,11 @@ export default function ExperiencesSection({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-all duration-200 hover:border-purple-500/30 hover:bg-purple-500/8 hover:text-foreground"
+              className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-all duration-200 hover:border-orange-500/30 hover:bg-orange-500/8 hover:text-foreground"
             >
-              <BookmarkCheck className="h-3.5 w-3.5 text-purple-400/70" />
+              <BookmarkCheck className="h-3.5 w-3.5 text-orange-400/70" />
               <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
-              <span className="text-[9px] uppercase tracking-[0.15em] text-foreground/30 group-hover:text-purple-300">
+              <span className="text-[9px] uppercase tracking-[0.15em] text-foreground/30 group-hover:text-orange-400">
                 {item.type}
               </span>
             </motion.a>

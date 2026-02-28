@@ -129,7 +129,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-purple-500/15 selection:text-purple-200`}
+        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-orange-500/15 selection:text-orange-200`}
       >
         <script
           type="application/ld+json"
@@ -150,7 +150,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500/50 sm:left-4 sm:top-4"
+              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-orange-500/50 sm:left-4 sm:top-4"
               style={{
                 marginLeft: "env(safe-area-inset-left, 0)",
                 marginTop: "env(safe-area-inset-top, 0)",

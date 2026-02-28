@@ -65,7 +65,7 @@ export default function VisualEffects() {
           {shouldReduceMotion ? (
             <>
               <div className="orb top-[-100px] left-[-100px] h-[500px] w-[500px] bg-blue-600/10" />
-              <div className="orb right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-purple-600/10" />
+              <div className="orb right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-orange-500/10" />
               <div className="orb top-[40%] left-[20%] h-[300px] w-[300px] bg-indigo-600/10" />
             </>
           ) : (
@@ -84,7 +84,7 @@ export default function VisualEffects() {
                   y: mousePos.y * 40,
                 }}
                 transition={{ type: "spring", damping: 25, stiffness: 40 }}
-                className="orb animation-delay-2000 right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-purple-600/10"
+                className="orb animation-delay-2000 right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-orange-500/10"
               />
               <motion.div
                 animate={{

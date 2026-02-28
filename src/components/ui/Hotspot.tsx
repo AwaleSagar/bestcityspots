@@ -111,7 +111,7 @@ export default function Hotspot({
           ${inline ? "ml-1" : ""}
           ${sizeClass}
           relative flex items-center justify-center cursor-pointer rounded-full
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50
+          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50
           touch-target
         `}
         style={{ minHeight: "24px", minWidth: "24px" }}

@@ -32,7 +32,7 @@ export default function MobileBottomNav() {
                 href={href}
                 className={`nav-link flex flex-col items-center justify-center gap-1.5 px-2 py-3.5 min-h-[var(--mobile-bottom-nav-height)] text-center transition-colors duration-300 ${
                   isActive
-                    ? "text-purple-400"
+                    ? "text-orange-400"
                     : "text-foreground/40 active:text-foreground/70"
                 }`}
                 aria-current={isActive ? "page" : undefined}

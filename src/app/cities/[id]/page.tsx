@@ -68,22 +68,22 @@ function MetricCard({
   );
 
   return (
-    <div className="group/metric relative overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-5 flex flex-col gap-4 transition-all duration-500 hover:border-purple-500/10">
+    <div className="group/metric relative overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-5 flex flex-col gap-4 transition-all duration-500 hover:border-orange-500/10">
       <div className="pointer-events-none absolute inset-0 -z-0 opacity-0 transition-opacity duration-700 group-hover/metric:opacity-100">
-        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-purple-500/40 to-transparent" />
+        <div className="animate-scan absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-orange-500/40 to-transparent" />
       </div>
 
       <div className="relative z-10 flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover/metric:border-purple-500/20 group-hover/metric:bg-purple-500/[0.06]">
-            <Icon className="h-5 w-5 text-purple-400/60 transition-colors duration-300 group-hover/metric:text-purple-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover/metric:border-orange-500/20 group-hover/metric:bg-orange-500/[0.06]">
+            <Icon className="h-5 w-5 text-orange-400/60 transition-colors duration-300 group-hover/metric:text-orange-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/35">
                 {label}
               </div>
-              <div className="hidden text-[8px] font-mono text-purple-500/25 group-hover/metric:block">
+              <div className="hidden text-[8px] font-mono text-orange-400/25 group-hover/metric:block">
                 ID_{debugId}
               </div>
             </div>
@@ -249,7 +249,7 @@ export default async function CityPage({
             href="/"
             className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/45 transition-colors duration-300 hover:text-foreground md:gap-4 py-2"
           >
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/30 group-hover:bg-purple-500/10 md:h-11 md:w-11">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-orange-500/30 group-hover:bg-orange-500/10 md:h-11 md:w-11">
               <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5 md:h-[18px] md:w-[18px]" />
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-[0.15em] md:text-xs">
@@ -262,8 +262,8 @@ export default async function CityPage({
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
             <header className="relative space-y-5 py-4 md:space-y-6 md:py-6 overflow-visible">
-              <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-purple-600/[0.05] blur-[150px] animate-pulse-glow" />
-              <div className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-purple-400/60 uppercase">
+              <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-orange-500/[0.05] blur-[150px] animate-pulse-glow" />
+              <div className="flex items-center gap-4 text-[11px] font-semibold tracking-[0.3em] text-orange-400/60 uppercase">
                 <Navigation className="h-4 w-4" />
                 {city.iso3} <span className="text-foreground/15">/&#47;</span>{" "}
                 {city.capital || "Urban Center"}
@@ -284,10 +284,10 @@ export default async function CityPage({
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-purple-500/10 hover:shadow-xl">
+              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-orange-500/10 hover:shadow-xl">
                 <div className="mb-6 flex items-center gap-4 text-foreground/35">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors duration-300 group-hover/card:bg-purple-500/10">
-                    <Users className="h-5 w-5 text-purple-400/70 transition-colors group-hover/card:text-purple-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/[0.06] transition-colors duration-300 group-hover/card:bg-orange-500/10">
+                    <Users className="h-5 w-5 text-orange-400/70 transition-colors group-hover/card:text-orange-400" />
                   </div>
                   <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
                     Census Data
@@ -301,10 +301,10 @@ export default async function CityPage({
                 </div>
               </div>
 
-              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-purple-500/10 hover:shadow-xl">
+              <div className="group/card rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-8 md:rounded-3xl md:p-10 transition-all duration-500 hover:border-orange-500/10 hover:shadow-xl">
                 <div className="mb-6 flex items-center gap-4 text-foreground/35">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/[0.06] transition-colors group-hover/card:bg-purple-500/10">
-                    <MapPin className="h-5 w-5 text-purple-400/70 transition-colors group-hover/card:text-purple-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/[0.06] transition-colors group-hover/card:bg-orange-500/10">
+                    <MapPin className="h-5 w-5 text-orange-400/70 transition-colors group-hover/card:text-orange-400" />
                   </div>
                   <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
                     Territory
@@ -362,7 +362,7 @@ export default async function CityPage({
                     className="rounded-2xl border border-foreground/[0.04] bg-foreground/[0.01] p-5 transition-all duration-500 hover:border-foreground/[0.08]"
                   >
                     <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground/40">
-                      <ItemIcon className="h-4 w-4 text-purple-400/60" />
+                      <ItemIcon className="h-4 w-4 text-orange-400/60" />
                       {title}
                     </div>
                     <p className="text-sm leading-relaxed text-foreground/45">{text}</p>
@@ -387,7 +387,7 @@ export default async function CityPage({
               </p>
               <Link
                 href="/resources/top-cities"
-                className="block w-full rounded-2xl border border-purple-400/25 bg-purple-500/10 py-5 md:py-6 text-center text-base font-semibold text-foreground transition-all duration-300 hover:bg-purple-500/15 hover:border-purple-400/35 hover:shadow-lg hover:shadow-purple-500/5"
+                className="block w-full rounded-2xl border border-orange-500/25 bg-orange-500/10 py-5 md:py-6 text-center text-base font-semibold text-foreground transition-all duration-300 hover:bg-orange-500/15 hover:border-orange-500/35 hover:shadow-lg hover:shadow-orange-500/5"
               >
                 Browse Free City Guide
               </Link>

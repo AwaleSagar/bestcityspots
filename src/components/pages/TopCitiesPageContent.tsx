@@ -55,14 +55,14 @@ function FeaturedCityCard({ city, rank }: { city: City; rank: number }) {
     >
       <Link
         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-        className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-6 transition-all duration-500 hover:border-purple-500/15 hover:shadow-xl md:rounded-3xl md:p-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40"
+        className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-6 transition-all duration-500 hover:border-orange-500/15 hover:shadow-xl md:rounded-3xl md:p-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40"
       >
         {/* Rank */}
         <div className="mb-6 flex items-start justify-between">
           <span className="text-5xl font-bold tracking-[-0.04em] text-foreground/[0.06] md:text-6xl">
             {String(rank).padStart(2, "0")}
           </span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] text-foreground/30 transition-all duration-300 group-hover:border-purple-500/25 group-hover:bg-purple-500/8 group-hover:text-purple-400">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] text-foreground/30 transition-all duration-300 group-hover:border-orange-500/25 group-hover:bg-orange-500/8 group-hover:text-orange-400">
             <ArrowUpRight className="h-4 w-4" />
           </div>
         </div>
@@ -113,7 +113,7 @@ function CityRow({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
       href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-      className="group flex items-center gap-4 rounded-xl border border-transparent px-4 py-3.5 transition-all duration-300 hover:border-foreground/[0.05] hover:bg-foreground/[0.015] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40 sm:px-5 sm:py-4 md:gap-5"
+      className="group flex items-center gap-4 rounded-xl border border-transparent px-4 py-3.5 transition-all duration-300 hover:border-foreground/[0.05] hover:bg-foreground/[0.015] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40 sm:px-5 sm:py-4 md:gap-5"
     >
       {/* Rank */}
       <span className="w-8 flex-shrink-0 text-right font-mono text-sm text-foreground/20 md:w-10">
@@ -195,7 +195,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                 href="/"
                 className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/40 transition-colors duration-300 hover:text-foreground py-2"
               >
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-purple-500/25 group-hover:bg-purple-500/8">
+                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-orange-500/25 group-hover:bg-orange-500/8">
                   <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" aria-hidden />
                 </span>
                 <span className="text-[11px] font-medium uppercase tracking-[0.15em]">
@@ -265,7 +265,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                   Cities are ranked by metropolitan population using data from public census
                   databases and verified geographic sources. All data is refreshable and
                   cross-referenced — see{" "}
-                  <Link href="/about" className="text-purple-400/60 underline underline-offset-2 decoration-purple-400/20 hover:text-purple-400 transition-colors">
+                  <Link href="/about" className="text-orange-400/60 underline underline-offset-2 decoration-orange-400/20 hover:text-orange-400 transition-colors">
                     our data sources
                   </Link>{" "}
                   for full transparency. Rankings reflect urban scale; individual city
