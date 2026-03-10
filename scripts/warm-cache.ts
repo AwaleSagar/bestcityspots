@@ -108,16 +108,33 @@ const INSIGHTS_WARM_THRESHOLD_DAYS = CACHE_TTL.INSIGHTS_FRESH_DAYS - 35; // Warm
 const WEATHER_WARM_THRESHOLD_MINUTES = CACHE_TTL.WEATHER_FRESH_MINUTES - 10; // Warm 10 min before expiry
 const METRICS_WARM_THRESHOLD_MINUTES = CACHE_TTL.METRICS_FRESH_MINUTES - 10;
 
+function getAqiLabel(aqi: number): string {
+  switch (aqi) {
+    case 1:
+      return "Good";
+    case 2:
+      return "Fair";
+    case 3:
+      return "Moderate";
+    case 4:
+      return "Poor";
+    case 5:
+      return "Very Poor";
+    default:
+      return "Unknown";
+  }
+}
+
 // ============================================================================
 // Supabase Client
 // ============================================================================
 
 function createSupabaseClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
-    console.error("Error: Missing NEXT_PUBLIC_SUPABASE_URL or Supabase key");
+    console.error("Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
     process.exit(1);
   }
 
@@ -238,7 +255,7 @@ Examples:
 
 Environment Variables Required:
   NEXT_PUBLIC_SUPABASE_URL
-  NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_SERVICE_ROLE_KEY)
+  SUPABASE_SERVICE_ROLE_KEY
   GOOGLE_PLACES_API_KEY (for --places)
   GOOGLE_GEMINI_API_KEY (for --insights)
   OPENWEATHERMAP_API_KEY (for --weather)
@@ -482,10 +499,10 @@ async function warmPlacesCache(
         queryText = `Top landmarks and attractions in ${city.city}`;
         break;
       case "restaurants":
-        queryText = `Best restaurants and local food in ${city.city}`;
+        queryText = `Best restaurants, local food, street food, and cheap eats in ${city.city}`;
         break;
       case "hotels":
-        queryText = `Top rated hotels and places to stay in ${city.city}`;
+        queryText = `Top rated hotels, hostels, guest houses, and budget stays in ${city.city}`;
         break;
     }
 
@@ -495,7 +512,7 @@ async function warmPlacesCache(
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location,places.photos",
+          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location",
       },
       body: JSON.stringify({
         textQuery: queryText,
@@ -650,7 +667,7 @@ async function warmWeatherCache(
     const weather = await weatherRes.json();
     const aqiData = await aqiRes.json();
     const rawAqi = aqiData.list?.[0]?.main?.aqi;
-    const aqiLabels: Record<number, string> = { 1: "Good", 2: "Fair", 3: "Moderate", 4: "Poor", 5: "Very Poor" };
+    const aqiValue = typeof rawAqi === "number" ? rawAqi : 0;
 
     const row = {
       city_id: city.id,
@@ -662,8 +679,8 @@ async function warmWeatherCache(
       description: weather.weather?.[0]?.description || "unknown",
       icon: weather.weather?.[0]?.icon || "",
       wind_speed: weather.wind?.speed || 0,
-      aqi: typeof rawAqi === "number" ? rawAqi : 0,
-      aqi_label: aqiLabels[rawAqi] || "Unknown",
+      aqi: aqiValue,
+      aqi_label: getAqiLabel(aqiValue),
       updated_at: new Date().toISOString(),
     };
 

@@ -12,12 +12,34 @@ const IMAGE_MAX_WIDTH = 800;
 const IMAGE_MAX_HEIGHT = 600;
 const BLURHASH_COMPONENT_X = 4;
 const BLURHASH_COMPONENT_Y = 3;
+const PLACE_IMAGE_BATCH_SIZE = 3;
+const PLACE_IMAGE_ENRICH_LIMIT = 8;
+const PLACE_QUERY_RESULT_LIMIT = 50;
+const MIN_RESULTS_BEFORE_FALLBACK = 8;
+const MIN_BUDGET_RESULTS = 2;
+const BUDGET_PRICE_LEVELS = new Set(["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE"]);
+const inFlightPlacesRequests = new Map<string, Promise<Landmark[]>>();
+
+let hasWarnedMissingServiceRole = false;
 
 // Result type for image resolution with BlurHash
 interface ImageResult {
   imageUrl: string;
   blurhash: string;
 }
+
+type CachedLandmark = Landmark & {
+  imageUrls?: string[];
+};
+
+type PlaceType = "landmarks" | "restaurants" | "hotels";
+
+type TopPlacesOptions = {
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+  _bypassCache?: boolean;
+};
 
 export interface Landmark {
   id: string;
@@ -41,6 +63,268 @@ type GooglePlacePhoto = { name: string };
 type GooglePlace = Landmark & {
   photos?: GooglePlacePhoto[];
 };
+
+function getPlacesWriteClient() {
+  if (supabaseServer) {
+    return supabaseServer;
+  }
+
+  if (!hasWarnedMissingServiceRole) {
+    hasWarnedMissingServiceRole = true;
+    console.warn("[places] SUPABASE_SERVICE_ROLE_KEY missing; cache writes and image uploads are disabled.");
+  }
+
+  return null;
+}
+
+function buildPlacesRequestKey(cityName: string, type: PlaceType, opts?: TopPlacesOptions): string {
+  const lat = typeof opts?.lat === "number" ? opts.lat.toFixed(3) : "na";
+  const lng = typeof opts?.lng === "number" ? opts.lng.toFixed(3) : "na";
+  const radius = typeof opts?.radiusKm === "number" ? opts.radiusKm.toFixed(0) : "default";
+  return [cityName.toLowerCase(), type, lat, lng, radius].join(":");
+}
+
+function getPrimaryQuery(cityName: string, type: PlaceType): string {
+  switch (type) {
+    case "landmarks":
+      return `Top landmarks and attractions in ${cityName}`;
+    case "restaurants":
+      return `Best restaurants, local food, street food, and cheap eats in ${cityName}`;
+    case "hotels":
+      return `Top rated hotels, hostels, guest houses, and budget stays in ${cityName}`;
+  }
+}
+
+function getFallbackBudgetQuery(cityName: string, type: PlaceType): string | null {
+  switch (type) {
+    case "restaurants":
+      return `Best cheap eats and budget restaurants in ${cityName}`;
+    case "hotels":
+      return `Best budget hotels, hostels, and guest houses in ${cityName}`;
+    default:
+      return null;
+  }
+}
+
+function inferBudgetPlaces(places: GooglePlace[]): void {
+  places.forEach((place) => {
+    if (!place.priceLevel) {
+      place.priceLevel = "PRICE_LEVEL_INEXPENSIVE";
+    }
+  });
+}
+
+function dedupePlaces(places: GooglePlace[]): GooglePlace[] {
+  const uniqueMap = new Map<string, GooglePlace>();
+  places.forEach((place) => {
+    uniqueMap.set(place.id, place);
+  });
+  return Array.from(uniqueMap.values());
+}
+
+function hasBudgetCoverage(places: Landmark[]): boolean {
+  let budgetCount = 0;
+  for (const place of places.slice(0, 12)) {
+    if (place.priceLevel && BUDGET_PRICE_LEVELS.has(place.priceLevel)) {
+      budgetCount += 1;
+    }
+    if (budgetCount >= MIN_BUDGET_RESULTS) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isBudgetSensitive(type: PlaceType): boolean {
+  return type === "restaurants" || type === "hotels";
+}
+
+function stripPhotoMetadata(places: GooglePlace[]): void {
+  places.forEach((place) => {
+    delete place.photos;
+  });
+}
+
+function filterPlacesByRadius(
+  places: GooglePlace[],
+  centerLat: number,
+  centerLng: number,
+  effectiveRadiusKm: number
+): GooglePlace[] {
+  const filtered = places.filter((place) => {
+    const lat = place.location?.latitude;
+    const lng = place.location?.longitude;
+    if (typeof lat !== "number" || typeof lng !== "number") return true;
+    return haversineKm(centerLat, centerLng, lat, lng) <= effectiveRadiusKm;
+  });
+
+  return filtered.length > 0 ? filtered : places;
+}
+
+async function savePlacesCache(
+  cityName: string,
+  type: PlaceType,
+  places: Landmark[],
+  updatedAt = new Date().toISOString()
+): Promise<void> {
+  const client = getPlacesWriteClient();
+  if (!client || places.length === 0) {
+    return;
+  }
+
+  const { error } = await client.from("city_places_cache").upsert(
+    {
+      city_name: cityName,
+      place_type: type,
+      places_data: places,
+      updated_at: updatedAt,
+    },
+    { onConflict: "city_name,place_type" }
+  );
+
+  if (error) {
+    console.warn(`[places] Failed to save cache for ${cityName}/${type}:`, error.message);
+  }
+}
+
+function recordPlacesCacheEvent(type: PlaceType, isHit: boolean): void {
+  const client = getPlacesWriteClient();
+  if (!client) {
+    return;
+  }
+
+  void (async () => {
+    try {
+      const { error } = await client.rpc("record_cache_event", {
+        p_cache_type: `places:${type}`,
+        p_is_hit: isHit,
+      });
+
+      if (error) {
+        console.warn(`[places] Failed to record cache event for ${type}:`, error.message);
+      }
+    } catch (error) {
+      console.warn(`[places] Failed to record cache event for ${type}:`, error);
+    }
+  })();
+}
+
+async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[], apiKey: string): Promise<void> {
+  const targets = rankedPlaces.slice(0, PLACE_IMAGE_ENRICH_LIMIT);
+
+  for (let i = 0; i < targets.length; i += PLACE_IMAGE_BATCH_SIZE) {
+    const batch = targets.slice(i, i + PLACE_IMAGE_BATCH_SIZE);
+    await Promise.all(
+      batch.map(async (place) => {
+        const photo = place.photos?.[0];
+        if (!photo?.name || !place.id) return;
+
+        const landmark = place as Landmark;
+        const result = await resolvePlaceImage(
+          place.id,
+          photo.name,
+          apiKey,
+          landmark.blurhash
+        );
+
+        if (result) {
+          landmark.imageUrl = result.imageUrl;
+          landmark.blurhash = result.blurhash;
+        }
+      })
+    );
+  }
+}
+
+async function fetchFreshPlaces(
+  cityName: string,
+  type: PlaceType,
+  apiKey: string,
+  opts?: TopPlacesOptions
+): Promise<Landmark[]> {
+  const requestedRadiusKm = opts?.radiusKm ?? 90;
+  const apiMaxRadiusKm = 50;
+  const effectiveRadiusKm = Math.min(requestedRadiusKm, apiMaxRadiusKm);
+  const centerLat = opts?.lat;
+  const centerLng = opts?.lng;
+  const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
+
+  const primaryPlaces = await fetchFromGoogle(cityName, getPrimaryQuery(cityName, type), apiKey, {
+    lat: centerLat,
+    lng: centerLng,
+    effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
+  });
+
+  let places = primaryPlaces;
+
+  if (hasCoords) {
+    places = filterPlacesByRadius(places, centerLat, centerLng, effectiveRadiusKm);
+  }
+
+  let rankedPlaces = rankingEngine.rank(dedupePlaces(places));
+  const fallbackQuery = getFallbackBudgetQuery(cityName, type);
+  const shouldRunFallback = Boolean(
+    fallbackQuery && (
+      rankedPlaces.length < MIN_RESULTS_BEFORE_FALLBACK ||
+      (isBudgetSensitive(type) && !hasBudgetCoverage(rankedPlaces))
+    )
+  );
+
+  if (shouldRunFallback && fallbackQuery) {
+    const fallbackPlaces = await fetchFromGoogle(cityName, fallbackQuery, apiKey, {
+      lat: centerLat,
+      lng: centerLng,
+      effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
+    });
+
+    inferBudgetPlaces(fallbackPlaces);
+
+    const mergedPlaces = hasCoords
+      ? filterPlacesByRadius([...places, ...fallbackPlaces], centerLat, centerLng, effectiveRadiusKm)
+      : [...places, ...fallbackPlaces];
+
+    rankedPlaces = rankingEngine.rank(dedupePlaces(mergedPlaces));
+  }
+
+  if (rankedPlaces.length === 0) {
+    console.info("[places] No places returned after search", { cityName, type });
+    return [];
+  }
+
+  const rankedGooglePlaces = rankedPlaces as GooglePlace[];
+  await enrichRankedPlaceImages(rankedGooglePlaces, apiKey);
+  stripPhotoMetadata(rankedGooglePlaces);
+
+  return rankedGooglePlaces;
+}
+
+async function fetchAndCachePlaces(
+  cityName: string,
+  type: PlaceType,
+  opts?: TopPlacesOptions
+): Promise<Landmark[]> {
+  const requestKey = buildPlacesRequestKey(cityName, type, opts);
+  const existingRequest = inFlightPlacesRequests.get(requestKey);
+  if (existingRequest) {
+    return existingRequest;
+  }
+
+  const request = (async () => {
+    recordPlacesCacheEvent(type, false);
+    const freshPlaces = await fetchFreshPlaces(cityName, type, API_KEY!, opts);
+
+    if (freshPlaces.length > 0) {
+      await savePlacesCache(cityName, type, freshPlaces);
+    }
+
+    return freshPlaces;
+  })().finally(() => {
+    inFlightPlacesRequests.delete(requestKey);
+  });
+
+  inFlightPlacesRequests.set(requestKey, request);
+  return request;
+}
 
 // Generate BlurHash from image buffer using sharp
 async function generateBlurhash(imageBuffer: ArrayBuffer): Promise<string | undefined> {
@@ -68,6 +352,48 @@ async function generateBlurhash(imageBuffer: ArrayBuffer): Promise<string | unde
   }
 }
 
+function buildPlaceImagePublicUrl(placeId: string, supabaseUrl: string): string {
+  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${placeId}.jpg`;
+}
+
+function normalizeCachedPlace(place: Landmark, supabaseUrl: string): {
+  place: CachedLandmark;
+  changed: boolean;
+} {
+  const normalizedPlace: CachedLandmark = { ...place };
+  const expectedUrl = buildPlaceImagePublicUrl(place.id, supabaseUrl);
+  const bucketPath = `/storage/v1/object/public/${BUCKET}/`;
+  let changed = false;
+
+  if (
+    typeof normalizedPlace.imageUrl === "string" &&
+    normalizedPlace.imageUrl.includes(bucketPath) &&
+    normalizedPlace.imageUrl !== expectedUrl
+  ) {
+    normalizedPlace.imageUrl = expectedUrl;
+    changed = true;
+  }
+
+  const extraImageUrls = (place as CachedLandmark).imageUrls;
+  if (Array.isArray(extraImageUrls)) {
+    const normalizedImageUrls = extraImageUrls
+      .filter((value): value is string => typeof value === "string" && value.length > 0)
+      .map((value) => (value.includes(bucketPath) ? expectedUrl : value));
+
+    if (JSON.stringify(extraImageUrls) !== JSON.stringify(normalizedImageUrls)) {
+      normalizedPlace.imageUrls = normalizedImageUrls;
+      changed = true;
+    }
+
+    if (!normalizedPlace.imageUrl && normalizedImageUrls.includes(expectedUrl)) {
+      normalizedPlace.imageUrl = expectedUrl;
+      changed = true;
+    }
+  }
+
+  return { place: normalizedPlace, changed };
+}
+
 // Resolve place photo to Supabase Storage URL (fetch from Google, upload, return public URL)
 // Also generates BlurHash for LQIP placeholder
 async function resolvePlaceImage(
@@ -76,12 +402,12 @@ async function resolvePlaceImage(
   apiKey: string,
   existingBlurhash?: string
 ): Promise<ImageResult | undefined> {
-  const client = supabaseServer ?? supabase;
+  const client = getPlacesWriteClient();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   if (!supabaseUrl) return undefined;
 
   const storagePath = `${placeId}.jpg`;
-  const publicUrl = `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${storagePath}`;
+  const publicUrl = buildPlaceImagePublicUrl(placeId, supabaseUrl);
 
   try {
     // Check if image already exists in storage
@@ -110,6 +436,10 @@ async function resolvePlaceImage(
 
     // Generate BlurHash before uploading
     const blurhash = await generateBlurhash(arrayBuffer);
+
+    if (!client) {
+      return undefined;
+    }
 
     // Upload to Supabase Storage
     const { error } = await client.storage
@@ -149,7 +479,7 @@ async function fetchFromGoogle(
       },
       body: JSON.stringify({
         textQuery: queryText,
-        maxResultCount: 50,
+        maxResultCount: PLACE_QUERY_RESULT_LIMIT,
         locationBias:
           opts?.lat && opts?.lng && opts?.effectiveRadiusKm
             ? {
@@ -185,8 +515,8 @@ async function fetchFromGoogle(
  */
 async function refreshPlacesInBackground(
   cityName: string,
-  type: "landmarks" | "restaurants" | "hotels",
-  opts?: { lat?: number; lng?: number; radiusKm?: number },
+  type: PlaceType,
+  opts?: TopPlacesOptions,
 ): Promise<void> {
   try {
     await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
@@ -197,8 +527,8 @@ async function refreshPlacesInBackground(
 
 export async function getTopPlaces(
   cityName: string,
-  type: "landmarks" | "restaurants" | "hotels",
-  opts?: { lat?: number; lng?: number; radiusKm?: number; _bypassCache?: boolean }
+  type: PlaceType,
+  opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
   if (!API_KEY) {
     console.warn(`[places] Missing API key; returning empty for ${cityName} / ${type}`);
@@ -206,13 +536,6 @@ export async function getTopPlaces(
   }
 
   try {
-    const requestedRadiusKm = opts?.radiusKm ?? 90; // generous metro radius
-    const apiMaxRadiusKm = 50; // Google Places API limit
-    const effectiveRadiusKm = Math.min(requestedRadiusKm, apiMaxRadiusKm);
-    const centerLat = opts?.lat;
-    const centerLng = opts?.lng;
-    const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
-
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
     const { data: cache } = bypassCache ? { data: null } : await supabase
@@ -228,146 +551,32 @@ export async function getTopPlaces(
       const daysSinceUpdate = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
 
       if (daysSinceUpdate < CACHE_TTL.PLACES_FRESH_DAYS) {
-        const cachedPlaces = (cache.places_data || []) as Landmark[];
+        recordPlacesCacheEvent(type, true);
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const cachedPlacesRaw = (cache.places_data || []) as Landmark[];
+        const normalizedResults = supabaseUrl
+          ? cachedPlacesRaw.map((place) => normalizeCachedPlace(place, supabaseUrl))
+          : cachedPlacesRaw.map((place) => ({ place, changed: false }));
+        const cachedPlaces = normalizedResults.map((result) => result.place);
+        const normalizedChanged = normalizedResults.some((result) => result.changed);
 
-        const isBudgetSensitive = type === "restaurants" || type === "hotels";
-        const hasBudget = cachedPlaces.some(
-          (p) => p.priceLevel === "PRICE_LEVEL_INEXPENSIVE" || p.priceLevel === "PRICE_LEVEL_FREE"
-        );
-        const hasImages = cachedPlaces.some((p) => !!p.imageUrl);
-
-        const isQualityOk = (!isBudgetSensitive || hasBudget) && hasImages;
-
-        if (isQualityOk) {
-          if (daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS) {
-            // 7-30 day window: serve stale, refresh in background (fire-and-forget)
-            refreshPlacesInBackground(cityName, type, opts).catch(() => {});
-          }
-          return cachedPlaces;
+        if (normalizedChanged) {
+          void savePlacesCache(cityName, type, cachedPlaces, cache.updated_at);
         }
-        if (!hasImages) {
-          console.info(`[places] Cache hit but missing images for ${type}. Forcing refetch...`);
-        } else {
-          console.info(
-            `[places] Cache hit but missing budget options for ${type}. Forcing refetch...`
-          );
+
+        const shouldRefreshForAge = daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS;
+        const shouldRefreshForCoverage = isBudgetSensitive(type) && !hasBudgetCoverage(cachedPlaces);
+        const shouldRefreshForImages = !cachedPlaces.some((place) => !!place.imageUrl);
+
+        if (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages) {
+          refreshPlacesInBackground(cityName, type, opts).catch(() => {});
         }
+
+        return cachedPlaces;
       }
     }
 
-    // 2. Multi-Query Strategy (Stratified Sampling)
-    // We explicitly ask for "Best" AND "Budget" to guarantee price diversity.
-    const queries: { text: string; isBudget: boolean }[] = [];
-
-    // Primary Query (General Quality)
-    switch (type) {
-      case "landmarks":
-        queries.push({ text: `Top landmarks and attractions in ${cityName}`, isBudget: false });
-        break;
-      case "restaurants":
-        queries.push({ text: `Best restaurants and local food in ${cityName}`, isBudget: false });
-        break;
-      case "hotels":
-        queries.push({ text: `Top rated hotels and places to stay in ${cityName}`, isBudget: false });
-        break;
-    }
-
-    // Budget Query (Explicit Low Cost) - Only for dining/stays
-    if (type === "restaurants") {
-      queries.push({ text: `Best cheap eats and budget restaurants in ${cityName}`, isBudget: true });
-    } else if (type === "hotels") {
-      // Explicitly include hostels/guest houses to find cheaper options
-      queries.push({ text: `Best budget hotels, hostels, and guest houses in ${cityName}`, isBudget: true });
-    }
-
-    // Run queries in parallel
-    const results = await Promise.all(
-      queries.map(async (q) => {
-        const places = await fetchFromGoogle(cityName, q.text, API_KEY, {
-          lat: centerLat,
-          lng: centerLng,
-          effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
-        });
-
-        // PRICE Level Inference:
-        // If we specifically searched for "budget/cheap" and Google gave us a result,
-        // but excluded the price level (common for hostels/small spots),
-        // we infer it as INEXPENSIVE so it shows up in the UI filter.
-        if (q.isBudget) {
-          places.forEach((p) => {
-            if (!p.priceLevel) {
-              p.priceLevel = "PRICE_LEVEL_INEXPENSIVE";
-            }
-          });
-        }
-        return places;
-      })
-    );
-
-    // Merge and Deduplicate
-    const allPlaces = results.flat();
-    const uniqueMap = new Map<string, GooglePlace>();
-    allPlaces.forEach((p) => uniqueMap.set(p.id, p));
-    let places: GooglePlace[] = Array.from(uniqueMap.values());
-
-    // Filter out obvious outliers when we have coordinates
-    if (hasCoords) {
-      const centerLatValue = centerLat as number;
-      const centerLngValue = centerLng as number;
-      const filtered = places.filter((place) => {
-        const lat = place.location?.latitude;
-        const lng = place.location?.longitude;
-        if (typeof lat !== "number" || typeof lng !== "number") return true;
-        return haversineKm(centerLatValue, centerLngValue, lat, lng) <= effectiveRadiusKm;
-      });
-
-      // If filtering nuked everything, fall back to the unfiltered list
-      places = filtered.length > 0 ? filtered : places;
-    }
-
-    if (places.length === 0) {
-      console.info("[places] No places returned after multi-query", {
-        cityName,
-        type,
-      });
-    }
-
-    // 2b. Enrich places with cached images and BlurHash (fetch from Google, upload to Supabase)
-    const BATCH_SIZE = 3;
-    for (let i = 0; i < places.length; i += BATCH_SIZE) {
-      const batch = places.slice(i, i + BATCH_SIZE);
-      await Promise.all(
-        batch.map(async (place) => {
-          const photo = place.photos?.[0];
-          if (!photo?.name || !place.id) return;
-          const landmark = place as Landmark;
-          const result = await resolvePlaceImage(
-            place.id,
-            photo.name,
-            API_KEY,
-            landmark.blurhash
-          );
-          if (result) {
-            landmark.imageUrl = result.imageUrl;
-            landmark.blurhash = result.blurhash;
-          }
-          delete (place as GooglePlace).photos;
-        })
-      );
-    }
-
-    // 3. Save ALL results back to Supabase
-    if (places.length > 0) {
-      await supabase.from("city_places_cache").upsert({
-        city_name: cityName,
-        place_type: type,
-        places_data: places,
-        updated_at: new Date().toISOString(),
-      });
-    }
-
-    // Default return: Ranking Engine sort (Bayesian + Virality)
-    return rankingEngine.rank(places);
+    return await fetchAndCachePlaces(cityName, type, opts);
   } catch (e) {
     console.error(`Failed to fetch ${type} for ${cityName}:`, e);
     return [];

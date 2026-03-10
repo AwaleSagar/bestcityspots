@@ -16,7 +16,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <div
-        className="rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md touch-target min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)]"
+        className="touch-target min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] rounded-full border border-line bg-surface/75 backdrop-blur-md"
         aria-hidden
       />
     );
@@ -26,7 +26,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="touch-target relative flex min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-xl border border-foreground/10 bg-background/20 backdrop-blur-md transition-colors duration-100 hover:bg-foreground/5"
+      className="touch-target relative flex min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-full border border-line bg-surface/75 backdrop-blur-md transition-colors duration-100 hover:bg-surface-strong/90"
       aria-label="Toggle theme"
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -38,7 +38,7 @@ export function ThemeToggle() {
             exit={{ scale: 0.5, opacity: 0, rotate: -90 }}
             transition={{ duration: 0.2 }}
           >
-            <Moon className="h-5 w-5 text-orange-400" />
+            <Moon className="h-5 w-5 text-accent" />
           </motion.div>
         ) : (
           <motion.div
@@ -48,7 +48,7 @@ export function ThemeToggle() {
             exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
             transition={{ duration: 0.2 }}
           >
-            <Sun className="h-5 w-5 text-amber-500" />
+            <Sun className="h-5 w-5 text-accent" />
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Geist_Mono, Sora } from "next/font/google";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -10,13 +10,18 @@ export const viewport: Viewport = {
   userScalable: true,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+    { media: "(prefers-color-scheme: light)", color: "#f4efe6" },
+    { media: "(prefers-color-scheme: dark)", color: "#020202" },
   ],
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
@@ -129,7 +134,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased selection:bg-orange-500/15 selection:text-orange-200`}
+        className={`${sora.variable} ${fraunces.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased`}
       >
         <script
           type="application/ld+json"
@@ -150,7 +155,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-xl border border-foreground/10 bg-background/90 px-4 py-3 text-xs font-black tracking-[0.2em] text-foreground/80 uppercase opacity-0 backdrop-blur-md transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-orange-500/50 sm:left-4 sm:top-4"
+              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-full border border-line bg-surface/95 px-4 py-3 text-[11px] font-semibold tracking-[0.24em] text-foreground uppercase opacity-0 shadow-lg backdrop-blur-xl transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent/40 sm:left-4 sm:top-4"
               style={{
                 marginLeft: "env(safe-area-inset-left, 0)",
                 marginTop: "env(safe-area-inset-top, 0)",

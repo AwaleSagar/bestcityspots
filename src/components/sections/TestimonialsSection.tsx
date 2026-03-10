@@ -43,89 +43,90 @@ const uniqueFeatures = [
 export default function TestimonialsSection() {
   return (
     <section
-      className="relative overflow-hidden rounded-[2rem] border border-foreground/[0.06] bg-foreground/[0.02] py-16 md:rounded-[2.5rem] md:py-24"
+      className="relative overflow-hidden rounded-[2rem] border border-line bg-surface/65 py-10 shadow-3xl backdrop-blur-xl md:rounded-[2.75rem] md:py-14"
       aria-labelledby="highlights-heading"
     >
-      {/* Decorative gradient */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -top-40 left-1/2 h-[500px] w-[600px] -translate-x-1/2 rounded-full bg-orange-500/[0.05] blur-[150px]" />
-        <div className="absolute bottom-0 right-0 h-[300px] w-[400px] rounded-full bg-amber-500/[0.04] blur-[120px]" />
+        <div className="absolute -top-24 left-10 h-56 w-56 rounded-full bg-[color:var(--liquid-glow-1)] blur-[120px]" />
+        <div className="absolute bottom-0 right-0 h-60 w-60 rounded-full bg-[color:var(--liquid-glow-2)] blur-[140px]" />
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 md:px-8">
+      <div className="mx-auto grid max-w-6xl gap-8 px-5 md:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
         <ScrollReveal animation="fade-up">
-          <div className="mb-14 text-center md:mb-20">
-            <span className="mb-4 inline-block text-[11px] font-bold tracking-[0.25em] text-orange-400/80 uppercase">
-              How It Works
-            </span>
+          <div className="rounded-[1.9rem] border border-line bg-background/40 p-6 md:p-8 lg:sticky lg:top-28">
+            <span className="section-heading">Use the atlas</span>
             <h2
               id="highlights-heading"
-              className="text-3xl font-bold tracking-[-0.02em] text-foreground md:text-4xl"
+              className="mt-4 text-[clamp(2rem,4vw,3.3rem)] leading-[0.98] text-foreground"
             >
-              Everything you need to explore
+              A travel tool that reads more like a briefing than a dashboard.
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-foreground/45 md:text-base">
-              Plan with confidence and discover with delight.
+            <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
+              The redesign pushes the product toward an editorial rhythm: fewer competing badges, stronger hierarchy, and clearer moments to search, compare, and commit.
             </p>
+            <div className="mt-8 grid gap-3 text-sm text-muted">
+              <div className="rounded-2xl border border-line bg-surface/65 px-4 py-3">Read the city summary before you start scanning details.</div>
+              <div className="rounded-2xl border border-line bg-surface/65 px-4 py-3">Keep pricing, local tips, and signals visible without overwhelming the first screen.</div>
+              <div className="rounded-2xl border border-line bg-surface/65 px-4 py-3">Let the product feel more intentional on mobile, not just compressed from desktop.</div>
+            </div>
           </div>
         </ScrollReveal>
 
-        <ul className="grid gap-6 md:grid-cols-3 md:gap-8" role="list">
+        <div className="space-y-5">
+          <ul className="grid gap-5 md:grid-cols-3" role="list">
           {highlights.map(({ text, label, icon: Icon }, idx) => (
             <ScrollReveal key={label} animation="fade-up" staggerIndex={idx} staggerDelay={0.15}>
               <motion.li
                 whileHover={{ y: -6 }}
                 transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="group relative flex flex-col gap-5 rounded-2xl border border-foreground/[0.07] bg-foreground/[0.03] p-7 transition-all duration-500 hover:border-orange-500/20 hover:shadow-lg hover:bg-foreground/[0.05] md:p-8"
+                className="group relative flex h-full flex-col gap-5 rounded-[1.8rem] border border-line bg-surface/70 p-5 transition-all duration-500 hover:border-accent/20 hover:shadow-lg md:p-6"
               >
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500/[0.1] border border-orange-500/[0.1] transition-colors duration-300 group-hover:bg-orange-500/[0.18]">
-                  <Icon className="h-5 w-5 text-orange-400/80 transition-colors group-hover:text-orange-400" aria-hidden />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-background/50 transition-colors duration-300">
+                  <Icon className="h-5 w-5 text-accent transition-colors" aria-hidden />
                 </div>
                 <div>
-                  <h3 className="mb-2 text-base font-bold tracking-tight text-foreground/90">
+                  <h3 className="mb-2 text-lg leading-tight text-foreground">
                     {label}
                   </h3>
-                  <p className="text-sm leading-relaxed text-foreground/45">
+                  <p className="text-sm leading-relaxed text-muted">
                     {text}
                   </p>
                 </div>
               </motion.li>
             </ScrollReveal>
           ))}
-        </ul>
+          </ul>
 
-        {/* Unique features */}
-        <div className="mt-20 md:mt-28">
           <ScrollReveal animation="fade-up">
-            <div className="mb-14 text-center">
-              <span className="mb-4 inline-block text-[11px] font-bold tracking-[0.25em] text-amber-400/80 uppercase">
+            <div className="pt-4">
+              <span className="mb-4 inline-block text-[11px] font-bold tracking-[0.25em] text-muted uppercase">
                 The Difference
               </span>
-              <h3 className="text-2xl font-bold tracking-[-0.02em] text-foreground md:text-3xl">
-                What makes us different
+              <h3 className="text-2xl text-foreground md:text-3xl">
+                What this direction changes
               </h3>
-              <p className="mx-auto mt-3 max-w-md text-sm text-foreground/45">
-                Curated, not scraped. Every recommendation is intentional.
+              <p className="mt-3 max-w-xl text-sm text-muted md:text-base">
+                The next layers of implementation will carry this same language into city detail pages, AI summaries, and cards with heavier interaction.
               </p>
             </div>
           </ScrollReveal>
 
-          <ul className="grid gap-6 md:grid-cols-3 md:gap-8" role="list">
+          <ul className="grid gap-5 md:grid-cols-3" role="list">
             {uniqueFeatures.map(({ icon: Icon, title, description }, idx) => (
               <ScrollReveal key={title} animation="fade-up" staggerIndex={idx} staggerDelay={0.15}>
                 <motion.li
                   whileHover={{ y: -6 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="group flex flex-col gap-5 rounded-2xl border border-amber-500/[0.1] bg-amber-500/[0.03] p-7 transition-all duration-500 hover:border-amber-500/25 hover:shadow-lg hover:bg-amber-500/[0.06] md:p-8"
+                  className="group flex h-full flex-col gap-5 rounded-[1.8rem] border border-line bg-background/35 p-5 transition-all duration-500 hover:border-accent/18 hover:shadow-lg md:p-6"
                 >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-500/[0.15] bg-amber-500/[0.08] transition-all duration-300 group-hover:bg-amber-500/[0.15] group-hover:border-amber-500/25">
-                    <Icon className="h-5 w-5 text-amber-400/80 transition-colors group-hover:text-amber-400" aria-hidden />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-surface/70 transition-all duration-300">
+                    <Icon className="h-5 w-5 text-accent transition-colors" aria-hidden />
                   </div>
                   <div>
-                    <h4 className="mb-2 text-base font-bold tracking-tight text-foreground/90">
+                    <h4 className="mb-2 text-lg leading-tight text-foreground">
                       {title}
                     </h4>
-                    <p className="text-sm leading-relaxed text-foreground/45">
+                    <p className="text-sm leading-relaxed text-muted">
                       {description}
                     </p>
                   </div>

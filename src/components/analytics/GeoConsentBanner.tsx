@@ -58,29 +58,27 @@ export function GeoConsentBanner() {
           animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md md:left-auto md:right-6 md:bottom-6"
+          className="fixed bottom-[calc(var(--mobile-bottom-nav-height)+1rem)] left-4 right-4 z-50 mx-auto max-w-md md:bottom-6 md:left-auto md:right-6"
           role="dialog"
           aria-labelledby="geo-consent-title"
           aria-describedby="geo-consent-description"
         >
-          <div className="relative overflow-hidden rounded-2xl border border-foreground/10 bg-background/95 p-5 shadow-2xl backdrop-blur-xl">
-            {/* Gradient accent */}
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 via-orange-500 to-pink-500" />
+          <div className="relative overflow-hidden rounded-[1.8rem] border border-line bg-surface-strong/95 p-5 shadow-2xl backdrop-blur-xl">
+            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[color:var(--color-brand-secondary)] via-[color:var(--color-accent)] to-[color:var(--color-accent-strong)]" />
 
             {/* Close button */}
             <button
               onClick={handleDismiss}
-              className="absolute right-3 top-3 rounded-full p-1.5 text-foreground/40 transition-colors hover:bg-foreground/10 hover:text-foreground/60"
+              className="absolute right-3 top-3 rounded-full p-1.5 text-muted transition-colors hover:bg-background/60 hover:text-foreground"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />
             </button>
 
-            {/* Content */}
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-orange-500/20">
-                  <MapPin className="h-5 w-5 text-blue-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent-soft text-accent">
+                  <MapPin className="h-5 w-5" />
                 </div>
               </div>
               <div className="flex-1 pr-6">
@@ -88,28 +86,25 @@ export function GeoConsentBanner() {
                   id="geo-consent-title"
                   className="text-sm font-semibold text-foreground"
                 >
-                  Help us improve
+                  Share your rough location?
                 </h3>
                 <p
                   id="geo-consent-description"
-                  className="mt-1 text-xs leading-relaxed text-foreground/60"
+                  className="mt-1 text-xs leading-relaxed text-muted"
                 >
-                  Share your general location to help us show relevant city
-                  content and improve our service. We only store aggregate data,
-                  never your exact location.
+                  We use general location data to surface more relevant city content and improve aggregate travel insights. Exact coordinates are not stored.
                 </p>
 
-                {/* Buttons */}
                 <div className="mt-4 flex gap-2">
                   <button
                     onClick={handleAccept}
-                    className="rounded-lg bg-gradient-to-r from-blue-600 to-orange-600 px-4 py-2 text-xs font-medium text-white transition-all hover:from-blue-500 hover:to-orange-600 hover:shadow-lg hover:shadow-orange-500/25"
+                    className="rounded-full bg-foreground px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-background transition-all hover:shadow-lg"
                   >
                     Allow
                   </button>
                   <button
                     onClick={handleDecline}
-                    className="rounded-lg border border-foreground/10 bg-foreground/5 px-4 py-2 text-xs font-medium text-foreground/70 transition-colors hover:bg-foreground/10 hover:text-foreground"
+                    className="rounded-full border border-line bg-background/45 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted transition-colors hover:text-foreground"
                   >
                     No thanks
                   </button>

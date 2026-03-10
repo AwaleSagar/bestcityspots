@@ -19,7 +19,6 @@ import {
   BookmarkCheck,
   BookmarkPlus,
   MapPin,
-  ExternalLink,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAnalytics } from "@/lib/useAnalytics";
@@ -282,6 +281,24 @@ export default function ExperiencesSection({
 
   const getNeighborhood = (address?: string) => address?.split(",")[0]?.trim();
 
+  const getAddressContext = (address?: string) => {
+    if (!address) return null;
+    const segments = address
+      .split(",")
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (segments.length === 0) return null;
+    if (segments.length === 1) {
+      return { primary: segments[0], secondary: null };
+    }
+
+    return {
+      primary: segments[0],
+      secondary: segments.slice(1, 3).join(" • "),
+    };
+  };
+
   const getInsiderTips = (place: Landmark) => {
     const tips: string[] = [];
     const name = place.displayName.text;
@@ -406,6 +423,12 @@ export default function ExperiencesSection({
     const isExpanded = expandedCards.has(item.id) || !!savedNote || !!noteValue;
     const pulseTags = getLocalPulseTags(item);
     const insiderTips = getInsiderTips(item);
+    const addressContext = getAddressContext(item.formattedAddress);
+    const primaryPulse = pulseTags[0] || formatType(item.types);
+    const ratingLabel = item.rating ? item.rating.toFixed(1) : null;
+    const reviewLabel = item.userRatingCount != null && item.userRatingCount > 0
+      ? `${formatPopulation(item.userRatingCount)} reviews`
+      : null;
 
     return (
       <motion.div
@@ -413,11 +436,11 @@ export default function ExperiencesSection({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}
-        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-2xl md:rounded-[2rem] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(124,58,237,0.08)] ${isFeatured ? "md:col-span-2" : ""}`}
+        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-[1.75rem] border border-white/6 transition-all duration-500 hover:-translate-y-1 hover:border-orange-500/15 hover:shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
       >
         {/* Image with Overlaid Info */}
         {item.imageUrl && (
-          <div className={`relative w-full shrink-0 overflow-hidden ${isFeatured ? "h-52 md:h-72" : "h-40 md:h-48"}`}>
+          <div className={`relative w-full shrink-0 overflow-hidden ${isFeatured ? "h-56 md:h-80" : "h-44 md:h-52"}`}>
             <OptimizedImage
               src={item.imageUrl}
               blurhash={item.blurhash}
@@ -427,141 +450,120 @@ export default function ExperiencesSection({
             />
             {/* Gradient overlay */}
             <div
-              className="pointer-events-none absolute inset-0 z-20 bg-gradient-to-t from-black/80 via-black/20 to-transparent"
+              className="pointer-events-none absolute inset-0 z-20 bg-[linear-gradient(180deg,rgba(4,4,4,0.2)_0%,rgba(4,4,4,0.04)_24%,rgba(4,4,4,0.48)_68%,rgba(4,4,4,0.9)_100%)]"
               aria-hidden="true"
             />
-            {/* Rating badge on image */}
-            {item.rating && (
-              <div className="absolute top-3 right-3 z-30 flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/10">
-                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                <span className="text-sm font-black tracking-tight text-white">
-                  {item.rating}
-                </span>
+            {/* Top-right: rating only */}
+            {ratingLabel && (
+              <div className="absolute right-4 top-4 z-30 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/50 px-2.5 py-1 text-[11px] font-black tracking-[0.06em] text-white backdrop-blur-md md:right-5 md:top-5">
+                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                <span>{ratingLabel}</span>
               </div>
             )}
-            {/* Price badge */}
-            {item.priceLevel && (
-              <div className="absolute top-3 left-3 z-30 rounded-full bg-black/50 px-3 py-1.5 text-[10px] font-black tracking-widest text-white/80 uppercase backdrop-blur-md border border-white/10">
-                {getPriceLevel(item.priceLevel)}
-              </div>
-            )}
-            {/* Title overlay on image */}
-            <div className="absolute bottom-0 left-0 right-0 z-30 p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="rounded-md bg-orange-500/30 px-2 py-0.5 text-[9px] md:text-[10px] font-black tracking-[0.1em] text-orange-400 uppercase border border-orange-500/20 backdrop-blur-sm">
-                  {formatType(item.types)}
-                </span>
-                <span className="text-[10px] md:text-[11px] font-bold text-white/60 uppercase tracking-widest truncate">
-                  {item.formattedAddress.split(",")[0]}
-                </span>
-              </div>
-              <h3 className={`font-black tracking-tight text-white leading-tight ${isFeatured ? "text-xl md:text-2xl" : "text-lg md:text-xl"}`}>
+            {/* Bottom: name + address */}
+            <div className="absolute inset-x-0 bottom-0 z-30 p-4 md:p-5">
+              <h3 className={`max-w-[16ch] text-white leading-[0.94] ${isFeatured ? "text-[1.75rem] md:text-[2.25rem]" : "text-[1.5rem] md:text-[1.75rem]"}`}>
                 {item.displayName.text}
               </h3>
+              {addressContext?.primary && (
+                <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="line-clamp-1">{addressContext.primary}</span>
+                  {addressContext.secondary && (
+                    <>
+                      <span className="text-white/25">·</span>
+                      <span className="line-clamp-1 text-white/35">{addressContext.secondary}</span>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Card Body */}
-        <div className={`flex flex-col gap-4 px-5 pb-5 md:px-6 md:pb-6 ${item.imageUrl ? "pt-4" : "pt-5 md:pt-6"}`}>
+        <div className={`flex flex-col gap-3 px-4 pb-4 md:px-5 md:pb-5 ${item.imageUrl ? "pt-3" : "pt-5 md:pt-6"}`}>
           {/* No-image fallback title */}
           {!item.imageUrl && (
-            <div className="flex items-start gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-foreground/5 bg-foreground/[0.02]" aria-hidden="true">
-                <Compass className="h-5 w-5 text-orange-400/60" />
-              </div>
-              <div>
-                <h3 className="text-lg font-black tracking-tight text-foreground/90">
-                  {item.displayName.text}
-                </h3>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <span className="rounded-md bg-orange-500/10 px-2 py-0.5 text-[9px] font-black tracking-[0.1em] text-orange-400/80 uppercase border border-orange-500/20">
-                    {formatType(item.types)}
-                  </span>
-                  <span className="text-[10px] font-bold text-foreground/50 uppercase tracking-widest">
-                    {item.formattedAddress.split(",")[0]}
-                  </span>
+            <div className="rounded-[1.35rem] border border-white/6 bg-foreground/[0.03] p-4">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-orange-500/15 bg-orange-500/10" aria-hidden="true">
+                  <Compass className="h-5 w-5 text-orange-400/70" />
+                </div>
+                <div className="min-w-0 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-orange-400/90">
+                      {primaryPulse}
+                    </span>
+                    {getPriceLevel(item.priceLevel) && (
+                      <span className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-foreground/55">
+                        {getPriceLevel(item.priceLevel)}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-[1.55rem] leading-[0.98] text-foreground/92">
+                    {item.displayName.text}
+                  </h3>
+                  {addressContext?.primary && (
+                    <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/48">
+                      <MapPin className="h-3.5 w-3.5 text-orange-400/70" />
+                      <span className="line-clamp-1">{addressContext.primary}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Pulse Tags + Reviews */}
-          <div className="flex flex-wrap items-center gap-2">
-            {pulseTags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-2.5 py-1 text-[9px] md:text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/50 transition-colors duration-200 group-hover/card:border-orange-500/15 group-hover/card:text-foreground/60"
-              >
-                {tag}
-              </span>
-            ))}
-            {item.userRatingCount != null && item.userRatingCount > 0 && (
-              <span className="ml-auto text-[10px] font-black text-foreground/35 uppercase tracking-widest">
-                {formatPopulation(item.userRatingCount)} reviews
-              </span>
-            )}
-          </div>
-
-          {/* Insider Tips */}
-          {insiderTips.length > 0 && (
-            <div className="rounded-xl border border-orange-500/10 bg-orange-500/[0.04] p-3.5">
-              <div className="mb-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] text-orange-400/70">
-                <Compass className="h-3 w-3" />
-                Insider tips
-              </div>
-              <div className="space-y-1 text-[11px] leading-relaxed text-foreground/70">
-                {insiderTips.map((tip) => (
-                  <div key={tip} className="flex items-start gap-2">
-                    <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-orange-500/40" />
-                    <span>{tip}</span>
-                  </div>
-                ))}
-              </div>
+          {/* Compact meta row — only shown when there's no image (image cards show this on the overlay) */}
+          {!item.imageUrl && (
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-foreground/40">
+              {ratingLabel && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/8 bg-foreground/[0.03] px-3 py-1">
+                  <Star className="h-3.5 w-3.5 fill-orange-400/85 text-orange-400/85" />
+                  <span>{ratingLabel}</span>
+                </span>
+              )}
+              {reviewLabel && (
+                <span className="rounded-full border border-foreground/8 bg-foreground/[0.03] px-3 py-1">
+                  {reviewLabel}
+                </span>
+              )}
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
+          {/* Action row — compact icons + labels */}
+          <div className="flex items-center gap-1.5">
             {item.googleMapsUri && (
               <a
                 href={item.googleMapsUri}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackAction("click_maps_link")}
-                className="flex items-center gap-2 rounded-xl border border-blue-500/25 bg-blue-500/8 px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-blue-300 transition-all hover:border-blue-400/40 hover:bg-blue-500/15 active:scale-95"
+                className="inline-flex items-center gap-1.5 rounded-full border border-foreground/8 bg-foreground/[0.03] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/50 transition-all hover:border-sky-500/25 hover:text-sky-300 active:scale-[0.97]"
               >
-                <MapPin className="h-3.5 w-3.5" />
-                <span>Maps</span>
-                <ExternalLink className="h-3 w-3 opacity-50" />
+                <MapPin className="h-3 w-3" />
+                Maps
               </a>
             )}
             <button
               onClick={() => toggleSave(item, activeTab)}
-              className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] transition-all active:scale-95 ${savedIds.has(item.id)
-                ? "border-orange-500/30 bg-orange-500/10 text-orange-400 hover:border-orange-500/40"
-                : "border-foreground/10 bg-foreground/[0.03] text-foreground/50 hover:border-orange-500/20 hover:text-foreground"
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] transition-all active:scale-[0.97] ${savedIds.has(item.id)
+                ? "border-orange-500/25 bg-orange-500/8 text-orange-300"
+                : "border-foreground/8 bg-foreground/[0.03] text-foreground/50 hover:border-orange-500/20 hover:text-foreground/75"
                 }`}
               aria-pressed={savedIds.has(item.id)}
             >
-              {savedIds.has(item.id) ? (
-                <>
-                  <BookmarkCheck className="h-3.5 w-3.5" />
-                  <span>Saved</span>
-                </>
-              ) : (
-                <>
-                  <BookmarkPlus className="h-3.5 w-3.5" />
-                  <span>Save</span>
-                </>
-              )}
+              {savedIds.has(item.id) ? <BookmarkCheck className="h-3 w-3" /> : <BookmarkPlus className="h-3 w-3" />}
+              {savedIds.has(item.id) ? "Saved" : "Save"}
             </button>
             <button
               onClick={() => toggleExpand(item.id)}
-              className="flex items-center gap-2 rounded-xl border border-foreground/10 bg-foreground/[0.03] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.12em] text-foreground/50 transition-all hover:border-orange-500/20 hover:text-foreground active:scale-95"
+              className="ml-auto inline-flex items-center gap-1 rounded-full border border-foreground/6 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/35 transition-all hover:border-orange-500/15 hover:text-foreground/60 active:scale-[0.97]"
               aria-expanded={isExpanded}
             >
-              {isExpanded ? "Hide notes" : "Add insight"}
+              <Compass className="h-3 w-3" />
+              {isExpanded ? "Hide" : "More"}
             </button>
           </div>
 
@@ -574,8 +576,19 @@ export default function ExperiencesSection({
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.25 }}
-                className="w-full space-y-3 border-t border-foreground/5 pt-4"
+                className="w-full space-y-3 border-t border-foreground/5 pt-3"
               >
+                {/* Insider Tips — shown on expand */}
+                {insiderTips.length > 0 && (
+                  <div className="space-y-1 text-[11px] leading-relaxed text-foreground/55">
+                    {insiderTips.map((tip) => (
+                      <div key={tip} className="flex items-start gap-2">
+                        <span className="mt-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-orange-500/40" />
+                        <span>{tip}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {savedNote && (
                   <div className="rounded-xl border border-orange-500/15 bg-orange-500/5 p-4 text-sm text-orange-400/90">
                     <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400/80">

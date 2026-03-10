@@ -50,6 +50,14 @@ const imageVariants = {
 const PLACEHOLDER_WIDTH = 32;
 const PLACEHOLDER_HEIGHT = 32;
 
+function shouldBypassNextImageOptimization(src: string): boolean {
+  try {
+    return new URL(src).pathname.includes("/storage/v1/object/public/place_images/");
+  } catch {
+    return src.includes("/storage/v1/object/public/place_images/");
+  }
+}
+
 /**
  * Decode BlurHash to a base64 data URL for instant placeholder rendering
  */
@@ -157,6 +165,7 @@ function OptimizedImageInner({
 
   // Generate sizes for responsive loading (Next.js handles srcset generation)
   const sizes = generateSizes(width);
+  const bypassOptimization = useMemo(() => shouldBypassNextImageOptimization(src), [src]);
 
   // Use fill mode if no explicit dimensions
   const useFillMode = !width || !height;
@@ -217,6 +226,7 @@ function OptimizedImageInner({
               alt={alt}
               fill
               sizes={sizes}
+              unoptimized={bypassOptimization}
               style={{ objectFit }}
               onLoad={handleLoad}
               onError={handleError}
@@ -230,6 +240,7 @@ function OptimizedImageInner({
               width={width}
               height={height}
               sizes={sizes}
+              unoptimized={bypassOptimization}
               style={{ objectFit }}
               onLoad={handleLoad}
               onError={handleError}

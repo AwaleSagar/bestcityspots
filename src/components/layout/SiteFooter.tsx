@@ -15,7 +15,7 @@ const companyLinks = [
 export default function SiteFooter() {
   return (
     <footer
-      className="relative border-t border-foreground/[0.05] bg-foreground/[0.015]"
+      className="relative border-t border-line/80 bg-surface/45"
       role="contentinfo"
       aria-label="Site footer"
     >
@@ -23,23 +23,29 @@ export default function SiteFooter() {
         className="container-gutter mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20"
         style={{ paddingBottom: "max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))" }}
       >
-        <div className="grid gap-12 md:grid-cols-3">
-          {/* Brand */}
-          <div>
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500/25 to-amber-500/10">
-                <MapPin className="h-4 w-4 text-orange-400" aria-hidden />
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
+          <div className="rounded-[2rem] border border-line bg-surface/70 p-6 shadow-lg backdrop-blur-xl md:p-8">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-accent-contrast shadow-sm">
+                <MapPin className="h-4 w-4" aria-hidden />
               </div>
-              <span className="text-sm font-bold tracking-tight text-foreground/90">Best City Spots</span>
+              <div>
+                <span className="block text-base font-semibold tracking-tight text-foreground">Best City Spots</span>
+                <span className="block text-[10px] font-medium uppercase tracking-[0.22em] text-muted">Editorial city intelligence</span>
+              </div>
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-foreground/35">
-              Curated city experiences for modern explorers. Powered by verified data and AI-assisted insights.
+            <p className="max-w-md text-sm leading-relaxed text-muted">
+              Best City Spots is built for travelers who want signal, not noise. We combine public data, live travel context, and AI-assisted summaries into a calmer way to choose where to go next.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
+              <span className="rounded-full border border-line bg-background/40 px-3 py-2">10,000+ cities</span>
+              <span className="rounded-full border border-line bg-background/40 px-3 py-2">Mobile-first guides</span>
+              <span className="rounded-full border border-line bg-background/40 px-3 py-2">Transparent sources</span>
+            </div>
           </div>
 
-          {/* Explore */}
           <div>
-            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/25">
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
               Explore
             </h3>
             <nav aria-label="Footer explore navigation">
@@ -48,7 +54,7 @@ export default function SiteFooter() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-muted transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35"
                     >
                       <Icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
                       {label}
@@ -59,9 +65,8 @@ export default function SiteFooter() {
             </nav>
           </div>
 
-          {/* Company */}
           <div>
-            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/25">
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
               Company
             </h3>
             <nav aria-label="Footer company navigation">
@@ -70,7 +75,7 @@ export default function SiteFooter() {
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center text-sm font-medium text-foreground/45 transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50"
+                      className="link touch-target inline-flex items-center text-sm font-medium text-muted transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35"
                     >
                       {label}
                     </Link>
@@ -81,12 +86,12 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-3 border-t border-foreground/[0.05] pt-8 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-foreground/25">
+        <div className="mt-16 flex flex-col gap-3 border-t border-line pt-8 md:flex-row md:items-center md:justify-between">
+          <p className="text-xs text-muted">
             &copy; {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
           </p>
-          <p className="text-xs text-foreground/25">
-            Made with ❤️ in Pune &middot; Sagar Awale
+          <p className="text-xs text-muted">
+            Made in Pune &middot; Designed for deliberate trips
           </p>
         </div>
       </div>
