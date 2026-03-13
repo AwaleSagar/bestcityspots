@@ -221,7 +221,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
       </label>
 
       <div className="group relative">
-        <Search className="absolute top-1/2 left-6 h-5 w-5 -translate-y-1/2 text-muted transition-all duration-300 group-focus-within:text-accent md:left-8 md:h-6 md:w-6" />
+        <Search className="absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 text-muted transition-all duration-300 group-focus-within:text-accent md:left-6 md:h-5 md:w-5" />
         <input
           id="city-search"
           ref={inputRef}
@@ -239,11 +239,11 @@ export default function CitySearch({ topCities }: CitySearchProps) {
           aria-expanded={shouldShowResults}
           aria-controls={resultsListId}
           aria-activedescendant={activeOptionId}
-          className="liquid-glass w-full rounded-[1.7rem] border border-line bg-background/30 py-5 pl-14 pr-16 text-base font-medium text-foreground shadow-lg transition-all duration-300 outline-none hover:border-accent/18 focus:border-accent/28 focus:ring-4 focus:ring-accent/10 focus:shadow-xl placeholder:text-muted md:rounded-[2rem] md:py-7 md:pl-[4.5rem] md:pr-20 md:text-xl"
+          className="liquid-glass w-full rounded-[1.25rem] border border-line bg-background/30 py-3.5 pl-12 pr-14 text-sm font-medium text-foreground shadow-lg transition-all duration-300 outline-none hover:border-accent/18 focus:border-accent/28 focus:ring-4 focus:ring-accent/10 focus:shadow-xl placeholder:text-muted md:rounded-[1.5rem] md:py-5 md:pl-16 md:pr-18 md:text-lg"
         />
 
         {/* Principle 4: Contrast - Loading indicator */}
-        <div className="absolute top-1/2 right-6 md:right-8 -translate-y-1/2 flex items-center gap-2">
+        <div className="absolute top-1/2 right-4 md:right-5 -translate-y-1/2 flex items-center gap-2">
           {(isSearching || isLocating) && (
             <motion.div
               animate={{ rotate: 360 }}
@@ -274,8 +274,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
               type="button"
               onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
               className={`touch-target min-h-[var(--touch-target-min)] rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 ${activeFilter === filter.id
-                  ? "border-accent/24 bg-accent-soft text-accent-strong"
-                  : "border-line bg-background/25 text-muted hover:border-accent/16 hover:text-foreground"
+                ? "border-accent/24 bg-accent-soft text-accent-strong"
+                : "border-line bg-background/25 text-muted hover:border-accent/16 hover:text-foreground"
                 }`}
             >
               {filter.label}
@@ -376,7 +376,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className={`glass-dropdown divide-y divide-line overflow-hidden rounded-[1.7rem] shadow-xl md:rounded-[2rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
+              className={`glass-dropdown divide-y divide-line overflow-hidden rounded-[1.25rem] shadow-xl md:rounded-[1.5rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
@@ -399,22 +399,22 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                     <div className="flex min-w-0 items-center gap-3.5 md:gap-5">
                       <div
                         className={`flex h-11 w-11 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl border transition-all duration-200 ${activeIndex === idx
-                            ? "border-accent/25 bg-accent-soft shadow-md"
-                            : "border-line bg-background/30 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
+                          ? "border-accent/25 bg-accent-soft shadow-md"
+                          : "border-line bg-background/30 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
                           }`}
                       >
                         <MapPin
                           className={`h-4.5 w-4.5 md:h-5 md:w-5 transition-colors duration-200 ${activeIndex === idx
-                              ? "text-accent"
-                              : "text-muted group-hover/item:text-accent"
+                            ? "text-accent"
+                            : "text-muted group-hover/item:text-accent"
                             }`}
                         />
                       </div>
                       <div className="min-w-0">
                         <div
                           className={`truncate text-base md:text-lg font-bold tracking-tight transition-colors duration-200 flex items-center gap-2.5 ${activeIndex === idx
-                              ? "text-foreground"
-                              : "text-muted-strong group-hover/item:text-foreground"
+                            ? "text-foreground"
+                            : "text-muted-strong group-hover/item:text-foreground"
                             }`}
                         >
                           {highlightMatch(city.city, searchQuery)}
@@ -431,8 +431,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                         </div>
                         <div
                           className={`mt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex items-center gap-1.5 ${activeIndex === idx
-                              ? "text-accent"
-                              : "text-muted group-hover/item:text-muted-strong"
+                            ? "text-accent"
+                            : "text-muted group-hover/item:text-muted-strong"
                             }`}
                         >
                           <span>{city.country}</span>
@@ -455,8 +455,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                       <div className="hidden text-right sm:block">
                         <div
                           className={`text-sm font-semibold transition-colors duration-200 ${activeIndex === idx
-                              ? "text-muted"
-                              : "text-muted/60 group-hover/item:text-muted"
+                            ? "text-muted"
+                            : "text-muted/60 group-hover/item:text-muted"
                             }`}
                         >
                           {formatPopulation(city.population)}
@@ -464,8 +464,8 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                       </div>
                       <div
                         className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 ${activeIndex === idx
-                            ? "translate-x-0 border-accent/25 bg-accent-soft opacity-100"
-                            : "-translate-x-3 border-line opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
+                          ? "translate-x-0 border-accent/25 bg-accent-soft opacity-100"
+                          : "-translate-x-3 border-line opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
                           }`}
                       >
                         <ArrowRight className="h-4 w-4 text-accent" />

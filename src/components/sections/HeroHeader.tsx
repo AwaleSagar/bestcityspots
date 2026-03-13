@@ -39,34 +39,34 @@ export default function HeroHeader() {
       animate="visible"
       className="relative overflow-hidden pt-4 md:pt-6"
     >
-      <div className="noise-overlay relative overflow-hidden rounded-[2rem] border border-line bg-surface/72 px-5 py-6 shadow-3xl backdrop-blur-xl md:rounded-[3rem] md:px-8 md:py-10 lg:px-10">
+      <div className="noise-overlay relative overflow-hidden rounded-[1.5rem] border border-line bg-surface/72 px-5 py-5 shadow-3xl backdrop-blur-xl md:rounded-[2.25rem] md:px-8 md:py-8 lg:px-10">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -left-10 top-0 h-48 w-48 rounded-full bg-[color:var(--liquid-glow-1)] blur-[90px]" />
           <div className="absolute right-0 top-10 h-40 w-40 rounded-full bg-[color:var(--liquid-glow-2)] blur-[90px]" />
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] lg:items-end lg:gap-10">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-end lg:gap-8">
           <div className="text-left">
-            <motion.div variants={fadeUp} className="mb-6">
+            <motion.div variants={fadeUp} className="mb-4">
               <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-background/45 px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-muted-strong uppercase backdrop-blur-sm">
                 <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden />
                 Atlas // Index 01
               </span>
             </motion.div>
 
-            <motion.h1 variants={fadeUp} className="max-w-4xl text-[clamp(3rem,8vw,6.5rem)] leading-[0.9] text-foreground">
+            <motion.h1 variants={fadeUp} className="max-w-4xl text-[clamp(2.2rem,5.5vw,4.5rem)] leading-[0.92] text-foreground">
               Choose a city with
               <span className="block text-accent">more context, less clutter.</span>
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
-              className="mt-5 max-w-2xl text-sm leading-relaxed text-muted md:text-base"
+              className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base"
             >
               Best City Spots turns destination research into an editorial briefing. Search by city, scan live signals, and move from curiosity to a shortlist without bouncing across ten tabs.
             </motion.p>
 
-            <motion.div variants={scaleIn} className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <motion.div variants={scaleIn} className="mt-6 flex flex-col items-stretch gap-2.5 sm:flex-row sm:items-center">
               <Link
                 href="#city-search"
                 className="btn-primary btn-primary-accent group"
@@ -84,14 +84,14 @@ export default function HeroHeader() {
               </Link>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="mt-8 flex flex-wrap gap-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-              <span className="rounded-full border border-line bg-background/45 px-3.5 py-2">10,000+ cities</span>
-              <span className="rounded-full border border-line bg-background/45 px-3.5 py-2">Live climate signals</span>
-              <span className="rounded-full border border-line bg-background/45 px-3.5 py-2">Transparent sourcing</span>
+            <motion.div variants={fadeUp} className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
+              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">10,000+ cities</span>
+              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">Live climate signals</span>
+              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">Transparent sourcing</span>
             </motion.div>
           </div>
 
-          <motion.div variants={fadeUp} className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {[
               {
                 value: "24/7",
@@ -109,13 +109,13 @@ export default function HeroHeader() {
                 text: "Search, compare, and decide inside one mobile-friendly atlas instead of a tab maze.",
               },
             ].map(({ value, label, text }) => (
-              <div key={label} className="rounded-[1.6rem] border border-line bg-background/45 p-4 shadow-sm backdrop-blur-md md:p-5">
+              <div key={label} className="rounded-[1.2rem] border border-line bg-background/45 p-3.5 shadow-sm backdrop-blur-md md:p-4">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">{label}</span>
                   <Compass className="h-4 w-4 text-accent" aria-hidden />
                 </div>
-                <div className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-foreground">{value}</div>
-                <p className="mt-3 text-sm leading-relaxed text-muted">{text}</p>
+                <div className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">{value}</div>
+                <p className="mt-2 text-[13px] leading-relaxed text-muted">{text}</p>
               </div>
             ))}
           </motion.div>

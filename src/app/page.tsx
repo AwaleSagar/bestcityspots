@@ -21,10 +21,10 @@ export default async function Home() {
       >
         <HeroHeader />
 
-        <section className="grid gap-8 pb-24 pt-10 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-start lg:gap-12 lg:pb-32 lg:pt-14">
+        <section className="grid gap-6 pb-16 pt-8 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-start lg:gap-10 lg:pb-24 lg:pt-10">
           <div className="space-y-5 lg:sticky lg:top-28">
             <span className="section-heading">Start with intent</span>
-            <h2 className="max-w-sm text-[clamp(2rem,5vw,3.4rem)] leading-[0.96] text-foreground">
+            <h2 className="max-w-sm text-[clamp(1.6rem,3.5vw,2.6rem)] leading-[1] text-foreground">
               Search like you already know how you want the trip to feel.
             </h2>
             <p className="max-w-md text-sm leading-relaxed text-muted md:text-base">
@@ -32,12 +32,12 @@ export default async function Home() {
             </p>
           </div>
 
-          <div className="rounded-[2rem] border border-line bg-surface/68 p-4 shadow-xl backdrop-blur-xl md:p-6 lg:rounded-[2.5rem]">
+          <div className="rounded-[1.5rem] border border-line bg-surface/68 p-4 shadow-xl backdrop-blur-xl md:p-5 lg:rounded-[2rem]">
             <CitySearch topCities={topCities} />
           </div>
         </section>
 
-        <div className="mb-28 space-y-28 content-lazy md:mb-36 md:space-y-36">
+        <div className="mb-16 space-y-16 content-lazy md:mb-24 md:space-y-24">
           <TrustIndicators />
           <FreeResourceCTA />
           <TestimonialsSection />

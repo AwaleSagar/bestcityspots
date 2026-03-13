@@ -20,12 +20,12 @@ export default function SiteFooter() {
       aria-label="Site footer"
     >
       <div
-        className="container-gutter mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20"
+        className="container-gutter mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14"
         style={{ paddingBottom: "max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))" }}
       >
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
-          <div className="rounded-[2rem] border border-line bg-surface/70 p-6 shadow-lg backdrop-blur-xl md:p-8">
-            <div className="mb-5 flex items-center gap-3">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
+          <div className="rounded-[1.5rem] border border-line bg-surface/70 p-5 shadow-lg backdrop-blur-xl md:p-6">
+            <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-accent-contrast shadow-sm">
                 <MapPin className="h-4 w-4" aria-hidden />
               </div>
@@ -86,7 +86,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-3 border-t border-line pt-8 md:flex-row md:items-center md:justify-between">
+        <div className="mt-10 flex flex-col gap-3 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-muted">
             &copy; {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
           </p>
