@@ -3,8 +3,7 @@
 import type { KeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
-import { formatPopulation } from "@/lib/format";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,6 +17,7 @@ interface CitySearchProps {
 
 const KEYBOARD_ANIMATION_DELAY = 300;
 const DROPDOWN_MAX_HEIGHT = "40vh";
+const transitionEase = [0.22, 1, 0.36, 1] as const;
 
 const PLACEHOLDER_HINTS = [
   "Where do you want to explore?",
@@ -44,6 +44,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const { recentCities, addRecentCity } = useRecentSearches();
   const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
   const isTouchDevice = isMobile || isTablet;
+  const shouldReduceMotion = useReducedMotion();
 
   // Rotate placeholder hints
   useEffect(() => {
@@ -80,9 +81,9 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         let results = await searchCities(searchQuery, 15, controller.signal);
 
         if (activeFilter === "megacity") {
-          results = results.filter(c => c.population > 5000000);
+          results = results.filter((c) => c.population > 5000000);
         } else if (activeFilter === "capital") {
-          results = results.filter(c => c.capital === "primary");
+          results = results.filter((c) => c.capital === "primary");
         }
 
         if (controller.signal.aborted) return;
@@ -131,7 +132,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             part.toLowerCase() === query.toLowerCase() ? (
               <mark
                 key={i}
-                className="rounded-sm bg-accent-soft px-0.5 font-bold text-accent-strong shadow-sm"
+                className="bg-accent-soft text-accent-strong rounded-sm px-0.5 font-bold shadow-sm"
               >
                 {part}
               </mark>
@@ -210,9 +211,9 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   return (
     <motion.div
       ref={containerRef}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
+      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2, ease: transitionEase }}
       className="relative scroll-mt-20"
     >
       {/* Accessibility - Proper labels */}
@@ -220,8 +221,25 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         Search for a city
       </label>
 
-      <div className="group relative">
-        <Search className="absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 text-muted transition-all duration-300 group-focus-within:text-accent md:left-6 md:h-5 md:w-5" />
+      <motion.div
+        layout
+        transition={{ duration: shouldReduceMotion ? 0 : 0.38, ease: transitionEase }}
+        className="search-shell group relative"
+      >
+        <motion.div
+          className="search-shell-glow"
+          aria-hidden
+          animate={
+            shouldReduceMotion
+              ? undefined
+              : {
+                  opacity: [0.22, 0.45, 0.22],
+                  scale: [1, 1.03, 1],
+                }
+          }
+          transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <Search className="text-muted group-focus-within:text-accent absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 transition-all duration-300 md:left-6 md:h-5 md:w-5" />
         <input
           id="city-search"
           ref={inputRef}
@@ -239,16 +257,16 @@ export default function CitySearch({ topCities }: CitySearchProps) {
           aria-expanded={shouldShowResults}
           aria-controls={resultsListId}
           aria-activedescendant={activeOptionId}
-          className="liquid-glass w-full rounded-[1.25rem] border border-line bg-background/30 py-3.5 pl-12 pr-14 text-sm font-medium text-foreground shadow-lg transition-all duration-300 outline-none hover:border-accent/18 focus:border-accent/28 focus:ring-4 focus:ring-accent/10 focus:shadow-xl placeholder:text-muted md:rounded-[1.5rem] md:py-5 md:pl-16 md:pr-18 md:text-lg"
+          className="border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full rounded-[1.5rem] border py-4 pr-14 pl-12 text-sm font-semibold shadow-sm transition-all duration-300 outline-none md:rounded-[1.7rem] md:py-5 md:pr-18 md:pl-16 md:text-lg"
         />
 
         {/* Principle 4: Contrast - Loading indicator */}
-        <div className="absolute top-1/2 right-4 md:right-5 -translate-y-1/2 flex items-center gap-2">
+        <div className="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-2 md:right-5">
           {(isSearching || isLocating) && (
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="h-7 w-7 rounded-full border-2 border-accent/10 border-t-accent"
+              className="border-accent/10 border-t-accent h-7 w-7 rounded-full border-2"
             />
           )}
           <button
@@ -256,49 +274,51 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             onClick={handleLocate}
             disabled={isLocating}
             aria-label="Use current location"
-            className={`flex h-10 w-10 items-center justify-center rounded-full border border-line bg-background/35 text-muted transition-colors duration-100 hover:border-accent/25 hover:text-accent disabled:cursor-not-allowed disabled:opacity-40 ${isLocating ? "animate-pulse border-accent/30 text-accent" : ""}`}
+            className={`border-line bg-surface/88 text-muted hover:border-accent/25 hover:text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-40 ${isLocating ? "border-accent/30 text-accent animate-pulse" : ""}`}
           >
             <LocateFixed className="h-5 w-5" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-1 sm:px-2">
-        <div className="flex gap-2">
-          {[
-            { id: "megacity", label: "Megacities" },
-            { id: "capital", label: "Capitals" },
-          ].map((filter) => (
-            <button
-              key={filter.id}
-              type="button"
-              onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
-              className={`touch-target min-h-[var(--touch-target-min)] rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 ${activeFilter === filter.id
-                ? "border-accent/24 bg-accent-soft text-accent-strong"
-                : "border-line bg-background/25 text-muted hover:border-accent/16 hover:text-foreground"
-                }`}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
         <div className="text-xs font-medium tracking-wide">
-          <div className="text-foreground/30" aria-live="polite">
-            {isLocating ? (
-              <span className="animate-pulse text-accent">Finding your location...</span>
-            ) : isSearching ? (
-              <span className="animate-pulse text-accent">Searching...</span>
-            ) : shouldShowResults && topFuzzyHint ? (
-              <span className="flex items-center gap-1.5 text-muted">
-                <Sparkles className="h-3 w-3 text-accent" />
-                Did you mean <span className="font-bold text-accent">{topFuzzyHint}</span>?
-                <span className="opacity-40 ml-1">·</span>
-                <span className="opacity-60">{searchResults.length} results</span>
-              </span>
-            ) : shouldShowResults ? (
-              <span className="text-muted">{searchResults.length} results</span>
-            ) : null}
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={
+                isLocating
+                  ? "locating"
+                  : isSearching
+                    ? "searching"
+                    : shouldShowResults && topFuzzyHint
+                      ? "hint"
+                      : shouldShowResults
+                        ? "count"
+                        : "idle"
+              }
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: transitionEase }}
+              className="text-foreground/30 min-h-[1rem]"
+              aria-live="polite"
+            >
+              {isLocating ? (
+                <span className="text-accent">Finding your location...</span>
+              ) : isSearching ? (
+                <span className="text-accent">Searching...</span>
+              ) : shouldShowResults && topFuzzyHint ? (
+                <span className="text-muted flex items-center gap-1.5">
+                  <Sparkles className="text-accent h-3 w-3" />
+                  Did you mean <span className="text-accent font-bold">{topFuzzyHint}</span>?
+                  <span className="ml-1 opacity-40">·</span>
+                  <span className="opacity-60">{searchResults.length} results</span>
+                </span>
+              ) : shouldShowResults ? (
+                <span className="text-muted">{searchResults.length} results</span>
+              ) : null}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -307,48 +327,33 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         {!shouldShowResults && (
           <motion.div
             key="discovery"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 10 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.34, ease: transitionEase }}
             className="mt-10 space-y-10 overflow-hidden"
           >
-            {recentCities.length > 0 && (
+            {recentCities.length > 0 ? (
               <div>
-                <h2 className="mb-4 px-1 text-xs font-bold tracking-wider text-foreground/30 uppercase flex items-center gap-2">
+                <h2 className="text-foreground/30 mb-4 flex items-center gap-2 px-1 text-xs font-bold tracking-wider uppercase">
                   <Activity className="h-3 w-3" /> Recent Searches
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                  {recentCities.map((city) => (
-                    <Link
-                      key={`recent-${city.id}`}
-                      href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                      onClick={() => addRecentCity(city)}
-                      className="liquid-glass inline-block rounded-2xl border border-line bg-background/30 px-5 py-2.5 text-sm font-semibold text-muted transition-all duration-200 hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground active:scale-95"
-                    >
-                      {city.city}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {topCities.length > 0 && (
-              <div>
-                <h2 className="mb-4 px-1 text-xs font-bold tracking-wider text-foreground/30 uppercase">
-                  Trending Destinations
-                </h2>
-                <div className="flex flex-wrap gap-3">
-                  {topCities.map((city, idx) => (
+                  {recentCities.map((city, index) => (
                     <motion.div
-                      key={city.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: idx * 0.04 }}
+                      key={`recent-${city.id}`}
+                      initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+                      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                      transition={{
+                        duration: shouldReduceMotion ? 0 : 0.36,
+                        ease: transitionEase,
+                        delay: shouldReduceMotion ? 0 : index * 0.04,
+                      }}
                     >
                       <Link
                         href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
                         onClick={() => addRecentCity(city)}
-                        className="liquid-glass inline-block rounded-2xl border border-line bg-background/30 px-5 py-2.5 text-sm font-semibold text-muted transition-all duration-200 hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground active:scale-95"
+                        className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
                       >
                         {city.city}
                       </Link>
@@ -356,7 +361,35 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                   ))}
                 </div>
               </div>
-            )}
+            ) : topCities.length > 0 ? (
+              <div>
+                <h2 className="text-foreground/30 mb-4 px-1 text-xs font-bold tracking-wider uppercase">
+                  Trending Destinations
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {topCities.map((city, idx) => (
+                    <motion.div
+                      key={city.id}
+                      initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96, y: 8 }}
+                      animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1, y: 0 }}
+                      transition={{
+                        duration: shouldReduceMotion ? 0 : 0.36,
+                        ease: transitionEase,
+                        delay: shouldReduceMotion ? 0 : idx * 0.04,
+                      }}
+                    >
+                      <Link
+                        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                        onClick={() => addRecentCity(city)}
+                        className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
+                      >
+                        {city.city}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </motion.div>
         )}
 
@@ -364,28 +397,58 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         {shouldShowResults && (
           <motion.div
             key="results"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
+            layout
+            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: transitionEase }}
             className={`mt-6 space-y-4 ${isVirtualKeyboardOpen ? "pb-[50vh]" : ""}`}
             style={{
               maxHeight: isVirtualKeyboardOpen ? DROPDOWN_MAX_HEIGHT : "none",
             }}
           >
-            <ul
+            <motion.div layout className="flex gap-2 px-1 sm:px-2">
+              {[
+                { id: "megacity", label: "Megacities" },
+                { id: "capital", label: "Capitals" },
+              ].map((filter) => (
+                <motion.button
+                  key={filter.id}
+                  type="button"
+                  layout
+                  onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
+                  whileHover={shouldReduceMotion ? undefined : { y: -1.5 }}
+                  whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: transitionEase }}
+                  className={`touch-target min-h-[var(--touch-target-min)] rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 ${
+                    activeFilter === filter.id
+                      ? "border-accent/24 bg-accent-soft text-accent-strong"
+                      : "border-line bg-surface/72 text-muted hover:border-accent/16 hover:text-foreground"
+                  }`}
+                >
+                  {filter.label}
+                </motion.button>
+              ))}
+            </motion.div>
+            <motion.ul
+              layout
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className={`glass-dropdown divide-y divide-line overflow-hidden rounded-[1.25rem] shadow-xl md:rounded-[1.5rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
+              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-[1.5rem] shadow-xl md:rounded-[1.8rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
+                  layout
                   key={city.id}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.04 }}
-                  className={`group/item cursor-pointer transition-all duration-200 ${activeIndex === idx ? "bg-accent-soft/80" : "hover:bg-background/40"
-                    }`}
+                  initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
+                  animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
+                  transition={{
+                    duration: shouldReduceMotion ? 0 : 0.32,
+                    ease: transitionEase,
+                    delay: shouldReduceMotion ? 0 : idx * 0.03,
+                  }}
+                  className={`group/item cursor-pointer transition-all duration-200 ${activeIndex === idx ? "bg-accent-soft/80" : "hover:bg-surface/72"}`}
                   role="option"
                   aria-selected={activeIndex === idx}
                   id={`city-option-${city.id}`}
@@ -394,46 +457,40 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                   <Link
                     href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
                     onClick={() => addRecentCity(city)}
-                    className="flex w-full items-center justify-between gap-4 px-5 md:px-8 py-4 md:py-5"
+                    className="flex w-full items-center justify-between gap-4 px-5 py-4 md:px-8 md:py-5"
                   >
                     <div className="flex min-w-0 items-center gap-3.5 md:gap-5">
                       <div
-                        className={`flex h-11 w-11 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-xl border transition-all duration-200 ${activeIndex === idx
-                          ? "border-accent/25 bg-accent-soft shadow-md"
-                          : "border-line bg-background/30 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
-                          }`}
+                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border transition-all duration-200 md:h-12 md:w-12 ${
+                          activeIndex === idx
+                            ? "border-accent/25 bg-accent-soft shadow-md"
+                            : "border-line bg-surface/72 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
+                        }`}
                       >
                         <MapPin
-                          className={`h-4.5 w-4.5 md:h-5 md:w-5 transition-colors duration-200 ${activeIndex === idx
-                            ? "text-accent"
-                            : "text-muted group-hover/item:text-accent"
-                            }`}
+                          className={`h-4.5 w-4.5 transition-colors duration-200 md:h-5 md:w-5 ${
+                            activeIndex === idx
+                              ? "text-accent"
+                              : "text-muted group-hover/item:text-accent"
+                          }`}
                         />
                       </div>
                       <div className="min-w-0">
                         <div
-                          className={`truncate text-base md:text-lg font-bold tracking-tight transition-colors duration-200 flex items-center gap-2.5 ${activeIndex === idx
-                            ? "text-foreground"
-                            : "text-muted-strong group-hover/item:text-foreground"
-                            }`}
+                          className={`flex items-center gap-2.5 truncate text-base font-bold tracking-tight transition-colors duration-200 md:text-lg ${
+                            activeIndex === idx
+                              ? "text-foreground"
+                              : "text-muted-strong group-hover/item:text-foreground"
+                          }`}
                         >
                           {highlightMatch(city.city, searchQuery)}
-                          {city.capital === "primary" && (
-                            <span className="badge-featured rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold">
-                              Capital
-                            </span>
-                          )}
-                          {city.population > 5000000 && (
-                            <span className="badge-top-rated rounded-md px-1.5 py-0.5 text-[9px] uppercase tracking-wider font-bold">
-                              Megacity
-                            </span>
-                          )}
                         </div>
                         <div
-                          className={`mt-0.5 text-xs font-medium tracking-wide transition-colors duration-200 flex items-center gap-1.5 ${activeIndex === idx
-                            ? "text-accent"
-                            : "text-muted group-hover/item:text-muted-strong"
-                            }`}
+                          className={`mt-0.5 flex items-center gap-1.5 text-xs font-medium tracking-wide transition-colors duration-200 ${
+                            activeIndex === idx
+                              ? "text-accent"
+                              : "text-muted group-hover/item:text-muted-strong"
+                          }`}
                         >
                           <span>{city.country}</span>
                           {city.admin_name && (
@@ -452,23 +509,14 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                       </div>
                     </div>
                     <div className="flex flex-shrink-0 items-center gap-4">
-                      <div className="hidden text-right sm:block">
-                        <div
-                          className={`text-sm font-semibold transition-colors duration-200 ${activeIndex === idx
-                            ? "text-muted"
-                            : "text-muted/60 group-hover/item:text-muted"
-                            }`}
-                        >
-                          {formatPopulation(city.population)}
-                        </div>
-                      </div>
                       <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 ${activeIndex === idx
-                          ? "translate-x-0 border-accent/25 bg-accent-soft opacity-100"
-                          : "-translate-x-3 border-line opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
-                          }`}
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 ${
+                          activeIndex === idx
+                            ? "border-accent/25 bg-accent-soft translate-x-0 opacity-100"
+                            : "border-line -translate-x-3 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
+                        }`}
                       >
-                        <ArrowRight className="h-4 w-4 text-accent" />
+                        <ArrowRight className="text-accent h-4 w-4" />
                       </div>
                     </div>
                   </Link>
@@ -476,15 +524,15 @@ export default function CitySearch({ topCities }: CitySearchProps) {
               ))}
               {searchResults.length === 0 && !isSearching && (
                 <li className="px-8 py-14 text-center" role="status" aria-live="polite">
-                  <div className="mb-2 text-sm font-semibold text-foreground/50">
+                  <div className="text-foreground/50 mb-2 text-sm font-semibold">
                     No matches for &quot;{searchQuery}&quot;
                   </div>
-                  <div className="text-sm text-foreground/30">
+                  <div className="text-foreground/30 text-sm">
                     Try searching for another city or country.
                   </div>
                 </li>
               )}
-            </ul>
+            </motion.ul>
           </motion.div>
         )}
       </AnimatePresence>

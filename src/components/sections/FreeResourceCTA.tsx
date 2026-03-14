@@ -1,83 +1,59 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, ArrowRight, MapPin, Star, Wallet } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, MapPinned, Users2, Wallet } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
 const guideHighlights = [
-  { icon: MapPin, text: "50 curated cities" },
-  { icon: Star, text: "Top attractions" },
-  { icon: Wallet, text: "Budget-friendly picks" },
-] as const;
+  { icon: MapPinned, text: "50 ranked cities", color: "text-accent" },
+  { icon: Users2, text: "Population context", color: "text-[color:var(--color-cat-stays)]" },
+  { icon: Wallet, text: "Fast planning cues", color: "text-[color:var(--color-brand-accent)]" },
+];
 
 export default function FreeResourceCTA() {
   return (
-    <section
-      className="mx-auto max-w-6xl"
-      aria-labelledby="free-resource-heading"
-    >
+    <section className="mx-auto max-w-7xl" aria-labelledby="free-resource-heading">
       <ScrollReveal animation="fade-up">
-        <div className="noise-overlay relative overflow-hidden rounded-[1.5rem] border border-line bg-surface/70 p-5 shadow-3xl backdrop-blur-xl md:rounded-[2rem] md:p-8 lg:p-10">
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute -left-10 top-0 h-44 w-44 rounded-full bg-[color:var(--liquid-glow-1)] blur-[100px]" />
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.06, 0.12, 0.06] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[color:var(--liquid-glow-2)] blur-[80px]"
-            />
-          </div>
-
-          <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.88fr)] lg:items-end lg:gap-10">
+        <div className="atlas-panel-strong rounded-[2.2rem] p-5 md:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end">
             <div>
-              <span className="badge-featured mb-4 inline-flex rounded-full px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]">
-                Free Guide
-              </span>
-
+              <span className="eyebrow">Free Reference Guide</span>
               <h2
                 id="free-resource-heading"
-                className="max-w-xl text-[clamp(1.6rem,3.5vw,2.8rem)] leading-[1] text-foreground"
+                className="text-foreground mt-5 max-w-3xl text-[clamp(2.2rem,4vw,4.2rem)] leading-[0.92]"
               >
-                Start broad, then narrow the shortlist with a sharper city index.
+                Start broad with The Global 50, then dive into individual city desks when the
+                shortlist tightens.
               </h2>
-
-              <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted md:text-base">
-                The Top 50 guide works like an editorial front door into the atlas: major cities first, then the deeper city pages when you are ready to compare climate, momentum, and experiences.
+              <p className="text-muted mt-2 max-w-2xl text-xs leading-6">
+                Our 50 most-searched cities, ranked and reviewed.
+              </p>
+              <p className="text-muted mt-4 max-w-2xl text-sm leading-7 md:text-base">
+                The guide works like a quick editorial index. It gives you the major cities in one
+                sweep, then routes you into the richer city pages with weather, metrics, and saved
+                planning notes.
               </p>
 
-              <div className="mt-6 flex flex-col items-stretch gap-2.5 sm:flex-row sm:items-center">
+              <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                 <Link href="/resources/top-cities" className="btn-primary group">
-                  <BookOpen className="h-4 w-4" aria-hidden />
-                  Explore the Guide
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden />
+                  <BookOpen className="h-4 w-4" />
+                  Open The Global 50
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
-                <div className="rounded-full border border-line bg-background/40 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-                  No sign-up required
-                </div>
+                <span className="text-muted text-sm">No sign-up required</span>
               </div>
             </div>
 
-            <div className="rounded-[1.4rem] border border-line bg-background/40 p-4 shadow-sm backdrop-blur-md md:p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted">Inside the guide</span>
-                <span className="text-2xl font-semibold tracking-[-0.04em] text-foreground">50</span>
-              </div>
-
-              <div className="mb-5 grid gap-2.5 sm:grid-cols-3 lg:grid-cols-1">
-                {guideHighlights.map(({ icon: Icon, text }) => (
-                  <div
-                    key={text}
-                    className="flex items-center gap-2 rounded-2xl border border-line bg-surface/70 px-4 py-3 text-xs font-semibold text-muted-strong"
-                  >
-                    <Icon className="h-3.5 w-3.5 text-accent" aria-hidden />
-                    {text}
+            <div className="atlas-frame rounded-[1.8rem] p-5 md:p-6">
+              <div className="labelled-rule">Inside The Edition</div>
+              <div className="mt-5 grid gap-3">
+                {guideHighlights.map(({ icon: Icon, text, color }) => (
+                  <div key={text} className="flex items-center gap-3 py-2">
+                    <Icon className={`h-4 w-4 shrink-0 ${color}`} aria-hidden />
+                    <span className="text-muted-strong text-sm font-medium">{text}</span>
                   </div>
                 ))}
               </div>
-
-              <p className="text-sm leading-relaxed text-muted">
-                Rankings, entry-point recommendations, and fast access to full guides for the cities that matter most when you are planning from a small screen.
-              </p>
             </div>
           </div>
         </div>

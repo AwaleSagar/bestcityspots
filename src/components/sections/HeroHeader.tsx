@@ -1,124 +1,104 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Compass, Sparkles } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, Compass, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const stagger = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.2 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.12 },
   },
 };
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 50, filter: "blur(8px)" },
+  hidden: { opacity: 0, y: 16 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const },
-  },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.92 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+    transition: { duration: 0.7, ease: [0.19, 1, 0.22, 1] as const },
   },
 };
 
 export default function HeroHeader() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <motion.header
       variants={stagger}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden pt-4 md:pt-6"
+      className="relative overflow-hidden pt-3 md:pt-6"
     >
-      <div className="noise-overlay relative overflow-hidden rounded-[1.5rem] border border-line bg-surface/72 px-5 py-5 shadow-3xl backdrop-blur-xl md:rounded-[2.25rem] md:px-8 md:py-8 lg:px-10">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -left-10 top-0 h-48 w-48 rounded-full bg-[color:var(--liquid-glow-1)] blur-[90px]" />
-          <div className="absolute right-0 top-10 h-40 w-40 rounded-full bg-[color:var(--liquid-glow-2)] blur-[90px]" />
+      <div className="landing-hero-shell rounded-[2.2rem] p-5 md:p-8 lg:p-10">
+        <div className="hero-atmosphere" aria-hidden>
+          <motion.span
+            className="hero-atmosphere-orb hero-atmosphere-orb-primary"
+            animate={shouldReduceMotion ? undefined : { x: [0, 20, -8, 0], y: [0, -14, 10, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.span
+            className="hero-atmosphere-orb hero-atmosphere-orb-secondary"
+            animate={shouldReduceMotion ? undefined : { x: [0, -16, 8, 0], y: [0, 18, -12, 0] }}
+            transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+          />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:items-end lg:gap-8">
-          <div className="text-left">
-            <motion.div variants={fadeUp} className="mb-4">
-              <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-background/45 px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-muted-strong uppercase backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden />
-                Atlas // Index 01
-              </span>
-            </motion.div>
-
-            <motion.h1 variants={fadeUp} className="max-w-4xl text-[clamp(2.2rem,5.5vw,4.5rem)] leading-[0.92] text-foreground">
-              Choose a city with
-              <span className="block text-accent">more context, less clutter.</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeUp}
-              className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base"
-            >
-              Best City Spots turns destination research into an editorial briefing. Search by city, scan live signals, and move from curiosity to a shortlist without bouncing across ten tabs.
+        <div className="mx-auto max-w-3xl">
+          <div>
+            <motion.p variants={fadeUp} className="eyebrow">
+              Editorial Atlas 2026 &middot; Human-readable city intelligence
             </motion.p>
 
-            <motion.div variants={scaleIn} className="mt-6 flex flex-col items-stretch gap-2.5 sm:flex-row sm:items-center">
-              <Link
-                href="#city-search"
-                className="btn-primary btn-primary-accent group"
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById("city-search")?.focus();
-                }}
-              >
-                Open City Search
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
-              </Link>
-              <Link href="/resources/top-cities" className="btn-secondary group">
-                <BookOpen className="h-4 w-4" aria-hidden />
-                Read the Top 50
-              </Link>
+            <motion.h1 variants={fadeUp} className="page-title text-foreground mt-6 max-w-5xl">
+              Pick a city the way a thoughtful magazine would edit the shortlist.
+            </motion.h1>
+
+            <motion.p variants={fadeUp} className="lede mt-5 max-w-3xl">
+              Best City Spots turns sprawling destination research into a clean urban briefing.
+              Search once, get weather and scale instantly, then move into neighborhood texture,
+              travel timing, and saved experiences without losing your place.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="mt-8">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+                <Link
+                  href="#city-search"
+                  className="btn-primary group"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    const searchInput = document.getElementById("city-search");
+                    searchInput?.scrollIntoView({
+                      behavior: shouldReduceMotion ? "auto" : "smooth",
+                      block: "center",
+                    });
+                    window.setTimeout(() => searchInput?.focus(), shouldReduceMotion ? 0 : 220);
+                  }}
+                >
+                  Find a city
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+
+                <div className="atlas-chip atlas-chip-accent hero-notice rounded-full border border-[color:color-mix(in_oklab,var(--color-accent)_20%,transparent)] px-3 py-2">
+                  <Compass className="h-3.5 w-3.5" aria-hidden />
+                  Search, compare, then dive deeper
+                </div>
+              </div>
             </motion.div>
 
-            <motion.div variants={fadeUp} className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted">
-              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">10,000+ cities</span>
-              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">Live climate signals</span>
-              <span className="rounded-full border border-line bg-background/45 px-3 py-1.5">Transparent sourcing</span>
+            <motion.div
+              variants={fadeUp}
+              className="mt-10 flex flex-wrap items-center gap-3 text-xs text-[color:var(--color-muted)]"
+            >
+              <div className="hero-metric-pill">
+                <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-accent)]" aria-hidden />
+                Instant city signals
+              </div>
+              <div className="hero-metric-pill">Editorial briefings</div>
+              <div className="hero-metric-pill">Live context</div>
             </motion.div>
           </div>
-
-          <motion.div variants={fadeUp} className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            {[
-              {
-                value: "24/7",
-                label: "Live signals",
-                text: "Weather, city metrics, and changing conditions keep the shortlist current.",
-              },
-              {
-                value: "50",
-                label: "Editorial picks",
-                text: "Start with the most important cities, then drill into neighborhoods and pulse.",
-              },
-              {
-                value: "1",
-                label: "Calmer workflow",
-                text: "Search, compare, and decide inside one mobile-friendly atlas instead of a tab maze.",
-              },
-            ].map(({ value, label, text }) => (
-              <div key={label} className="rounded-[1.2rem] border border-line bg-background/45 p-3.5 shadow-sm backdrop-blur-md md:p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">{label}</span>
-                  <Compass className="h-4 w-4 text-accent" aria-hidden />
-                </div>
-                <div className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-foreground">{value}</div>
-                <p className="mt-2 text-[13px] leading-relaxed text-muted">{text}</p>
-              </div>
-            ))}
-          </motion.div>
         </div>
       </div>
     </motion.header>

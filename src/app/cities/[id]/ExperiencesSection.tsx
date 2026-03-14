@@ -330,9 +330,9 @@ export default function ExperiencesSection({
   };
 
   const tabs = [
-    { id: "landmarks", label: "Landmarks", icon: Ticket },
-    { id: "restaurants", label: "Dining", icon: Utensils },
-    { id: "hotels", label: "Stays", icon: Hotel },
+    { id: "landmarks", label: "Landmarks", icon: Ticket, activeText: "text-accent", activeBg: "bg-accent-soft", activeBorder: "border-accent/20", activeCount: "bg-accent/15 text-accent" },
+    { id: "restaurants", label: "Dining", icon: Utensils, activeText: "text-cat-dining", activeBg: "bg-cat-dining-soft", activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-dining)_20%,transparent)]", activeCount: "bg-[color:var(--color-cat-dining-soft)] text-cat-dining" },
+    { id: "hotels", label: "Stays", icon: Hotel, activeText: "text-cat-stays", activeBg: "bg-cat-stays-soft", activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-stays)_20%,transparent)]", activeCount: "bg-[color:var(--color-cat-stays-soft)] text-cat-stays" },
   ] as const;
 
   const priceLevelLabels = new Map<string, string>([
@@ -385,6 +385,14 @@ export default function ExperiencesSection({
   const draftNotesMap = useMemo(() => toNoteMap(draftNotes), [draftNotes]);
   const placeNotesMap = toNoteMap(placeNotes);
 
+  const catColor = useMemo(() => {
+    switch (activeTab) {
+      case "restaurants": return { hover: "hover:border-emerald-500/15", badge: "border-emerald-500/15 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400/90", icon: "text-emerald-500 dark:text-emerald-400/70", iconBg: "border-emerald-500/15 bg-emerald-500/10", dot: "bg-emerald-500/40", save: "border-emerald-500/25 bg-emerald-500/8 text-emerald-500 dark:text-emerald-300", saveHover: "hover:border-emerald-500/20", note: "border-emerald-500/15 bg-emerald-500/5", noteLabel: "text-emerald-500 dark:text-emerald-400/80", noteBtn: "border-emerald-500/30 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/30", focus: "focus:border-emerald-500/40 focus:ring-emerald-500/20", moreHover: "hover:border-emerald-500/15", star: "fill-emerald-400 text-emerald-400" };
+      case "hotels": return { hover: "hover:border-sky-500/15", badge: "border-sky-500/15 bg-sky-500/10 text-sky-600 dark:text-sky-400/90", icon: "text-sky-500 dark:text-sky-400/70", iconBg: "border-sky-500/15 bg-sky-500/10", dot: "bg-sky-500/40", save: "border-sky-500/25 bg-sky-500/8 text-sky-500 dark:text-sky-300", saveHover: "hover:border-sky-500/20", note: "border-sky-500/15 bg-sky-500/5", noteLabel: "text-sky-500 dark:text-sky-400/80", noteBtn: "border-sky-500/30 bg-sky-500/20 text-sky-600 dark:text-sky-400 hover:border-sky-500/50 hover:bg-sky-500/30", focus: "focus:border-sky-500/40 focus:ring-sky-500/20", moreHover: "hover:border-sky-500/15", star: "fill-sky-400 text-sky-400" };
+      default: return { hover: "hover:border-orange-500/15", badge: "border-orange-500/15 bg-orange-500/10 text-orange-600 dark:text-orange-400/90", icon: "text-orange-500 dark:text-orange-400/70", iconBg: "border-orange-500/15 bg-orange-500/10", dot: "bg-orange-500/40", save: "border-orange-500/25 bg-orange-500/8 text-orange-500 dark:text-orange-300", saveHover: "hover:border-orange-500/20", note: "border-orange-500/15 bg-orange-500/5", noteLabel: "text-orange-500 dark:text-orange-400/80", noteBtn: "border-orange-500/30 bg-orange-500/20 text-orange-600 dark:text-orange-400 hover:border-orange-500/50 hover:bg-orange-500/30", focus: "focus:border-orange-500/40 focus:ring-orange-500/20", moreHover: "hover:border-orange-500/15", star: "fill-amber-400 text-amber-400" };
+    }
+  }, [activeTab]);
+
   const toggleSave = (place: Landmark, type: "landmarks" | "restaurants" | "hotels") => {
     setSavedPlaces((prev) => {
       const exists = prev.some((p) => p.id === place.id && p.city === cityName);
@@ -436,7 +444,7 @@ export default function ExperiencesSection({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}
-        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-[1.75rem] border border-white/6 transition-all duration-500 hover:-translate-y-1 hover:border-orange-500/15 hover:shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
+        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-[1.75rem] border border-white/6 transition-all duration-500 hover:-translate-y-1 ${catColor.hover} hover:shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
       >
         {/* Image with Overlaid Info */}
         {item.imageUrl && (
@@ -487,12 +495,12 @@ export default function ExperiencesSection({
           {!item.imageUrl && (
             <div className="rounded-[1.35rem] border border-white/6 bg-foreground/[0.03] p-4">
               <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-orange-500/15 bg-orange-500/10" aria-hidden="true">
-                  <Compass className="h-5 w-5 text-orange-400/70" />
+                <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border ${catColor.iconBg}`} aria-hidden="true">
+                  <Compass className={`h-5 w-5 ${catColor.icon}`} />
                 </div>
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-orange-400/90">
+                    <span className={`rounded-full border ${catColor.badge} px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em]`}>
                       {primaryPulse}
                     </span>
                     {getPriceLevel(item.priceLevel) && (
@@ -506,7 +514,7 @@ export default function ExperiencesSection({
                   </h3>
                   {addressContext?.primary && (
                     <div className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-foreground/48">
-                      <MapPin className="h-3.5 w-3.5 text-orange-400/70" />
+                      <MapPin className={`h-3.5 w-3.5 ${catColor.icon}`} />
                       <span className="line-clamp-1">{addressContext.primary}</span>
                     </div>
                   )}
@@ -520,7 +528,7 @@ export default function ExperiencesSection({
             <div className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-foreground/40">
               {ratingLabel && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/8 bg-foreground/[0.03] px-3 py-1">
-                  <Star className="h-3.5 w-3.5 fill-orange-400/85 text-orange-400/85" />
+                  <Star className={`h-3.5 w-3.5 ${catColor.star}`} />
                   <span>{ratingLabel}</span>
                 </span>
               )}
@@ -559,7 +567,7 @@ export default function ExperiencesSection({
             </button>
             <button
               onClick={() => toggleExpand(item.id)}
-              className="ml-auto inline-flex items-center gap-1 rounded-full border border-foreground/6 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/35 transition-all hover:border-orange-500/15 hover:text-foreground/60 active:scale-[0.97]"
+              className={`ml-auto inline-flex items-center gap-1 rounded-full border border-foreground/6 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground/35 transition-all ${catColor.moreHover} hover:text-foreground/60 active:scale-[0.97]`}
               aria-expanded={isExpanded}
             >
               <Compass className="h-3 w-3" />
@@ -583,15 +591,15 @@ export default function ExperiencesSection({
                   <div className="space-y-1 text-[11px] leading-relaxed text-foreground/55">
                     {insiderTips.map((tip) => (
                       <div key={tip} className="flex items-start gap-2">
-                        <span className="mt-[6px] h-1 w-1 flex-shrink-0 rounded-full bg-orange-500/40" />
+                        <span className={`mt-[6px] h-1 w-1 flex-shrink-0 rounded-full ${catColor.dot}`} />
                         <span>{tip}</span>
                       </div>
                     ))}
                   </div>
                 )}
                 {savedNote && (
-                  <div className="rounded-xl border border-orange-500/15 bg-orange-500/5 p-4 text-sm text-orange-400/90">
-                    <div className="mb-2 text-[10px] font-black uppercase tracking-[0.2em] text-orange-400/80">
+                  <div className={`rounded-xl border ${catColor.note} p-4 text-sm`}>
+                    <div className={`mb-2 text-[10px] font-black uppercase tracking-[0.2em] ${catColor.noteLabel}`}>
                       Your note
                     </div>
                     <div className="leading-relaxed text-foreground/90">{savedNote}</div>
@@ -615,13 +623,13 @@ export default function ExperiencesSection({
                       }}
                       rows={2}
                       maxLength={280}
-                      className="w-full rounded-xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition-colors duration-100 focus:border-orange-500/40 focus:bg-foreground/[0.05] focus:ring-2 focus:ring-orange-500/20"
+                      className={`w-full rounded-xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-foreground/80 outline-none transition-colors duration-100 ${catColor.focus} focus:bg-foreground/[0.05]`}
                       placeholder="Share a quick tip, vibe, or hidden detail..."
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={() => saveNote(item.id, noteValue)}
-                        className="rounded-xl border border-orange-500/30 bg-orange-500/20 px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] text-orange-400 transition-colors duration-100 hover:border-orange-500/50 hover:bg-orange-500/30"
+                        className={`rounded-xl border px-4 py-2 text-[11px] font-black uppercase tracking-[0.15em] transition-colors duration-100 ${catColor.noteBtn}`}
                         disabled={!notesHydrated}
                       >
                         Save note
@@ -648,7 +656,7 @@ export default function ExperiencesSection({
     <div className="space-y-8">
       {/* Tab Switcher with Count Badges */}
       <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl md:rounded-[1.5rem] bg-foreground/[0.02] border border-foreground/5 w-fit">
+        <div className="flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 md:rounded-[1.5rem]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -665,15 +673,15 @@ export default function ExperiencesSection({
                 {isActive && (
                   <motion.div
                     layoutId="active-tab"
-                    className="absolute inset-0 bg-orange-500/10 border border-orange-500/20 rounded-xl md:rounded-2xl shadow-[0_0_20px_rgba(124,58,237,0.06)]"
+                    className={`absolute inset-0 rounded-xl border ${tab.activeBorder} ${tab.activeBg} md:rounded-2xl`}
                     transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
                   />
                 )}
                 <Icon
-                  className={`relative z-10 w-3.5 h-3.5 md:w-4 md:h-4 transition-colors duration-200 ${isActive ? "text-orange-400" : "text-foreground/20"}`}
+                  className={`relative z-10 h-3.5 w-3.5 transition-colors duration-200 md:h-4 md:w-4 ${isActive ? tab.activeText : "text-foreground/20"}`}
                 />
                 <span className="relative z-10">{tab.label}</span>
-                <span className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] md:text-[9px] font-black tabular-nums transition-colors duration-200 ${isActive ? "bg-orange-500/20 text-orange-400" : "bg-foreground/5 text-foreground/25"}`}>
+                <span className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] font-black tabular-nums transition-colors duration-200 md:text-[9px] ${isActive ? tab.activeCount : "bg-foreground/5 text-foreground/25"}`}>
                   {count}
                 </span>
               </button>
@@ -688,12 +696,12 @@ export default function ExperiencesSection({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
-              className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-foreground/[0.01] border border-foreground/5 w-fit"
+              className="flex w-fit items-center gap-1.5 rounded-2xl border border-line bg-background/45 p-1.5"
             >
               <button
                 onClick={() => setSelectedPrice(null)}
                 className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === null
-                  ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                  ? "border border-accent/20 bg-accent-soft text-accent"
                   : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                   }`}
               >
@@ -704,7 +712,7 @@ export default function ExperiencesSection({
                   key={level.id}
                   onClick={() => setSelectedPrice(level.id)}
                   className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black transition-all ${selectedPrice === level.id
-                    ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                    ? "border border-accent/20 bg-accent-soft text-accent"
                     : "text-foreground/20 hover:text-foreground/40 border border-transparent"
                     }`}
                 >
@@ -718,8 +726,8 @@ export default function ExperiencesSection({
 
       {/* Saved Places */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-foreground/50">
-          <Bookmark className="h-3.5 w-3.5 text-orange-400/70" />
+        <div className="flex items-center gap-2 rounded-xl border border-line bg-background/45 px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-foreground/50">
+          <Bookmark className="h-3.5 w-3.5 text-accent" />
           <span>
             {savedForCity.length} saved in {cityName}
           </span>
@@ -734,11 +742,11 @@ export default function ExperiencesSection({
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="group flex items-center gap-2 rounded-xl border border-foreground/5 bg-foreground/[0.02] px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-all duration-200 hover:border-orange-500/30 hover:bg-orange-500/8 hover:text-foreground"
+              className="group flex items-center gap-2 rounded-xl border border-line bg-background/45 px-3 py-1.5 text-[11px] font-bold text-foreground/70 transition-all duration-200 hover:border-accent/30 hover:bg-accent-soft/70 hover:text-foreground"
             >
-              <BookmarkCheck className="h-3.5 w-3.5 text-orange-400/70" />
+              <BookmarkCheck className="h-3.5 w-3.5 text-accent" />
               <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
-              <span className="text-[9px] uppercase tracking-[0.15em] text-foreground/30 group-hover:text-orange-400">
+              <span className="text-[9px] uppercase tracking-[0.15em] text-foreground/30 group-hover:text-accent">
                 {item.type}
               </span>
             </motion.a>

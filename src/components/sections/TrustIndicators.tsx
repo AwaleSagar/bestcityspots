@@ -1,105 +1,105 @@
 "use client";
 
-import { Globe2, Shield, Zap, CheckCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { Globe2, Radar, ShieldCheck, Waypoints } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
-const indicators = [
+const pillars = [
   {
     icon: Globe2,
-    label: "Worldwide Coverage",
+    title: "Global coverage with local texture",
     stat: "10,000+",
-    statLabel: "Cities",
-    description: "Verified data across thousands of cities, so you can explore confidently wherever your curiosity takes you.",
+    detail:
+      "Cities, metros, and recognizable travel hubs are searchable from the same entry point.",
+    iconColor: "text-[color:var(--color-brand-secondary)]" as const,
+    iconBg: "bg-[color:var(--color-cat-stays-soft)]" as const,
+    iconBorder:
+      "border-[color:color-mix(in_oklab,var(--color-brand-secondary)_18%,transparent)]" as const,
   },
   {
-    icon: Shield,
-    label: "Transparent & Ethical",
-    stat: "100%",
-    statLabel: "Open",
-    description: "No dark patterns, no hidden agendas. Every metric shows its source, so you always know what you're reading.",
-  },
-  {
-    icon: Zap,
-    label: "Always Fresh",
+    icon: Radar,
+    title: "Live context, not static brochure copy",
     stat: "24/7",
-    statLabel: "Updates",
-    description: "Live weather, updated metrics, and AI-curated insights refreshed daily — so your plans stay current.",
+    detail:
+      "Weather and air quality change with the moment, so the guide reflects current conditions.",
+    iconColor: "text-[color:var(--color-cat-dining)]" as const,
+    iconBg: "bg-[color:var(--color-cat-dining-soft)]" as const,
+    iconBorder:
+      "border-[color:color-mix(in_oklab,var(--color-cat-dining)_18%,transparent)]" as const,
   },
-] as const;
-
-const credibilitySignals = [
-  { icon: CheckCircle, text: "Google Places verified" },
-  { icon: CheckCircle, text: "Public data sourced" },
-  { icon: CheckCircle, text: "AI insights fact-checked" },
-] as const;
+  {
+    icon: ShieldCheck,
+    title: "Methodology shown in plain language",
+    stat: "Open",
+    detail:
+      "Sources stay visible and the AI layer is clearly framed as assisted synthesis, not hidden authority.",
+    iconColor: "text-accent" as const,
+    iconBg: "bg-accent-soft" as const,
+    iconBorder: "border-accent/18" as const,
+  },
+];
 
 export default function TrustIndicators() {
   return (
-    <section
-      className="relative mx-auto max-w-6xl"
-      aria-labelledby="trust-heading"
-    >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:gap-10">
+    <section className="mx-auto max-w-7xl" aria-labelledby="trust-heading">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
         <ScrollReveal animation="fade-up">
-          <div className="space-y-5 lg:sticky lg:top-28">
-            <span className="section-heading">Built on trust</span>
-            <h2 id="trust-heading" className="max-w-sm text-[clamp(1.6rem,3.5vw,2.6rem)] leading-[1] text-foreground">
-              The product is designed to feel credible before it feels clever.
+          <div className="lg:sticky lg:top-24">
+            <span className="section-heading">Trust Signals</span>
+            <h2
+              id="trust-heading"
+              className="text-foreground mt-5 max-w-lg text-[clamp(2.2rem,4vw,3.8rem)] leading-[0.92]"
+            >
+              Credibility shows up in the reading experience before the user checks the sources
+              page.
             </h2>
-            <p className="max-w-md text-sm leading-relaxed text-muted md:text-base">
-              Everything on the surface should make the site easier to trust on a phone: clear sources, calmer hierarchy, and fewer decorative distractions fighting the content.
+            <p className="text-muted mt-4 max-w-lg text-sm leading-7 md:text-base">
+              Good travel products feel composed. The interface should make it obvious what is live,
+              what is editorial, and what is machine-assisted. That clarity is part of the brand.
             </p>
           </div>
         </ScrollReveal>
 
-        <ul className="grid grid-cols-1 gap-3 md:grid-cols-3 md:gap-4" role="list">
-          {indicators.map(({ icon: Icon, label, stat, statLabel, description }, idx) => (
-            <ScrollReveal key={label} animation="fade-up" staggerIndex={idx} staggerDelay={0.15}>
-              <motion.li
-                whileHover={{ y: -6 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="group relative overflow-hidden rounded-[1.4rem] border border-line bg-surface/70 p-4 transition-all duration-500 hover:border-accent/20 hover:shadow-xl md:p-5"
-              >
-                <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[color:var(--liquid-glow-1)] blur-[60px] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-
-                <div className="relative">
-                  <div className="mb-4 flex items-center justify-between">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">0{idx + 1}</span>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-line bg-background/45">
-                      <Icon className="h-5 w-5 text-accent transition-colors duration-300" aria-hidden />
-                    </div>
+        <div className="grid gap-4">
+          {pillars.map(({ icon: Icon, title, detail, iconColor, iconBg, iconBorder }, index) => (
+            <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.12}>
+              <article className="atlas-panel rounded-[1.4rem] p-5 md:p-6">
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] border ${iconBorder} ${iconBg}`}
+                  >
+                    <Icon className={`h-4.5 w-4.5 ${iconColor}`} aria-hidden />
                   </div>
-
-                  <div className="mb-4">
-                    <span className="text-2xl font-semibold tracking-[-0.04em] text-foreground">{stat}</span>
-                    <span className="ml-1.5 text-sm font-semibold text-accent">{statLabel}</span>
+                  <div>
+                    <h3 className="text-foreground text-[clamp(1.3rem,2.2vw,1.8rem)] leading-tight">
+                      {title}
+                    </h3>
+                    <p className="text-muted mt-2 max-w-xl text-sm leading-7">{detail}</p>
                   </div>
-
-                  <h3 className="mb-2 text-base leading-tight text-foreground">
-                    {label}
-                  </h3>
-                  <p className="text-[13px] leading-relaxed text-muted">{description}</p>
                 </div>
-              </motion.li>
+              </article>
             </ScrollReveal>
           ))}
-        </ul>
-      </div>
 
-      <ScrollReveal animation="fade-up" delay={0.4}>
-        <div className="mt-6 flex flex-wrap gap-2.5 md:mt-8">
-          {credibilitySignals.map(({ icon: Icon, text }) => (
-            <div
-              key={text}
-              className="flex items-center gap-2 rounded-full border border-line bg-background/40 px-4 py-2.5 text-xs font-medium text-muted-strong transition-colors duration-300 hover:border-accent/20 hover:text-foreground"
-            >
-              <Icon className="h-3.5 w-3.5 text-accent" aria-hidden />
-              {text}
+          <ScrollReveal animation="fade-up" delay={0.3}>
+            <div className="atlas-frame rounded-[1.4rem] p-5 md:p-6">
+              <div className="labelled-rule">Verification</div>
+              <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                {[
+                  "Google Places verified",
+                  "Public weather sources",
+                  "Explicit AI labeling",
+                  "No paywall gates",
+                ].map((item) => (
+                  <li key={item} className="text-muted flex items-center gap-2 text-sm">
+                    <Waypoints className="text-accent h-3.5 w-3.5 shrink-0" aria-hidden />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
+          </ScrollReveal>
         </div>
-      </ScrollReveal>
+      </div>
     </section>
   );
 }

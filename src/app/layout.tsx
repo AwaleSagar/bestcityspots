@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Geist_Mono, Sora } from "next/font/google";
+import { Cormorant_Garamond, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -11,23 +11,25 @@ export const viewport: Viewport = {
   viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f4efe6" },
-    { media: "(prefers-color-scheme: dark)", color: "#020202" },
+    { media: "(prefers-color-scheme: dark)", color: "#17110d" },
   ],
 };
 
-const sora = Sora({
-  variable: "--font-sora",
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument-sans",
   subsets: ["latin"],
 });
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant-garamond",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
@@ -98,11 +100,7 @@ import SiteNav from "@/components/layout/SiteNav";
 import SiteFooter from "@/components/layout/SiteFooter";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ClientEffects from "@/components/effects/ClientEffects";
-import {
-  AnalyticsProvider,
-  PageTracker,
-  GeoConsentBanner,
-} from "@/components/analytics";
+import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
 
 const jsonLd = [
   {
@@ -134,7 +132,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${sora.variable} ${fraunces.variable} ${geistMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased`}
+        className={`${instrumentSans.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased`}
       >
         <script
           type="application/ld+json"
@@ -146,7 +144,7 @@ export default function RootLayout({
         />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
@@ -155,7 +153,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link pointer-events-auto fixed left-3 top-3 z-[210] rounded-full border border-line bg-surface/95 px-4 py-3 text-[11px] font-semibold tracking-[0.24em] text-foreground uppercase opacity-0 shadow-lg backdrop-blur-xl transition focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-accent/40 sm:left-4 sm:top-4"
+              className="skip-link border-line bg-surface/95 text-foreground focus-visible:ring-accent/40 pointer-events-auto fixed top-3 left-3 z-[210] rounded-full border px-4 py-3 text-[11px] font-semibold tracking-[0.24em] uppercase opacity-0 shadow-lg backdrop-blur-xl transition focus-visible:opacity-100 focus-visible:ring-2 sm:top-4 sm:left-4"
               style={{
                 marginLeft: "env(safe-area-inset-left, 0)",
                 marginTop: "env(safe-area-inset-top, 0)",
@@ -164,8 +162,8 @@ export default function RootLayout({
               Skip to content
             </a>
             <ClientEffects />
-            <div className="relative z-10 flex min-h-screen flex-col mobile-bottom-spacer">
-              <div className="flex-1 flex flex-col">{children}</div>
+            <div className="mobile-bottom-spacer relative z-10 flex min-h-screen flex-col">
+              <div className="flex flex-1 flex-col">{children}</div>
               <SiteFooter />
             </div>
             <MobileBottomNav />

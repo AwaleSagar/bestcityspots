@@ -2,8 +2,7 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Globe2, Users, BarChart3, MapPin } from "lucide-react";
+import { ArrowLeft, ArrowRight, Globe2, MapPinned, Users } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { formatPopulation } from "@/lib/format";
@@ -24,88 +23,52 @@ interface TopCitiesPageContentProps {
   cities: City[];
 }
 
-const tiers = [
+const bands = [
   {
-    id: "tier-1",
-    label: "1 — 10",
-    title: "Global Leaders",
-    range: [0, 10] as const,
+    label: "01-10",
+    title: "Global anchors",
+    cities: (items: City[]) => items.slice(0, 10),
   },
   {
-    id: "tier-2",
-    label: "11 — 25",
-    title: "Major Hubs",
-    range: [10, 25] as const,
+    label: "11-25",
+    title: "Major hubs",
+    cities: (items: City[]) => items.slice(10, 25),
   },
   {
-    id: "tier-3",
-    label: "26 — 50",
-    title: "Emerging Destinations",
-    range: [25, 50] as const,
+    label: "26-50",
+    title: "Scale with momentum",
+    cities: (items: City[]) => items.slice(25, 50),
   },
 ];
 
-function FeaturedCityCard({ city, rank }: { city: City; rank: number }) {
-  const shouldReduceMotion = useReducedMotion();
-
+function CityCard({ city, rank }: { city: City; rank: number }) {
   return (
-    <motion.div
-      whileHover={shouldReduceMotion ? {} : { y: -4 }}
-      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+    <Link
+      href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+      className="atlas-panel interactive-card flex h-full flex-col justify-between rounded-[1.8rem] p-5 md:p-6"
     >
-      <Link
-        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-        className="group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border border-foreground/[0.05] bg-foreground/[0.015] p-6 transition-all duration-500 hover:border-orange-500/15 hover:shadow-xl md:rounded-3xl md:p-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40"
-      >
-        {/* Rank */}
-        <div className="mb-6 flex items-start justify-between">
-          <span className="text-5xl font-bold tracking-[-0.04em] text-foreground/[0.06] md:text-6xl">
-            {String(rank).padStart(2, "0")}
-          </span>
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] text-foreground/30 transition-all duration-300 group-hover:border-orange-500/25 group-hover:bg-orange-500/8 group-hover:text-orange-400">
-            <ArrowUpRight className="h-4 w-4" />
-          </div>
-        </div>
+      <div>
+        <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-muted">
+          Rank {String(rank).padStart(2, "0")}
+        </p>
+        <h3 className="mt-3 text-[2.2rem] leading-none text-foreground">{city.city}</h3>
+        <p className="mt-2 text-sm uppercase tracking-[0.14em] text-muted-strong">
+          {city.country}
+          {city.admin_name ? ` / ${city.admin_name}` : ""}
+        </p>
+      </div>
 
-        {/* City info */}
-        <div className="space-y-3">
-          <h3 className="text-xl font-bold tracking-[-0.01em] text-foreground transition-colors group-hover:text-foreground md:text-2xl">
-            {city.city}
-          </h3>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-foreground/40">
-            <span>{city.country}</span>
-            {city.admin_name && (
-              <>
-                <span className="text-foreground/15">·</span>
-                <span className="text-foreground/30">{city.admin_name}</span>
-              </>
-            )}
-          </div>
+      <div className="mt-6 flex items-end justify-between gap-4 border-t border-line pt-4">
+        <div>
+          <p className="text-lg font-semibold text-foreground">{formatPopulation(city.population)}</p>
+          <p className="text-[0.68rem] uppercase tracking-[0.22em] text-muted">Population</p>
         </div>
-
-        {/* Data row */}
-        <div className="mt-6 flex items-center gap-4 border-t border-foreground/[0.04] pt-5">
-          <div>
-            <div className="text-lg font-bold tracking-tight text-foreground">
-              {formatPopulation(city.population)}
-            </div>
-            <div className="text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/30">
-              Population
-            </div>
-          </div>
-          {city.capital === "primary" && (
-            <div className="ml-auto rounded-md border border-amber-500/20 bg-amber-500/[0.06] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-400/80">
-              Capital
-            </div>
-          )}
-          {city.iso3 && (
-            <div className={`${city.capital === "primary" ? "" : "ml-auto"} font-mono text-xs text-foreground/20`}>
-              {city.iso3}
-            </div>
-          )}
+        <div className="flex items-center gap-2">
+          {city.capital === "primary" ? <span className="badge-featured">Capital</span> : null}
+          <ArrowRight className="h-4 w-4 text-accent" aria-hidden />
         </div>
-      </Link>
-    </motion.div>
+      </div>
+    </Link>
   );
 }
 
@@ -113,266 +76,174 @@ function CityRow({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
       href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-      className="group flex items-center gap-4 rounded-xl border border-transparent px-4 py-3.5 transition-all duration-300 hover:border-foreground/[0.05] hover:bg-foreground/[0.015] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/40 sm:px-5 sm:py-4 md:gap-5"
+      className="group flex items-center gap-4 rounded-[1.2rem] border border-transparent px-4 py-3 transition-colors duration-300 hover:border-line hover:bg-background/55"
     >
-      {/* Rank */}
-      <span className="w-8 flex-shrink-0 text-right font-mono text-sm text-foreground/20 md:w-10">
-        {rank}
-      </span>
-
-      {/* City */}
-      <span className="min-w-0 flex-1 font-medium text-foreground/75 transition-colors group-hover:text-foreground">
-        {city.city}
-      </span>
-
-      {/* Country */}
-      <span className="hidden text-sm text-foreground/35 sm:block">
+      <span className="w-10 shrink-0 font-mono text-sm text-muted">{String(rank).padStart(2, "0")}</span>
+      <span className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">{city.city}</span>
+      <span className="hidden text-sm uppercase tracking-[0.12em] text-muted-strong sm:block">
         {city.country}
       </span>
-
-      {/* Region */}
-      <span className="hidden text-sm text-foreground/20 md:block md:w-32 md:text-right">
-        {city.admin_name || "—"}
-      </span>
-
-      {/* Capital badge */}
-      <span className="hidden w-16 text-center md:block">
-        {city.capital === "primary" ? (
-          <span className="rounded-md border border-amber-500/15 bg-amber-500/[0.04] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-400/70">
-            Capital
-          </span>
-        ) : (
-          <span className="text-foreground/10">—</span>
-        )}
-      </span>
-
-      {/* Population */}
-      <span className="w-16 text-right font-mono text-sm text-foreground/30 sm:w-20">
+      <span className="hidden text-sm text-muted md:block">{city.admin_name || "Regional center"}</span>
+      <span className="w-20 text-right text-sm font-semibold text-muted-strong">
         {formatPopulation(city.population)}
       </span>
-
-      {/* Arrow */}
-      <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-foreground/15 transition-all duration-300 group-hover:bg-foreground/[0.04] group-hover:text-foreground/40">
-        <ArrowRight className="h-3.5 w-3.5" />
-      </span>
+      <ArrowRight className="h-4 w-4 shrink-0 text-accent transition-transform duration-300 group-hover:translate-x-1" />
     </Link>
-  );
-}
-
-function TierDivider({ label, title }: { label: string; title: string }) {
-  return (
-    <ScrollReveal animation="fade-up">
-      <div className="flex items-center gap-5 pb-2 pt-6 md:gap-6 md:pt-8">
-        <span className="font-mono text-xs text-foreground/20">{label}</span>
-        <div className="h-px flex-1 bg-foreground/[0.04]" />
-        <span className="text-xs font-medium text-foreground/25">{title}</span>
-      </div>
-    </ScrollReveal>
   );
 }
 
 export default function TopCitiesPageContent({ cities }: TopCitiesPageContentProps) {
   const stats = useMemo(() => {
-    const countries = new Set(cities.map((c) => c.country));
-    const capitals = cities.filter((c) => c.capital === "primary").length;
-    const totalPop = cities.reduce((sum, c) => sum + (c.population || 0), 0);
-    return { countries: countries.size, capitals, totalPop };
+    const countries = new Set(cities.map((city) => city.country)).size;
+    const capitals = cities.filter((city) => city.capital === "primary").length;
+    const combinedPopulation = cities.reduce((total, city) => total + city.population, 0);
+
+    return {
+      countries,
+      capitals,
+      combinedPopulation,
+    };
   }, [cities]);
+
+  const featuredCities = cities.slice(0, 6);
 
   return (
     <>
       <ScrollProgress />
 
-      <main id="main-content" className="min-h-screen bg-transparent font-sans text-foreground">
+      <main id="main-content" className="min-h-screen bg-transparent text-foreground">
         <div
-          className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
+          className="container-gutter mx-auto max-w-6xl px-4 py-12 sm:px-6"
           style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
         >
-          {/* Back nav */}
           <ScrollReveal animation="fade-down" delay={0.1}>
-            <nav className="mb-12 md:mb-16" aria-label="Breadcrumb">
+            <nav className="mb-10" aria-label="Breadcrumb">
               <Link
                 href="/"
-                className="group nav-link touch-target inline-flex min-h-[var(--touch-target-min)] items-center gap-3 text-foreground/40 transition-colors duration-300 hover:text-foreground py-2"
+                className="inline-flex items-center gap-3 rounded-full border border-line bg-background/65 px-4 py-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-muted-strong transition-colors duration-300 hover:text-foreground"
               >
-                <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-foreground/[0.06] bg-foreground/[0.02] transition-all duration-300 group-hover:border-orange-500/25 group-hover:bg-orange-500/8">
-                  <ArrowLeft className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" aria-hidden />
-                </span>
-                <span className="text-[11px] font-medium uppercase tracking-[0.15em]">
-                  Back to Explorer
-                </span>
+                <ArrowLeft className="h-4 w-4" aria-hidden />
+                Back to explorer
               </Link>
             </nav>
           </ScrollReveal>
 
-          {/* ─── HERO ─── */}
-          <header className="mb-16 md:mb-20">
-            <ScrollReveal animation="fade-up" delay={0.2}>
-              <span className="mb-5 inline-block text-[11px] font-medium tracking-[0.3em] text-foreground/25 uppercase">
-                Reference Index — Updated {new Date().getFullYear()}
-              </span>
+          <header className="atlas-frame rounded-[2.4rem] p-6 md:p-8 lg:p-10">
+            <ScrollReveal animation="fade-up">
+              <span className="eyebrow">The Global 50</span>
             </ScrollReveal>
-
-            <ScrollReveal animation="fade-up" delay={0.3}>
-              <h1 className="text-4xl font-bold tracking-[-0.03em] text-foreground md:text-5xl lg:text-6xl">
-                The Global 50
+            <ScrollReveal animation="fade-up" delay={0.1}>
+              <h1 className="mt-6 max-w-4xl page-title text-foreground">
+                Fifty cities to start from when the trip is still wide open.
               </h1>
             </ScrollReveal>
-
-            <ScrollReveal animation="fade-up" delay={0.4}>
-              <p className="mt-5 max-w-2xl text-base leading-relaxed text-foreground/45 md:text-lg">
-                A curated ranking of the world&apos;s most significant urban centers,
-                ordered by metropolitan population. Each city links to a full guide with
-                AI-powered insights, real-time weather, and curated local experiences.
+            <ScrollReveal animation="fade-up" delay={0.2}>
+              <p className="mt-5 max-w-3xl lede">
+                This ranking is a fast editorial index of urban scale. Use it when you want a strong
+                first shortlist, then open individual city guides for weather, briefings, places, and
+                saved planning notes.
               </p>
             </ScrollReveal>
 
-            {/* Key stats strip */}
-            <ScrollReveal animation="fade-up" delay={0.5}>
-              <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-foreground/[0.04] pt-8 md:gap-10">
-                <div className="flex items-center gap-2.5">
-                  <BarChart3 className="h-4 w-4 text-foreground/20" />
-                  <span className="text-sm font-medium text-foreground/50">
-                    <strong className="text-foreground/75">{cities.length}</strong> Cities
-                  </span>
+            <ScrollReveal animation="fade-up" delay={0.3}>
+              <div className="mt-8 grid gap-3 md:grid-cols-3">
+                <div className="atlas-panel rounded-[1.5rem] p-4">
+                  <div className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-muted">
+                    <Globe2 className="h-4 w-4 text-accent" aria-hidden />
+                    Countries
+                  </div>
+                  <p className="mt-3 text-3xl leading-none text-foreground">{stats.countries}</p>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Globe2 className="h-4 w-4 text-foreground/20" />
-                  <span className="text-sm font-medium text-foreground/50">
-                    <strong className="text-foreground/75">{stats.countries}</strong> Countries
-                  </span>
+                <div className="atlas-panel rounded-[1.5rem] p-4">
+                  <div className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-muted">
+                    <MapPinned className="h-4 w-4 text-accent" aria-hidden />
+                    Capitals
+                  </div>
+                  <p className="mt-3 text-3xl leading-none text-foreground">{stats.capitals}</p>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <MapPin className="h-4 w-4 text-foreground/20" />
-                  <span className="text-sm font-medium text-foreground/50">
-                    <strong className="text-foreground/75">{stats.capitals}</strong> Capitals
-                  </span>
+                <div className="atlas-panel rounded-[1.5rem] p-4">
+                  <div className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-muted">
+                    <Users className="h-4 w-4 text-accent" aria-hidden />
+                    Combined population
+                  </div>
+                  <p className="mt-3 text-3xl leading-none text-foreground">
+                    {formatPopulation(stats.combinedPopulation)}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Users className="h-4 w-4 text-foreground/20" />
-                  <span className="text-sm font-medium text-foreground/50">
-                    <strong className="text-foreground/75">{formatPopulation(stats.totalPop)}</strong> Combined Pop.
-                  </span>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Methodology note */}
-            <ScrollReveal animation="fade-up" delay={0.55}>
-              <div className="mt-8 rounded-xl border border-foreground/[0.04] bg-foreground/[0.01] px-5 py-4 md:px-6">
-                <p className="text-xs leading-relaxed text-foreground/35">
-                  <strong className="text-foreground/50">Methodology.</strong>{" "}
-                  Cities are ranked by metropolitan population using data from public census
-                  databases and verified geographic sources. All data is refreshable and
-                  cross-referenced — see{" "}
-                  <Link href="/about" className="text-orange-400/60 underline underline-offset-2 decoration-orange-400/20 hover:text-orange-400 transition-colors">
-                    our data sources
-                  </Link>{" "}
-                  for full transparency. Rankings reflect urban scale; individual city
-                  guides layer in climate, culture, and AI-curated insights for a
-                  complete picture.
-                </p>
               </div>
             </ScrollReveal>
           </header>
 
-          {/* ─── RANKINGS ─── */}
-          <section aria-labelledby="cities-list-heading">
+          <section className="mt-12">
+            <div className="labelled-rule">Featured Cities</div>
+            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {featuredCities.map((city, index) => (
+                <ScrollReveal key={city.id} animation="fade-up" staggerIndex={index} staggerDelay={0.08}>
+                  <CityCard city={city} rank={index + 1} />
+                </ScrollReveal>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-16" aria-labelledby="cities-list-heading">
             <h2 id="cities-list-heading" className="sr-only">
               Ranked list of top 50 cities
             </h2>
 
-            {tiers.map((tier) => {
-              const tierCities = cities.slice(tier.range[0], tier.range[1]);
-              const isFeaturedTier = tier.id === "tier-1";
+            {bands.map((band) => {
+              const bandCities = band.cities(cities);
+              const startRank = cities.indexOf(bandCities[0]) + 1;
 
               return (
-                <div key={tier.id} className="mb-12 md:mb-16">
-                  <TierDivider label={tier.label} title={tier.title} />
+                <div key={band.label} className="mt-10">
+                  <div className="labelled-rule">
+                    {band.label} / {band.title}
+                  </div>
+                  <div className="atlas-frame mt-4 rounded-[1.8rem] p-3 md:p-4">
+                    <div className="mb-2 hidden items-center gap-4 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-muted sm:flex">
+                      <span className="w-10">Rank</span>
+                      <span className="flex-1">City</span>
+                      <span>Country</span>
+                      <span className="hidden md:block">Region</span>
+                      <span className="w-20 text-right">Population</span>
+                      <span className="w-4" />
+                    </div>
 
-                  {isFeaturedTier ? (
-                    /* Featured grid for the top 10 */
-                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5">
-                      {tierCities.map((city, idx) => (
-                        <ScrollReveal
-                          key={city.id}
-                          animation="fade-up"
-                          staggerIndex={idx}
-                          staggerDelay={0.06}
-                        >
-                          <FeaturedCityCard
-                            city={city}
-                            rank={tier.range[0] + idx + 1}
-                          />
+                    <div className="divide-y divide-line/80">
+                      {bandCities.map((city, index) => (
+                        <ScrollReveal key={city.id} animation="fade-up" staggerIndex={index} staggerDelay={0.03}>
+                          <CityRow city={city} rank={startRank + index} />
                         </ScrollReveal>
                       ))}
                     </div>
-                  ) : (
-                    /* Compact rows for 11-50 */
-                    <div className="mt-4">
-                      {/* Column labels */}
-                      <div className="mb-1 flex items-center gap-4 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/20 sm:px-5 md:gap-5">
-                        <span className="w-8 text-right md:w-10">#</span>
-                        <span className="flex-1">City</span>
-                        <span className="hidden sm:block">Country</span>
-                        <span className="hidden md:block md:w-32 md:text-right">Region</span>
-                        <span className="hidden w-16 text-center md:block">Status</span>
-                        <span className="w-16 text-right sm:w-20">Pop.</span>
-                        <span className="w-7" />
-                      </div>
-
-                      <ol
-                        className="divide-y divide-foreground/[0.03]"
-                        start={tier.range[0] + 1}
-                      >
-                        {tierCities.map((city, idx) => (
-                          <ScrollReveal
-                            key={city.id}
-                            animation="fade-up"
-                            staggerIndex={idx}
-                            staggerDelay={0.03}
-                          >
-                            <li>
-                              <CityRow
-                                city={city}
-                                rank={tier.range[0] + idx + 1}
-                              />
-                            </li>
-                          </ScrollReveal>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
           </section>
 
-          {/* ─── FOOTER CTA ─── */}
           <ScrollReveal animation="fade-up">
-            <div className="mt-8 flex flex-col items-center gap-6 border-t border-foreground/[0.04] pt-14 text-center md:pt-16">
-              <p className="max-w-md text-sm leading-relaxed text-foreground/40">
-                Each city above links to a full guide with AI briefings, real-time
-                weather, curated landmarks, dining, and stays. Explore any city to
-                start planning.
-              </p>
-              <div className="flex flex-wrap justify-center gap-3">
-                <Link href="/" className="btn-primary">
-                  Go to Explorer
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                  className="btn-secondary"
-                >
-                  Back to Top
-                </button>
+            <section className="atlas-panel-strong mt-16 rounded-[2.2rem] p-6 md:p-8">
+              <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                <p className="max-w-2xl text-base leading-8 text-muted-strong md:text-lg">
+                  Every city above links to a full guide with AI briefings, live weather, curated places,
+                  and a personal save flow for trip planning.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/" className="btn-primary">
+                    Go to explorer
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    className="btn-secondary"
+                  >
+                    Back to top
+                  </button>
+                </div>
               </div>
-              <p className="mt-4 text-[11px] text-foreground/20">
-                All data sourced from public census databases · Google Places API · Google Gemini AI
-              </p>
-            </div>
+            </section>
           </ScrollReveal>
         </div>
       </main>

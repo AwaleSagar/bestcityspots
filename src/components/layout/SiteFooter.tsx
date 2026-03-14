@@ -1,62 +1,63 @@
 import Link from "next/link";
-import { MapPin, BookOpen, Info, Compass } from "lucide-react";
+import { BookOpen, Compass, Info, MapPinned } from "lucide-react";
 
 const exploreLinks = [
-  { href: "/", label: "Explore Cities", icon: MapPin },
-  { href: "/resources/top-cities", label: "Top 50 Cities Guide", icon: BookOpen },
-  { href: "/resources/top-cities#plan", label: "Plan Your Trip", icon: Compass },
+  { href: "/", label: "Explore cities" },
+  { href: "/resources/top-cities", label: "Top cities" },
 ] as const;
 
 const companyLinks = [
-  { href: "/about", label: "About Us", icon: Info },
-  { href: "/about", label: "Data Sources & Methodology" },
+  { href: "/about", label: "About the project" },
+  { href: "/about#source-stack", label: "Data sources" },
 ] as const;
 
 export default function SiteFooter() {
   return (
-    <footer
-      className="relative border-t border-line/80 bg-surface/45"
-      role="contentinfo"
-      aria-label="Site footer"
-    >
+    <footer className="border-t border-line/70 bg-background/65" role="contentinfo" aria-label="Site footer">
       <div
-        className="container-gutter mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-14"
+        className="container-gutter mx-auto max-w-7xl px-4 py-10 sm:px-6 md:py-14"
         style={{ paddingBottom: "max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))" }}
       >
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,0.8fr)_minmax(0,0.8fr)]">
-          <div className="rounded-[1.5rem] border border-line bg-surface/70 p-5 shadow-lg backdrop-blur-xl md:p-6">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent text-accent-contrast shadow-sm">
-                <MapPin className="h-4 w-4" aria-hidden />
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)]">
+          <div className="atlas-frame rounded-[2rem] p-5 md:p-6">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-accent text-accent-contrast">
+                <MapPinned className="h-4 w-4" aria-hidden />
               </div>
               <div>
-                <span className="block text-base font-semibold tracking-tight text-foreground">Best City Spots</span>
-                <span className="block text-[10px] font-medium uppercase tracking-[0.22em] text-muted">Editorial city intelligence</span>
+                <span className="block text-xl leading-none text-foreground">Best City Spots</span>
+                <span className="mt-1 block font-mono text-[0.62rem] uppercase tracking-[0.28em] text-muted">
+                  Atlas for deliberate travel
+                </span>
               </div>
             </div>
-            <p className="max-w-md text-sm leading-relaxed text-muted">
-              Best City Spots is built for travelers who want signal, not noise. We combine public data, live travel context, and AI-assisted summaries into a calmer way to choose where to go next.
+
+            <p className="mt-5 max-w-xl text-sm leading-7 text-muted">
+              A city research tool built to reduce noise: clear search, live urban signals, AI-assisted
+              briefings, and city pages that help you decide where to go next without fighting the interface.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2.5 text-[11px] font-medium uppercase tracking-[0.16em] text-muted">
-              <span className="rounded-full border border-line bg-background/40 px-3 py-2">10,000+ cities</span>
-              <span className="rounded-full border border-line bg-background/40 px-3 py-2">Mobile-first guides</span>
-              <span className="rounded-full border border-line bg-background/40 px-3 py-2">Transparent sources</span>
+
+            <div className="mt-5 flex flex-wrap gap-3">
+              {["10,000+ cities", "AI clearly labeled", "Mobile-first planning"].map((item) => (
+                <span key={item} className="atlas-chip">
+                  <Compass className="h-3.5 w-3.5 text-accent" aria-hidden />
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
 
-          <div>
-            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
-              Explore
-            </h3>
-            <nav aria-label="Footer explore navigation">
-              <ul className="space-y-3.5">
-                {exploreLinks.map(({ href, label, icon: Icon }) => (
+          <div className="atlas-panel rounded-[2rem] p-5 md:p-6">
+            <div className="labelled-rule">Explore</div>
+            <nav className="mt-5" aria-label="Footer explore navigation">
+              <ul className="space-y-3">
+                {exploreLinks.map(({ href, label }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center gap-2.5 text-sm font-medium text-muted transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35"
+                      className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.14em] text-muted-strong transition-colors duration-300 hover:text-foreground"
                     >
-                      <Icon className="h-3.5 w-3.5 flex-shrink-0" aria-hidden />
+                      <BookOpen className="h-3.5 w-3.5 text-[color:var(--color-brand-accent)]" aria-hidden />
                       {label}
                     </Link>
                   </li>
@@ -65,18 +66,17 @@ export default function SiteFooter() {
             </nav>
           </div>
 
-          <div>
-            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted">
-              Company
-            </h3>
-            <nav aria-label="Footer company navigation">
-              <ul className="space-y-3.5">
+          <div className="atlas-panel rounded-[2rem] p-5 md:p-6">
+            <div className="labelled-rule">About</div>
+            <nav className="mt-5" aria-label="Footer company navigation">
+              <ul className="space-y-3">
                 {companyLinks.map(({ href, label }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className="link touch-target inline-flex items-center text-sm font-medium text-muted transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/35"
+                      className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.14em] text-muted-strong transition-colors duration-300 hover:text-foreground"
                     >
+                      <Info className="h-3.5 w-3.5 text-[color:var(--color-brand-secondary)]" aria-hidden />
                       {label}
                     </Link>
                   </li>
@@ -86,13 +86,9 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-line pt-6 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} Best City Spots. Built for travelers who value clarity.
-          </p>
-          <p className="text-xs text-muted">
-            Made in Pune &middot; Designed for deliberate trips
-          </p>
+        <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 text-xs uppercase tracking-[0.14em] text-muted md:flex-row md:items-center md:justify-between">
+          <p>&copy; {new Date().getFullYear()} Best City Spots</p>
+          <p>Designed as an editorial atlas for city-first trips</p>
         </div>
       </div>
     </footer>
