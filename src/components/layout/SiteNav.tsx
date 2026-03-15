@@ -10,7 +10,7 @@ const navLinks = [
 
 export default function SiteNav() {
   return (
-    <header className="border-line/70 bg-background/92 sticky top-0 z-[200] w-full border-b backdrop-blur-xl max-md:bg-background max-md:backdrop-blur-none">
+    <header className="border-line/70 bg-background/92 sticky top-0 z-[200] w-full border-b backdrop-blur-xl max-md:bg-background/96 max-md:backdrop-blur-md">
       <div className="container-gutter mx-auto max-w-7xl px-4 py-3 sm:px-6">
         <div className="border-line bg-surface/82 flex items-center justify-between gap-3 rounded-[1.2rem] border px-3 py-3 shadow-sm sm:rounded-[1.4rem] md:rounded-[1.6rem] md:px-4">
           <Link
