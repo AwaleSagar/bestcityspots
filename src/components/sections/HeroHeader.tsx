@@ -47,21 +47,22 @@ export default function HeroHeader() {
 
         <div className="mx-auto max-w-3xl">
           <div>
-            <motion.p variants={fadeUp} className="eyebrow">
+            <motion.p variants={fadeUp} className="eyebrow hidden sm:inline-flex">
               Editorial Atlas 2026 &middot; Human-readable city intelligence
             </motion.p>
 
-            <motion.h1 variants={fadeUp} className="page-title text-foreground mt-4 max-w-5xl sm:mt-6">
+            <motion.h1 variants={fadeUp} className="page-title text-foreground mt-2 max-w-5xl sm:mt-6">
               Pick a city the way a thoughtful magazine would edit the shortlist.
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="lede mt-5 max-w-3xl">
-              Best City Spots turns sprawling destination research into a clean urban briefing.
+            <motion.p variants={fadeUp} className="lede mt-3 max-w-3xl sm:mt-5">
+              <span className="hidden sm:inline">Best City Spots turns sprawling destination research into a clean urban briefing.
               Search once, get weather and scale instantly, then move into neighborhood texture,
-              travel timing, and saved experiences without losing your place.
+              travel timing, and saved experiences without losing your place.</span>
+              <span className="sm:hidden">Turn destination research into a clean urban briefing — weather, signals, and planning in one place.</span>
             </motion.p>
 
-            <motion.div variants={fadeUp} className="mt-8">
+            <motion.div variants={fadeUp} className="mt-5 sm:mt-8">
               <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <Link
                   href="#city-search"
@@ -80,7 +81,7 @@ export default function HeroHeader() {
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
 
-                <div className="atlas-chip atlas-chip-accent hero-notice rounded-full border border-[color:color-mix(in_oklab,var(--color-accent)_20%,transparent)] px-3 py-2">
+                <div className="atlas-chip atlas-chip-accent hero-notice hidden rounded-full border border-[color:color-mix(in_oklab,var(--color-accent)_20%,transparent)] px-3 py-2 sm:inline-flex">
                   <Compass className="h-3.5 w-3.5" aria-hidden />
                   Search, compare, then dive deeper
                 </div>
@@ -89,7 +90,7 @@ export default function HeroHeader() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-6 flex flex-wrap items-center gap-2 text-xs text-[color:var(--color-muted)] sm:mt-10 sm:gap-3"
+              className="mt-4 hidden flex-wrap items-center gap-2 text-xs text-[color:var(--color-muted)] sm:mt-10 sm:flex sm:gap-3"
             >
               <div className="hero-metric-pill text-[0.68rem] sm:text-xs">
                 <Sparkles className="h-3 w-3 text-[color:var(--color-accent)] sm:h-3.5 sm:w-3.5" aria-hidden />

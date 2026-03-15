@@ -845,7 +845,7 @@ html {
 @media (max-width: 767px) {
   .mobile-bottom-spacer {
     padding-bottom: calc(
-      var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 0.75rem
+      var(--mobile-bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 1.5rem
     );
   }
 
@@ -854,7 +854,74 @@ html {
     contain-intrinsic-size: auto 320px;
   }
 
-  body::before {
-    background-size: 56px 56px;
+  /* Performance: remove decorative textures on mobile */
+  body::before,
+  body::after {
+    display: none;
+  }
+
+  /* Performance: replace backdrop-filter with opaque fills on mobile */
+  .glass,
+  .glass-dropdown,
+  .liquid-glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--color-glass-heavy);
+  }
+
+  /* Strip card monotony: flatten sections that don't need boxing on mobile */
+  .mobile-flat {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .mobile-flat::before {
+    display: none;
+  }
+
+  /* Use color borders instead of full card wrapping on mobile */
+  .mobile-color-border {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0;
+    padding: 0.75rem 0 0.75rem 1rem;
+  }
+
+  .mobile-color-border.border-secondary {
+    border-left-color: var(--color-brand-secondary);
+  }
+
+  .mobile-color-border.border-dining {
+    border-left-color: var(--color-cat-dining);
+  }
+
+  /* Hero: compress for mobile — move search closer */
+  .landing-hero-shell {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .hero-atmosphere-orb {
+    display: none;
+  }
+
+  /* Disable hover-only effects on touch */
+  .interactive-card {
+    transition: none;
+  }
+
+  .interactive-card:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .interactive-card:active {
+    transform: scale(0.98);
+    transition: transform 0.12s ease;
   }
 }

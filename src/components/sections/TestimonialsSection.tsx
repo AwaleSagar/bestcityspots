@@ -74,9 +74,9 @@ export default function TestimonialsSection() {
                 staggerIndex={index}
                 staggerDelay={0.12}
               >
-                <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem]">
+                <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] max-md:border-none max-md:bg-transparent max-md:shadow-none max-md:p-0 max-md:pl-4 max-md:border-l-[3px] max-md:border-l-[color:var(--color-accent)] max-md:rounded-none">
                   <Icon className={`h-5 w-5 ${color}`} aria-hidden />
-                  <h3 className="text-foreground mt-4 text-xl leading-tight">{title}</h3>
+                  <h3 className="text-foreground mt-4 text-xl leading-tight md:mt-4 max-md:mt-2">{title}</h3>
                   <p className="text-muted mt-2 text-sm leading-7">{text}</p>
                 </article>
               </ScrollReveal>

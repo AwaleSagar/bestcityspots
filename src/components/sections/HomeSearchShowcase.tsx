@@ -21,7 +21,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
       whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.8, ease: sectionEase, delay: 0.12 }}
-      className="search-stage mt-8 grid gap-6 pb-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-8 lg:pb-24"
+      className="search-stage mt-4 grid gap-6 pb-16 sm:mt-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-8 lg:pb-24"
     >
       <motion.div
         className="lg:sticky lg:top-24"

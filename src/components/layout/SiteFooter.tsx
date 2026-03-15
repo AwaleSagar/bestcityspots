@@ -90,6 +90,9 @@ export default function SiteFooter() {
           <p>&copy; {new Date().getFullYear()} Best City Spots</p>
           <p>Designed as an editorial atlas for city-first trips</p>
         </div>
+
+        {/* Clearance for mobile bottom nav */}
+        <div className="h-4 md:hidden" aria-hidden />
       </div>
     </footer>
   );

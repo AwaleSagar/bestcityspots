@@ -51,7 +51,6 @@ function MetricCard({
   source?: string;
 }) {
   const isEmpty = value === null || value === undefined || value === "";
-  const debugId = label.replace(/[^a-z0-9]/gi, "").slice(0, 6).toUpperCase() || "METRIC";
   const display = isEmpty ? (
     <span className="text-foreground/25">N/A</span>
   ) : (
@@ -68,19 +67,16 @@ function MetricCard({
   );
 
   return (
-    <div className="atlas-panel group/metric rounded-[1.1rem] p-4 flex flex-col gap-3 transition-all duration-500 hover:border-accent/14 sm:rounded-[1.3rem] sm:gap-4 sm:p-5">
+    <div className="atlas-panel group/metric rounded-[1.1rem] p-4 flex flex-col gap-3 transition-all duration-300 active:scale-[0.98] sm:rounded-[1.3rem] sm:gap-4 sm:p-5 md:hover:border-accent/14 md:duration-500">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] border border-line bg-background/55 transition-all duration-300 group-hover/metric:border-accent/20 group-hover/metric:bg-accent-soft/60">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] border border-line bg-background/55 transition-all duration-300 md:group-hover/metric:border-accent/20 md:group-hover/metric:bg-accent-soft/60">
             <Icon className="h-5 w-5 text-accent transition-colors duration-300" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted">
                 {label}
-              </div>
-              <div className="hidden text-[8px] font-mono text-accent/45 group-hover/metric:block">
-                ID_{debugId}
               </div>
             </div>
             {display}
@@ -276,7 +272,7 @@ export default async function CityPage({
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
+              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
                 <div className="mb-6 flex items-center gap-4 text-muted">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
                     <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
@@ -285,7 +281,7 @@ export default async function CityPage({
                     Census Data
                   </span>
                 </div>
-                <div className="mb-2 text-4xl md:text-5xl font-bold tracking-[-0.02em] text-foreground">
+                <div className="mb-2 text-4xl font-bold tracking-[-0.02em] text-foreground md:text-5xl">
                   {formatPopulation(city.population)}
                 </div>
                 <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">
@@ -293,7 +289,7 @@ export default async function CityPage({
                 </div>
               </div>
 
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
+              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
                 <div className="mb-4 flex items-center gap-4 text-muted sm:mb-6">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
                     <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
@@ -302,7 +298,7 @@ export default async function CityPage({
                     Territory
                   </span>
                 </div>
-                <div className="mb-2 text-2xl md:text-3xl leading-tight font-bold tracking-tight text-foreground">
+                <div className="mb-2 text-2xl font-bold leading-tight tracking-tight text-foreground md:text-3xl">
                   {city.admin_name || "Autonomous"}
                 </div>
                 <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">

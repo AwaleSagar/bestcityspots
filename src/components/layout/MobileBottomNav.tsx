@@ -37,7 +37,7 @@ export default function MobileBottomNav() {
                 aria-current={isActive ? "page" : undefined}
               >
                 <Icon className="h-5 w-5" aria-hidden />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em]">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.1em]">
                   {label}
                 </span>
               </Link>

@@ -62,15 +62,16 @@ export default function TrustIndicators() {
         <div className="grid gap-4">
           {pillars.map(({ icon: Icon, title, detail, iconColor, iconBg, iconBorder }, index) => (
             <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.12}>
-              <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] md:p-6">
+              <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] md:p-6 max-md:mobile-color-border">
                 <div className="flex items-start gap-4">
                   <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] border ${iconBorder} ${iconBg}`}
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] border max-md:hidden ${iconBorder} ${iconBg}`}
                   >
                     <Icon className={`h-4.5 w-4.5 ${iconColor}`} aria-hidden />
                   </div>
                   <div>
                     <h3 className="text-foreground text-[clamp(1.3rem,2.2vw,1.8rem)] leading-tight">
+                      <Icon className={`mr-2 inline h-4.5 w-4.5 md:hidden ${iconColor}`} aria-hidden />
                       {title}
                     </h3>
                     <p className="text-muted mt-2 max-w-xl text-sm leading-7">{detail}</p>
