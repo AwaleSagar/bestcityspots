@@ -50,7 +50,7 @@ export default function TestimonialsSection() {
     <section className="mx-auto max-w-7xl" aria-labelledby="highlights-heading">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-8">
         <ScrollReveal animation="fade-up">
-          <div className="atlas-frame rounded-[2rem] p-5 md:p-7 lg:sticky lg:top-24">
+          <div className="atlas-frame rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2rem] md:p-7 lg:sticky lg:top-24">
             <span className="section-heading">Use The Atlas</span>
             <h2
               id="highlights-heading"
@@ -74,7 +74,7 @@ export default function TestimonialsSection() {
                 staggerIndex={index}
                 staggerDelay={0.12}
               >
-                <article className="atlas-panel rounded-[1.4rem] p-5">
+                <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem]">
                   <Icon className={`h-5 w-5 ${color}`} aria-hidden />
                   <h3 className="text-foreground mt-4 text-xl leading-tight">{title}</h3>
                   <p className="text-muted mt-2 text-sm leading-7">{text}</p>
@@ -84,7 +84,7 @@ export default function TestimonialsSection() {
           </div>
 
           <ScrollReveal animation="fade-up" delay={0.2}>
-            <div className="atlas-frame rounded-[1.4rem] p-5 md:p-6">
+            <div className="atlas-frame rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] md:p-6">
               <div className="labelled-rule">What The Direction Changes</div>
               <div className="mt-5 grid gap-4 md:grid-cols-3">
                 {outcomes.map(({ icon: Icon, title, text, color }) => (

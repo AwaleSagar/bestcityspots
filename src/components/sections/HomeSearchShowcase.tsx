@@ -62,7 +62,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
         <motion.div
           whileHover={shouldReduceMotion ? undefined : { y: -4 }}
           transition={{ duration: 0.35, ease: sectionEase }}
-          className="atlas-frame atlas-spotlight rounded-[2rem] p-5 md:p-6"
+          className="atlas-frame atlas-spotlight rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2rem] md:p-6"
         >
           <div className="labelled-rule">Trending City Guides</div>
           <div className="mt-5 space-y-4">
@@ -101,7 +101,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
         <motion.div
           whileHover={shouldReduceMotion ? undefined : { y: -3 }}
           transition={{ duration: 0.32, ease: sectionEase }}
-          className="atlas-panel atlas-spotlight rounded-[1.8rem] p-5 md:p-6"
+          className="atlas-panel atlas-spotlight rounded-[1.4rem] p-5 sm:rounded-[1.6rem] md:rounded-[1.8rem] md:p-6"
         >
           <h3 className="text-muted text-sm font-medium">What makes this different</h3>
           <div className="mt-4 grid gap-3">

@@ -68,7 +68,8 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
       </div>
 
       {/* Tab Switcher — matches ExperiencesSection tab style */}
-      <div className="flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 md:rounded-[1.5rem]">
+      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+        <div className="flex w-max items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 sm:w-fit md:rounded-[1.5rem]">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -110,6 +111,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
             </button>
           );
         })}
+        </div>
       </div>
 
       {/* Tab Content */}
@@ -123,7 +125,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35 }}
           >
-            <div className="atlas-panel rounded-[2.5rem] p-8 shadow-2xl md:rounded-[3rem] md:p-10">
+            <div className="atlas-panel rounded-[1.6rem] p-6 shadow-2xl sm:rounded-[2rem] md:rounded-[3rem] md:p-10">
               <p className="text-base font-medium leading-loose text-muted-strong md:text-lg">
                 {insight.intro}
               </p>

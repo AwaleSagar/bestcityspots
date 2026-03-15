@@ -14,8 +14,8 @@ export default function FreeResourceCTA() {
   return (
     <section className="mx-auto max-w-7xl" aria-labelledby="free-resource-heading">
       <ScrollReveal animation="fade-up">
-        <div className="atlas-panel-strong rounded-[2.2rem] p-5 md:p-8 lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:items-end">
+        <div className="atlas-panel-strong rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2.2rem] md:p-8 lg:p-10">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
             <div>
               <span className="eyebrow">Free Reference Guide</span>
               <h2
@@ -44,7 +44,7 @@ export default function FreeResourceCTA() {
               </div>
             </div>
 
-            <div className="atlas-frame rounded-[1.8rem] p-5 md:p-6">
+            <div className="atlas-frame rounded-[1.2rem] p-5 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-6">
               <div className="labelled-rule">Inside The Edition</div>
               <div className="mt-5 grid gap-3">
                 {guideHighlights.map(({ icon: Icon, text, color }) => (

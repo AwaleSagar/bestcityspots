@@ -45,7 +45,7 @@ function CityCard({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
       href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-      className="atlas-panel interactive-card flex h-full flex-col justify-between rounded-[1.8rem] p-5 md:p-6"
+      className="atlas-panel interactive-card flex h-full flex-col justify-between rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.8rem] md:p-6"
     >
       <div>
         <p className="font-mono text-[0.72rem] uppercase tracking-[0.24em] text-muted">
@@ -76,15 +76,15 @@ function CityRow({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
       href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-      className="group flex items-center gap-4 rounded-[1.2rem] border border-transparent px-4 py-3 transition-colors duration-300 hover:border-line hover:bg-background/55"
+      className="group flex items-center gap-3 rounded-[1rem] border border-transparent px-3 py-2.5 transition-colors duration-300 hover:border-line hover:bg-background/55 sm:gap-4 sm:px-4 sm:py-3 sm:rounded-[1.2rem]"
     >
-      <span className="w-10 shrink-0 font-mono text-sm text-muted">{String(rank).padStart(2, "0")}</span>
-      <span className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">{city.city}</span>
+      <span className="w-8 shrink-0 font-mono text-xs text-muted sm:w-10 sm:text-sm">{String(rank).padStart(2, "0")}</span>
+      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground sm:text-base">{city.city}</span>
       <span className="hidden text-sm uppercase tracking-[0.12em] text-muted-strong sm:block">
         {city.country}
       </span>
       <span className="hidden text-sm text-muted md:block">{city.admin_name || "Regional center"}</span>
-      <span className="w-20 text-right text-sm font-semibold text-muted-strong">
+      <span className="w-16 text-right text-xs font-semibold text-muted-strong sm:w-20 sm:text-sm">
         {formatPopulation(city.population)}
       </span>
       <ArrowRight className="h-4 w-4 shrink-0 text-accent transition-transform duration-300 group-hover:translate-x-1" />
@@ -128,7 +128,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
             </nav>
           </ScrollReveal>
 
-          <header className="atlas-frame rounded-[2.4rem] p-6 md:p-8 lg:p-10">
+          <header className="atlas-frame rounded-[1.6rem] p-5 sm:rounded-[2rem] md:rounded-[2.4rem] md:p-8 lg:p-10">
             <ScrollReveal animation="fade-up">
               <span className="eyebrow">The Global 50</span>
             </ScrollReveal>
@@ -147,7 +147,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
 
             <ScrollReveal animation="fade-up" delay={0.3}>
               <div className="mt-8 grid gap-3 md:grid-cols-3">
-                <div className="atlas-panel rounded-[1.5rem] p-4">
+                  <div className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] md:rounded-[1.5rem]">
                   <div className="flex items-center gap-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-muted">
                     <Globe2 className="h-4 w-4 text-accent" aria-hidden />
                     Countries
@@ -199,7 +199,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                   <div className="labelled-rule">
                     {band.label} / {band.title}
                   </div>
-                  <div className="atlas-frame mt-4 rounded-[1.8rem] p-3 md:p-4">
+                  <div className="atlas-frame mt-4 rounded-[1.2rem] p-3 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-4">
                     <div className="mb-2 hidden items-center gap-4 px-4 py-2 text-[0.68rem] font-bold uppercase tracking-[0.2em] text-muted sm:flex">
                       <span className="w-10">Rank</span>
                       <span className="flex-1">City</span>
@@ -223,7 +223,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
           </section>
 
           <ScrollReveal animation="fade-up">
-            <section className="atlas-panel-strong mt-16 rounded-[2.2rem] p-6 md:p-8">
+            <section className="atlas-panel-strong mt-16 rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2.2rem] md:p-8">
               <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                 <p className="max-w-2xl text-base leading-8 text-muted-strong md:text-lg">
                   Every city above links to a full guide with AI briefings, live weather, curated places,

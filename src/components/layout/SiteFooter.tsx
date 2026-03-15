@@ -19,7 +19,7 @@ export default function SiteFooter() {
         style={{ paddingBottom: "max(2.5rem, calc(env(safe-area-inset-bottom, 0px) + 2rem))" }}
       >
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)]">
-          <div className="atlas-frame rounded-[2rem] p-5 md:p-6">
+          <div className="atlas-frame rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2rem] md:p-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-full border border-line bg-accent text-accent-contrast">
                 <MapPinned className="h-4 w-4" aria-hidden />
@@ -47,7 +47,7 @@ export default function SiteFooter() {
             </div>
           </div>
 
-          <div className="atlas-panel rounded-[2rem] p-5 md:p-6">
+          <div className="atlas-panel rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2rem] md:p-6">
             <div className="labelled-rule">Explore</div>
             <nav className="mt-5" aria-label="Footer explore navigation">
               <ul className="space-y-3">
@@ -66,7 +66,7 @@ export default function SiteFooter() {
             </nav>
           </div>
 
-          <div className="atlas-panel rounded-[2rem] p-5 md:p-6">
+          <div className="atlas-panel rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2rem] md:p-6">
             <div className="labelled-rule">About</div>
             <nav className="mt-5" aria-label="Footer company navigation">
               <ul className="space-y-3">

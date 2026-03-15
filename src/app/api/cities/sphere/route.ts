@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { getTopCities } from "@/lib/cities";
 import {
   getMixedCitiesFromCategories,
@@ -6,17 +7,28 @@ import {
   SPHERE_CATEGORIES,
 } from "@/lib/sphere-categories";
 
+const SphereQuerySchema = z.object({
+  limit: z.coerce.number().int().min(10).max(200).default(120),
+  mode: z.enum(["categories", "population", "category"]).default("categories"),
+  category: z.string().optional(),
+});
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const limitRaw = searchParams.get("limit");
-  const mode = searchParams.get("mode") || "categories"; // "categories" | "population" | "category"
-  const category = searchParams.get("category"); // specific category ID
+  const parsed = SphereQuerySchema.safeParse({
+    limit: searchParams.get("limit") ?? undefined,
+    mode: searchParams.get("mode") ?? undefined,
+    category: searchParams.get("category") ?? undefined,
+  });
 
-  const limit = (() => {
-    const n = Number(limitRaw);
-    if (!Number.isFinite(n)) return 120;
-    return Math.max(10, Math.min(200, Math.floor(n)));
-  })();
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid parameters" },
+      { status: 400 }
+    );
+  }
+
+  const { limit, mode, category } = parsed.data;
 
   let labels: string[] = [];
 

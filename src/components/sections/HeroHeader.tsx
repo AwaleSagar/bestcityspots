@@ -31,7 +31,7 @@ export default function HeroHeader() {
       animate="visible"
       className="relative overflow-hidden pt-3 md:pt-6"
     >
-      <div className="landing-hero-shell rounded-[2.2rem] p-5 md:p-8 lg:p-10">
+      <div className="landing-hero-shell rounded-[1.4rem] p-4 sm:rounded-[1.8rem] sm:p-5 md:rounded-[2.2rem] md:p-8 lg:p-10">
         <div className="hero-atmosphere" aria-hidden>
           <motion.span
             className="hero-atmosphere-orb hero-atmosphere-orb-primary"
@@ -51,7 +51,7 @@ export default function HeroHeader() {
               Editorial Atlas 2026 &middot; Human-readable city intelligence
             </motion.p>
 
-            <motion.h1 variants={fadeUp} className="page-title text-foreground mt-6 max-w-5xl">
+            <motion.h1 variants={fadeUp} className="page-title text-foreground mt-4 max-w-5xl sm:mt-6">
               Pick a city the way a thoughtful magazine would edit the shortlist.
             </motion.h1>
 
@@ -89,14 +89,14 @@ export default function HeroHeader() {
 
             <motion.div
               variants={fadeUp}
-              className="mt-10 flex flex-wrap items-center gap-3 text-xs text-[color:var(--color-muted)]"
+              className="mt-6 flex flex-wrap items-center gap-2 text-xs text-[color:var(--color-muted)] sm:mt-10 sm:gap-3"
             >
-              <div className="hero-metric-pill">
-                <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-accent)]" aria-hidden />
+              <div className="hero-metric-pill text-[0.68rem] sm:text-xs">
+                <Sparkles className="h-3 w-3 text-[color:var(--color-accent)] sm:h-3.5 sm:w-3.5" aria-hidden />
                 Instant city signals
               </div>
-              <div className="hero-metric-pill">Editorial briefings</div>
-              <div className="hero-metric-pill">Live context</div>
+              <div className="hero-metric-pill text-[0.68rem] sm:text-xs">Editorial briefings</div>
+              <div className="hero-metric-pill text-[0.68rem] sm:text-xs">Live context</div>
             </motion.div>
           </div>
         </div>

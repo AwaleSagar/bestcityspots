@@ -444,7 +444,7 @@ export default function ExperiencesSection({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: index * 0.08, duration: 0.4 }}
-        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-[1.75rem] border border-white/6 transition-all duration-500 hover:-translate-y-1 ${catColor.hover} hover:shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
+        className={`liquid-glass group/card flex flex-col overflow-hidden rounded-[1.2rem] border border-white/6 transition-all duration-500 hover:-translate-y-1 ${catColor.hover} hover:shadow-[0_24px_70px_rgba(0,0,0,0.26)] sm:rounded-[1.5rem] md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
       >
         {/* Image with Overlaid Info */}
         {item.imageUrl && (
@@ -656,7 +656,8 @@ export default function ExperiencesSection({
     <div className="space-y-8">
       {/* Tab Switcher with Count Badges */}
       <div className="flex flex-col gap-4">
-        <div className="flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 md:rounded-[1.5rem]">
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+          <div className="flex w-max items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 sm:w-fit md:rounded-[1.5rem]">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -687,6 +688,7 @@ export default function ExperiencesSection({
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* Price Filter */}

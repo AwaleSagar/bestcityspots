@@ -62,7 +62,7 @@ export default function TrustIndicators() {
         <div className="grid gap-4">
           {pillars.map(({ icon: Icon, title, detail, iconColor, iconBg, iconBorder }, index) => (
             <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.12}>
-              <article className="atlas-panel rounded-[1.4rem] p-5 md:p-6">
+              <article className="atlas-panel rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] md:p-6">
                 <div className="flex items-start gap-4">
                   <div
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[0.9rem] border ${iconBorder} ${iconBg}`}
@@ -81,7 +81,7 @@ export default function TrustIndicators() {
           ))}
 
           <ScrollReveal animation="fade-up" delay={0.3}>
-            <div className="atlas-frame rounded-[1.4rem] p-5 md:p-6">
+            <div className="atlas-frame rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5 md:rounded-[1.4rem] md:p-6">
               <div className="labelled-rule">Verification</div>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
                 {[

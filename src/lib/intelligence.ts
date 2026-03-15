@@ -128,7 +128,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       { onConflict: "city_id" }
     ).then(({ error }) => {
       if (error) {
-        console.error(`Failed to cache insight for ${city.city}:`, error);
+        console.error(`[intelligence] Failed to cache insight for ${city.city}:`, error);
       } else {
         console.info(`✅ Cached insight for ${city.city}`);
       }
@@ -136,7 +136,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
 
     return parsed;
   } catch (e) {
-    console.error(`Failed to get city insight for ${city.id}:`, e);
+      console.error(`[intelligence] Failed to get city insight for ${city.id}:`, e);
     // If validation fails or AI errors, we could fall back to the cached (stale) data
     // if we haven't already returned it.
     return cachedInsight;
@@ -186,27 +186,29 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
     const response = await result.response;
     const text = response.text();
 
-    // Parse the AI response (clean up markdown if present)
+    // Parse and validate AI response with Zod
+    const TrendingCitiesSchema = z.array(z.string().min(1).max(100));
     let cityNames: string[];
     try {
-      cityNames = JSON.parse(text.replace(/```json|```/gi, "").trim());
-    } catch {
-      console.error("Failed to parse AI trending cities response");
+      const raw = JSON.parse(text.replace(/```json|```/gi, "").trim());
+      cityNames = TrendingCitiesSchema.parse(raw);
+    } catch (parseErr) {
+      console.error("[intelligence] Failed to parse/validate AI trending cities:", parseErr);
       return [];
     }
 
-    if (!Array.isArray(cityNames)) {
-      return [];
-    }
-
-    // 3. Update Supabase Cache for the next 24 hours
-    await supabase
+    // 3. Update Supabase Cache for the next 24 hours (fire-and-forget)
+    const cacheClient = supabaseServer || supabase;
+    cacheClient
       .from("ai_trending_cache")
-      .upsert({ id: 1, city_names: cityNames, updated_at: new Date().toISOString() });
+      .upsert({ id: 1, city_names: cityNames, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (error) console.warn("[intelligence] Trending cache update failed:", error.message);
+      });
 
     return await matchCitiesInDb(cityNames);
   } catch (e) {
-    console.error("Intelligent trending fetch failed:", e);
+    console.error("[intelligence] Intelligent trending fetch failed:", e);
     return [];
   }
 }

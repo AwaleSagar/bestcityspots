@@ -24,7 +24,7 @@ export default async function Home() {
 
         <HomeSearchShowcase topCities={topCities} />
 
-        <div className="content-lazy mb-16 space-y-16 md:mb-24 md:space-y-24">
+        <div className="content-lazy mb-12 space-y-12 sm:mb-16 sm:space-y-16 md:mb-24 md:space-y-24">
           <TrustIndicators />
           <FreeResourceCTA />
           <TestimonialsSection />

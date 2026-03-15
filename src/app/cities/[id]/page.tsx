@@ -68,7 +68,7 @@ function MetricCard({
   );
 
   return (
-    <div className="atlas-panel group/metric rounded-[1.5rem] p-5 flex flex-col gap-4 transition-all duration-500 hover:border-accent/14">
+    <div className="atlas-panel group/metric rounded-[1.1rem] p-4 flex flex-col gap-3 transition-all duration-500 hover:border-accent/14 sm:rounded-[1.3rem] sm:gap-4 sm:p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] border border-line bg-background/55 transition-all duration-300 group-hover/metric:border-accent/20 group-hover/metric:bg-accent-soft/60">
@@ -248,10 +248,10 @@ export default async function CityPage({
           </Link>
         </nav>
 
-        <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-12 lg:gap-20">
+        <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
-            <header className="atlas-frame relative space-y-5 overflow-visible rounded-[2.4rem] p-6 md:space-y-6 md:p-8">
+            <header className="atlas-frame relative space-y-5 overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:space-y-6 md:rounded-[2.4rem] md:p-8">
               <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px] animate-pulse-glow" />
               <div className="flex flex-wrap items-center gap-3">
                 <span className="eyebrow">
@@ -276,7 +276,7 @@ export default async function CityPage({
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-              <div className="atlas-panel interactive-card rounded-[1.8rem] p-8 md:p-10">
+              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
                 <div className="mb-6 flex items-center gap-4 text-muted">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
                     <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
@@ -293,8 +293,8 @@ export default async function CityPage({
                 </div>
               </div>
 
-              <div className="atlas-panel interactive-card rounded-[1.8rem] p-8 md:p-10">
-                <div className="mb-6 flex items-center gap-4 text-muted">
+              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
+                <div className="mb-4 flex items-center gap-4 text-muted sm:mb-6">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
                     <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
                   </div>
@@ -351,7 +351,7 @@ export default async function CityPage({
                 ].map(({ icon: ItemIcon, title, text, color }) => (
                   <div
                     key={title}
-                    className="atlas-panel rounded-[1.5rem] p-5 transition-all duration-500 hover:border-accent/12"
+                    className="atlas-panel rounded-[1.1rem] p-4 transition-all duration-500 hover:border-accent/12 sm:rounded-[1.3rem] sm:p-5"
                   >
                     <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted">
                       <ItemIcon className={`h-4 w-4 ${color}`} />
@@ -363,14 +363,30 @@ export default async function CityPage({
               </div>
             </section>
 
+            {/* Mobile-only CTA - shown before experiences */}
+            <div className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden">
+              <h3 className="text-xl font-bold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">
+                Plan Your {city.city} Trip
+              </h3>
+              <p className="text-sm leading-relaxed text-muted">
+                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences — all free, no sign-up required.
+              </p>
+              <Link
+                href="/resources/top-cities"
+                className="btn-primary w-full"
+              >
+                Browse Free City Guide
+              </Link>
+            </div>
+
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-8 lg:sticky lg:top-20 lg:col-span-4">
-            <div className="atlas-panel-strong relative space-y-8 rounded-[2rem] p-8 md:p-10">
+          <div className="hidden space-y-8 lg:sticky lg:top-20 lg:col-span-4 lg:block">
+            <div className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
               <h3 className="text-2xl md:text-3xl leading-tight font-bold tracking-[-0.02em] text-foreground">
                 Plan Your <br /> {city.city} Trip
               </h3>
@@ -385,7 +401,7 @@ export default async function CityPage({
               </Link>
             </div>
 
-            <div className="atlas-panel rounded-[2rem] p-8 md:p-10">
+            <div className="atlas-panel rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
               <h4 className="text-[11px] font-semibold tracking-[0.25em] text-muted uppercase">
                 Core Metrics
               </h4>

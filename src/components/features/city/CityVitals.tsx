@@ -32,7 +32,7 @@ export default function CityVitals({ data }: CityVitalsProps) {
   };
 
   return (
-    <div className="atlas-panel rounded-[2rem] p-6 shadow-xl">
+    <div className="atlas-panel rounded-[1.4rem] p-5 shadow-xl sm:rounded-[1.7rem] sm:p-6 md:rounded-[2rem]">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
           Live City Vitals

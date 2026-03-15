@@ -15,7 +15,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-3 left-1/2 z-[200] w-[calc(100%-1rem)] max-w-sm -translate-x-1/2 rounded-[1.6rem] border border-line bg-surface-strong/92 shadow-3xl backdrop-blur-2xl backdrop-saturate-150 md:hidden"
+      className="fixed bottom-3 left-1/2 z-[200] w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 rounded-[1.2rem] border border-line bg-surface-strong/92 shadow-3xl backdrop-blur-2xl backdrop-saturate-150 sm:rounded-[1.4rem] md:hidden"
       aria-label="Mobile navigation"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0)" }}
     >

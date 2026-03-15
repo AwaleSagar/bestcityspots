@@ -12,7 +12,7 @@ export default function SiteNav() {
   return (
     <header className="border-line/70 bg-background/92 sticky top-0 z-[200] w-full border-b backdrop-blur-xl">
       <div className="container-gutter mx-auto max-w-7xl px-4 py-3 sm:px-6">
-        <div className="border-line bg-surface/82 flex items-center justify-between gap-3 rounded-[1.6rem] border px-3 py-3 shadow-sm md:px-4">
+        <div className="border-line bg-surface/82 flex items-center justify-between gap-3 rounded-[1.2rem] border px-3 py-3 shadow-sm sm:rounded-[1.4rem] md:rounded-[1.6rem] md:px-4">
           <Link
             href="/"
             className="group flex min-w-0 items-center gap-3 rounded-full px-1 py-1"

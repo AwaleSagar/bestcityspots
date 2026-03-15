@@ -7,6 +7,9 @@ import { encode } from "blurhash";
 import { CACHE_TTL } from "./cache-config";
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+if (!API_KEY) {
+  console.warn("[places] GOOGLE_PLACES_API_KEY not set — place enrichment disabled.");
+}
 const BUCKET = "place_images";
 const IMAGE_MAX_WIDTH = 800;
 const IMAGE_MAX_HEIGHT = 600;

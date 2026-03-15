@@ -526,13 +526,21 @@ html {
 .hero-metric-pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  min-height: 2.25rem;
-  padding: 0.55rem 0.9rem;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.4rem 0.7rem;
   border-radius: 9999px;
   border: 1px solid color-mix(in oklab, var(--foreground) 9%, transparent);
   background: color-mix(in oklab, var(--background) 84%, transparent);
   box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 640px) {
+  .hero-metric-pill {
+    gap: 0.45rem;
+    min-height: 2.25rem;
+    padding: 0.55rem 0.9rem;
+  }
 }
 
 .lede {
