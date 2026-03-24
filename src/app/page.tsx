@@ -15,16 +15,13 @@ export default async function Home() {
   const topCities = await fetchTrendingDestinations();
 
   return (
-    <main id="main-content" className="text-foreground min-h-screen bg-transparent">
-      <div
-        className="container-gutter mx-auto max-w-7xl px-4 sm:px-6"
-        style={{ paddingTop: "max(1.5rem, calc(env(safe-area-inset-top, 0px) + 2rem))" }}
-      >
+    <main id="main-content" className="text-foreground min-h-screen">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <HeroHeader />
 
         <HomeSearchShowcase topCities={topCities} />
 
-        <div className="content-lazy mb-12 space-y-12 sm:mb-16 sm:space-y-16 md:mb-24 md:space-y-24">
+        <div className="space-y-16 pb-16 sm:space-y-20 md:space-y-24 md:pb-24">
           <TrustIndicators />
           <FreeResourceCTA />
           <TestimonialsSection />
