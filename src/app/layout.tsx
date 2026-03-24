@@ -10,8 +10,8 @@ export const viewport: Viewport = {
   userScalable: true,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f4efe6" },
-    { media: "(prefers-color-scheme: dark)", color: "#17110d" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f5f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#1a1614" },
   ],
 };
 
@@ -132,7 +132,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${instrumentSans.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} relative isolate min-h-screen overflow-x-hidden antialiased`}
+        className={`${instrumentSans.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} min-h-screen antialiased`}
       >
         <script
           type="application/ld+json"
@@ -153,7 +153,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link border-line bg-surface/95 text-foreground focus-visible:ring-accent/40 pointer-events-auto fixed top-3 left-3 z-[210] rounded-full border px-4 py-3 text-[11px] font-semibold tracking-[0.24em] uppercase opacity-0 shadow-lg backdrop-blur-xl transition focus-visible:opacity-100 focus-visible:ring-2 sm:top-4 sm:left-4"
+              className="skip-link fixed top-3 left-3 z-[210] rounded-lg border border-line bg-surface px-4 py-2 text-xs font-semibold text-foreground opacity-0 shadow-md transition focus-visible:opacity-100 sm:top-4 sm:left-4"
               style={{
                 marginLeft: "env(safe-area-inset-left, 0)",
                 marginTop: "env(safe-area-inset-top, 0)",
@@ -162,7 +162,7 @@ export default function RootLayout({
               Skip to content
             </a>
             <ClientEffects />
-            <div className="mobile-bottom-spacer relative z-10 flex min-h-screen flex-col">
+            <div className="mobile-bottom-spacer flex min-h-screen flex-col">
               <div className="flex flex-1 flex-col">{children}</div>
               <SiteFooter />
             </div>

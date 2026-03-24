@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { motion, AnimatePresence } from "framer-motion";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -16,7 +15,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <div
-        className="touch-target min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] rounded-full border border-line bg-surface/75 backdrop-blur-md"
+        className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface"
         aria-hidden
       />
     );
@@ -26,32 +25,14 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="touch-target relative flex min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-full border border-line bg-surface/75 backdrop-blur-md transition-colors duration-100 hover:bg-surface-strong/90"
+      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-muted transition-colors hover:bg-surface-strong hover:text-foreground"
       aria-label="Toggle theme"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        {theme === "dark" ? (
-          <motion.div
-            key="moon"
-            initial={{ scale: 0.5, opacity: 0, rotate: 90 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: -90 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Moon className="h-5 w-5 text-accent" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="sun"
-            initial={{ scale: 0.5, opacity: 0, rotate: -90 }}
-            animate={{ scale: 1, opacity: 1, rotate: 0 }}
-            exit={{ scale: 0.5, opacity: 0, rotate: 90 }}
-            transition={{ duration: 0.2 }}
-          >
-            <Sun className="h-5 w-5 text-accent" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {theme === "dark" ? (
+        <Moon className="h-4 w-4" />
+      ) : (
+        <Sun className="h-4 w-4" />
+      )}
     </button>
   );
 }

@@ -5,36 +5,31 @@ import { ArrowRight, BookOpen, MapPinned, Users2, Wallet } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
 const guideHighlights = [
-  { icon: MapPinned, text: "50 ranked cities", color: "text-accent" },
-  { icon: Users2, text: "Population context", color: "text-[color:var(--color-cat-stays)]" },
-  { icon: Wallet, text: "Fast planning cues", color: "text-[color:var(--color-brand-accent)]" },
+  { icon: MapPinned, text: "50 ranked cities" },
+  { icon: Users2, text: "Population context" },
+  { icon: Wallet, text: "Fast planning cues" },
 ];
 
 export default function FreeResourceCTA() {
   return (
     <section className="mx-auto max-w-7xl" aria-labelledby="free-resource-heading">
       <ScrollReveal animation="fade-up">
-        <div className="atlas-panel-strong rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2.2rem] md:p-8 lg:p-10">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end">
+        <div className="rounded-xl border border-line bg-surface-strong p-6 sm:p-8 md:p-10">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <span className="eyebrow">Free Reference Guide</span>
+              <p className="text-xs font-medium uppercase tracking-wider text-muted">Free Reference Guide</p>
               <h2
                 id="free-resource-heading"
-                className="text-foreground mt-5 max-w-3xl text-[clamp(2.2rem,4vw,4.2rem)] leading-[0.92]"
+                className="text-foreground mt-3 max-w-xl text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
               >
-                Start broad with The Global 50, then dive into individual city desks when the
-                shortlist tightens.
+                Start broad with The Global 50, then dive into individual city guides.
               </h2>
-              <p className="text-muted mt-2 max-w-2xl text-xs leading-6">
-                Our 50 most-searched cities, ranked and reviewed.
-              </p>
-              <p className="text-muted mt-4 max-w-2xl text-sm leading-7 md:text-base">
-                The guide works like a quick editorial index. It gives you the major cities in one
-                sweep, then routes you into the richer city pages with weather, metrics, and saved
-                planning notes.
+              <p className="text-muted mt-3 max-w-lg text-sm leading-relaxed md:text-base">
+                A quick editorial index of the most-searched cities, ranked and reviewed. Routes you
+                into richer city pages with weather, metrics, and planning notes.
               </p>
 
-              <div className="mt-7 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <div className="mt-6 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
                 <Link href="/resources/top-cities" className="btn-primary group">
                   <BookOpen className="h-4 w-4" />
                   Open The Global 50
@@ -44,13 +39,13 @@ export default function FreeResourceCTA() {
               </div>
             </div>
 
-            <div className="atlas-frame rounded-[1.2rem] p-5 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-6">
-              <div className="labelled-rule">Inside The Edition</div>
-              <div className="mt-5 grid gap-3">
-                {guideHighlights.map(({ icon: Icon, text, color }) => (
-                  <div key={text} className="flex items-center gap-3 py-2">
-                    <Icon className={`h-4 w-4 shrink-0 ${color}`} aria-hidden />
-                    <span className="text-muted-strong text-sm font-medium">{text}</span>
+            <div className="rounded-lg border border-line bg-surface p-5">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted">Inside The Edition</p>
+              <div className="mt-3 space-y-2">
+                {guideHighlights.map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-3 py-1.5">
+                    <Icon className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+                    <span className="text-sm font-medium text-foreground">{text}</span>
                   </div>
                 ))}
               </div>

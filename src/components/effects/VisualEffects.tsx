@@ -1,29 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Terminal, Shield, Cpu, Activity, Database, Globe } from "lucide-react";
 import { usePathname } from "next/navigation";
 import CitySphereBackground from "@/components/features/city/CitySphereBackground";
 
 export default function VisualEffects() {
-  const shouldReduceMotion = useReducedMotion();
   const pathname = usePathname();
   const showSphere = pathname === "/";
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isAtlasMode, setIsAtlasMode] = useState(false);
   const inputBufferRef = useRef("");
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      // Calculate normalized position (-0.5 to 0.5)
-      setMousePos({
-        x: e.clientX / window.innerWidth - 0.5,
-        y: e.clientY / window.innerHeight - 0.5,
-      });
-    },
-    [setMousePos]
-  );
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     const char = e.key.toLowerCase();
@@ -42,105 +29,53 @@ export default function VisualEffects() {
   }, []);
 
   useEffect(() => {
-    // Respect reduced motion: no parallax tracking
-    if (!shouldReduceMotion && !showSphere) {
-      window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
-      if (!shouldReduceMotion && !showSphere) {
-        window.removeEventListener("mousemove", handleMouseMove);
-      }
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleMouseMove, handleKeyDown, shouldReduceMotion, showSphere]);
+  }, [handleKeyDown]);
 
   return (
     <>
-      {showSphere ? (
-        <CitySphereBackground />
-      ) : (
-        /* Parallax Orbs Background */
-        <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-          {shouldReduceMotion ? (
-            <>
-              <div className="orb top-[-100px] left-[-100px] h-[500px] w-[500px] bg-blue-600/10" />
-              <div className="orb right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-orange-500/10" />
-              <div className="orb top-[40%] left-[20%] h-[300px] w-[300px] bg-indigo-600/10" />
-            </>
-          ) : (
-            <>
-              <motion.div
-                animate={{
-                  x: mousePos.x * -60,
-                  y: mousePos.y * -60,
-                }}
-                transition={{ type: "spring", damping: 30, stiffness: 50 }}
-                className="orb top-[-100px] left-[-100px] h-[500px] w-[500px] bg-blue-600/10"
-              />
-              <motion.div
-                animate={{
-                  x: mousePos.x * 40,
-                  y: mousePos.y * 40,
-                }}
-                transition={{ type: "spring", damping: 25, stiffness: 40 }}
-                className="orb animation-delay-2000 right-[-100px] bottom-[-100px] h-[400px] w-[400px] bg-orange-500/10"
-              />
-              <motion.div
-                animate={{
-                  x: mousePos.x * -20,
-                  y: mousePos.y * -20,
-                }}
-                transition={{ type: "spring", damping: 20, stiffness: 30 }}
-                className="orb animation-delay-4000 top-[40%] left-[20%] h-[300px] w-[300px] bg-indigo-600/10"
-              />
-            </>
-          )}
-        </div>
-      )}
+      {showSphere && <CitySphereBackground />}
 
       {/* Atlas Mode Terminal Overlay */}
       <AnimatePresence>
         {isAtlasMode && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={() => setIsAtlasMode(false)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 backdrop-blur-xl p-6"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6"
             role="dialog"
             aria-modal="true"
             aria-label="Atlas system diagnostics"
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="w-full max-w-2xl rounded-3xl border border-blue-500/30 bg-background p-8 shadow-glow"
+            <div
+              className="w-full max-w-2xl rounded-xl border border-line bg-surface p-8"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-8 flex items-center justify-between">
+              <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10">
-                    <Terminal className="h-5 w-5 text-blue-400" />
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
+                    <Terminal className="h-4 w-4 text-accent" />
                   </div>
                   <div>
-                    <div className="text-xs font-black tracking-[0.3em] text-blue-400 uppercase">
+                    <div className="text-xs font-semibold tracking-wider text-muted uppercase">
                       System Diagnostics
                     </div>
-                    <div className="text-lg font-black tracking-tighter text-foreground">
-                      ATLAS CORE // VER 1.0.1
+                    <div className="text-base font-bold tracking-tight text-foreground">
+                      ATLAS CORE v1.0.1
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsAtlasMode(false)}
-                  className="rounded-lg border border-foreground/10 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-foreground/40 hover:bg-foreground/5"
+                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-strong"
                 >
-                  Terminate Session
+                  Close
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { icon: Shield, label: "Security Layer", val: "ACTIVE // AES-256" },
                   { icon: Cpu, label: "Neural Engine", val: "GEMINI 1.5 PRO" },
@@ -149,32 +84,17 @@ export default function VisualEffects() {
                   { icon: Globe, label: "Global Nodes", val: "CITIES_INTEL.V4" },
                   { icon: Activity, label: "Uptime", val: "99.982% // SYNC" },
                 ].map((item, i) => (
-                  <div key={i} className="rounded-2xl border border-foreground/5 bg-foreground/[0.02] p-4">
-                    <div className="mb-2 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-foreground/30">
+                  <div key={i} className="rounded-lg border border-line bg-surface-strong p-3">
+                    <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
                       <item.icon className="h-3 w-3" />
                       {item.label}
                     </div>
-                    <div className="font-mono text-xs font-bold text-blue-400/80">{item.val}</div>
+                    <div className="font-mono text-xs text-accent">{item.val}</div>
                   </div>
                 ))}
               </div>
-
-              <div className="mt-8 space-y-2 opacity-50">
-                <div className="font-mono text-[10px] text-green-500">
-                  {">"} INITIALIZING SCAN SEQUENCE...
-                </div>
-                <div className="font-mono text-[10px] text-green-500">
-                  {">"} ACCESSING GLOBAL CITY DATABASE... [OK]
-                </div>
-                <div className="font-mono text-[10px] text-green-500">
-                  {">"} BYPASSING OBSOLETE TRAVEL DATA... [COMPLETE]
-                </div>
-                <div className="font-mono text-[10px] text-blue-400 animate-pulse">
-                  {">"} STANDBY FOR INTELLIGENCE RETRIEVAL_
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
     </>
