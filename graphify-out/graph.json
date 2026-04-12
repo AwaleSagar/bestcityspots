@@ -1,0 +1,4606 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "robots.ts",
+      "file_type": "code",
+      "source_file": "src/app/robots.ts",
+      "source_location": "L1",
+      "id": "src_app_robots_ts",
+      "community": 23
+    },
+    {
+      "label": "robots()",
+      "file_type": "code",
+      "source_file": "src/app/robots.ts",
+      "source_location": "L5",
+      "id": "robots_robots",
+      "community": 23
+    },
+    {
+      "label": "opengraph-image.tsx",
+      "file_type": "code",
+      "source_file": "src/app/opengraph-image.tsx",
+      "source_location": "L1",
+      "id": "src_app_opengraph_image_tsx",
+      "community": 49
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "src/app/actions.ts",
+      "source_location": "L1",
+      "id": "src_app_actions_ts",
+      "community": 24
+    },
+    {
+      "label": "fetchTrendingDestinations()",
+      "file_type": "code",
+      "source_file": "src/app/actions.ts",
+      "source_location": "L6",
+      "id": "actions_fetchtrendingdestinations",
+      "community": 24
+    },
+    {
+      "label": "sitemap.ts",
+      "file_type": "code",
+      "source_file": "src/app/sitemap.ts",
+      "source_location": "L1",
+      "id": "src_app_sitemap_ts",
+      "community": 25
+    },
+    {
+      "label": "sitemap()",
+      "file_type": "code",
+      "source_file": "src/app/sitemap.ts",
+      "source_location": "L9",
+      "id": "sitemap_sitemap",
+      "community": 25
+    },
+    {
+      "label": "layout.tsx",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L1",
+      "id": "src_app_layout_tsx",
+      "community": 26
+    },
+    {
+      "label": "RootLayout()",
+      "file_type": "code",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L127",
+      "id": "layout_rootlayout",
+      "community": 26
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_page_tsx",
+      "community": 27
+    },
+    {
+      "label": "Home()",
+      "file_type": "code",
+      "source_file": "src/app/page.tsx",
+      "source_location": "L14",
+      "id": "page_home",
+      "community": 27
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/resources/top-cities/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_resources_top_cities_page_tsx",
+      "community": 28
+    },
+    {
+      "label": "TopCitiesPage()",
+      "file_type": "code",
+      "source_file": "src/app/resources/top-cities/page.tsx",
+      "source_location": "L30",
+      "id": "page_topcitiespage",
+      "community": 28
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/about/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_about_page_tsx",
+      "community": 29
+    },
+    {
+      "label": "AboutPage()",
+      "file_type": "code",
+      "source_file": "src/app/about/page.tsx",
+      "source_location": "L53",
+      "id": "page_aboutpage",
+      "community": 29
+    },
+    {
+      "label": "ExperiencesSkeleton.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSkeleton.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_experiencesskeleton_tsx",
+      "community": 18
+    },
+    {
+      "label": "Shimmer()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSkeleton.tsx",
+      "source_location": "L7",
+      "id": "experiencesskeleton_shimmer",
+      "community": 18
+    },
+    {
+      "label": "ExperienceCardSkeleton()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSkeleton.tsx",
+      "source_location": "L14",
+      "id": "experiencesskeleton_experiencecardskeleton",
+      "community": 18
+    },
+    {
+      "label": "AIBriefingSkeleton.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/AIBriefingSkeleton.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_aibriefingskeleton_tsx",
+      "community": 50
+    },
+    {
+      "label": "AIBriefingClient.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/AIBriefingClient.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_aibriefingclient_tsx",
+      "community": 30
+    },
+    {
+      "label": "getSeasonColor()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/AIBriefingClient.tsx",
+      "source_location": "L24",
+      "id": "aibriefingclient_getseasoncolor",
+      "community": 30
+    },
+    {
+      "label": "AIBriefingSection.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/AIBriefingSection.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_aibriefingsection_tsx",
+      "community": 31
+    },
+    {
+      "label": "AIBriefingSection()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/AIBriefingSection.tsx",
+      "source_location": "L9",
+      "id": "aibriefingsection_aibriefingsection",
+      "community": 31
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/page.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_page_tsx",
+      "community": 19
+    },
+    {
+      "label": "CityVitalsFallback()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/page.tsx",
+      "source_location": "L27",
+      "id": "page_cityvitalsfallback",
+      "community": 19
+    },
+    {
+      "label": "notFound()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/page.tsx",
+      "source_location": "L178",
+      "id": "page_notfound",
+      "community": 19
+    },
+    {
+      "label": "ExperiencesSection.tsx",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L1",
+      "id": "src_app_cities_id_experiencessection_tsx",
+      "community": 1
+    },
+    {
+      "label": "sanitizeKey()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L43",
+      "id": "experiencessection_sanitizekey",
+      "community": 1
+    },
+    {
+      "label": "toNoteMap()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L45",
+      "id": "experiencessection_tonotemap",
+      "community": 1
+    },
+    {
+      "label": "sanitizeNotes()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L55",
+      "id": "experiencessection_sanitizenotes",
+      "community": 1
+    },
+    {
+      "label": "parseStoredNotes()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L62",
+      "id": "experiencessection_parsestorednotes",
+      "community": 1
+    },
+    {
+      "label": "topK()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L95",
+      "id": "experiencessection_topk",
+      "community": 1
+    },
+    {
+      "label": "update()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L168",
+      "id": "experiencessection_update",
+      "community": 1
+    },
+    {
+      "label": "persistCityNotes()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L198",
+      "id": "experiencessection_persistcitynotes",
+      "community": 1
+    },
+    {
+      "label": "updatePlaceNotes()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L206",
+      "id": "experiencessection_updateplacenotes",
+      "community": 1
+    },
+    {
+      "label": "updateDraftNotes()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L216",
+      "id": "experiencessection_updatedraftnotes",
+      "community": 1
+    },
+    {
+      "label": "saveNote()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L224",
+      "id": "experiencessection_savenote",
+      "community": 1
+    },
+    {
+      "label": "clearNote()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L237",
+      "id": "experiencessection_clearnote",
+      "community": 1
+    },
+    {
+      "label": "toggleExpand()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L251",
+      "id": "experiencessection_toggleexpand",
+      "community": 1
+    },
+    {
+      "label": "getLocalPulseTags()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L263",
+      "id": "experiencessection_getlocalpulsetags",
+      "community": 1
+    },
+    {
+      "label": "getNeighborhood()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L282",
+      "id": "experiencessection_getneighborhood",
+      "community": 1
+    },
+    {
+      "label": "getAddressContext()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L284",
+      "id": "experiencessection_getaddresscontext",
+      "community": 1
+    },
+    {
+      "label": "getInsiderTips()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L302",
+      "id": "experiencessection_getinsidertips",
+      "community": 1
+    },
+    {
+      "label": "formatType()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L365",
+      "id": "experiencessection_formattype",
+      "community": 1
+    },
+    {
+      "label": "getPriceLevel()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L373",
+      "id": "experiencessection_getpricelevel",
+      "community": 1
+    },
+    {
+      "label": "toggleSave()",
+      "file_type": "code",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L396",
+      "id": "experiencessection_togglesave",
+      "community": 1
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/cities/sphere/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_cities_sphere_route_ts",
+      "community": 32
+    },
+    {
+      "label": "GET()",
+      "file_type": "code",
+      "source_file": "src/app/api/cities/sphere/route.ts",
+      "source_location": "L16",
+      "id": "route_get",
+      "community": 32
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
+      "source_file": "src/app/api/analytics/route.ts",
+      "source_location": "L1",
+      "id": "src_app_api_analytics_route_ts",
+      "community": 33
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/analytics/route.ts",
+      "source_location": "L9",
+      "id": "route_post",
+      "community": 33
+    },
+    {
+      "label": "OptimizedImage.tsx",
+      "file_type": "code",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L1",
+      "id": "src_components_optimizedimage_tsx",
+      "community": 14
+    },
+    {
+      "label": "shouldBypassNextImageOptimization()",
+      "file_type": "code",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L53",
+      "id": "optimizedimage_shouldbypassnextimageoptimization",
+      "community": 14
+    },
+    {
+      "label": "blurhashToDataURL()",
+      "file_type": "code",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L64",
+      "id": "optimizedimage_blurhashtodataurl",
+      "community": 14
+    },
+    {
+      "label": "OptimizedImageInner()",
+      "file_type": "code",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L96",
+      "id": "optimizedimage_optimizedimageinner",
+      "community": 14
+    },
+    {
+      "label": "ScrollProgress.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/ScrollProgress.tsx",
+      "source_location": "L1",
+      "id": "src_components_ui_scrollprogress_tsx",
+      "community": 51
+    },
+    {
+      "label": "InteractiveButton.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/InteractiveButton.tsx",
+      "source_location": "L1",
+      "id": "src_components_ui_interactivebutton_tsx",
+      "community": 52
+    },
+    {
+      "label": "Breadcrumbs.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/Breadcrumbs.tsx",
+      "source_location": "L1",
+      "id": "src_components_ui_breadcrumbs_tsx",
+      "community": 53
+    },
+    {
+      "label": "ScrollReveal.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/ScrollReveal.tsx",
+      "source_location": "L1",
+      "id": "src_components_ui_scrollreveal_tsx",
+      "community": 20
+    },
+    {
+      "label": "ScrollReveal()",
+      "file_type": "code",
+      "source_file": "src/components/ui/ScrollReveal.tsx",
+      "source_location": "L65",
+      "id": "scrollreveal_scrollreveal",
+      "community": 20
+    },
+    {
+      "label": "StaggerContainer()",
+      "file_type": "code",
+      "source_file": "src/components/ui/ScrollReveal.tsx",
+      "source_location": "L120",
+      "id": "scrollreveal_staggercontainer",
+      "community": 20
+    },
+    {
+      "label": "Hotspot.tsx",
+      "file_type": "code",
+      "source_file": "src/components/ui/Hotspot.tsx",
+      "source_location": "L1",
+      "id": "src_components_ui_hotspot_tsx",
+      "community": 34
+    },
+    {
+      "label": "Hotspot()",
+      "file_type": "code",
+      "source_file": "src/components/ui/Hotspot.tsx",
+      "source_location": "L62",
+      "id": "hotspot_hotspot",
+      "community": 34
+    },
+    {
+      "label": "TrustIndicators.tsx",
+      "file_type": "code",
+      "source_file": "src/components/sections/TrustIndicators.tsx",
+      "source_location": "L1",
+      "id": "src_components_sections_trustindicators_tsx",
+      "community": 54
+    },
+    {
+      "label": "HeroHeader.tsx",
+      "file_type": "code",
+      "source_file": "src/components/sections/HeroHeader.tsx",
+      "source_location": "L1",
+      "id": "src_components_sections_heroheader_tsx",
+      "community": 55
+    },
+    {
+      "label": "FreeResourceCTA.tsx",
+      "file_type": "code",
+      "source_file": "src/components/sections/FreeResourceCTA.tsx",
+      "source_location": "L1",
+      "id": "src_components_sections_freeresourcecta_tsx",
+      "community": 35
+    },
+    {
+      "label": "FreeResourceCTA()",
+      "file_type": "code",
+      "source_file": "src/components/sections/FreeResourceCTA.tsx",
+      "source_location": "L13",
+      "id": "freeresourcecta_freeresourcecta",
+      "community": 35
+    },
+    {
+      "label": "HomeSearchShowcase.tsx",
+      "file_type": "code",
+      "source_file": "src/components/sections/HomeSearchShowcase.tsx",
+      "source_location": "L1",
+      "id": "src_components_sections_homesearchshowcase_tsx",
+      "community": 56
+    },
+    {
+      "label": "TestimonialsSection.tsx",
+      "file_type": "code",
+      "source_file": "src/components/sections/TestimonialsSection.tsx",
+      "source_location": "L1",
+      "id": "src_components_sections_testimonialssection_tsx",
+      "community": 57
+    },
+    {
+      "label": "SiteFooter.tsx",
+      "file_type": "code",
+      "source_file": "src/components/layout/SiteFooter.tsx",
+      "source_location": "L1",
+      "id": "src_components_layout_sitefooter_tsx",
+      "community": 36
+    },
+    {
+      "label": "SiteFooter()",
+      "file_type": "code",
+      "source_file": "src/components/layout/SiteFooter.tsx",
+      "source_location": "L14",
+      "id": "sitefooter_sitefooter",
+      "community": 36
+    },
+    {
+      "label": "MobileBottomNav.tsx",
+      "file_type": "code",
+      "source_file": "src/components/layout/MobileBottomNav.tsx",
+      "source_location": "L1",
+      "id": "src_components_layout_mobilebottomnav_tsx",
+      "community": 37
+    },
+    {
+      "label": "MobileBottomNav()",
+      "file_type": "code",
+      "source_file": "src/components/layout/MobileBottomNav.tsx",
+      "source_location": "L13",
+      "id": "mobilebottomnav_mobilebottomnav",
+      "community": 37
+    },
+    {
+      "label": "ThemeToggle.tsx",
+      "file_type": "code",
+      "source_file": "src/components/layout/ThemeToggle.tsx",
+      "source_location": "L1",
+      "id": "src_components_layout_themetoggle_tsx",
+      "community": 58
+    },
+    {
+      "label": "ThemeProvider.tsx",
+      "file_type": "code",
+      "source_file": "src/components/layout/ThemeProvider.tsx",
+      "source_location": "L1",
+      "id": "src_components_layout_themeprovider_tsx",
+      "community": 38
+    },
+    {
+      "label": "ThemeProvider()",
+      "file_type": "code",
+      "source_file": "src/components/layout/ThemeProvider.tsx",
+      "source_location": "L6",
+      "id": "themeprovider_themeprovider",
+      "community": 38
+    },
+    {
+      "label": "SiteNav.tsx",
+      "file_type": "code",
+      "source_file": "src/components/layout/SiteNav.tsx",
+      "source_location": "L1",
+      "id": "src_components_layout_sitenav_tsx",
+      "community": 39
+    },
+    {
+      "label": "SiteNav()",
+      "file_type": "code",
+      "source_file": "src/components/layout/SiteNav.tsx",
+      "source_location": "L11",
+      "id": "sitenav_sitenav",
+      "community": 39
+    },
+    {
+      "label": "CityVitals.tsx",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L1",
+      "id": "src_components_features_city_cityvitals_tsx",
+      "community": 15
+    },
+    {
+      "label": "getAqiColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L9",
+      "id": "cityvitals_getaqicolor",
+      "community": 15
+    },
+    {
+      "label": "getTempColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L20",
+      "id": "cityvitals_gettempcolor",
+      "community": 15
+    },
+    {
+      "label": "getTempIconColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L27",
+      "id": "cityvitals_gettempiconcolor",
+      "community": 15
+    },
+    {
+      "label": "ConstellationBackground.tsx",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L1",
+      "id": "src_components_features_city_constellationbackground_tsx",
+      "community": 2
+    },
+    {
+      "label": "getStarColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L50",
+      "id": "constellationbackground_getstarcolor",
+      "community": 2
+    },
+    {
+      "label": "getLabelColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L55",
+      "id": "constellationbackground_getlabelcolor",
+      "community": 2
+    },
+    {
+      "label": "getLabelGlow()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L60",
+      "id": "constellationbackground_getlabelglow",
+      "community": 2
+    },
+    {
+      "label": "generateStars()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L65",
+      "id": "constellationbackground_generatestars",
+      "community": 2
+    },
+    {
+      "label": "buildSpatialGrid()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L98",
+      "id": "constellationbackground_buildspatialgrid",
+      "community": 2
+    },
+    {
+      "label": "getNeighborStars()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L114",
+      "id": "constellationbackground_getneighborstars",
+      "community": 2
+    },
+    {
+      "label": "generateConnections()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L136",
+      "id": "constellationbackground_generateconnections",
+      "community": 2
+    },
+    {
+      "label": "load()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L221",
+      "id": "constellationbackground_load",
+      "community": 2
+    },
+    {
+      "label": "handleMouseMove()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L255",
+      "id": "constellationbackground_handlemousemove",
+      "community": 2
+    },
+    {
+      "label": "animate()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L268",
+      "id": "constellationbackground_animate",
+      "community": 2
+    },
+    {
+      "label": "CitySphereBackground.tsx",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L1",
+      "id": "src_components_features_city_cityspherebackground_tsx",
+      "community": 6
+    },
+    {
+      "label": "fibonacciSphere()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L36",
+      "id": "cityspherebackground_fibonaccisphere",
+      "community": 6
+    },
+    {
+      "label": "getNodeColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L52",
+      "id": "cityspherebackground_getnodecolor",
+      "community": 6
+    },
+    {
+      "label": "getGlowColor()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L63",
+      "id": "cityspherebackground_getglowcolor",
+      "community": 6
+    },
+    {
+      "label": "load()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L117",
+      "id": "cityspherebackground_load",
+      "community": 6
+    },
+    {
+      "label": "handleMouseMove()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L145",
+      "id": "cityspherebackground_handlemousemove",
+      "community": 6
+    },
+    {
+      "label": "tick()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L203",
+      "id": "cityspherebackground_tick",
+      "community": 6
+    },
+    {
+      "label": "CitySearch.tsx",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySearch.tsx",
+      "source_location": "L1",
+      "id": "src_components_features_city_citysearch_tsx",
+      "community": 21
+    },
+    {
+      "label": "handleKeyDown()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySearch.tsx",
+      "source_location": "L149",
+      "id": "citysearch_handlekeydown",
+      "community": 21
+    },
+    {
+      "label": "handleLocate()",
+      "file_type": "code",
+      "source_file": "src/components/features/city/CitySearch.tsx",
+      "source_location": "L177",
+      "id": "citysearch_handlelocate",
+      "community": 21
+    },
+    {
+      "label": "ClientEffects.tsx",
+      "file_type": "code",
+      "source_file": "src/components/effects/ClientEffects.tsx",
+      "source_location": "L1",
+      "id": "src_components_effects_clienteffects_tsx",
+      "community": 40
+    },
+    {
+      "label": "ClientEffects()",
+      "file_type": "code",
+      "source_file": "src/components/effects/ClientEffects.tsx",
+      "source_location": "L12",
+      "id": "clienteffects_clienteffects",
+      "community": 40
+    },
+    {
+      "label": "FloralAccent.tsx",
+      "file_type": "code",
+      "source_file": "src/components/effects/FloralAccent.tsx",
+      "source_location": "L1",
+      "id": "src_components_effects_floralaccent_tsx",
+      "community": 41
+    },
+    {
+      "label": "FloralAccent()",
+      "file_type": "code",
+      "source_file": "src/components/effects/FloralAccent.tsx",
+      "source_location": "L3",
+      "id": "floralaccent_floralaccent",
+      "community": 41
+    },
+    {
+      "label": "VisualEffects.tsx",
+      "file_type": "code",
+      "source_file": "src/components/effects/VisualEffects.tsx",
+      "source_location": "L1",
+      "id": "src_components_effects_visualeffects_tsx",
+      "community": 59
+    },
+    {
+      "label": "TopCitiesPageContent.tsx",
+      "file_type": "code",
+      "source_file": "src/components/pages/TopCitiesPageContent.tsx",
+      "source_location": "L1",
+      "id": "src_components_pages_topcitiespagecontent_tsx",
+      "community": 42
+    },
+    {
+      "label": "CityCard()",
+      "file_type": "code",
+      "source_file": "src/components/pages/TopCitiesPageContent.tsx",
+      "source_location": "L44",
+      "id": "topcitiespagecontent_citycard",
+      "community": 42
+    },
+    {
+      "label": "AboutPageContent.tsx",
+      "file_type": "code",
+      "source_file": "src/components/pages/AboutPageContent.tsx",
+      "source_location": "L1",
+      "id": "src_components_pages_aboutpagecontent_tsx",
+      "community": 60
+    },
+    {
+      "label": "AnalyticsProvider.tsx",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L1",
+      "id": "src_components_analytics_analyticsprovider_tsx",
+      "community": 4
+    },
+    {
+      "label": "generateSessionId()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L70",
+      "id": "analyticsprovider_generatesessionid",
+      "community": 4
+    },
+    {
+      "label": "getOrCreateSession()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L77",
+      "id": "analyticsprovider_getorcreatesession",
+      "community": 4
+    },
+    {
+      "label": "isNewVisitor()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L94",
+      "id": "analyticsprovider_isnewvisitor",
+      "community": 4
+    },
+    {
+      "label": "getGeoConsent()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L105",
+      "id": "analyticsprovider_getgeoconsent",
+      "community": 4
+    },
+    {
+      "label": "setGeoConsentStorage()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L110",
+      "id": "analyticsprovider_setgeoconsentstorage",
+      "community": 4
+    },
+    {
+      "label": "shouldTrack()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L115",
+      "id": "analyticsprovider_shouldtrack",
+      "community": 4
+    },
+    {
+      "label": "AnalyticsProvider()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L140",
+      "id": "analyticsprovider_analyticsprovider",
+      "community": 4
+    },
+    {
+      "label": "PageTracker.tsx",
+      "file_type": "code",
+      "source_file": "src/components/analytics/PageTracker.tsx",
+      "source_location": "L1",
+      "id": "src_components_analytics_pagetracker_tsx",
+      "community": 43
+    },
+    {
+      "label": "PageTracker()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/PageTracker.tsx",
+      "source_location": "L13",
+      "id": "pagetracker_pagetracker",
+      "community": 43
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "src/components/analytics/index.ts",
+      "source_location": "L1",
+      "id": "src_components_analytics_index_ts",
+      "community": 61
+    },
+    {
+      "label": "GeoConsentBanner.tsx",
+      "file_type": "code",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L1",
+      "id": "src_components_analytics_geoconsentbanner_tsx",
+      "community": 16
+    },
+    {
+      "label": "handleAccept()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L33",
+      "id": "geoconsentbanner_handleaccept",
+      "community": 16
+    },
+    {
+      "label": "handleDecline()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L39",
+      "id": "geoconsentbanner_handledecline",
+      "community": 16
+    },
+    {
+      "label": "handleDismiss()",
+      "file_type": "code",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L45",
+      "id": "geoconsentbanner_handledismiss",
+      "community": 16
+    },
+    {
+      "label": "useRecentSearches.ts",
+      "file_type": "code",
+      "source_file": "src/hooks/useRecentSearches.ts",
+      "source_location": "L1",
+      "id": "src_hooks_userecentsearches_ts",
+      "community": 44
+    },
+    {
+      "label": "useRecentSearches()",
+      "file_type": "code",
+      "source_file": "src/hooks/useRecentSearches.ts",
+      "source_location": "L10",
+      "id": "userecentsearches_userecentsearches",
+      "community": 44
+    },
+    {
+      "label": "useDeviceType.ts",
+      "file_type": "code",
+      "source_file": "src/hooks/useDeviceType.ts",
+      "source_location": "L1",
+      "id": "src_hooks_usedevicetype_ts",
+      "community": 45
+    },
+    {
+      "label": "useDeviceType()",
+      "file_type": "code",
+      "source_file": "src/hooks/useDeviceType.ts",
+      "source_location": "L23",
+      "id": "usedevicetype_usedevicetype",
+      "community": 45
+    },
+    {
+      "label": "useNetworkQuality.ts",
+      "file_type": "code",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L1",
+      "id": "src_hooks_usenetworkquality_ts",
+      "community": 17
+    },
+    {
+      "label": "getConnection()",
+      "file_type": "code",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L38",
+      "id": "usenetworkquality_getconnection",
+      "community": 17
+    },
+    {
+      "label": "determineQuality()",
+      "file_type": "code",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L44",
+      "id": "usenetworkquality_determinequality",
+      "community": 17
+    },
+    {
+      "label": "useNetworkQuality()",
+      "file_type": "code",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L80",
+      "id": "usenetworkquality_usenetworkquality",
+      "community": 17
+    },
+    {
+      "label": "validation.ts",
+      "file_type": "code",
+      "source_file": "src/lib/validation.ts",
+      "source_location": "L1",
+      "id": "src_lib_validation_ts",
+      "community": 62
+    },
+    {
+      "label": "analytics.ts",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L1",
+      "id": "src_lib_analytics_ts",
+      "community": 3
+    },
+    {
+      "label": "getToday()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L56",
+      "id": "analytics_gettoday",
+      "community": 3
+    },
+    {
+      "label": "parseUserAgent()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L60",
+      "id": "analytics_parseuseragent",
+      "community": 3
+    },
+    {
+      "label": "parseReferrer()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L94",
+      "id": "analytics_parsereferrer",
+      "community": 3
+    },
+    {
+      "label": "recordDailyVisitorStats()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L155",
+      "id": "analytics_recorddailyvisitorstats",
+      "community": 3
+    },
+    {
+      "label": "recordTrafficSource()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L196",
+      "id": "analytics_recordtrafficsource",
+      "community": 3
+    },
+    {
+      "label": "recordDeviceStats()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L218",
+      "id": "analytics_recorddevicestats",
+      "community": 3
+    },
+    {
+      "label": "recordGeoStats()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L239",
+      "id": "analytics_recordgeostats",
+      "community": 3
+    },
+    {
+      "label": "recordCityView()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L260",
+      "id": "analytics_recordcityview",
+      "community": 3
+    },
+    {
+      "label": "recordUserAction()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L274",
+      "id": "analytics_recorduseraction",
+      "community": 3
+    },
+    {
+      "label": "processAnalyticsBatch()",
+      "file_type": "code",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L295",
+      "id": "analytics_processanalyticsbatch",
+      "community": 3
+    },
+    {
+      "label": "cities.ts",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L1",
+      "id": "src_lib_cities_ts",
+      "community": 5
+    },
+    {
+      "label": "normalizeQuery()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L25",
+      "id": "cities_normalizequery",
+      "community": 5
+    },
+    {
+      "label": "queryCitiesInBox()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L29",
+      "id": "cities_querycitiesinbox",
+      "community": 5
+    },
+    {
+      "label": "findNearest()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L51",
+      "id": "cities_findnearest",
+      "community": 5
+    },
+    {
+      "label": "findNearestCity()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L60",
+      "id": "cities_findnearestcity",
+      "community": 5
+    },
+    {
+      "label": "searchCities()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L76",
+      "id": "cities_searchcities",
+      "community": 5
+    },
+    {
+      "label": "getTopCities()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L122",
+      "id": "cities_gettopcities",
+      "community": 5
+    },
+    {
+      "label": "getCityById()",
+      "file_type": "code",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L148",
+      "id": "cities_getcitybyid",
+      "community": 5
+    },
+    {
+      "label": "ranking.ts",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L1",
+      "id": "src_lib_ranking_ts",
+      "community": 7
+    },
+    {
+      "label": "RankingEngine",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L37",
+      "id": "ranking_rankingengine",
+      "community": 7
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L40",
+      "id": "ranking_rankingengine_constructor",
+      "community": 7
+    },
+    {
+      "label": ".calculateBayesianScore()",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L48",
+      "id": "ranking_rankingengine_calculatebayesianscore",
+      "community": 7
+    },
+    {
+      "label": ".calculateViralityBoost()",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L65",
+      "id": "ranking_rankingengine_calculateviralityboost",
+      "community": 7
+    },
+    {
+      "label": ".getScore()",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L73",
+      "id": "ranking_rankingengine_getscore",
+      "community": 7
+    },
+    {
+      "label": ".rank()",
+      "file_type": "code",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L91",
+      "id": "ranking_rankingengine_rank",
+      "community": 7
+    },
+    {
+      "label": "storage.ts",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L1",
+      "id": "src_lib_storage_ts",
+      "community": 8
+    },
+    {
+      "label": "hasStorage()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L1",
+      "id": "storage_hasstorage",
+      "community": 8
+    },
+    {
+      "label": "getStorageItem()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L4",
+      "id": "storage_getstorageitem",
+      "community": 8
+    },
+    {
+      "label": "setStorageItem()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L14",
+      "id": "storage_setstorageitem",
+      "community": 8
+    },
+    {
+      "label": "removeStorageItem()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L23",
+      "id": "storage_removestorageitem",
+      "community": 8
+    },
+    {
+      "label": "getJsonStorageItem()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L32",
+      "id": "storage_getjsonstorageitem",
+      "community": 8
+    },
+    {
+      "label": "setJsonStorageItem()",
+      "file_type": "code",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L43",
+      "id": "storage_setjsonstorageitem",
+      "community": 8
+    },
+    {
+      "label": "cache-config.ts",
+      "file_type": "code",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L1",
+      "id": "src_lib_cache_config_ts",
+      "community": 11
+    },
+    {
+      "label": "isCacheFresh()",
+      "file_type": "code",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L21",
+      "id": "cache_config_iscachefresh",
+      "community": 11
+    },
+    {
+      "label": "minutes()",
+      "file_type": "code",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L28",
+      "id": "cache_config_minutes",
+      "community": 11
+    },
+    {
+      "label": "hours()",
+      "file_type": "code",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L30",
+      "id": "cache_config_hours",
+      "community": 11
+    },
+    {
+      "label": "days()",
+      "file_type": "code",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L32",
+      "id": "cache_config_days",
+      "community": 11
+    },
+    {
+      "label": "format.ts",
+      "file_type": "code",
+      "source_file": "src/lib/format.ts",
+      "source_location": "L1",
+      "id": "src_lib_format_ts",
+      "community": 46
+    },
+    {
+      "label": "formatPopulation()",
+      "file_type": "code",
+      "source_file": "src/lib/format.ts",
+      "source_location": "L4",
+      "id": "format_formatpopulation",
+      "community": 46
+    },
+    {
+      "label": "intelligence.ts",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L1",
+      "id": "src_lib_intelligence_ts",
+      "community": 10
+    },
+    {
+      "label": "sanitizeJsonResponse()",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L36",
+      "id": "intelligence_sanitizejsonresponse",
+      "community": 10
+    },
+    {
+      "label": "isFresh()",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L55",
+      "id": "intelligence_isfresh",
+      "community": 10
+    },
+    {
+      "label": "getCityInsight()",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L67",
+      "id": "intelligence_getcityinsight",
+      "community": 10
+    },
+    {
+      "label": "getIntelligentTrendingCities()",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L150",
+      "id": "intelligence_getintelligenttrendingcities",
+      "community": 10
+    },
+    {
+      "label": "matchCitiesInDb()",
+      "file_type": "code",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L219",
+      "id": "intelligence_matchcitiesindb",
+      "community": 10
+    },
+    {
+      "label": "weather.ts",
+      "file_type": "code",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L1",
+      "id": "src_lib_weather_ts",
+      "community": 12
+    },
+    {
+      "label": "parseCachedWeather()",
+      "file_type": "code",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L24",
+      "id": "weather_parsecachedweather",
+      "community": 12
+    },
+    {
+      "label": "getAqiLabel()",
+      "file_type": "code",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L29",
+      "id": "weather_getaqilabel",
+      "community": 12
+    },
+    {
+      "label": "fetchFreshWeather()",
+      "file_type": "code",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L40",
+      "id": "weather_fetchfreshweather",
+      "community": 12
+    },
+    {
+      "label": "getCityWeather()",
+      "file_type": "code",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L93",
+      "id": "weather_getcityweather",
+      "community": 12
+    },
+    {
+      "label": "places.ts",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L1",
+      "id": "src_lib_places_ts",
+      "community": 0
+    },
+    {
+      "label": "getPlacesWriteClient()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L70",
+      "id": "places_getplaceswriteclient",
+      "community": 0
+    },
+    {
+      "label": "buildPlacesRequestKey()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L83",
+      "id": "places_buildplacesrequestkey",
+      "community": 0
+    },
+    {
+      "label": "getPrimaryQuery()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L90",
+      "id": "places_getprimaryquery",
+      "community": 0
+    },
+    {
+      "label": "getFallbackBudgetQuery()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L101",
+      "id": "places_getfallbackbudgetquery",
+      "community": 0
+    },
+    {
+      "label": "inferBudgetPlaces()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L112",
+      "id": "places_inferbudgetplaces",
+      "community": 0
+    },
+    {
+      "label": "dedupePlaces()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L120",
+      "id": "places_dedupeplaces",
+      "community": 0
+    },
+    {
+      "label": "hasBudgetCoverage()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L128",
+      "id": "places_hasbudgetcoverage",
+      "community": 0
+    },
+    {
+      "label": "isBudgetSensitive()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L141",
+      "id": "places_isbudgetsensitive",
+      "community": 0
+    },
+    {
+      "label": "stripPhotoMetadata()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L145",
+      "id": "places_stripphotometadata",
+      "community": 0
+    },
+    {
+      "label": "filterPlacesByRadius()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L151",
+      "id": "places_filterplacesbyradius",
+      "community": 0
+    },
+    {
+      "label": "savePlacesCache()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L167",
+      "id": "places_saveplacescache",
+      "community": 0
+    },
+    {
+      "label": "recordPlacesCacheEvent()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L193",
+      "id": "places_recordplacescacheevent",
+      "community": 0
+    },
+    {
+      "label": "enrichRankedPlaceImages()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L215",
+      "id": "places_enrichrankedplaceimages",
+      "community": 0
+    },
+    {
+      "label": "fetchFreshPlaces()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L242",
+      "id": "places_fetchfreshplaces",
+      "community": 0
+    },
+    {
+      "label": "fetchAndCachePlaces()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L304",
+      "id": "places_fetchandcacheplaces",
+      "community": 0
+    },
+    {
+      "label": "generateBlurhash()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L333",
+      "id": "places_generateblurhash",
+      "community": 0
+    },
+    {
+      "label": "buildPlaceImagePublicUrl()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L358",
+      "id": "places_buildplaceimagepublicurl",
+      "community": 0
+    },
+    {
+      "label": "normalizeCachedPlace()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L362",
+      "id": "places_normalizecachedplace",
+      "community": 0
+    },
+    {
+      "label": "resolvePlaceImage()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L402",
+      "id": "places_resolveplaceimage",
+      "community": 0
+    },
+    {
+      "label": "fetchFromGoogle()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L468",
+      "id": "places_fetchfromgoogle",
+      "community": 0
+    },
+    {
+      "label": "refreshPlacesInBackground()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L519",
+      "id": "places_refreshplacesinbackground",
+      "community": 0
+    },
+    {
+      "label": "getTopPlaces()",
+      "file_type": "code",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L531",
+      "id": "places_gettopplaces",
+      "community": 0
+    },
+    {
+      "label": "supabase.ts",
+      "file_type": "code",
+      "source_file": "src/lib/supabase.ts",
+      "source_location": "L1",
+      "id": "src_lib_supabase_ts",
+      "community": 63
+    },
+    {
+      "label": "metrics.ts",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L1",
+      "id": "src_lib_metrics_ts",
+      "community": 9
+    },
+    {
+      "label": "getOpenMeteoAirQuality()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L17",
+      "id": "metrics_getopenmeteoairquality",
+      "community": 9
+    },
+    {
+      "label": "getOpenMeteoWeather()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L33",
+      "id": "metrics_getopenmeteoweather",
+      "community": 9
+    },
+    {
+      "label": "comfortFromTemp()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L47",
+      "id": "metrics_comfortfromtemp",
+      "community": 9
+    },
+    {
+      "label": "toMetrics()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L56",
+      "id": "metrics_tometrics",
+      "community": 9
+    },
+    {
+      "label": "fetchAndCacheMetrics()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L69",
+      "id": "metrics_fetchandcachemetrics",
+      "community": 9
+    },
+    {
+      "label": "getCityMetrics()",
+      "file_type": "code",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L99",
+      "id": "metrics_getcitymetrics",
+      "community": 9
+    },
+    {
+      "label": "useAnalytics.ts",
+      "file_type": "code",
+      "source_file": "src/lib/useAnalytics.ts",
+      "source_location": "L1",
+      "id": "src_lib_useanalytics_ts",
+      "community": 47
+    },
+    {
+      "label": "useAnalytics()",
+      "file_type": "code",
+      "source_file": "src/lib/useAnalytics.ts",
+      "source_location": "L27",
+      "id": "useanalytics_useanalytics",
+      "community": 47
+    },
+    {
+      "label": "image-transforms.ts",
+      "file_type": "code",
+      "source_file": "src/lib/image-transforms.ts",
+      "source_location": "L1",
+      "id": "src_lib_image_transforms_ts",
+      "community": 22
+    },
+    {
+      "label": "generateSizes()",
+      "file_type": "code",
+      "source_file": "src/lib/image-transforms.ts",
+      "source_location": "L21",
+      "id": "image_transforms_generatesizes",
+      "community": 22
+    },
+    {
+      "label": "getQualityValue()",
+      "file_type": "code",
+      "source_file": "src/lib/image-transforms.ts",
+      "source_location": "L29",
+      "id": "image_transforms_getqualityvalue",
+      "community": 22
+    },
+    {
+      "label": "sphere-categories.ts",
+      "file_type": "code",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L1",
+      "id": "src_lib_sphere_categories_ts",
+      "community": 13
+    },
+    {
+      "label": "fisherYatesShuffle()",
+      "file_type": "code",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L19",
+      "id": "sphere_categories_fisheryatesshuffle",
+      "community": 13
+    },
+    {
+      "label": "getMixedCitiesFromCategories()",
+      "file_type": "code",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L253",
+      "id": "sphere_categories_getmixedcitiesfromcategories",
+      "community": 13
+    },
+    {
+      "label": "getCitiesFromCategory()",
+      "file_type": "code",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L309",
+      "id": "sphere_categories_getcitiesfromcategory",
+      "community": 13
+    },
+    {
+      "label": "getCategoryIds()",
+      "file_type": "code",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L319",
+      "id": "sphere_categories_getcategoryids",
+      "community": 13
+    },
+    {
+      "label": "geo.ts",
+      "file_type": "code",
+      "source_file": "src/lib/geo.ts",
+      "source_location": "L1",
+      "id": "src_lib_geo_ts",
+      "community": 48
+    },
+    {
+      "label": "haversineKm()",
+      "file_type": "code",
+      "source_file": "src/lib/geo.ts",
+      "source_location": "L13",
+      "id": "geo_haversinekm",
+      "community": 48
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/robots.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "src_app_robots_ts",
+      "_tgt": "robots_robots",
+      "source": "src_app_robots_ts",
+      "target": "robots_robots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/actions.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "src_app_actions_ts",
+      "_tgt": "actions_fetchtrendingdestinations",
+      "source": "src_app_actions_ts",
+      "target": "actions_fetchtrendingdestinations",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/sitemap.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "src_app_sitemap_ts",
+      "_tgt": "sitemap_sitemap",
+      "source": "src_app_sitemap_ts",
+      "target": "sitemap_sitemap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/layout.tsx",
+      "source_location": "L127",
+      "weight": 1.0,
+      "_src": "src_app_layout_tsx",
+      "_tgt": "layout_rootlayout",
+      "source": "src_app_layout_tsx",
+      "target": "layout_rootlayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/page.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "src_app_page_tsx",
+      "_tgt": "page_home",
+      "source": "src_app_page_tsx",
+      "target": "page_home",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/resources/top-cities/page.tsx",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "src_app_resources_top_cities_page_tsx",
+      "_tgt": "page_topcitiespage",
+      "source": "src_app_resources_top_cities_page_tsx",
+      "target": "page_topcitiespage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/about/page.tsx",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_src": "src_app_about_page_tsx",
+      "_tgt": "page_aboutpage",
+      "source": "src_app_about_page_tsx",
+      "target": "page_aboutpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSkeleton.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencesskeleton_tsx",
+      "_tgt": "experiencesskeleton_shimmer",
+      "source": "src_app_cities_id_experiencesskeleton_tsx",
+      "target": "experiencesskeleton_shimmer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSkeleton.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencesskeleton_tsx",
+      "_tgt": "experiencesskeleton_experiencecardskeleton",
+      "source": "src_app_cities_id_experiencesskeleton_tsx",
+      "target": "experiencesskeleton_experiencecardskeleton",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/AIBriefingClient.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_aibriefingclient_tsx",
+      "_tgt": "aibriefingclient_getseasoncolor",
+      "source": "src_app_cities_id_aibriefingclient_tsx",
+      "target": "aibriefingclient_getseasoncolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/AIBriefingSection.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_aibriefingsection_tsx",
+      "_tgt": "aibriefingsection_aibriefingsection",
+      "source": "src_app_cities_id_aibriefingsection_tsx",
+      "target": "aibriefingsection_aibriefingsection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/page.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_page_tsx",
+      "_tgt": "page_cityvitalsfallback",
+      "source": "src_app_cities_id_page_tsx",
+      "target": "page_cityvitalsfallback",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/page.tsx",
+      "source_location": "L178",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_page_tsx",
+      "_tgt": "page_notfound",
+      "source": "src_app_cities_id_page_tsx",
+      "target": "page_notfound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_sanitizekey",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_sanitizekey",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_tonotemap",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_tonotemap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_sanitizenotes",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_sanitizenotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_parsestorednotes",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_parsestorednotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L95",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_topk",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_topk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L190",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_update",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_update",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L198",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_persistcitynotes",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_persistcitynotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L206",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_updateplacenotes",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_updateplacenotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L216",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_updatedraftnotes",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_updatedraftnotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L224",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_savenote",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_savenote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L237",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_clearnote",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_clearnote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L251",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_toggleexpand",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_toggleexpand",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L263",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_getlocalpulsetags",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_getlocalpulsetags",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L282",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_getneighborhood",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_getneighborhood",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L284",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_getaddresscontext",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_getaddresscontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L302",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_getinsidertips",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_getinsidertips",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L365",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_formattype",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_formattype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L373",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_getpricelevel",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_getpricelevel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L396",
+      "weight": 1.0,
+      "_src": "src_app_cities_id_experiencessection_tsx",
+      "_tgt": "experiencessection_togglesave",
+      "source": "src_app_cities_id_experiencessection_tsx",
+      "target": "experiencessection_togglesave",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L202",
+      "weight": 1.0,
+      "_src": "experiencessection_persistcitynotes",
+      "_tgt": "experiencessection_sanitizekey",
+      "source": "experiencessection_sanitizekey",
+      "target": "experiencessection_persistcitynotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L226",
+      "weight": 1.0,
+      "_src": "experiencessection_savenote",
+      "_tgt": "experiencessection_sanitizekey",
+      "source": "experiencessection_sanitizekey",
+      "target": "experiencessection_savenote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_src": "experiencessection_clearnote",
+      "_tgt": "experiencessection_sanitizekey",
+      "source": "experiencessection_sanitizekey",
+      "target": "experiencessection_clearnote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L202",
+      "weight": 1.0,
+      "_src": "experiencessection_persistcitynotes",
+      "_tgt": "experiencessection_sanitizenotes",
+      "source": "experiencessection_sanitizenotes",
+      "target": "experiencessection_persistcitynotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L201",
+      "weight": 1.0,
+      "_src": "experiencessection_persistcitynotes",
+      "_tgt": "experiencessection_parsestorednotes",
+      "source": "experiencessection_parsestorednotes",
+      "target": "experiencessection_persistcitynotes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L227",
+      "weight": 1.0,
+      "_src": "experiencessection_savenote",
+      "_tgt": "experiencessection_updateplacenotes",
+      "source": "experiencessection_updateplacenotes",
+      "target": "experiencessection_savenote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L243",
+      "weight": 1.0,
+      "_src": "experiencessection_clearnote",
+      "_tgt": "experiencessection_updateplacenotes",
+      "source": "experiencessection_updateplacenotes",
+      "target": "experiencessection_clearnote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L240",
+      "weight": 1.0,
+      "_src": "experiencessection_clearnote",
+      "_tgt": "experiencessection_updatedraftnotes",
+      "source": "experiencessection_updatedraftnotes",
+      "target": "experiencessection_clearnote",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/cities/[id]/ExperiencesSection.tsx",
+      "source_location": "L305",
+      "weight": 1.0,
+      "_src": "experiencessection_getinsidertips",
+      "_tgt": "experiencessection_getneighborhood",
+      "source": "experiencessection_getneighborhood",
+      "target": "experiencessection_getinsidertips",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/cities/sphere/route.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "src_app_api_cities_sphere_route_ts",
+      "_tgt": "route_get",
+      "source": "src_app_api_cities_sphere_route_ts",
+      "target": "route_get",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/analytics/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "src_app_api_analytics_route_ts",
+      "_tgt": "route_post",
+      "source": "src_app_api_analytics_route_ts",
+      "target": "route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_src": "src_components_optimizedimage_tsx",
+      "_tgt": "optimizedimage_shouldbypassnextimageoptimization",
+      "source": "src_components_optimizedimage_tsx",
+      "target": "optimizedimage_shouldbypassnextimageoptimization",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_src": "src_components_optimizedimage_tsx",
+      "_tgt": "optimizedimage_blurhashtodataurl",
+      "source": "src_components_optimizedimage_tsx",
+      "target": "optimizedimage_blurhashtodataurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/OptimizedImage.tsx",
+      "source_location": "L96",
+      "weight": 1.0,
+      "_src": "src_components_optimizedimage_tsx",
+      "_tgt": "optimizedimage_optimizedimageinner",
+      "source": "src_components_optimizedimage_tsx",
+      "target": "optimizedimage_optimizedimageinner",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/ScrollReveal.tsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "src_components_ui_scrollreveal_tsx",
+      "_tgt": "scrollreveal_scrollreveal",
+      "source": "src_components_ui_scrollreveal_tsx",
+      "target": "scrollreveal_scrollreveal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/ScrollReveal.tsx",
+      "source_location": "L120",
+      "weight": 1.0,
+      "_src": "src_components_ui_scrollreveal_tsx",
+      "_tgt": "scrollreveal_staggercontainer",
+      "source": "src_components_ui_scrollreveal_tsx",
+      "target": "scrollreveal_staggercontainer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/ui/Hotspot.tsx",
+      "source_location": "L62",
+      "weight": 1.0,
+      "_src": "src_components_ui_hotspot_tsx",
+      "_tgt": "hotspot_hotspot",
+      "source": "src_components_ui_hotspot_tsx",
+      "target": "hotspot_hotspot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/sections/FreeResourceCTA.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "src_components_sections_freeresourcecta_tsx",
+      "_tgt": "freeresourcecta_freeresourcecta",
+      "source": "src_components_sections_freeresourcecta_tsx",
+      "target": "freeresourcecta_freeresourcecta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/layout/SiteFooter.tsx",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "src_components_layout_sitefooter_tsx",
+      "_tgt": "sitefooter_sitefooter",
+      "source": "src_components_layout_sitefooter_tsx",
+      "target": "sitefooter_sitefooter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/layout/MobileBottomNav.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "src_components_layout_mobilebottomnav_tsx",
+      "_tgt": "mobilebottomnav_mobilebottomnav",
+      "source": "src_components_layout_mobilebottomnav_tsx",
+      "target": "mobilebottomnav_mobilebottomnav",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/layout/ThemeProvider.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "src_components_layout_themeprovider_tsx",
+      "_tgt": "themeprovider_themeprovider",
+      "source": "src_components_layout_themeprovider_tsx",
+      "target": "themeprovider_themeprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/layout/SiteNav.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "src_components_layout_sitenav_tsx",
+      "_tgt": "sitenav_sitenav",
+      "source": "src_components_layout_sitenav_tsx",
+      "target": "sitenav_sitenav",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityvitals_tsx",
+      "_tgt": "cityvitals_getaqicolor",
+      "source": "src_components_features_city_cityvitals_tsx",
+      "target": "cityvitals_getaqicolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityvitals_tsx",
+      "_tgt": "cityvitals_gettempcolor",
+      "source": "src_components_features_city_cityvitals_tsx",
+      "target": "cityvitals_gettempcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CityVitals.tsx",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityvitals_tsx",
+      "_tgt": "cityvitals_gettempiconcolor",
+      "source": "src_components_features_city_cityvitals_tsx",
+      "target": "cityvitals_gettempiconcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L50",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_getstarcolor",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_getstarcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_getlabelcolor",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_getlabelcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_getlabelglow",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_getlabelglow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_generatestars",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_generatestars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L98",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_buildspatialgrid",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_buildspatialgrid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L114",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_getneighborstars",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_getneighborstars",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L136",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_generateconnections",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_generateconnections",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_load",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_load",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_handlemousemove",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_handlemousemove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L268",
+      "weight": 1.0,
+      "_src": "src_components_features_city_constellationbackground_tsx",
+      "_tgt": "constellationbackground_animate",
+      "source": "src_components_features_city_constellationbackground_tsx",
+      "target": "constellationbackground_animate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L147",
+      "weight": 1.0,
+      "_src": "constellationbackground_generateconnections",
+      "_tgt": "constellationbackground_buildspatialgrid",
+      "source": "constellationbackground_buildspatialgrid",
+      "target": "constellationbackground_generateconnections",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/ConstellationBackground.tsx",
+      "source_location": "L157",
+      "weight": 1.0,
+      "_src": "constellationbackground_generateconnections",
+      "_tgt": "constellationbackground_getneighborstars",
+      "source": "constellationbackground_getneighborstars",
+      "target": "constellationbackground_generateconnections",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_fibonaccisphere",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_fibonaccisphere",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L52",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_getnodecolor",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_getnodecolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_getglowcolor",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_getglowcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_load",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_load",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_handlemousemove",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_handlemousemove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySphereBackground.tsx",
+      "source_location": "L203",
+      "weight": 1.0,
+      "_src": "src_components_features_city_cityspherebackground_tsx",
+      "_tgt": "cityspherebackground_tick",
+      "source": "src_components_features_city_cityspherebackground_tsx",
+      "target": "cityspherebackground_tick",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySearch.tsx",
+      "source_location": "L149",
+      "weight": 1.0,
+      "_src": "src_components_features_city_citysearch_tsx",
+      "_tgt": "citysearch_handlekeydown",
+      "source": "src_components_features_city_citysearch_tsx",
+      "target": "citysearch_handlekeydown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/features/city/CitySearch.tsx",
+      "source_location": "L177",
+      "weight": 1.0,
+      "_src": "src_components_features_city_citysearch_tsx",
+      "_tgt": "citysearch_handlelocate",
+      "source": "src_components_features_city_citysearch_tsx",
+      "target": "citysearch_handlelocate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/effects/ClientEffects.tsx",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "src_components_effects_clienteffects_tsx",
+      "_tgt": "clienteffects_clienteffects",
+      "source": "src_components_effects_clienteffects_tsx",
+      "target": "clienteffects_clienteffects",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/effects/FloralAccent.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "src_components_effects_floralaccent_tsx",
+      "_tgt": "floralaccent_floralaccent",
+      "source": "src_components_effects_floralaccent_tsx",
+      "target": "floralaccent_floralaccent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/pages/TopCitiesPageContent.tsx",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "src_components_pages_topcitiespagecontent_tsx",
+      "_tgt": "topcitiespagecontent_citycard",
+      "source": "src_components_pages_topcitiespagecontent_tsx",
+      "target": "topcitiespagecontent_citycard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_generatesessionid",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_generatesessionid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L77",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_getorcreatesession",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_getorcreatesession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_isnewvisitor",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_isnewvisitor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L105",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_getgeoconsent",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_getgeoconsent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L110",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_setgeoconsentstorage",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_setgeoconsentstorage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_shouldtrack",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_shouldtrack",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L140",
+      "weight": 1.0,
+      "_src": "src_components_analytics_analyticsprovider_tsx",
+      "_tgt": "analyticsprovider_analyticsprovider",
+      "source": "src_components_analytics_analyticsprovider_tsx",
+      "target": "analyticsprovider_analyticsprovider",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/AnalyticsProvider.tsx",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "analyticsprovider_getorcreatesession",
+      "_tgt": "analyticsprovider_generatesessionid",
+      "source": "analyticsprovider_generatesessionid",
+      "target": "analyticsprovider_getorcreatesession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/PageTracker.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "src_components_analytics_pagetracker_tsx",
+      "_tgt": "pagetracker_pagetracker",
+      "source": "src_components_analytics_pagetracker_tsx",
+      "target": "pagetracker_pagetracker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "src_components_analytics_geoconsentbanner_tsx",
+      "_tgt": "geoconsentbanner_handleaccept",
+      "source": "src_components_analytics_geoconsentbanner_tsx",
+      "target": "geoconsentbanner_handleaccept",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_src": "src_components_analytics_geoconsentbanner_tsx",
+      "_tgt": "geoconsentbanner_handledecline",
+      "source": "src_components_analytics_geoconsentbanner_tsx",
+      "target": "geoconsentbanner_handledecline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/components/analytics/GeoConsentBanner.tsx",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "src_components_analytics_geoconsentbanner_tsx",
+      "_tgt": "geoconsentbanner_handledismiss",
+      "source": "src_components_analytics_geoconsentbanner_tsx",
+      "target": "geoconsentbanner_handledismiss",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useRecentSearches.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "src_hooks_userecentsearches_ts",
+      "_tgt": "userecentsearches_userecentsearches",
+      "source": "src_hooks_userecentsearches_ts",
+      "target": "userecentsearches_userecentsearches",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useDeviceType.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "src_hooks_usedevicetype_ts",
+      "_tgt": "usedevicetype_usedevicetype",
+      "source": "src_hooks_usedevicetype_ts",
+      "target": "usedevicetype_usedevicetype",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_src": "src_hooks_usenetworkquality_ts",
+      "_tgt": "usenetworkquality_getconnection",
+      "source": "src_hooks_usenetworkquality_ts",
+      "target": "usenetworkquality_getconnection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "src_hooks_usenetworkquality_ts",
+      "_tgt": "usenetworkquality_determinequality",
+      "source": "src_hooks_usenetworkquality_ts",
+      "target": "usenetworkquality_determinequality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/hooks/useNetworkQuality.ts",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_src": "src_hooks_usenetworkquality_ts",
+      "_tgt": "usenetworkquality_usenetworkquality",
+      "source": "src_hooks_usenetworkquality_ts",
+      "target": "usenetworkquality_usenetworkquality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_gettoday",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_gettoday",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_parseuseragent",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_parseuseragent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_parsereferrer",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_parsereferrer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L155",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recorddailyvisitorstats",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recorddailyvisitorstats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L196",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recordtrafficsource",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recordtrafficsource",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L218",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recorddevicestats",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recorddevicestats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L239",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recordgeostats",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recordgeostats",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L260",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recordcityview",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recordcityview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L274",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_recorduseraction",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_recorduseraction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L295",
+      "weight": 1.0,
+      "_src": "src_lib_analytics_ts",
+      "_tgt": "analytics_processanalyticsbatch",
+      "source": "src_lib_analytics_ts",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L305",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_gettoday",
+      "source": "analytics_gettoday",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L307",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_parseuseragent",
+      "source": "analytics_parseuseragent",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L308",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_parsereferrer",
+      "source": "analytics_parsereferrer",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L317",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recorddailyvisitorstats",
+      "source": "analytics_recorddailyvisitorstats",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L318",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recordtrafficsource",
+      "source": "analytics_recordtrafficsource",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L319",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recorddevicestats",
+      "source": "analytics_recorddevicestats",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L322",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recordgeostats",
+      "source": "analytics_recordgeostats",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L331",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recordcityview",
+      "source": "analytics_recordcityview",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/analytics.ts",
+      "source_location": "L332",
+      "weight": 1.0,
+      "_src": "analytics_processanalyticsbatch",
+      "_tgt": "analytics_recorduseraction",
+      "source": "analytics_recorduseraction",
+      "target": "analytics_processanalyticsbatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_normalizequery",
+      "source": "src_lib_cities_ts",
+      "target": "cities_normalizequery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_querycitiesinbox",
+      "source": "src_lib_cities_ts",
+      "target": "cities_querycitiesinbox",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_findnearest",
+      "source": "src_lib_cities_ts",
+      "target": "cities_findnearest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_findnearestcity",
+      "source": "src_lib_cities_ts",
+      "target": "cities_findnearestcity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L76",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_searchcities",
+      "source": "src_lib_cities_ts",
+      "target": "cities_searchcities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L122",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_gettopcities",
+      "source": "src_lib_cities_ts",
+      "target": "cities_gettopcities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_src": "src_lib_cities_ts",
+      "_tgt": "cities_getcitybyid",
+      "source": "src_lib_cities_ts",
+      "target": "cities_getcitybyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "cities_searchcities",
+      "_tgt": "cities_normalizequery",
+      "source": "cities_normalizequery",
+      "target": "cities_searchcities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L63",
+      "weight": 1.0,
+      "_src": "cities_findnearestcity",
+      "_tgt": "cities_querycitiesinbox",
+      "source": "cities_querycitiesinbox",
+      "target": "cities_findnearestcity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "_src": "cities_findnearestcity",
+      "_tgt": "cities_findnearest",
+      "source": "cities_findnearest",
+      "target": "cities_findnearestcity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cities.ts",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "cities_findnearestcity",
+      "_tgt": "cities_gettopcities",
+      "source": "cities_findnearestcity",
+      "target": "cities_gettopcities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "src_lib_ranking_ts",
+      "_tgt": "ranking_rankingengine",
+      "source": "src_lib_ranking_ts",
+      "target": "ranking_rankingengine",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine",
+      "_tgt": "ranking_rankingengine_constructor",
+      "source": "ranking_rankingengine",
+      "target": "ranking_rankingengine_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L48",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine",
+      "_tgt": "ranking_rankingengine_calculatebayesianscore",
+      "source": "ranking_rankingengine",
+      "target": "ranking_rankingengine_calculatebayesianscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L65",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine",
+      "_tgt": "ranking_rankingengine_calculateviralityboost",
+      "source": "ranking_rankingengine",
+      "target": "ranking_rankingengine_calculateviralityboost",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L73",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine",
+      "_tgt": "ranking_rankingengine_getscore",
+      "source": "ranking_rankingengine",
+      "target": "ranking_rankingengine_getscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L91",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine",
+      "_tgt": "ranking_rankingengine_rank",
+      "source": "ranking_rankingengine",
+      "target": "ranking_rankingengine_rank",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine_getscore",
+      "_tgt": "ranking_rankingengine_calculatebayesianscore",
+      "source": "ranking_rankingengine_calculatebayesianscore",
+      "target": "ranking_rankingengine_getscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/ranking.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "ranking_rankingengine_getscore",
+      "_tgt": "ranking_rankingengine_calculateviralityboost",
+      "source": "ranking_rankingengine_calculateviralityboost",
+      "target": "ranking_rankingengine_getscore",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_hasstorage",
+      "source": "src_lib_storage_ts",
+      "target": "storage_hasstorage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_getstorageitem",
+      "source": "src_lib_storage_ts",
+      "target": "storage_getstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_setstorageitem",
+      "source": "src_lib_storage_ts",
+      "target": "storage_setstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_removestorageitem",
+      "source": "src_lib_storage_ts",
+      "target": "storage_removestorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_getjsonstorageitem",
+      "source": "src_lib_storage_ts",
+      "target": "storage_getjsonstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L43",
+      "weight": 1.0,
+      "_src": "src_lib_storage_ts",
+      "_tgt": "storage_setjsonstorageitem",
+      "source": "src_lib_storage_ts",
+      "target": "storage_setjsonstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "storage_getstorageitem",
+      "_tgt": "storage_hasstorage",
+      "source": "storage_hasstorage",
+      "target": "storage_getstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_src": "storage_setstorageitem",
+      "_tgt": "storage_hasstorage",
+      "source": "storage_hasstorage",
+      "target": "storage_setstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "storage_removestorageitem",
+      "_tgt": "storage_hasstorage",
+      "source": "storage_hasstorage",
+      "target": "storage_removestorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "storage_getjsonstorageitem",
+      "_tgt": "storage_getstorageitem",
+      "source": "storage_getstorageitem",
+      "target": "storage_getjsonstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/storage.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "_src": "storage_setjsonstorageitem",
+      "_tgt": "storage_setstorageitem",
+      "source": "storage_setstorageitem",
+      "target": "storage_setjsonstorageitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "src_lib_cache_config_ts",
+      "_tgt": "cache_config_iscachefresh",
+      "source": "src_lib_cache_config_ts",
+      "target": "cache_config_iscachefresh",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "src_lib_cache_config_ts",
+      "_tgt": "cache_config_minutes",
+      "source": "src_lib_cache_config_ts",
+      "target": "cache_config_minutes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "src_lib_cache_config_ts",
+      "_tgt": "cache_config_hours",
+      "source": "src_lib_cache_config_ts",
+      "target": "cache_config_hours",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/cache-config.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_src": "src_lib_cache_config_ts",
+      "_tgt": "cache_config_days",
+      "source": "src_lib_cache_config_ts",
+      "target": "cache_config_days",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/format.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "src_lib_format_ts",
+      "_tgt": "format_formatpopulation",
+      "source": "src_lib_format_ts",
+      "target": "format_formatpopulation",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_src": "src_lib_intelligence_ts",
+      "_tgt": "intelligence_sanitizejsonresponse",
+      "source": "src_lib_intelligence_ts",
+      "target": "intelligence_sanitizejsonresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "src_lib_intelligence_ts",
+      "_tgt": "intelligence_isfresh",
+      "source": "src_lib_intelligence_ts",
+      "target": "intelligence_isfresh",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L67",
+      "weight": 1.0,
+      "_src": "src_lib_intelligence_ts",
+      "_tgt": "intelligence_getcityinsight",
+      "source": "src_lib_intelligence_ts",
+      "target": "intelligence_getcityinsight",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L150",
+      "weight": 1.0,
+      "_src": "src_lib_intelligence_ts",
+      "_tgt": "intelligence_getintelligenttrendingcities",
+      "source": "src_lib_intelligence_ts",
+      "target": "intelligence_getintelligenttrendingcities",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L219",
+      "weight": 1.0,
+      "_src": "src_lib_intelligence_ts",
+      "_tgt": "intelligence_matchcitiesindb",
+      "source": "src_lib_intelligence_ts",
+      "target": "intelligence_matchcitiesindb",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_src": "intelligence_getcityinsight",
+      "_tgt": "intelligence_sanitizejsonresponse",
+      "source": "intelligence_sanitizejsonresponse",
+      "target": "intelligence_getcityinsight",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_src": "intelligence_getcityinsight",
+      "_tgt": "intelligence_isfresh",
+      "source": "intelligence_isfresh",
+      "target": "intelligence_getcityinsight",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/intelligence.ts",
+      "source_location": "L171",
+      "weight": 1.0,
+      "_src": "intelligence_getintelligenttrendingcities",
+      "_tgt": "intelligence_matchcitiesindb",
+      "source": "intelligence_getintelligenttrendingcities",
+      "target": "intelligence_matchcitiesindb",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "src_lib_weather_ts",
+      "_tgt": "weather_parsecachedweather",
+      "source": "src_lib_weather_ts",
+      "target": "weather_parsecachedweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "src_lib_weather_ts",
+      "_tgt": "weather_getaqilabel",
+      "source": "src_lib_weather_ts",
+      "target": "weather_getaqilabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "src_lib_weather_ts",
+      "_tgt": "weather_fetchfreshweather",
+      "source": "src_lib_weather_ts",
+      "target": "weather_fetchfreshweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L93",
+      "weight": 1.0,
+      "_src": "src_lib_weather_ts",
+      "_tgt": "weather_getcityweather",
+      "source": "src_lib_weather_ts",
+      "target": "weather_getcityweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_src": "weather_getcityweather",
+      "_tgt": "weather_parsecachedweather",
+      "source": "weather_parsecachedweather",
+      "target": "weather_getcityweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "weather_fetchfreshweather",
+      "_tgt": "weather_getaqilabel",
+      "source": "weather_getaqilabel",
+      "target": "weather_fetchfreshweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/weather.ts",
+      "source_location": "L121",
+      "weight": 1.0,
+      "_src": "weather_getcityweather",
+      "_tgt": "weather_fetchfreshweather",
+      "source": "weather_fetchfreshweather",
+      "target": "weather_getcityweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_getplaceswriteclient",
+      "source": "src_lib_places_ts",
+      "target": "places_getplaceswriteclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L83",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_buildplacesrequestkey",
+      "source": "src_lib_places_ts",
+      "target": "places_buildplacesrequestkey",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_getprimaryquery",
+      "source": "src_lib_places_ts",
+      "target": "places_getprimaryquery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_getfallbackbudgetquery",
+      "source": "src_lib_places_ts",
+      "target": "places_getfallbackbudgetquery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L112",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_inferbudgetplaces",
+      "source": "src_lib_places_ts",
+      "target": "places_inferbudgetplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L120",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_dedupeplaces",
+      "source": "src_lib_places_ts",
+      "target": "places_dedupeplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L128",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_hasbudgetcoverage",
+      "source": "src_lib_places_ts",
+      "target": "places_hasbudgetcoverage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_isbudgetsensitive",
+      "source": "src_lib_places_ts",
+      "target": "places_isbudgetsensitive",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L145",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_stripphotometadata",
+      "source": "src_lib_places_ts",
+      "target": "places_stripphotometadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L151",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_filterplacesbyradius",
+      "source": "src_lib_places_ts",
+      "target": "places_filterplacesbyradius",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L167",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_saveplacescache",
+      "source": "src_lib_places_ts",
+      "target": "places_saveplacescache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L193",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_recordplacescacheevent",
+      "source": "src_lib_places_ts",
+      "target": "places_recordplacescacheevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L215",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_enrichrankedplaceimages",
+      "source": "src_lib_places_ts",
+      "target": "places_enrichrankedplaceimages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L242",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_fetchfreshplaces",
+      "source": "src_lib_places_ts",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L304",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_fetchandcacheplaces",
+      "source": "src_lib_places_ts",
+      "target": "places_fetchandcacheplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L333",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_generateblurhash",
+      "source": "src_lib_places_ts",
+      "target": "places_generateblurhash",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L358",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_buildplaceimagepublicurl",
+      "source": "src_lib_places_ts",
+      "target": "places_buildplaceimagepublicurl",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L362",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_normalizecachedplace",
+      "source": "src_lib_places_ts",
+      "target": "places_normalizecachedplace",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L402",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_resolveplaceimage",
+      "source": "src_lib_places_ts",
+      "target": "places_resolveplaceimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L468",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_fetchfromgoogle",
+      "source": "src_lib_places_ts",
+      "target": "places_fetchfromgoogle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L519",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_refreshplacesinbackground",
+      "source": "src_lib_places_ts",
+      "target": "places_refreshplacesinbackground",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L531",
+      "weight": 1.0,
+      "_src": "src_lib_places_ts",
+      "_tgt": "places_gettopplaces",
+      "source": "src_lib_places_ts",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L173",
+      "weight": 1.0,
+      "_src": "places_saveplacescache",
+      "_tgt": "places_getplaceswriteclient",
+      "source": "places_getplaceswriteclient",
+      "target": "places_saveplacescache",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L194",
+      "weight": 1.0,
+      "_src": "places_recordplacescacheevent",
+      "_tgt": "places_getplaceswriteclient",
+      "source": "places_getplaceswriteclient",
+      "target": "places_recordplacescacheevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L408",
+      "weight": 1.0,
+      "_src": "places_resolveplaceimage",
+      "_tgt": "places_getplaceswriteclient",
+      "source": "places_getplaceswriteclient",
+      "target": "places_resolveplaceimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L309",
+      "weight": 1.0,
+      "_src": "places_fetchandcacheplaces",
+      "_tgt": "places_buildplacesrequestkey",
+      "source": "places_buildplacesrequestkey",
+      "target": "places_fetchandcacheplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_getprimaryquery",
+      "source": "places_getprimaryquery",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L268",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_getfallbackbudgetquery",
+      "source": "places_getfallbackbudgetquery",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L283",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_inferbudgetplaces",
+      "source": "places_inferbudgetplaces",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L267",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_dedupeplaces",
+      "source": "places_dedupeplaces",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L272",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_hasbudgetcoverage",
+      "source": "places_hasbudgetcoverage",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L571",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_hasbudgetcoverage",
+      "source": "places_hasbudgetcoverage",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L272",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_isbudgetsensitive",
+      "source": "places_isbudgetsensitive",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L571",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_isbudgetsensitive",
+      "source": "places_isbudgetsensitive",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L299",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_stripphotometadata",
+      "source": "places_stripphotometadata",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L264",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_filterplacesbyradius",
+      "source": "places_filterplacesbyradius",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L567",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_saveplacescache",
+      "source": "places_saveplacescache",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L557",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_recordplacescacheevent",
+      "source": "places_recordplacescacheevent",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L298",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_enrichrankedplaceimages",
+      "source": "places_enrichrankedplaceimages",
+      "target": "places_fetchfreshplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "places_fetchfreshplaces",
+      "_tgt": "places_fetchfromgoogle",
+      "source": "places_fetchfreshplaces",
+      "target": "places_fetchfromgoogle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L582",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_fetchandcacheplaces",
+      "source": "places_fetchandcacheplaces",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L427",
+      "weight": 1.0,
+      "_src": "places_resolveplaceimage",
+      "_tgt": "places_generateblurhash",
+      "source": "places_generateblurhash",
+      "target": "places_resolveplaceimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L367",
+      "weight": 1.0,
+      "_src": "places_normalizecachedplace",
+      "_tgt": "places_buildplaceimagepublicurl",
+      "source": "places_buildplaceimagepublicurl",
+      "target": "places_normalizecachedplace",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L413",
+      "weight": 1.0,
+      "_src": "places_resolveplaceimage",
+      "_tgt": "places_buildplaceimagepublicurl",
+      "source": "places_buildplaceimagepublicurl",
+      "target": "places_resolveplaceimage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/places.ts",
+      "source_location": "L575",
+      "weight": 1.0,
+      "_src": "places_gettopplaces",
+      "_tgt": "places_refreshplacesinbackground",
+      "source": "places_refreshplacesinbackground",
+      "target": "places_gettopplaces",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_getopenmeteoairquality",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_getopenmeteoairquality",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_getopenmeteoweather",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_getopenmeteoweather",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_comfortfromtemp",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_comfortfromtemp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_tometrics",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_tometrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L69",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_fetchandcachemetrics",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_fetchandcachemetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_src": "src_lib_metrics_ts",
+      "_tgt": "metrics_getcitymetrics",
+      "source": "src_lib_metrics_ts",
+      "target": "metrics_getcitymetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "metrics_fetchandcachemetrics",
+      "_tgt": "metrics_getopenmeteoairquality",
+      "source": "metrics_getopenmeteoairquality",
+      "target": "metrics_fetchandcachemetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "metrics_fetchandcachemetrics",
+      "_tgt": "metrics_getopenmeteoweather",
+      "source": "metrics_getopenmeteoweather",
+      "target": "metrics_fetchandcachemetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_src": "metrics_fetchandcachemetrics",
+      "_tgt": "metrics_comfortfromtemp",
+      "source": "metrics_comfortfromtemp",
+      "target": "metrics_fetchandcachemetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L112",
+      "weight": 1.0,
+      "_src": "metrics_getcitymetrics",
+      "_tgt": "metrics_tometrics",
+      "source": "metrics_tometrics",
+      "target": "metrics_getcitymetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/metrics.ts",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_src": "metrics_getcitymetrics",
+      "_tgt": "metrics_fetchandcachemetrics",
+      "source": "metrics_fetchandcachemetrics",
+      "target": "metrics_getcitymetrics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/useAnalytics.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "src_lib_useanalytics_ts",
+      "_tgt": "useanalytics_useanalytics",
+      "source": "src_lib_useanalytics_ts",
+      "target": "useanalytics_useanalytics",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/image-transforms.ts",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "src_lib_image_transforms_ts",
+      "_tgt": "image_transforms_generatesizes",
+      "source": "src_lib_image_transforms_ts",
+      "target": "image_transforms_generatesizes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/image-transforms.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "src_lib_image_transforms_ts",
+      "_tgt": "image_transforms_getqualityvalue",
+      "source": "src_lib_image_transforms_ts",
+      "target": "image_transforms_getqualityvalue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "src_lib_sphere_categories_ts",
+      "_tgt": "sphere_categories_fisheryatesshuffle",
+      "source": "src_lib_sphere_categories_ts",
+      "target": "sphere_categories_fisheryatesshuffle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L253",
+      "weight": 1.0,
+      "_src": "src_lib_sphere_categories_ts",
+      "_tgt": "sphere_categories_getmixedcitiesfromcategories",
+      "source": "src_lib_sphere_categories_ts",
+      "target": "sphere_categories_getmixedcitiesfromcategories",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L309",
+      "weight": 1.0,
+      "_src": "src_lib_sphere_categories_ts",
+      "_tgt": "sphere_categories_getcitiesfromcategory",
+      "source": "src_lib_sphere_categories_ts",
+      "target": "sphere_categories_getcitiesfromcategory",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L319",
+      "weight": 1.0,
+      "_src": "src_lib_sphere_categories_ts",
+      "_tgt": "sphere_categories_getcategoryids",
+      "source": "src_lib_sphere_categories_ts",
+      "target": "sphere_categories_getcategoryids",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/sphere-categories.ts",
+      "source_location": "L258",
+      "weight": 1.0,
+      "_src": "sphere_categories_getmixedcitiesfromcategories",
+      "_tgt": "sphere_categories_fisheryatesshuffle",
+      "source": "sphere_categories_fisheryatesshuffle",
+      "target": "sphere_categories_getmixedcitiesfromcategories",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/geo.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_src": "src_lib_geo_ts",
+      "_tgt": "geo_haversinekm",
+      "source": "src_lib_geo_ts",
+      "target": "geo_haversinekm",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": []
+}
