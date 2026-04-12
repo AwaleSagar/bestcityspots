@@ -39,3 +39,29 @@ export const paginationSchema = z.object({
 
 // Search query sanitizer (removes likely malicious characters if needed, usage depends on context)
 export const searchQuerySchema = z.string().trim().max(100);
+
+export const placeTypeSchema = z.enum(["landmarks", "restaurants", "hotels"]);
+
+export const placePriceTierSchema = z.enum([
+    "free",
+    "inexpensive",
+    "moderate",
+    "expensive",
+    "very_expensive",
+]);
+
+export const placeSortSchema = z.enum(["relevance", "rating", "reviews", "distance"]);
+
+export const placeSearchSchema = z.object({
+    cityName: safeString.max(120, "City name is too long"),
+    type: placeTypeSchema.optional(),
+    query: searchQuerySchema.optional(),
+    minRating: z.coerce.number().min(0).max(5).default(0),
+    maxPriceTier: placePriceTierSchema.optional(),
+    sortBy: placeSortSchema.default("relevance"),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+    lat: z.coerce.number().min(-90).max(90).optional(),
+    lng: z.coerce.number().min(-180).max(180).optional(),
+    radiusKm: z.coerce.number().min(1).max(50).default(25),
+});

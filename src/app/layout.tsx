@@ -98,8 +98,6 @@ export const metadata: Metadata = {
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 import SiteNav from "@/components/layout/SiteNav";
 import SiteFooter from "@/components/layout/SiteFooter";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
-import ClientEffects from "@/components/effects/ClientEffects";
 import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
 
 const jsonLd = [
@@ -161,12 +159,10 @@ export default function RootLayout({
             >
               Skip to content
             </a>
-            <ClientEffects />
-            <div className="mobile-bottom-spacer flex min-h-screen flex-col">
+            <div className="flex min-h-screen flex-col">
               <div className="flex flex-1 flex-col">{children}</div>
               <SiteFooter />
             </div>
-            <MobileBottomNav />
             <GeoConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>

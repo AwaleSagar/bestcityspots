@@ -1,435 +1,487 @@
-# Graph Report - src  (2026-04-12)
+# Graph Report - .  (2026-04-12)
 
 ## Corpus Check
-- Corpus is ~29,873 words - fits in a single context window. You may not need a graph.
+- 73 files · ~76,455 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 228 nodes · 231 edges · 64 communities detected
+- 286 nodes · 320 edges · 72 communities detected
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Places Data Pipeline|Places Data Pipeline]]
-- [[_COMMUNITY_Experiences Section UI|Experiences Section UI]]
-- [[_COMMUNITY_Constellation Background Animation|Constellation Background Animation]]
-- [[_COMMUNITY_Analytics Event Processing|Analytics Event Processing]]
-- [[_COMMUNITY_Analytics Session Management|Analytics Session Management]]
-- [[_COMMUNITY_City Search & Lookup|City Search & Lookup]]
-- [[_COMMUNITY_City Sphere Visualization|City Sphere Visualization]]
-- [[_COMMUNITY_City Ranking Engine|City Ranking Engine]]
-- [[_COMMUNITY_Local Storage Utilities|Local Storage Utilities]]
-- [[_COMMUNITY_Weather & Air Quality Metrics|Weather & Air Quality Metrics]]
-- [[_COMMUNITY_AI City Intelligence|AI City Intelligence]]
-- [[_COMMUNITY_Cache Configuration|Cache Configuration]]
-- [[_COMMUNITY_Weather Data Fetching|Weather Data Fetching]]
-- [[_COMMUNITY_Sphere Category Navigation|Sphere Category Navigation]]
-- [[_COMMUNITY_Image Optimization|Image Optimization]]
-- [[_COMMUNITY_City Vitals Display|City Vitals Display]]
-- [[_COMMUNITY_Geo Consent Banner|Geo Consent Banner]]
-- [[_COMMUNITY_Network Quality Hook|Network Quality Hook]]
-- [[_COMMUNITY_Experiences Skeleton UI|Experiences Skeleton UI]]
-- [[_COMMUNITY_City Detail Page|City Detail Page]]
-- [[_COMMUNITY_Scroll Reveal Animation|Scroll Reveal Animation]]
-- [[_COMMUNITY_City Search Input|City Search Input]]
-- [[_COMMUNITY_Image Transform Utilities|Image Transform Utilities]]
-- [[_COMMUNITY_Robots.txt|Robots.txt]]
-- [[_COMMUNITY_Server Actions|Server Actions]]
-- [[_COMMUNITY_Sitemap|Sitemap]]
-- [[_COMMUNITY_Root Layout|Root Layout]]
-- [[_COMMUNITY_Home Page|Home Page]]
-- [[_COMMUNITY_Top Cities Page|Top Cities Page]]
-- [[_COMMUNITY_About Page|About Page]]
-- [[_COMMUNITY_AI Briefing Client|AI Briefing Client]]
-- [[_COMMUNITY_AI Briefing Section|AI Briefing Section]]
-- [[_COMMUNITY_Sphere API Route|Sphere API Route]]
-- [[_COMMUNITY_Analytics API Route|Analytics API Route]]
-- [[_COMMUNITY_Hotspot UI|Hotspot UI]]
-- [[_COMMUNITY_Free Resource CTA|Free Resource CTA]]
-- [[_COMMUNITY_Site Footer|Site Footer]]
-- [[_COMMUNITY_Mobile Bottom Nav|Mobile Bottom Nav]]
-- [[_COMMUNITY_Theme Provider|Theme Provider]]
-- [[_COMMUNITY_Site Navigation|Site Navigation]]
-- [[_COMMUNITY_Client Effects|Client Effects]]
-- [[_COMMUNITY_Floral Accent Effect|Floral Accent Effect]]
-- [[_COMMUNITY_Top Cities Page Content|Top Cities Page Content]]
-- [[_COMMUNITY_Page Tracker Analytics|Page Tracker Analytics]]
-- [[_COMMUNITY_Recent Searches Hook|Recent Searches Hook]]
-- [[_COMMUNITY_Device Type Hook|Device Type Hook]]
-- [[_COMMUNITY_Number Formatting|Number Formatting]]
-- [[_COMMUNITY_Analytics Hook|Analytics Hook]]
-- [[_COMMUNITY_Geo Distance Utilities|Geo Distance Utilities]]
-- [[_COMMUNITY_Open Graph Image|Open Graph Image]]
-- [[_COMMUNITY_AI Briefing Skeleton|AI Briefing Skeleton]]
-- [[_COMMUNITY_Scroll Progress UI|Scroll Progress UI]]
-- [[_COMMUNITY_Interactive Button UI|Interactive Button UI]]
-- [[_COMMUNITY_Breadcrumbs UI|Breadcrumbs UI]]
-- [[_COMMUNITY_Trust Indicators Section|Trust Indicators Section]]
-- [[_COMMUNITY_Hero Header Section|Hero Header Section]]
-- [[_COMMUNITY_Home Search Showcase|Home Search Showcase]]
-- [[_COMMUNITY_Testimonials Section|Testimonials Section]]
-- [[_COMMUNITY_Theme Toggle|Theme Toggle]]
-- [[_COMMUNITY_Visual Effects|Visual Effects]]
-- [[_COMMUNITY_About Page Content|About Page Content]]
-- [[_COMMUNITY_Analytics Index|Analytics Index]]
-- [[_COMMUNITY_Input Validation|Input Validation]]
-- [[_COMMUNITY_Supabase Client|Supabase Client]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `fetchFreshPlaces()` - 11 edges
-2. `processAnalyticsBatch()` - 10 edges
-3. `getTopPlaces()` - 7 edges
-4. `RankingEngine` - 6 edges
-5. `fetchAndCacheMetrics()` - 5 edges
-6. `sanitizeKey()` - 4 edges
-7. `persistCityNotes()` - 4 edges
-8. `clearNote()` - 4 edges
-9. `findNearestCity()` - 4 edges
-10. `hasStorage()` - 4 edges
+1. `main()` - 12 edges
+2. `fetchFreshPlaces()` - 11 edges
+3. `processAnalyticsBatch()` - 10 edges
+4. `main()` - 7 edges
+5. `getTopPlaces()` - 7 edges
+6. `RankingEngine` - 6 edges
+7. `testGooglePlaces()` - 5 edges
+8. `resolveCities()` - 5 edges
+9. `fetchAndCacheMetrics()` - 5 edges
+10. `c()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
 - None detected - all connections are within the same source files.
 
 ## Communities
 
-### Community 0 - "Places Data Pipeline"
-Cohesion: 0.18
-Nodes (22): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+14 more)
+### Community 0 - "Community 0"
+Cohesion: 0.13
+Nodes (26): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+18 more)
 
-### Community 1 - "Experiences Section UI"
+### Community 1 - "Community 1"
+Cohesion: 0.18
+Nodes (20): checkInsightsCacheStatus(), checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus(), createSupabaseClient(), getAqiLabel(), getTopCitiesByPopulation(), getTopCitiesByTraffic() (+12 more)
+
+### Community 2 - "Community 2"
 Cohesion: 0.15
 Nodes (10): clearNote(), getInsiderTips(), getNeighborhood(), parseStoredNotes(), persistCityNotes(), sanitizeKey(), sanitizeNotes(), saveNote() (+2 more)
 
-### Community 2 - "Constellation Background Animation"
+### Community 3 - "Community 3"
+Cohesion: 0.32
+Nodes (12): c(), formatNumber(), getCityViews(), getDailyTrend(), getDeviceStats(), getGeoStats(), getOverview(), getTrafficSources() (+4 more)
+
+### Community 4 - "Community 4"
+Cohesion: 0.31
+Nodes (10): extractErrorMessage(), extractPlaces(), formatSample(), isPlaceResult(), isValidDisplayName(), jsonType(), mapJsonLayout(), parseArgs() (+2 more)
+
+### Community 5 - "Community 5"
 Cohesion: 0.22
 Nodes (3): buildSpatialGrid(), generateConnections(), getNeighborStars()
 
-### Community 3 - "Analytics Event Processing"
+### Community 6 - "Community 6"
 Cohesion: 0.35
 Nodes (10): getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats(), recordDeviceStats(), recordGeoStats() (+2 more)
 
-### Community 4 - "Analytics Session Management"
+### Community 7 - "Community 7"
 Cohesion: 0.29
 Nodes (2): generateSessionId(), getOrCreateSession()
 
-### Community 5 - "City Search & Lookup"
+### Community 8 - "Community 8"
 Cohesion: 0.39
 Nodes (6): findNearest(), findNearestCity(), getTopCities(), normalizeQuery(), queryCitiesInBox(), searchCities()
 
-### Community 6 - "City Sphere Visualization"
+### Community 9 - "Community 9"
 Cohesion: 0.29
 Nodes (0): 
 
-### Community 7 - "City Ranking Engine"
+### Community 10 - "Community 10"
 Cohesion: 0.38
 Nodes (1): RankingEngine
 
-### Community 8 - "Local Storage Utilities"
+### Community 11 - "Community 11"
 Cohesion: 0.52
 Nodes (6): getJsonStorageItem(), getStorageItem(), hasStorage(), removeStorageItem(), setJsonStorageItem(), setStorageItem()
 
-### Community 9 - "Weather & Air Quality Metrics"
+### Community 12 - "Community 12"
 Cohesion: 0.52
 Nodes (6): comfortFromTemp(), fetchAndCacheMetrics(), getCityMetrics(), getOpenMeteoAirQuality(), getOpenMeteoWeather(), toMetrics()
 
-### Community 10 - "AI City Intelligence"
+### Community 13 - "Community 13"
 Cohesion: 0.53
 Nodes (5): getCityInsight(), getIntelligentTrendingCities(), isFresh(), matchCitiesInDb(), sanitizeJsonResponse()
 
-### Community 11 - "Cache Configuration"
+### Community 14 - "Community 14"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 12 - "Weather Data Fetching"
+### Community 15 - "Community 15"
 Cohesion: 0.7
 Nodes (4): fetchFreshWeather(), getAqiLabel(), getCityWeather(), parseCachedWeather()
 
-### Community 13 - "Sphere Category Navigation"
+### Community 16 - "Community 16"
 Cohesion: 0.5
 Nodes (2): fisherYatesShuffle(), getMixedCitiesFromCategories()
 
-### Community 14 - "Image Optimization"
+### Community 17 - "Community 17"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 15 - "City Vitals Display"
+### Community 18 - "Community 18"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 16 - "Geo Consent Banner"
+### Community 19 - "Community 19"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 17 - "Network Quality Hook"
+### Community 20 - "Community 20"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 18 - "Experiences Skeleton UI"
+### Community 21 - "Community 21"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 19 - "City Detail Page"
+### Community 22 - "Community 22"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 20 - "Scroll Reveal Animation"
+### Community 23 - "Community 23"
+Cohesion: 0.67
+Nodes (1): GET()
+
+### Community 24 - "Community 24"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 21 - "City Search Input"
+### Community 25 - "Community 25"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 22 - "Image Transform Utilities"
+### Community 26 - "Community 26"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 23 - "Robots.txt"
+### Community 27 - "Community 27"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 24 - "Server Actions"
+### Community 28 - "Community 28"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 25 - "Sitemap"
+### Community 29 - "Community 29"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 26 - "Root Layout"
+### Community 30 - "Community 30"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 27 - "Home Page"
+### Community 31 - "Community 31"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 28 - "Top Cities Page"
+### Community 32 - "Community 32"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 29 - "About Page"
+### Community 33 - "Community 33"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 30 - "AI Briefing Client"
+### Community 34 - "Community 34"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 31 - "AI Briefing Section"
+### Community 35 - "Community 35"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 32 - "Sphere API Route"
+### Community 36 - "Community 36"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 33 - "Analytics API Route"
+### Community 37 - "Community 37"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 34 - "Hotspot UI"
+### Community 38 - "Community 38"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 35 - "Free Resource CTA"
+### Community 39 - "Community 39"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 36 - "Site Footer"
+### Community 40 - "Community 40"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 37 - "Mobile Bottom Nav"
+### Community 41 - "Community 41"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 38 - "Theme Provider"
+### Community 42 - "Community 42"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 39 - "Site Navigation"
+### Community 43 - "Community 43"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 40 - "Client Effects"
+### Community 44 - "Community 44"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 41 - "Floral Accent Effect"
+### Community 45 - "Community 45"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 42 - "Top Cities Page Content"
+### Community 46 - "Community 46"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 43 - "Page Tracker Analytics"
+### Community 47 - "Community 47"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 44 - "Recent Searches Hook"
+### Community 48 - "Community 48"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 45 - "Device Type Hook"
+### Community 49 - "Community 49"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 46 - "Number Formatting"
+### Community 50 - "Community 50"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 47 - "Analytics Hook"
+### Community 51 - "Community 51"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 48 - "Geo Distance Utilities"
+### Community 52 - "Community 52"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 49 - "Open Graph Image"
+### Community 53 - "Community 53"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 50 - "AI Briefing Skeleton"
+### Community 54 - "Community 54"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 51 - "Scroll Progress UI"
+### Community 55 - "Community 55"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 52 - "Interactive Button UI"
+### Community 56 - "Community 56"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 53 - "Breadcrumbs UI"
+### Community 57 - "Community 57"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 54 - "Trust Indicators Section"
+### Community 58 - "Community 58"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 55 - "Hero Header Section"
+### Community 59 - "Community 59"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 56 - "Home Search Showcase"
+### Community 60 - "Community 60"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 57 - "Testimonials Section"
+### Community 61 - "Community 61"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 58 - "Theme Toggle"
+### Community 62 - "Community 62"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 59 - "Visual Effects"
+### Community 63 - "Community 63"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 60 - "About Page Content"
+### Community 64 - "Community 64"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 61 - "Analytics Index"
+### Community 65 - "Community 65"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 62 - "Input Validation"
+### Community 66 - "Community 66"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 63 - "Supabase Client"
+### Community 67 - "Community 67"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 68 - "Community 68"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 69 - "Community 69"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 70 - "Community 70"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 71 - "Community 71"
 Cohesion: 1.0
 Nodes (0): 
 
 ## Knowledge Gaps
-- **Thin community `Robots.txt`** (2 nodes): `robots()`, `robots.ts`
+- **Thin community `Community 27`** (2 nodes): `testSearch()`, `test-supabase.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Server Actions`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
+- **Thin community `Community 28`** (2 nodes): `robots()`, `robots.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sitemap`** (2 nodes): `sitemap()`, `sitemap.ts`
+- **Thin community `Community 29`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Root Layout`** (2 nodes): `RootLayout()`, `layout.tsx`
+- **Thin community `Community 30`** (2 nodes): `sitemap()`, `sitemap.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Home Page`** (2 nodes): `Home()`, `page.tsx`
+- **Thin community `Community 31`** (2 nodes): `RootLayout()`, `layout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Top Cities Page`** (2 nodes): `TopCitiesPage()`, `page.tsx`
+- **Thin community `Community 32`** (2 nodes): `Home()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `About Page`** (2 nodes): `AboutPage()`, `page.tsx`
+- **Thin community `Community 33`** (2 nodes): `TopCitiesPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AI Briefing Client`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
+- **Thin community `Community 34`** (2 nodes): `AboutPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AI Briefing Section`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
+- **Thin community `Community 35`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sphere API Route`** (2 nodes): `GET()`, `route.ts`
+- **Thin community `Community 36`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Analytics API Route`** (2 nodes): `POST()`, `route.ts`
+- **Thin community `Community 37`** (2 nodes): `POST()`, `route.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hotspot UI`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
+- **Thin community `Community 38`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Free Resource CTA`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
+- **Thin community `Community 39`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Site Footer`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
+- **Thin community `Community 40`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Mobile Bottom Nav`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
+- **Thin community `Community 41`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Theme Provider`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
+- **Thin community `Community 42`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Site Navigation`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
+- **Thin community `Community 43`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Client Effects`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
+- **Thin community `Community 44`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Floral Accent Effect`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
+- **Thin community `Community 45`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Top Cities Page Content`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
+- **Thin community `Community 46`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Page Tracker Analytics`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
+- **Thin community `Community 47`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Recent Searches Hook`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
+- **Thin community `Community 48`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Device Type Hook`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
+- **Thin community `Community 49`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Number Formatting`** (2 nodes): `formatPopulation()`, `format.ts`
+- **Thin community `Community 50`** (2 nodes): `formatPopulation()`, `format.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Analytics Hook`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
+- **Thin community `Community 51`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Geo Distance Utilities`** (2 nodes): `haversineKm()`, `geo.ts`
+- **Thin community `Community 52`** (2 nodes): `haversineKm()`, `geo.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Open Graph Image`** (1 nodes): `opengraph-image.tsx`
+- **Thin community `Community 53`** (1 nodes): `next-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AI Briefing Skeleton`** (1 nodes): `AIBriefingSkeleton.tsx`
+- **Thin community `Community 54`** (1 nodes): `next.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Scroll Progress UI`** (1 nodes): `ScrollProgress.tsx`
+- **Thin community `Community 55`** (1 nodes): `trending-destinations.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Interactive Button UI`** (1 nodes): `InteractiveButton.tsx`
+- **Thin community `Community 56`** (1 nodes): `test-ranking.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Breadcrumbs UI`** (1 nodes): `Breadcrumbs.tsx`
+- **Thin community `Community 57`** (1 nodes): `opengraph-image.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trust Indicators Section`** (1 nodes): `TrustIndicators.tsx`
+- **Thin community `Community 58`** (1 nodes): `AIBriefingSkeleton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hero Header Section`** (1 nodes): `HeroHeader.tsx`
+- **Thin community `Community 59`** (1 nodes): `ScrollProgress.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Home Search Showcase`** (1 nodes): `HomeSearchShowcase.tsx`
+- **Thin community `Community 60`** (1 nodes): `InteractiveButton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Testimonials Section`** (1 nodes): `TestimonialsSection.tsx`
+- **Thin community `Community 61`** (1 nodes): `Breadcrumbs.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Theme Toggle`** (1 nodes): `ThemeToggle.tsx`
+- **Thin community `Community 62`** (1 nodes): `TrustIndicators.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Visual Effects`** (1 nodes): `VisualEffects.tsx`
+- **Thin community `Community 63`** (1 nodes): `HeroHeader.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `About Page Content`** (1 nodes): `AboutPageContent.tsx`
+- **Thin community `Community 64`** (1 nodes): `HomeSearchShowcase.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Analytics Index`** (1 nodes): `index.ts`
+- **Thin community `Community 65`** (1 nodes): `TestimonialsSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Input Validation`** (1 nodes): `validation.ts`
+- **Thin community `Community 66`** (1 nodes): `ThemeToggle.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Supabase Client`** (1 nodes): `supabase.ts`
+- **Thin community `Community 67`** (1 nodes): `VisualEffects.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 68`** (1 nodes): `AboutPageContent.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 69`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 70`** (1 nodes): `validation.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 71`** (1 nodes): `supabase.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
-_Not enough signal to generate questions. This usually means the corpus has no AMBIGUOUS edges, no bridge nodes, no INFERRED relationships, and all communities are tightly cohesive. Add more files or run with --mode deep to extract richer edges._
+_Questions this graph is uniquely positioned to answer:_
+
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.13 - nodes in this community are weakly interconnected._

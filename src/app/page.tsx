@@ -1,8 +1,6 @@
 import { fetchTrendingDestinations } from "@/app/actions";
 import HeroHeader from "@/components/sections/HeroHeader";
 import HomeSearchShowcase from "@/components/sections/HomeSearchShowcase";
-import TrustIndicators from "@/components/sections/TrustIndicators";
-import TestimonialsSection from "@/components/sections/TestimonialsSection";
 import FreeResourceCTA from "@/components/sections/FreeResourceCTA";
 
 export const metadata = {
@@ -21,10 +19,8 @@ export default async function Home() {
 
         <HomeSearchShowcase topCities={topCities} />
 
-        <div className="space-y-16 pb-16 sm:space-y-20 md:space-y-24 md:pb-24">
-          <TrustIndicators />
+        <div className="space-y-12 pb-14 sm:space-y-14 md:space-y-16 md:pb-20">
           <FreeResourceCTA />
-          <TestimonialsSection />
         </div>
       </div>
     </main>

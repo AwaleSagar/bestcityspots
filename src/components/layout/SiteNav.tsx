@@ -26,12 +26,12 @@ export default function SiteNav() {
         </Link>
 
         <div className="flex items-center gap-1">
-          <nav className="hidden items-center gap-0.5 md:flex" aria-label="Main navigation">
+          <nav className="flex items-center gap-0.5" aria-label="Main navigation">
             {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className="nav-pill text-muted-strong hover:text-foreground rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+                className="nav-pill text-muted-strong hover:text-foreground rounded-lg px-2.5 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm"
               >
                 {label}
               </Link>

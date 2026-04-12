@@ -21,6 +21,7 @@ const PLACE_QUERY_RESULT_LIMIT = 50;
 const MIN_RESULTS_BEFORE_FALLBACK = 8;
 const MIN_BUDGET_RESULTS = 2;
 const BUDGET_PRICE_LEVELS = new Set(["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE"]);
+const PRICE_TIER_ORDER: PlacePriceTier[] = ["free", "inexpensive", "moderate", "expensive", "very_expensive"];
 const inFlightPlacesRequests = new Map<string, Promise<Landmark[]>>();
 
 let hasWarnedMissingServiceRole = false;
@@ -35,7 +36,31 @@ type CachedLandmark = Landmark & {
   imageUrls?: string[];
 };
 
-type PlaceType = "landmarks" | "restaurants" | "hotels";
+export type PlaceType = "landmarks" | "restaurants" | "hotels";
+
+export type PlacePriceTier = "free" | "inexpensive" | "moderate" | "expensive" | "very_expensive";
+export type PlaceSort = "relevance" | "rating" | "reviews" | "distance";
+
+export type PlaceSearchOptions = {
+  cityName: string;
+  type?: PlaceType;
+  query?: string;
+  minRating?: number;
+  maxPriceTier?: PlacePriceTier;
+  sortBy?: PlaceSort;
+  page?: number;
+  limit?: number;
+  lat?: number;
+  lng?: number;
+  radiusKm?: number;
+};
+
+export type PlaceSearchResult = {
+  results: Landmark[];
+  total: number;
+  page: number;
+  limit: number;
+};
 
 type TopPlacesOptions = {
   lat?: number;
@@ -140,6 +165,73 @@ function hasBudgetCoverage(places: Landmark[]): boolean {
 
 function isBudgetSensitive(type: PlaceType): boolean {
   return type === "restaurants" || type === "hotels";
+}
+
+function mapPriceLevel(priceLevel?: string): PlacePriceTier | null {
+  switch (priceLevel) {
+    case "PRICE_LEVEL_FREE":
+      return "free";
+    case "PRICE_LEVEL_INEXPENSIVE":
+      return "inexpensive";
+    case "PRICE_LEVEL_MODERATE":
+      return "moderate";
+    case "PRICE_LEVEL_EXPENSIVE":
+      return "expensive";
+    case "PRICE_LEVEL_VERY_EXPENSIVE":
+      return "very_expensive";
+    default:
+      return null;
+  }
+}
+
+function isWithinMaxPriceTier(priceLevel: string | undefined, maxTier?: PlacePriceTier): boolean {
+  if (!maxTier) return true;
+
+  const normalized = mapPriceLevel(priceLevel);
+  if (!normalized) return true;
+
+  return PRICE_TIER_ORDER.indexOf(normalized) <= PRICE_TIER_ORDER.indexOf(maxTier);
+}
+
+function matchesQuery(place: Landmark, normalizedQuery: string): boolean {
+  const haystack = [
+    place.displayName?.text,
+    place.formattedAddress,
+    ...(place.types ?? []),
+  ]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(normalizedQuery);
+}
+
+function getDistanceKm(place: Landmark, lat?: number, lng?: number): number {
+  const placeLat = place.location?.latitude;
+  const placeLng = place.location?.longitude;
+
+  if (typeof lat !== "number" || typeof lng !== "number") return Number.POSITIVE_INFINITY;
+  if (typeof placeLat !== "number" || typeof placeLng !== "number") return Number.POSITIVE_INFINITY;
+
+  return haversineKm(lat, lng, placeLat, placeLng);
+}
+
+function sortPlaces(places: Landmark[], sortBy: PlaceSort, lat?: number, lng?: number): Landmark[] {
+  const sorted = [...places];
+
+  if (sortBy === "distance" && typeof lat === "number" && typeof lng === "number") {
+    return sorted.sort((a, b) => getDistanceKm(a, lat, lng) - getDistanceKm(b, lat, lng));
+  }
+
+  if (sortBy === "rating") {
+    return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  }
+
+  if (sortBy === "reviews") {
+    return sorted.sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0));
+  }
+
+  return sorted.sort((a, b) => rankingEngine.getScore(b) - rankingEngine.getScore(a));
 }
 
 function stripPhotoMetadata(places: GooglePlace[]): void {
@@ -584,4 +676,49 @@ export async function getTopPlaces(
     console.error(`Failed to fetch ${type} for ${cityName}:`, e);
     return [];
   }
+}
+
+export async function searchPlaces(options: PlaceSearchOptions): Promise<PlaceSearchResult> {
+  const page = options.page ?? 1;
+  const limit = options.limit ?? 20;
+  const sortBy = options.sortBy ?? "relevance";
+  const minRating = options.minRating ?? 0;
+  const normalizedQuery = options.query?.trim().toLowerCase();
+  const requestedTypes: PlaceType[] = options.type
+    ? [options.type]
+    : ["landmarks", "restaurants", "hotels"];
+
+  const batches = await Promise.all(
+    requestedTypes.map((placeType) =>
+      getTopPlaces(options.cityName, placeType, {
+        lat: options.lat,
+        lng: options.lng,
+        radiusKm: options.radiusKm,
+      })
+    )
+  );
+
+  const merged = batches.flat();
+
+  const filtered = merged.filter((place) => {
+    if ((place.rating ?? 0) < minRating) return false;
+    if (!isWithinMaxPriceTier(place.priceLevel, options.maxPriceTier)) return false;
+    if (normalizedQuery && !matchesQuery(place, normalizedQuery)) return false;
+
+    if (sortBy === "distance" && typeof options.lat === "number" && typeof options.lng === "number") {
+      return getDistanceKm(place, options.lat, options.lng) <= (options.radiusKm ?? 25);
+    }
+
+    return true;
+  });
+
+  const sorted = sortPlaces(filtered, sortBy, options.lat, options.lng);
+  const offset = (page - 1) * limit;
+
+  return {
+    results: sorted.slice(offset, offset + limit),
+    total: sorted.length,
+    page,
+    limit,
+  };
 }
