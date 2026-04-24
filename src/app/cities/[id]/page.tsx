@@ -10,87 +10,48 @@ import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
 import CityVitals from "@/components/features/city/CityVitals";
 import {
-  MapPin,
   Users,
   Navigation,
-  ArrowLeft,
   Activity,
   Cloud as CloudIcon,
   ThermometerSun,
 } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import {
+  Container,
+  Section,
+  Stack,
+  Row,
+  Grid,
+  Display,
+  Caption,
+  Text,
+  MetricStat,
+  Cover,
+  Divider,
+  FadeIn,
+} from "@/components/atlas";
 
 function CityVitalsFallback() {
   return (
-    <div className="atlas-panel rounded-[1.8rem] p-7 md:p-8">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">
-        Live City Vitals
-      </div>
-      <p className="mt-4 text-sm text-muted">
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5">
+      <Caption>Live city vitals</Caption>
+      <Text size="sm" tone="muted" className="mt-3">
         Vitals unavailable right now. Please check back soon.
-      </p>
+      </Text>
     </div>
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  unit,
-  icon: Icon,
-  source,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-  unit?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  source?: string;
-}) {
-  const isEmpty = value === null || value === undefined || value === "";
-  const display = isEmpty ? (
-    <span className="text-foreground/25">N/A</span>
-  ) : (
-    <div className="flex flex-col items-start leading-tight">
-      <span className="text-2xl font-bold tracking-tight text-foreground">
-        {typeof value === "number" ? value.toLocaleString() : value}
-      </span>
-      {unit && (
-        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/45">
-          {unit}
-        </span>
-      )}
-    </div>
-  );
-
+function CityVitalsSkeleton() {
   return (
-    <div className="atlas-panel group/metric rounded-[1.1rem] p-4 flex flex-col gap-3 transition-all duration-300 active:scale-[0.98] sm:rounded-[1.3rem] sm:gap-4 sm:p-5 md:hover:border-accent/14 md:duration-500">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] border border-line bg-background/55 transition-all duration-300 md:group-hover/metric:border-accent/20 md:group-hover/metric:bg-accent-soft/60">
-            <Icon className="h-5 w-5 text-accent transition-colors duration-300" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted">
-                {label}
-              </div>
-            </div>
-            {display}
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-between border-t border-line pt-3">
-        <div className="text-[9px] font-semibold uppercase tracking-[0.15em] text-muted">
-          Data Source
-        </div>
-        <div className="text-[9px] font-semibold uppercase tracking-[0.1em] text-muted-strong text-right max-w-[120px] leading-relaxed">
-          {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
-        </div>
-      </div>
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5">
+      <div className="atlas-shimmer h-4 w-32 rounded" />
+      <div className="atlas-shimmer mt-4 h-10 w-24 rounded" />
+      <div className="atlas-shimmer mt-4 h-4 w-full rounded" />
     </div>
   );
 }
@@ -109,32 +70,13 @@ async function ExperiencesWrapper({
     getTopPlaces(cityName, "restaurants", { lat, lng }),
     getTopPlaces(cityName, "hotels", { lat, lng }),
   ]);
-
   return (
-    <div className="space-y-10">
-      <div className="space-y-3">
-        <h2 className="labelled-rule">Top Experiences</h2>
-        <p className="max-w-lg text-sm tracking-wide text-muted">
-          Curated landmarks, dining, and stays ranked by traveler interest and local pulse.
-        </p>
-      </div>
-      <ExperiencesSection
-        cityName={cityName}
-        landmarks={landmarks}
-        restaurants={restaurants}
-        hotels={hotels}
-      />
-    </div>
-  );
-}
-
-function CityVitalsSkeleton() {
-  return (
-    <div className="atlas-panel animate-pulse rounded-[1.8rem] p-7 md:p-8">
-      <div className="h-2 w-32 rounded bg-foreground/10" />
-      <div className="mt-4 h-6 w-24 rounded bg-foreground/10" />
-      <div className="mt-6 h-10 w-full rounded bg-foreground/10" />
-    </div>
+    <ExperiencesSection
+      cityName={cityName}
+      landmarks={landmarks}
+      restaurants={restaurants}
+      hotels={hotels}
+    />
   );
 }
 
@@ -145,14 +87,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const result = cityIdSchema.safeParse(id);
-  if (!result.success) return { title: "City Not Found" };
+  if (!result.success) return { title: "City not found" };
 
   const city = await getCityById(result.data);
-  if (!city) return { title: "City Not Found" };
+  if (!city) return { title: "City not found" };
 
   return {
-    title: `${city.city}, ${city.country} - Travel Guide & Urban Data`,
-    description: `Comprehensive data and AI-powered travel insights for ${city.city}, ${city.country}. Real-time weather, demographics, and top attractions at Best City Spots.`,
+    title: `${city.city}, ${city.country} — travel guide`,
+    description: `Research ${city.city}, ${city.country} with live weather, air quality, population data, and AI-assisted travel briefings.`,
     openGraph: {
       title: `${city.city} | Best City Spots`,
       description: `Discover ${city.city} with AI insights and live urban data.`,
@@ -174,10 +116,7 @@ export default async function CityPage({
   const idResult = cityIdSchema.safeParse(id);
   const coordsResult = coordinatesSchema.safeParse({ lat, lng });
 
-  if (!idResult.success) {
-    notFound();
-  }
-
+  if (!idResult.success) notFound();
   if (!coordsResult.success) {
     console.warn("Invalid coordinates provided:", coordsResult.error);
   }
@@ -186,10 +125,7 @@ export default async function CityPage({
   const validCoords = coordsResult.success ? coordsResult.data : {};
 
   const city = await getCityById(cityId);
-
-  if (!city) {
-    notFound();
-  }
+  if (!city) notFound();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -216,214 +152,137 @@ export default async function CityPage({
   ]);
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-transparent font-sans text-foreground"
-    >
+    <main id="main-content">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div
-        className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
-        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
-      >
-        <Breadcrumbs
-          items={[
-            { label: "Cities", href: "/" },
-            { label: city.city },
-          ]}
-        />
-        <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-3 rounded-full border border-line bg-background/65 px-4 py-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-muted-strong transition-colors duration-300 hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Return to explorer
-          </Link>
-        </nav>
 
-        <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
-          {/* Main Info Column */}
-          <div className="space-y-14 lg:col-span-8">
-            <header className="atlas-frame relative space-y-5 overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:space-y-6 md:rounded-[2.4rem] md:p-8">
-              <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px] animate-pulse-glow" />
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="eyebrow">
-                  <Navigation className="h-3.5 w-3.5 text-accent" />
-                  {city.iso3 || "CITY"}
-                </span>
-                <span className="atlas-chip">{city.capital || "Urban center"}</span>
-              </div>
-              <h1 className="text-[clamp(3.2rem,8vw,6.8rem)] leading-[0.88] text-foreground break-words block pb-2">
+      {/* ── Cover header ── */}
+      <div className="relative h-[42vh] min-h-[280px] w-full sm:h-[50vh]">
+        <Cover seed={city.id} src={null} priority>
+          <Container className="text-white">
+            <Stack gap={2} align="start">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/35 px-2.5 py-0.5 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-white/95 backdrop-blur">
+                <Navigation className="h-3 w-3" aria-hidden />
+                {city.iso3 || "City"}
+              </span>
+              <Display
+                className="!text-white"
+                style={{
+                  viewTransitionName: `city-name-${city.id}`,
+                } as React.CSSProperties}
+              >
                 {city.city}
-              </h1>
-              <div className="flex items-center gap-6">
-                <p className="text-xl font-semibold uppercase tracking-[0.16em] text-muted-strong md:text-2xl">
-                  {city.country}
-                </p>
-                <div className="h-px flex-1 bg-gradient-to-r from-line to-transparent" />
-              </div>
-            </header>
+              </Display>
+              <p className="text-sm font-semibold uppercase tracking-[0.08em] text-white/85 sm:text-base">
+                {city.country}
+                {city.admin_name ? ` · ${city.admin_name}` : ""}
+              </p>
+            </Stack>
+          </Container>
+        </Cover>
+      </div>
 
+      <Container>
+        <div className="py-6">
+          <Breadcrumbs
+            items={[{ label: "Cities", href: "/" }, { label: city.city }]}
+          />
+        </div>
+      </Container>
+
+      {/* ── Right now (weather/AQI) ── */}
+      <Section size="sm" className="!pt-0" aria-labelledby="right-now-heading">
+        <Container>
+          <Stack gap={4}>
+            <Caption id="right-now-heading">Right now</Caption>
+            <Suspense fallback={<CityVitalsSkeleton />}>
+              {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
+            </Suspense>
+          </Stack>
+        </Container>
+      </Section>
+
+      <Container>
+        <Divider />
+      </Container>
+
+      {/* ── Vitals — population, territory ── */}
+      <Section size="sm" aria-labelledby="vitals-heading">
+        <Container>
+          <Stack gap={4}>
+            <Caption id="vitals-heading">Vitals</Caption>
+            <Grid cols={{ base: 2, md: 4 }} gap={3}>
+              <MetricStat
+                icon={<Users className="h-3.5 w-3.5" aria-hidden />}
+                label="Population"
+                value={formatPopulation(city.population)}
+                source="Census"
+              />
+              <MetricStat
+                label="Region"
+                value={city.admin_name || "Autonomous"}
+              />
+              <MetricStat
+                icon={<CloudIcon className="h-3.5 w-3.5" aria-hidden />}
+                label="Pollution (PM2.5)"
+                value={metrics?.pollution_pm25 ?? null}
+                unit="µg/m³"
+                source={metrics?.source?.pollution as string | undefined}
+              />
+              <MetricStat
+                icon={<ThermometerSun className="h-3.5 w-3.5" aria-hidden />}
+                label="Climate comfort"
+                value={metrics?.climate_comfort ?? null}
+                source={metrics?.source?.climate as string | undefined}
+              />
+            </Grid>
+            {metrics?.updated_at && (
+              <Row gap={2} className="text-[color:var(--color-muted-soft)]">
+                <Activity className="h-3 w-3" aria-hidden />
+                <Caption>
+                  Updated {new Date(metrics.updated_at).toLocaleDateString()}
+                </Caption>
+              </Row>
+            )}
+          </Stack>
+        </Container>
+      </Section>
+
+      <Container>
+        <Divider />
+      </Container>
+
+      {/* ── AI briefing ── */}
+      <Section size="md">
+        <Container>
+          <FadeIn>
             <Suspense fallback={<AIBriefingSkeleton />}>
               <AIBriefingSection city={city} />
             </Suspense>
+          </FadeIn>
+        </Container>
+      </Section>
 
-            <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
-                <div className="mb-6 flex items-center gap-4 text-muted">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
-                    <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
-                  </div>
-                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-                    Census Data
-                  </span>
-                </div>
-                <div className="mb-2 text-4xl font-bold tracking-[-0.02em] text-foreground md:text-5xl">
-                  {formatPopulation(city.population)}
-                </div>
-                <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">
-                  Global Residents
-                </div>
-              </div>
+      <Container>
+        <Divider />
+      </Container>
 
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
-                <div className="mb-4 flex items-center gap-4 text-muted sm:mb-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
-                    <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
-                  </div>
-                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
-                    Territory
-                  </span>
-                </div>
-                <div className="mb-2 text-2xl font-bold leading-tight tracking-tight text-foreground md:text-3xl">
-                  {city.admin_name || "Autonomous"}
-                </div>
-                <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">
-                  Regional Hub
-                </div>
-              </div>
-            </section>
-
-            <section className="space-y-10">
-              <h2 className="labelled-rule">Structural Profile</h2>
-              <Suspense fallback={<CityVitalsSkeleton />}>
-                {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
-              </Suspense>
-            </section>
-
-            <section className="space-y-6">
-              <h2 className="labelled-rule">Travel Essentials</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5">
-                {[
-                  {
-                    icon: MapPin,
-                    title: "Best Neighborhoods",
-                    color: "text-[color:var(--color-cat-dining)]",
-                    text: city.admin_name
-                      ? `Explore the diverse neighborhoods across the ${city.admin_name} region of ${city.city}. Browse landmarks below for specific areas.`
-                      : `Explore the diverse neighborhoods of ${city.city}. Browse landmarks below for specific areas.`,
-                  },
-                  {
-                    icon: Users,
-                    title: "Budget Tips",
-                    color: "text-[color:var(--color-brand-accent)]",
-                    text: "Use the price filter in Dining and Stays below to find options matching your budget. Filter by $ to $$$$ to plan your trip spending.",
-                  },
-                  {
-                    icon: Navigation,
-                    title: "Getting Around",
-                    color: "text-[color:var(--color-brand-secondary)]",
-                    text: `Open any listed spot in Maps for directions and transit options. Save places to build your personal itinerary for ${city.city}.`,
-                  },
-                  {
-                    icon: Activity,
-                    title: "Data Sources",
-                    color: "text-accent",
-                    text: "All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.",
-                  },
-                ].map(({ icon: ItemIcon, title, text, color }) => (
-                  <div
-                    key={title}
-                    className="atlas-panel rounded-[1.1rem] p-4 transition-all duration-500 hover:border-accent/12 sm:rounded-[1.3rem] sm:p-5"
-                  >
-                    <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted">
-                      <ItemIcon className={`h-4 w-4 ${color}`} />
-                      {title}
-                    </div>
-                    <p className="text-sm leading-relaxed text-muted">{text}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Mobile-only CTA - shown before experiences */}
-            <div className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden">
-              <h3 className="text-xl font-bold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">
-                Plan Your {city.city} Trip
-              </h3>
-              <p className="text-sm leading-relaxed text-muted">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences — all free, no sign-up required.
-              </p>
-              <Link
-                href="/resources/top-cities"
-                className="btn-primary w-full"
-              >
-                Browse Free City Guide
-              </Link>
-            </div>
-
+      {/* ── Top places ── */}
+      <Section size="md">
+        <Container>
+          <FadeIn>
             <Suspense fallback={<ExperiencesSkeleton />}>
-              <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
+              <ExperiencesWrapper
+                cityName={city.city}
+                lat={finalLat}
+                lng={finalLng}
+              />
             </Suspense>
-          </div>
-
-          {/* Sidebar */}
-          <div className="hidden space-y-8 lg:sticky lg:top-20 lg:col-span-4 lg:block">
-            <div className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h3 className="text-2xl md:text-3xl leading-tight font-bold tracking-[-0.02em] text-foreground">
-                Plan Your <br /> {city.city} Trip
-              </h3>
-              <p className="text-sm leading-relaxed text-muted">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences. Save your favorite spots to build a personal itinerary — all free, no sign-up required.
-              </p>
-              <Link
-                href="/resources/top-cities"
-                className="btn-primary w-full"
-              >
-                Browse Free City Guide
-              </Link>
-            </div>
-
-            <div className="atlas-panel rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h4 className="text-[11px] font-semibold tracking-[0.25em] text-muted uppercase">
-                Core Metrics
-              </h4>
-              <div className="grid grid-cols-1 gap-4">
-                <MetricCard
-                  icon={CloudIcon}
-                  label="Pollution (PM2.5)"
-                  value={metrics?.pollution_pm25}
-                  unit="µg/m³"
-                  source={metrics?.source?.pollution as string | undefined}
-                />
-                <MetricCard
-                  icon={ThermometerSun}
-                  label="Climate Comfort"
-                  value={metrics?.climate_comfort}
-                  source={metrics?.source?.climate as string | undefined}
-                />
-              </div>
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted">
-                <Activity className="h-3.5 w-3.5" />
-                {metrics?.updated_at ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}` : "Pending data"}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+          </FadeIn>
+        </Container>
+      </Section>
     </main>
   );
 }

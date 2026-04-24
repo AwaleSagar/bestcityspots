@@ -1,59 +1,36 @@
-import { Sparkles, Eye, Compass, CalendarRange } from "lucide-react";
+import { Skeleton, Stack, Row, Grid, Caption } from "@/components/atlas";
+import { Sparkles } from "lucide-react";
 
 export default function AIBriefingSkeleton() {
   return (
-    <section className="space-y-8">
-      {/* Section Heading */}
-      <div className="space-y-3">
-        <h2 className="labelled-rule">
-          <Sparkles className="h-4 w-4 text-accent animate-pulse" />
-          <span className="animate-pulse">AI City Briefing</span>
-          <span className="text-[10px] font-black tracking-[0.2em] text-accent/70 uppercase animate-pulse">
-            Generating...
-          </span>
-        </h2>
-        <div className="h-3 w-80 max-w-full bg-foreground/5 rounded animate-pulse" />
-      </div>
-
-      {/* Tab Switcher Skeleton */}
-      <div className="flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border border-line bg-background/55 p-1.5 md:rounded-[1.5rem]">
-        {[
-          { icon: Eye, label: "Overview" },
-          { icon: Compass, label: "Top Spots" },
-          { icon: CalendarRange, label: "When to Visit" },
-        ].map((tab, idx) => {
-          const Icon = tab.icon;
-          return (
-            <div
-              key={idx}
-              className={`flex items-center gap-2 md:gap-2.5 px-4 md:px-5 py-2.5 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] ${
-                idx === 0
-                  ? "border border-accent/20 bg-accent-soft text-foreground"
-                  : "text-foreground/30"
-              }`}
-            >
-              <Icon
-                className={`w-3.5 h-3.5 md:w-4 md:h-4 ${
-                  idx === 0 ? "text-accent" : "text-foreground/20"
-                }`}
-              />
-              <span>{tab.label}</span>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Content Skeleton — Overview card */}
-      <div className="atlas-panel rounded-[2.5rem] p-8 shadow-2xl space-y-4 md:rounded-[3rem] md:p-10">
-        <div className="h-4 w-full bg-foreground/5 rounded animate-pulse" />
-        <div className="h-4 w-5/6 bg-foreground/5 rounded animate-pulse" />
-        <div className="h-4 w-4/6 bg-foreground/5 rounded animate-pulse" />
-        <div className="h-4 w-3/5 bg-foreground/5 rounded animate-pulse" />
-        <div className="mt-6 flex items-center gap-2 border-t border-line pt-5">
-          <div className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-          <div className="h-2 w-56 bg-foreground/5 rounded animate-pulse" />
+    <section aria-label="AI briefing loading">
+      <Stack gap={4}>
+        <Row gap={2}>
+          <Caption>
+            <Sparkles className="h-3.5 w-3.5 text-[color:var(--color-accent)]" aria-hidden />
+            AI briefing · generating…
+          </Caption>
+        </Row>
+        <Skeleton className="h-8 w-64 max-w-full" />
+        <Skeleton className="h-4 w-80 max-w-full" />
+        <div className="flex gap-2 pt-2">
+          <Skeleton className="h-11 w-28" rounded="md" />
+          <Skeleton className="h-11 w-28" rounded="md" />
+          <Skeleton className="h-11 w-32" rounded="md" />
         </div>
-      </div>
+        <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 md:p-8">
+          <Stack gap={3}>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-10/12" />
+            <Skeleton className="h-4 w-8/12" />
+          </Stack>
+        </div>
+        <Grid cols={{ base: 1, sm: 2 }} gap={4} aria-hidden>
+          <Skeleton className="h-28 w-full" rounded="lg" />
+          <Skeleton className="h-28 w-full" rounded="lg" />
+        </Grid>
+      </Stack>
     </section>
   );
 }

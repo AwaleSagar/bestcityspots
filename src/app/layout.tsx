@@ -10,8 +10,8 @@ export const viewport: Viewport = {
   userScalable: true,
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f5f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1614" },
+    { media: "(prefers-color-scheme: light)", color: "#faf7f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#14110e" },
   ],
 };
 
@@ -96,7 +96,8 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import SiteNav from "@/components/layout/SiteNav";
+import TopBar from "@/components/layout/TopBar";
+import BottomBar from "@/components/layout/BottomBar";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
 
@@ -148,21 +149,15 @@ export default function RootLayout({
         >
           <AnalyticsProvider>
             <PageTracker />
-            <SiteNav />
-            <a
-              href="#main-content"
-              className="skip-link fixed top-3 left-3 z-[210] rounded-lg border border-line bg-surface px-4 py-2 text-xs font-semibold text-foreground opacity-0 shadow-md transition focus-visible:opacity-100 sm:top-4 sm:left-4"
-              style={{
-                marginLeft: "env(safe-area-inset-left, 0)",
-                marginTop: "env(safe-area-inset-top, 0)",
-              }}
-            >
+            <a href="#main-content" className="skip-link">
               Skip to content
             </a>
+            <TopBar />
             <div className="flex min-h-screen flex-col">
-              <div className="flex flex-1 flex-col">{children}</div>
+              <div className="flex flex-1 flex-col pb-mobile-nav">{children}</div>
               <SiteFooter />
             </div>
+            <BottomBar />
             <GeoConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>

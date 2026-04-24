@@ -3,9 +3,10 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { IconButton } from "@/components/atlas";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -14,25 +15,21 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div
-        className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface"
+      <span
+        className="inline-block h-11 w-11 rounded-[var(--radius-md)] border border-[color:var(--color-line)] bg-[color:var(--color-surface)]"
         aria-hidden
       />
     );
   }
 
+  const isDark = resolvedTheme === "dark";
   return (
-    <button
-      type="button"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface text-muted transition-colors hover:bg-surface-strong hover:text-foreground"
-      aria-label="Toggle theme"
+    <IconButton
+      variant="outline"
+      label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {theme === "dark" ? (
-        <Moon className="h-4 w-4" />
-      ) : (
-        <Sun className="h-4 w-4" />
-      )}
-    </button>
+      {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </IconButton>
   );
 }

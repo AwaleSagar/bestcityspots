@@ -2,183 +2,186 @@
 
 import type { KeyboardEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Search, MapPin, ArrowRight, LocateFixed, Sparkles } from "lucide-react";
+import { searchCities, findNearestCity, type City, type CitySearchResult } from "@/lib/cities";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { useAnalytics } from "@/lib/useAnalytics";
+import { Chip, cx } from "@/components/atlas";
 
 interface CitySearchProps {
   topCities: City[];
+  /** Optional overline hint shown below the input. */
+  autoFocus?: boolean;
 }
 
 const KEYBOARD_ANIMATION_DELAY = 300;
-const DROPDOWN_MAX_HEIGHT = "40vh";
-const transitionEase = [0.22, 1, 0.36, 1] as const;
+const DEBOUNCE_MS = 200;
+const MIN_QUERY_LEN = 2;
+const MAX_QUERY_LEN = 100;
 
 const PLACEHOLDER_HINTS = [
-  "Where do you want to explore?",
-  "Try 'NYC' or 'Bangkok'...",
-  "Search 'beaches' or 'gastronomy'...",
-  "Try 'Eiffel Tower' or 'Colosseum'...",
-  "Search by city, country, or attraction...",
+  "Search by city or country…",
+  "Try 'Tokyo' or 'Bangkok'",
+  "Try 'Lisbon' or 'Mexico City'",
+  "Try 'New York' or 'Cape Town'",
 ];
 
-export default function CitySearch({ topCities }: CitySearchProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
+function highlight(text: string, query: string) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.toLowerCase() ? (
+          <mark
+            key={i}
+            className="rounded-sm bg-[color:var(--color-accent-soft)] px-0.5 text-[color:var(--color-accent-strong)]"
+          >
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+function matchTypeLabel(r: CitySearchResult) {
+  if (r.match_type === "fuzzy") return "Similar match";
+  if (r.match_type === "alias") return "Also known as";
+  return null;
+}
+
+export default function CitySearch({ topCities, autoFocus }: CitySearchProps) {
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"megacity" | "capital" | null>(null);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const { trackAction } = useAnalytics();
   const hasTrackedSearch = useRef(false);
 
+  const router = useRouter();
+  const { trackAction } = useAnalytics();
   const { recentCities, addRecentCity } = useRecentSearches();
   const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
   const isTouchDevice = isMobile || isTablet;
-  const shouldReduceMotion = useReducedMotion();
 
-  // Rotate placeholder hints
   useEffect(() => {
-    if (searchQuery) return;
+    if (autoFocus) inputRef.current?.focus();
+  }, [autoFocus]);
+
+  // Rotating placeholder
+  useEffect(() => {
+    if (query) return;
     const interval = setInterval(() => {
       setPlaceholderIdx((prev) => (prev + 1) % PLACEHOLDER_HINTS.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [searchQuery]);
+  }, [query]);
 
-  const matchTypeLabel = useCallback((r: CitySearchResult) => {
-    if (r.match_type === "fuzzy") return "Similar match";
-    if (r.match_type === "alias") return "Also known as";
-    return null;
-  }, []);
-
-  // Scroll search container into view when virtual keyboard opens on touch devices
+  // Scroll into view when virtual keyboard opens
   useEffect(() => {
     if (!isVirtualKeyboardOpen || !isTouchDevice) return;
     const timeout = setTimeout(() => {
-      containerRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
+      containerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }, KEYBOARD_ANIMATION_DELAY);
     return () => clearTimeout(timeout);
   }, [isVirtualKeyboardOpen, isTouchDevice]);
 
+  // Debounced search
   useEffect(() => {
     const controller = new AbortController();
     const timer = setTimeout(async () => {
-      if (searchQuery.length >= 2) {
+      if (query.length >= MIN_QUERY_LEN) {
         setIsSearching(true);
-        let results = await searchCities(searchQuery, 15, controller.signal);
+        let found = await searchCities(query, 15, controller.signal);
 
-        if (activeFilter === "megacity") {
-          results = results.filter((c) => c.population > 5000000);
-        } else if (activeFilter === "capital") {
-          results = results.filter((c) => c.capital === "primary");
+        if (filter === "megacity") {
+          found = found.filter((c) => c.population > 5000000);
+        } else if (filter === "capital") {
+          found = found.filter((c) => c.capital === "primary");
         }
 
         if (controller.signal.aborted) return;
-        setSearchResults(results.slice(0, 10));
+        setResults(found.slice(0, 10));
         setActiveIndex(-1);
         setIsSearching(false);
 
-        if (!hasTrackedSearch.current && results.length > 0) {
+        if (!hasTrackedSearch.current && found.length > 0) {
           trackAction("search");
           hasTrackedSearch.current = true;
         }
       } else {
         controller.abort();
-        setSearchResults([]);
+        setResults([]);
         setActiveIndex(-1);
         setIsSearching(false);
         hasTrackedSearch.current = false;
       }
-    }, 200);
+    }, DEBOUNCE_MS);
 
     return () => {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [searchQuery, activeFilter, trackAction]);
+  }, [query, filter, trackAction]);
 
-  const shouldShowResults = searchQuery.trim().length >= 2;
+  const showResults = query.trim().length >= MIN_QUERY_LEN;
 
-  const topFuzzyHint = useMemo(() => {
-    if (!shouldShowResults || searchResults.length === 0) return null;
-    const first = searchResults[0];
-    if (first.match_type === "fuzzy" || first.match_type === "alias") {
-      return first.city;
-    }
+  const fuzzyHint = useMemo(() => {
+    if (!showResults || results.length === 0) return null;
+    const first = results[0];
+    if (first.match_type === "fuzzy" || first.match_type === "alias") return first.city;
     return null;
-  }, [shouldShowResults, searchResults]);
+  }, [showResults, results]);
 
-  const highlightMatch = useMemo(() => {
-    const highlightFn = (text: string, query: string) => {
-      if (!query) return text;
-      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const parts = text.split(new RegExp(`(${escaped})`, "gi"));
-      return (
-        <span>
-          {parts.map((part, i) =>
-            part.toLowerCase() === query.toLowerCase() ? (
-              <mark
-                key={i}
-                className="bg-accent-soft text-accent-strong rounded-sm px-0.5 font-bold shadow-sm"
-              >
-                {part}
-              </mark>
-            ) : (
-              <span key={i}>{part}</span>
-            )
-          )}
-        </span>
-      );
-    };
-    return highlightFn;
-  }, []);
+  const resultsListId = "city-search-results";
+  const activeCity = activeIndex >= 0 ? results.at(activeIndex) : undefined;
+  const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIndex((prev) => {
-        if (searchResults.length === 0) return -1;
-        return prev >= searchResults.length - 1 ? 0 : prev + 1;
-      });
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((prev) => {
-        if (searchResults.length === 0) return -1;
-        return prev <= 0 ? searchResults.length - 1 : prev - 1;
-      });
-    } else if (e.key === "Enter") {
-      const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
-      if (selectedCity) {
-        router.push(`/cities/${selectedCity.id}`);
-      } else if (searchResults.length > 0) {
-        const firstCity = searchResults.at(0);
-        if (firstCity) router.push(`/cities/${firstCity.id}`);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => {
+          if (results.length === 0) return -1;
+          return prev >= results.length - 1 ? 0 : prev + 1;
+        });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => {
+          if (results.length === 0) return -1;
+          return prev <= 0 ? results.length - 1 : prev - 1;
+        });
+      } else if (e.key === "Enter") {
+        const picked = activeIndex >= 0 ? results.at(activeIndex) : results.at(0);
+        if (picked) {
+          addRecentCity(picked);
+          router.push(`/cities/${picked.id}?lat=${picked.lat}&lng=${picked.lng}`);
+        }
+      } else if (e.key === "Escape") {
+        setQuery("");
+        setResults([]);
+        setActiveIndex(-1);
       }
-    } else if (e.key === "Escape") {
-      setSearchQuery("");
-      setSearchResults([]);
-      setActiveIndex(-1);
-    }
-  };
+    },
+    [activeIndex, results, router, addRecentCity],
+  );
 
-  const handleLocate = () => {
+  const handleLocate = useCallback(() => {
     if (isLocating || typeof navigator === "undefined" || !navigator.geolocation) {
       return;
     }
-
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       async (position) => {
@@ -186,87 +189,61 @@ export default function CitySearch({ topCities }: CitySearchProps) {
           const { latitude, longitude } = position.coords;
           const nearest = await findNearestCity(latitude, longitude);
           if (!nearest) {
-            console.warn("Unable to find nearest city for current location");
             setIsLocating(false);
             return;
           }
           addRecentCity(nearest);
           router.push(`/cities/${nearest.id}?lat=${latitude}&lng=${longitude}`);
-        } catch (error) {
-          console.warn("Unable to resolve current location", error);
-          setIsLocating(false); // Make sure to reset state on error
+        } catch {
+          setIsLocating(false);
         }
       },
-      (error) => {
-        console.warn("Geolocation permission denied or error", error);
-        setIsLocating(false);
-      }
+      () => setIsLocating(false),
     );
-  };
-
-  const resultsListId = "city-search-results";
-  const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
-  const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
+  }, [isLocating, router, addRecentCity]);
 
   return (
-    <motion.div
-      ref={containerRef}
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 30 }}
-      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2, ease: transitionEase }}
-      className="relative scroll-mt-20"
-    >
-      {/* Accessibility - Proper labels */}
+    <div ref={containerRef} className="relative w-full">
       <label htmlFor="city-search" className="sr-only">
         Search for a city
       </label>
 
-      <motion.div
-        layout
-        transition={{ duration: shouldReduceMotion ? 0 : 0.38, ease: transitionEase }}
-        className="search-shell group relative"
-      >
-        <motion.div
-          className="search-shell-glow"
-          aria-hidden
-          animate={
-            shouldReduceMotion
-              ? undefined
-              : {
-                  opacity: [0.22, 0.45, 0.22],
-                  scale: [1, 1.03, 1],
-                }
-          }
-          transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+      {/* Input shell */}
+      <div className="group relative">
+        <Search
+          className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[color:var(--color-muted)] transition-colors group-focus-within:text-[color:var(--color-foreground)]"
+          aria-hidden="true"
         />
-        <Search className="text-muted group-focus-within:text-accent absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 transition-all duration-300 md:left-6 md:h-5 md:w-5" />
         <input
           id="city-search"
           ref={inputRef}
           type="text"
           autoComplete="off"
-          value={searchQuery}
+          spellCheck={false}
+          value={query}
           onChange={(e) => {
             const val = e.target.value.replace(/[^a-zA-Z0-9\s-]/g, "");
-            if (val.length <= 100) setSearchQuery(val);
+            if (val.length <= MAX_QUERY_LEN) setQuery(val);
           }}
           onKeyDown={handleKeyDown}
           placeholder={PLACEHOLDER_HINTS.at(placeholderIdx) ?? PLACEHOLDER_HINTS[0]}
           role="combobox"
           aria-autocomplete="list"
-          aria-expanded={shouldShowResults}
+          aria-expanded={showResults}
           aria-controls={resultsListId}
           aria-activedescendant={activeOptionId}
-          className="border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full rounded-[1.2rem] border py-4 pr-14 pl-12 text-sm font-semibold shadow-sm transition-all duration-300 outline-none sm:rounded-[1.4rem] md:rounded-[1.7rem] md:py-5 md:pr-18 md:pl-16 md:text-lg"
+          className={cx(
+            "h-14 w-full rounded-[var(--radius-lg)] border border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)]",
+            "pl-12 pr-14 text-base text-[color:var(--color-foreground)] placeholder:text-[color:var(--color-muted)]",
+            "shadow-[var(--shadow-sm)] outline-none transition-[border-color,box-shadow] focus-visible:border-[color:var(--color-accent)] focus-visible:shadow-[var(--shadow-md)]",
+            "sm:h-16 sm:text-lg",
+          )}
         />
-
-        {/* Principle 4: Contrast - Loading indicator */}
-        <div className="absolute top-1/2 right-4 flex -translate-y-1/2 items-center gap-2 md:right-5">
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1">
           {(isSearching || isLocating) && (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="border-accent/10 border-t-accent h-7 w-7 rounded-full border-2"
+            <span
+              aria-hidden="true"
+              className="h-5 w-5 animate-spin rounded-full border-2 border-[color:var(--color-line)] border-t-[color:var(--color-accent)]"
             />
           )}
           <button
@@ -274,268 +251,163 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             onClick={handleLocate}
             disabled={isLocating}
             aria-label="Use current location"
-            className={`border-line bg-surface/88 text-muted hover:border-accent/25 hover:text-accent flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-100 disabled:cursor-not-allowed disabled:opacity-40 ${isLocating ? "border-accent/30 text-accent animate-pulse" : ""}`}
+            className={cx(
+              "inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] transition-colors",
+              "text-[color:var(--color-muted)] hover:bg-[color:var(--color-surface-muted)] hover:text-[color:var(--color-foreground)]",
+              "disabled:cursor-not-allowed disabled:opacity-50",
+            )}
           >
-            <LocateFixed className="h-5 w-5" />
+            <LocateFixed className="h-5 w-5" aria-hidden="true" />
           </button>
-        </div>
-      </motion.div>
-
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-1 sm:px-2">
-        <div className="text-xs font-medium tracking-wide">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={
-                isLocating
-                  ? "locating"
-                  : isSearching
-                    ? "searching"
-                    : shouldShowResults && topFuzzyHint
-                      ? "hint"
-                      : shouldShowResults
-                        ? "count"
-                        : "idle"
-              }
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-              animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: transitionEase }}
-              className="text-foreground/30 min-h-[1rem]"
-              aria-live="polite"
-            >
-              {isLocating ? (
-                <span className="text-accent">Finding your location...</span>
-              ) : isSearching ? (
-                <span className="text-accent">Searching...</span>
-              ) : shouldShowResults && topFuzzyHint ? (
-                <span className="text-muted flex items-center gap-1.5">
-                  <Sparkles className="text-accent h-3 w-3" />
-                  Did you mean <span className="text-accent font-bold">{topFuzzyHint}</span>?
-                  <span className="ml-1 opacity-40">·</span>
-                  <span className="opacity-60">{searchResults.length} results</span>
-                </span>
-              ) : shouldShowResults ? (
-                <span className="text-muted">{searchResults.length} results</span>
-              ) : null}
-            </motion.div>
-          </AnimatePresence>
         </div>
       </div>
 
-      {/* Progressive Disclosure - Show trending/recent when empty */}
-      <AnimatePresence mode="wait">
-        {!shouldShowResults && (
-          <motion.div
-            key="discovery"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 10 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.34, ease: transitionEase }}
-            className="mt-10 space-y-10 overflow-hidden"
-          >
-            {recentCities.length > 0 ? (
-              <div>
-                <h2 className="text-foreground/30 mb-4 flex items-center gap-2 px-1 text-xs font-bold tracking-wider uppercase">
-                  <Activity className="h-3 w-3" /> Recent Searches
-                </h2>
-                <div className="flex flex-wrap gap-3">
-                  {recentCities.map((city, index) => (
-                    <motion.div
-                      key={`recent-${city.id}`}
-                      initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-                      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-                      transition={{
-                        duration: shouldReduceMotion ? 0 : 0.36,
-                        ease: transitionEase,
-                        delay: shouldReduceMotion ? 0 : index * 0.04,
-                      }}
-                    >
-                      <Link
-                        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                        onClick={() => addRecentCity(city)}
-                        className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
-                      >
-                        {city.city}
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ) : topCities.length > 0 ? (
-              <div>
-                <h2 className="text-foreground/30 mb-4 px-1 text-xs font-bold tracking-wider uppercase">
-                  Trending Destinations
-                </h2>
-                <div className="flex flex-wrap gap-3">
-                  {topCities.map((city, idx) => (
-                    <motion.div
-                      key={city.id}
-                      initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96, y: 8 }}
-                      animate={shouldReduceMotion ? undefined : { opacity: 1, scale: 1, y: 0 }}
-                      transition={{
-                        duration: shouldReduceMotion ? 0 : 0.36,
-                        ease: transitionEase,
-                        delay: shouldReduceMotion ? 0 : idx * 0.04,
-                      }}
-                    >
-                      <Link
-                        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                        onClick={() => addRecentCity(city)}
-                        className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
-                      >
-                        {city.city}
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </motion.div>
+      {/* Live status line */}
+      <p
+        className="mt-2 min-h-[1.25rem] px-1 text-xs text-[color:var(--color-muted)]"
+        aria-live="polite"
+      >
+        {isLocating ? (
+          "Finding your location…"
+        ) : isSearching ? (
+          "Searching…"
+        ) : showResults && fuzzyHint ? (
+          <span className="inline-flex items-center gap-1.5">
+            <Sparkles className="h-3 w-3 text-[color:var(--color-accent)]" aria-hidden />
+            Did you mean{" "}
+            <span className="font-semibold text-[color:var(--color-foreground)]">
+              {fuzzyHint}
+            </span>
+            ? · {results.length} results
+          </span>
+        ) : showResults ? (
+          `${results.length} ${results.length === 1 ? "result" : "results"}`
+        ) : (
+          "Press Enter to open the top result."
         )}
+      </p>
 
-        {/* Results directly below input */}
-        {shouldShowResults && (
-          <motion.div
-            key="results"
-            layout
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: transitionEase }}
-            className={`mt-6 space-y-4 ${isVirtualKeyboardOpen ? "pb-[50vh]" : ""}`}
-            style={{
-              maxHeight: isVirtualKeyboardOpen ? DROPDOWN_MAX_HEIGHT : "none",
-            }}
-          >
-            <motion.div layout className="flex gap-2 px-1 sm:px-2">
-              {[
-                { id: "megacity", label: "Megacities" },
-                { id: "capital", label: "Capitals" },
-              ].map((filter) => (
-                <motion.button
-                  key={filter.id}
-                  type="button"
-                  layout
-                  onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
-                  whileHover={shouldReduceMotion ? undefined : { y: -1.5 }}
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-                  transition={{ duration: 0.18, ease: transitionEase }}
-                  className={`touch-target min-h-[var(--touch-target-min)] rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 ${
-                    activeFilter === filter.id
-                      ? "border-accent/24 bg-accent-soft text-accent-strong"
-                      : "border-line bg-surface/72 text-muted hover:border-accent/16 hover:text-foreground"
-                  }`}
-                >
-                  {filter.label}
-                </motion.button>
-              ))}
-            </motion.div>
-            <motion.ul
-              layout
-              id={resultsListId}
-              role="listbox"
-              aria-label="City search results"
-              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-[1.2rem] shadow-xl sm:rounded-[1.4rem] md:rounded-[1.8rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
+      {/* Results */}
+      {showResults && (
+        <div className={cx("mt-4", isVirtualKeyboardOpen && "pb-[50vh]")}>
+          <div className="mb-3 flex flex-wrap gap-2 px-1">
+            <Chip
+              size="sm"
+              selected={filter === "megacity"}
+              onClick={() => setFilter(filter === "megacity" ? null : "megacity")}
             >
-              {searchResults.map((city, idx) => (
-                <motion.li
-                  layout
+              Megacities
+            </Chip>
+            <Chip
+              size="sm"
+              selected={filter === "capital"}
+              onClick={() => setFilter(filter === "capital" ? null : "capital")}
+            >
+              Capitals
+            </Chip>
+          </div>
+
+          <ul
+            id={resultsListId}
+            role="listbox"
+            aria-label="City search results"
+            className={cx(
+              "divide-y divide-[color:var(--color-line)] overflow-hidden rounded-[var(--radius-lg)]",
+              "border border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)] shadow-[var(--shadow-md)]",
+              isVirtualKeyboardOpen && "max-h-[40vh] overflow-y-auto",
+            )}
+          >
+            {results.map((city, idx) => {
+              const active = activeIndex === idx;
+              return (
+                <li
                   key={city.id}
-                  initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
-                  animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
-                  transition={{
-                    duration: shouldReduceMotion ? 0 : 0.32,
-                    ease: transitionEase,
-                    delay: shouldReduceMotion ? 0 : idx * 0.03,
-                  }}
-                  className={`group/item cursor-pointer transition-all duration-200 ${activeIndex === idx ? "bg-accent-soft/80" : "hover:bg-surface/72"}`}
-                  role="option"
-                  aria-selected={activeIndex === idx}
                   id={`city-option-${city.id}`}
+                  role="option"
+                  aria-selected={active}
                   onMouseEnter={() => setActiveIndex(idx)}
+                  className={cx(active && "bg-[color:var(--color-surface-muted)]")}
                 >
                   <Link
                     href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
                     onClick={() => addRecentCity(city)}
-                    className="flex w-full items-center justify-between gap-4 px-5 py-4 md:px-8 md:py-5"
+                    className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4"
                   >
-                    <div className="flex min-w-0 items-center gap-3.5 md:gap-5">
-                      <div
-                        className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border transition-all duration-200 md:h-12 md:w-12 ${
-                          activeIndex === idx
-                            ? "border-accent/25 bg-accent-soft shadow-md"
-                            : "border-line bg-surface/72 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
-                        }`}
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span
+                        className={cx(
+                          "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[var(--radius-md)] border transition-colors",
+                          active
+                            ? "border-[color:var(--color-accent)] bg-[color:var(--color-accent-soft)] text-[color:var(--color-accent-strong)]"
+                            : "border-[color:var(--color-line)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-muted)]",
+                        )}
+                        aria-hidden="true"
                       >
-                        <MapPin
-                          className={`h-4.5 w-4.5 transition-colors duration-200 md:h-5 md:w-5 ${
-                            activeIndex === idx
-                              ? "text-accent"
-                              : "text-muted group-hover/item:text-accent"
-                          }`}
-                        />
-                      </div>
+                        <MapPin className="h-4 w-4" />
+                      </span>
                       <div className="min-w-0">
-                        <div
-                          className={`flex items-center gap-2.5 truncate text-base font-bold tracking-tight transition-colors duration-200 md:text-lg ${
-                            activeIndex === idx
-                              ? "text-foreground"
-                              : "text-muted-strong group-hover/item:text-foreground"
-                          }`}
-                        >
-                          {highlightMatch(city.city, searchQuery)}
+                        <div className="truncate text-base font-semibold text-[color:var(--color-foreground)]">
+                          {highlight(city.city, query)}
                         </div>
-                        <div
-                          className={`mt-0.5 flex items-center gap-1.5 text-xs font-medium tracking-wide transition-colors duration-200 ${
-                            activeIndex === idx
-                              ? "text-accent"
-                              : "text-muted group-hover/item:text-muted-strong"
-                          }`}
-                        >
-                          <span>{city.country}</span>
-                          {city.admin_name && (
-                            <>
-                              <span className="opacity-40">·</span>
-                              <span className="opacity-80">{city.admin_name}</span>
-                            </>
-                          )}
-                          {matchTypeLabel(city) && (
-                            <>
-                              <span className="opacity-40">·</span>
-                              <span className="italic opacity-70">{matchTypeLabel(city)}</span>
-                            </>
-                          )}
+                        <div className="truncate text-xs text-[color:var(--color-muted)]">
+                          {city.country}
+                          {city.admin_name ? ` · ${city.admin_name}` : ""}
+                          {matchTypeLabel(city) ? ` · ${matchTypeLabel(city)}` : ""}
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-shrink-0 items-center gap-4">
-                      <div
-                        className={`flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 ${
-                          activeIndex === idx
-                            ? "border-accent/25 bg-accent-soft translate-x-0 opacity-100"
-                            : "border-line -translate-x-3 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100"
-                        }`}
-                      >
-                        <ArrowRight className="text-accent h-4 w-4" />
-                      </div>
-                    </div>
+                    <ArrowRight
+                      className={cx(
+                        "h-4 w-4 flex-shrink-0 transition-colors",
+                        active
+                          ? "text-[color:var(--color-accent-strong)]"
+                          : "text-[color:var(--color-muted-soft)]",
+                      )}
+                      aria-hidden="true"
+                    />
                   </Link>
-                </motion.li>
-              ))}
-              {searchResults.length === 0 && !isSearching && (
-                <li className="px-8 py-14 text-center" role="status" aria-live="polite">
-                  <div className="text-foreground/50 mb-2 text-sm font-semibold">
-                    No matches for &quot;{searchQuery}&quot;
-                  </div>
-                  <div className="text-foreground/30 text-sm">
-                    Try searching for another city or country.
-                  </div>
                 </li>
-              )}
-            </motion.ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
+              );
+            })}
+            {results.length === 0 && !isSearching && (
+              <li className="px-5 py-10 text-center" role="status" aria-live="polite">
+                <p className="text-sm font-semibold text-[color:var(--color-foreground)]">
+                  No matches for &ldquo;{query}&rdquo;
+                </p>
+                <p className="mt-1 text-sm text-[color:var(--color-muted)]">
+                  Try searching for another city or country.
+                </p>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
+
+      {/* Discovery: recents / trending chips when empty */}
+      {!showResults && (recentCities.length > 0 || topCities.length > 0) && (
+        <div className="mt-8">
+          <h2 className="mb-3 px-1 text-xs font-semibold uppercase tracking-[0.08em] text-[color:var(--color-muted)]">
+            {recentCities.length > 0 ? "Recent" : "Trending"}
+          </h2>
+          <ul className="flex flex-wrap gap-2 px-1" role="list">
+            {(recentCities.length > 0 ? recentCities : topCities).map((city) => (
+              <li key={`chip-${city.id}`}>
+                <Link
+                  href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                  onClick={() => addRecentCity(city)}
+                  className={cx(
+                    "inline-flex min-h-[var(--touch-target-min)] items-center rounded-full border border-[color:var(--color-line-strong)] bg-[color:var(--color-surface)]",
+                    "px-4 py-2 text-sm font-medium text-[color:var(--color-foreground)] transition-colors",
+                    "hover:border-[color:var(--color-foreground)]",
+                  )}
+                >
+                  {city.city}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
