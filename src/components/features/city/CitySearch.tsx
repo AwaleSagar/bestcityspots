@@ -219,7 +219,6 @@ export default function CitySearch({ topCities, autoFocus }: CitySearchProps) {
           ref={inputRef}
           type="text"
           autoComplete="off"
-          spellCheck={false}
           value={query}
           onChange={(e) => {
             const val = e.target.value.replace(/[^a-zA-Z0-9\s-]/g, "");

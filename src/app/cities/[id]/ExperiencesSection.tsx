@@ -82,7 +82,38 @@ const parseStoredNotes = (raw: string | null): Map<string, CityNotes> => {
 
 function topK<T>(arr: T[], k: number, score: (item: T) => number): T[] {
   if (arr.length <= k) return [...arr].sort((a, b) => score(b) - score(a));
-  return [...arr].sort((a, b) => score(b) - score(a)).slice(0, k);
+  // Partial selection — O(n log k) — maintain a sorted top-k buffer.
+  const top: T[] = [];
+  for (const item of arr) {
+    const v = score(item);
+    if (top.length < k) {
+      top.push(item);
+      for (let i = top.length - 1; i > 0; i--) {
+        const prev = top.at(i - 1);
+        const curr = top.at(i);
+        if (prev !== undefined && curr !== undefined && score(curr) > score(prev)) {
+          top.splice(i - 1, 2, curr, prev);
+        } else {
+          break;
+        }
+      }
+      continue;
+    }
+    const worst = top.at(k - 1);
+    if (worst !== undefined && v > score(worst)) {
+      top.splice(k - 1, 1, item);
+      for (let i = k - 1; i > 0; i--) {
+        const prev = top.at(i - 1);
+        const curr = top.at(i);
+        if (prev !== undefined && curr !== undefined && score(curr) > score(prev)) {
+          top.splice(i - 1, 2, curr, prev);
+        } else {
+          break;
+        }
+      }
+    }
+  }
+  return top;
 }
 
 const priceLabels = new Map<string, string>([

@@ -234,7 +234,7 @@ export default function AboutPage() {
               <Heading level={2}>Pick a city and dive in.</Heading>
               <Text tone="muted">
                 No sign-up, no paywalls. Search any city, skim the signals, and
-                read the briefing — that&rsquo;s it.
+                read the briefing — that&apos;s it.
               </Text>
               <div className="pt-2">
                 <Link

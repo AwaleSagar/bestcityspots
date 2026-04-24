@@ -1,6 +1,6 @@
 import { WeatherData } from "@/lib/weather";
 import { Wind, Droplets, Gauge, Thermometer } from "lucide-react";
-import { Card, Caption, Mono, Row, Stack } from "@/components/atlas";
+import { Card, Caption, Mono, Row, Stack, cx } from "@/components/atlas";
 
 interface CityVitalsProps {
   data: WeatherData;
@@ -56,7 +56,10 @@ export default function CityVitals({ data }: CityVitalsProps) {
             </span>
           </Row>
           <span
-            className={`inline-flex w-fit items-center rounded-full border border-[color:var(--color-line)] bg-[color:var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-semibold ${aqiColor(data.aqi)}`}
+            className={cx(
+              "inline-flex w-fit items-center rounded-full border border-[color:var(--color-line)] bg-[color:var(--color-surface-muted)] px-2.5 py-0.5 text-xs font-semibold",
+              aqiColor(data.aqi),
+            )}
           >
             {data.aqi_label}
           </span>

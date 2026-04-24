@@ -77,11 +77,11 @@ function gapClass(gap: 1 | 2 | 3 | 4 | 6 | 8 | 12 | 16): string {
     case 1: return "gap-1";
     case 2: return "gap-2";
     case 3: return "gap-3";
+    case 4: return "gap-4";
     case 6: return "gap-6";
     case 8: return "gap-8";
     case 12: return "gap-12";
     case 16: return "gap-16";
-    default: return "gap-4";
   }
 }
 export function Stack<T extends React.ElementType = "div">({
@@ -220,7 +220,7 @@ export function Divider({ className }: { className?: string }) {
     <hr
       role="separator"
       aria-hidden="true"
-      className={cx("border-0 h-px w-full bg-[var(--color-line)]", className)}
+      className={cx("border-0 h-px w-full bg-[color:var(--color-line)]", className)}
     />
   );
 }

@@ -91,7 +91,6 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                 id={`ai-tab-${id}`}
                 aria-selected={active}
                 aria-controls={`ai-panel-${id}`}
-                tabIndex={active ? 0 : -1}
                 onClick={() => setTab(id)}
                 className={cx(
                   "inline-flex min-h-[var(--touch-target-min)] items-center gap-2 rounded-[var(--radius-md)] border px-3 py-2 text-sm font-medium transition-colors",

@@ -21,7 +21,7 @@ export default function TopBar() {
             aria-label="Best City Spots — home"
           >
             <span
-              aria-hidden
+              aria-hidden="true"
               className="inline-block h-2 w-2 rounded-full bg-[color:var(--color-accent)]"
             />
             <span className="truncate font-[family-name:var(--font-display)] text-lg font-medium tracking-[-0.01em] text-[color:var(--color-foreground)] sm:text-xl">
