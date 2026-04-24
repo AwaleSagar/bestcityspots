@@ -15,6 +15,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Reject oversized payloads early to protect the service.
+    const contentLengthHeader = request.headers.get("content-length");
+    if (contentLengthHeader) {
+      const contentLength = Number(contentLengthHeader);
+      if (Number.isFinite(contentLength) && contentLength > 64 * 1024) {
+        return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+      }
+    }
+
     const body = await request.json();
     const result = AnalyticsPayloadSchema.safeParse(body);
 

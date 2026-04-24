@@ -2,6 +2,10 @@ import "server-only";
 import { supabase, supabaseServer } from "./supabase";
 import type { City } from "./cities";
 import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
+import { fetchCurrent as fetchOpenMeteo, fetchPm25 } from "./providers/openMeteo";
+import { createLogger } from "./logger";
+
+const log = createLogger({ component: "metrics" });
 
 export interface CityMetrics {
   cost_index: number | null;
@@ -14,34 +18,13 @@ export interface CityMetrics {
   source?: Record<string, unknown> | null;
 }
 
-async function getOpenMeteoAirQuality(lat: number, lng: number) {
-  try {
-    const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lng}&hourly=pm2_5&past_days=1&forecast_days=1&timezone=auto`;
-    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const values: number[] | undefined = data?.hourly?.pm2_5;
-    if (!values || values.length === 0) return null;
-    const latest = values[values.length - 1];
-    return typeof latest === "number" ? latest : null;
-  } catch (e) {
-    console.warn("air-quality fetch failed", e);
-    return null;
-  }
+async function getOpenMeteoAirQuality(lat: number, lng: number): Promise<number | null> {
+  return await fetchPm25(lat, lng);
 }
 
-async function getOpenMeteoWeather(lat: number, lng: number) {
-  try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m&timezone=auto`;
-    const res = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const temp = data?.current?.temperature_2m;
-    return typeof temp === "number" ? temp : null;
-  } catch (e) {
-    console.warn("weather fetch failed", e);
-    return null;
-  }
+async function getOpenMeteoWeather(lat: number, lng: number): Promise<number | null> {
+  const data = await fetchOpenMeteo(lat, lng);
+  return data?.tempC ?? null;
 }
 
 function comfortFromTemp(temp: number | null): string | null {
@@ -89,8 +72,8 @@ async function fetchAndCacheMetrics(city: City): Promise<CityMetrics> {
       { city_id: city.id, ...metrics },
       { onConflict: "city_id" },
     )
-    .then(({ error }) => {
-      if (error) console.error("metrics cache write failed:", error);
+    .then(({ error }: { error: unknown }) => {
+      if (error) log.error("cache_write_failed", { cityId: city.id, error: String(error) });
     });
 
   return metrics;
@@ -120,14 +103,14 @@ export async function getCityMetrics(city: City): Promise<CityMetrics | null> {
       return cached;
     }
   } catch (e) {
-    console.warn("city_metrics fetch failed", e);
+    log.warn("cache_read_failed", { cityId: city.id, error: e instanceof Error ? e.message : String(e) });
   }
 
   // No cache at all -- fetch fresh (blocking)
   try {
     return await fetchAndCacheMetrics(city);
   } catch (e) {
-    console.error("live metrics fetch failed", e);
+    log.error("live_fetch_failed", { cityId: city.id, error: e instanceof Error ? e.message : String(e) });
     return null;
   }
 }

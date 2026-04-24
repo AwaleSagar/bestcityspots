@@ -3,6 +3,12 @@ import { City } from "./cities";
 import { z } from "zod";
 import { supabase, supabaseServer } from "./supabase";
 import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
+import { fetchCurrentWeather } from "./providers/openweather";
+import { fetchCurrent as fetchOpenMeteo, conditionFromWeatherCode } from "./providers/openMeteo";
+import { aqiLabelFromOwm } from "./mapping";
+import { createLogger } from "./logger";
+
+const log = createLogger({ component: "weather" });
 
 // Runtime validation schema for the application's internal weather model
 const WeatherDataSchema = z.object({
@@ -26,82 +32,75 @@ function parseCachedWeather(cached: unknown): WeatherData | null {
   return parsed.success ? parsed.data : null;
 }
 
-function getAqiLabel(aqi: number): string {
-  switch (aqi) {
-    case 1: return "Good";
-    case 2: return "Fair";
-    case 3: return "Moderate";
-    case 4: return "Poor";
-    case 5: return "Very Poor";
-    default: return "Unknown";
-  }
-}
-
-async function fetchFreshWeather(city: City, apiKey: string): Promise<WeatherData | null> {
+async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
   const db = supabaseServer ?? supabase;
 
-  const [weatherRes, aqiRes] = await Promise.all([
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`,
-      { signal: AbortSignal.timeout(10_000) }
-    ),
-    fetch(
-      `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`,
-      { signal: AbortSignal.timeout(10_000) }
-    ),
-  ]);
+  // Primary: OpenWeather (richer data when keyed).
+  let primary = await fetchCurrentWeather(city.lat, city.lng);
 
-  if (!weatherRes.ok || !aqiRes.ok) return null;
+  let normalized: WeatherData | null = null;
 
-  const weather = await weatherRes.json();
-  const aqiData = await aqiRes.json();
+  if (primary.ok) {
+    const aqiValue = primary.aqi?.aqi ?? 0;
+    normalized = {
+      temp: primary.current.temp,
+      feels_like: primary.current.feelsLike,
+      temp_min: primary.current.tempMin,
+      temp_max: primary.current.tempMax,
+      humidity: primary.current.humidity,
+      description: primary.current.description,
+      icon: primary.current.icon,
+      wind_speed: primary.current.windSpeed,
+      aqi: aqiValue,
+      aqi_label: aqiLabelFromOwm(aqiValue),
+      updated_at: new Date().toISOString(),
+    };
+  } else {
+    // Fallback chain: Open-Meteo keyless current weather.
+    log.warn("owm.fallback", { reason: primary.reason, cityId: city.id });
+    const fallback = await fetchOpenMeteo(city.lat, city.lng);
+    if (!fallback || fallback.tempC === null) return null;
+    normalized = {
+      temp: fallback.tempC,
+      feels_like: fallback.tempC,
+      temp_min: fallback.tempC,
+      temp_max: fallback.tempC,
+      humidity: fallback.humidity ?? 0,
+      description: conditionFromWeatherCode(fallback.weatherCode),
+      icon: "",
+      wind_speed: fallback.windKph ?? 0,
+      aqi: 0,
+      aqi_label: "Unknown",
+      updated_at: new Date().toISOString(),
+    };
+    primary = { ok: false, reason: primary.reason };
+  }
 
-  const rawAqi = aqiData.list?.[0]?.main?.aqi;
-  const aqiValue = typeof rawAqi === "number" ? rawAqi : 0;
-
-  const normalized: WeatherData = {
-    temp: weather.main?.temp || 0,
-    feels_like: weather.main?.feels_like || 0,
-    temp_min: weather.main?.temp_min || 0,
-    temp_max: weather.main?.temp_max || 0,
-    humidity: weather.main?.humidity || 0,
-    description: weather.weather?.[0]?.description || "unknown",
-    icon: weather.weather?.[0]?.icon || "",
-    wind_speed: weather.wind?.speed || 0,
-    aqi: aqiValue,
-    aqi_label: getAqiLabel(aqiValue),
-    updated_at: new Date().toISOString(),
-  };
-
-  const validData = WeatherDataSchema.parse(normalized);
-
-  db.from("city_weather_cache")
-    .upsert({ city_id: city.id, ...validData }, { onConflict: "city_id" })
-    .then(({ error }) => {
-      if (error) console.error("Weather cache update failed:", error);
-    });
-
-  return validData;
-}
-
-/**
- * Fetches weather and air quality with stale-while-revalidate caching:
- *  - Fresh (< 60 min): return cached immediately
- *  - Stale (>= 60 min): return stale data, fire async background refresh
- *  - Missing: block on fresh fetch
- */
-export async function getCityWeather(city: City): Promise<WeatherData | null> {
-  const apiKey = process.env.OPENWEATHERMAP_API_KEY;
-  if (!apiKey) {
-    console.warn("OPENWEATHERMAP_API_KEY not found in environment.");
+  const parsed = WeatherDataSchema.safeParse(normalized);
+  if (!parsed.success) {
+    log.warn("invalid_shape", { cityId: city.id, error: parsed.error.message });
     return null;
   }
 
-  const db = supabaseServer ?? supabase;
-  if (!supabaseServer) {
-    console.warn("SUPABASE_SERVICE_ROLE_KEY missing; weather cache uses anon key.");
-  }
+  db.from("city_weather_cache")
+    .upsert({ city_id: city.id, ...parsed.data }, { onConflict: "city_id" })
+    .then(({ error }: { error: unknown }) => {
+      if (error) log.error("cache_write_failed", { cityId: city.id, error: String(error) });
+    });
 
+  return parsed.data;
+}
+
+/**
+ * Fetch weather with stale-while-revalidate caching and multi-provider
+ * fallback:
+ *  - Fresh (< 60 min): return cached immediately.
+ *  - Stale (>= 60 min): return stale, fire async refresh.
+ *  - Missing or provider outage: block on fresh fetch (OpenWeather, then
+ *    Open-Meteo). If both fail but any stale row exists, return it.
+ */
+export async function getCityWeather(city: City): Promise<WeatherData | null> {
+  const db = supabaseServer ?? supabase;
   const ttlMs = minutes(CACHE_TTL.WEATHER_FRESH_MINUTES);
 
   try {
@@ -117,24 +116,27 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
         if (isCacheFresh(cached.updated_at, ttlMs)) {
           return validCached;
         }
-        // Stale-while-revalidate: serve stale, refresh in background
-        fetchFreshWeather(city, apiKey).catch(() => {});
+        // Stale-while-revalidate: serve stale, refresh in background.
+        fetchFreshWeather(city).catch(() => {});
         return validCached;
       }
     }
 
-    // No usable cache -- block on fresh fetch
-    const fresh = await fetchFreshWeather(city, apiKey);
+    // No usable cache — block on fresh fetch.
+    const fresh = await fetchFreshWeather(city);
     if (fresh) return fresh;
 
-    // Last resort: return any stale data we can parse
+    // Last resort: return any stale data we can parse.
     if (cached) {
       const fallback = parseCachedWeather(cached);
       if (fallback) return fallback;
     }
     return null;
   } catch (error) {
-    console.error("Failed to fetch city weather:", error);
+    log.error("fetch_failed", {
+      cityId: city.id,
+      error: error instanceof Error ? error.message : String(error),
+    });
     return null;
   }
 }

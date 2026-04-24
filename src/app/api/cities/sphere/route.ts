@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { createHash } from "node:crypto";
 import { getTopCities } from "@/lib/cities";
 import {
   getMixedCitiesFromCategories,
@@ -55,19 +56,34 @@ export async function GET(req: Request) {
       break;
   }
 
-  return NextResponse.json(
-    {
-      labels,
-      limit: labels.length,
-      mode,
-      categories: SPHERE_CATEGORIES.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
-    },
-    {
+  const body = {
+    labels,
+    limit: labels.length,
+    mode,
+    categories: SPHERE_CATEGORIES.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
+  };
+
+  // ETag = SHA-1 hash of the payload. SHA-1 is used here only as a fast
+  // non-cryptographic fingerprint for cache validation — not for security.
+  const etag = `"${createHash("sha1").update(JSON.stringify(body)).digest("hex").slice(0, 16)}"`;
+  const ifNoneMatch = req.headers.get("if-none-match");
+  if (ifNoneMatch === etag) {
+    return new NextResponse(null, {
+      status: 304,
       headers: {
-        // Cache at the edge for a day; city list doesn't change frequently.
+        ETag: etag,
         "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
       },
-    }
-  );
+    });
+  }
+
+  return NextResponse.json(body, {
+    headers: {
+      // Cache at the edge for a day; city list doesn't change frequently.
+      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+      ETag: etag,
+    },
+  });
 }
+
 

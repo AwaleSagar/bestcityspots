@@ -16,8 +16,19 @@ const IMAGE_MAX_HEIGHT = 600;
 const BLURHASH_COMPONENT_X = 4;
 const BLURHASH_COMPONENT_Y = 3;
 const PLACE_IMAGE_BATCH_SIZE = 3;
-const PLACE_IMAGE_ENRICH_LIMIT = 8;
+// Kept separate from display count so enrichment covers UI permutations.
+// UI shows top 5 by userRatingCount, and can filter by 4 price levels.
+// We enrich the union of: top 20 by Bayesian rank + top 5 per price bucket,
+// so every plausible view renders with images.
+const PLACE_IMAGE_ENRICH_LIMIT = 20;
+const PLACE_IMAGE_PER_PRICE_BUCKET = 5;
 const PLACE_QUERY_RESULT_LIMIT = 50;
+const PRICE_BUCKETS = [
+  "PRICE_LEVEL_INEXPENSIVE",
+  "PRICE_LEVEL_MODERATE",
+  "PRICE_LEVEL_EXPENSIVE",
+  "PRICE_LEVEL_VERY_EXPENSIVE",
+] as const;
 const MIN_RESULTS_BEFORE_FALLBACK = 8;
 const MIN_BUDGET_RESULTS = 2;
 const BUDGET_PRICE_LEVELS = new Set(["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE"]);
@@ -304,8 +315,48 @@ function recordPlacesCacheEvent(type: PlaceType, isHit: boolean): void {
   })();
 }
 
+/**
+ * Pick the set of places to enrich with images.
+ *
+ * The UI sorts by `userRatingCount` (desc) and shows the top 5, optionally
+ * filtered by a price bucket. The ranking engine sorts by Bayesian quality,
+ * which can pick a different 8 places. Without alignment, displayed cards
+ * often have no image. We therefore enrich the union of:
+ *   - Top N by ranking engine (original behavior — good defaults).
+ *   - Top 5 by `userRatingCount` overall (primary UI view).
+ *   - Top 5 by `userRatingCount` within each price bucket (filtered views).
+ */
+function selectImageEnrichmentTargets(rankedPlaces: GooglePlace[]): GooglePlace[] {
+  const selected = new Map<string, GooglePlace>();
+
+  const take = (list: GooglePlace[], n: number) => {
+    for (const place of list.slice(0, n)) {
+      if (place.id && !selected.has(place.id)) {
+        selected.set(place.id, place);
+      }
+    }
+  };
+
+  // 1. Ranking-engine top N (quality-weighted, original behavior).
+  take(rankedPlaces, PLACE_IMAGE_ENRICH_LIMIT);
+
+  // 2. Top by userRatingCount — what the unfiltered UI actually shows.
+  const byReviews = [...rankedPlaces].sort(
+    (a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0)
+  );
+  take(byReviews, PLACE_IMAGE_PER_PRICE_BUCKET);
+
+  // 3. Top by userRatingCount within each price bucket — filtered UI views.
+  for (const bucket of PRICE_BUCKETS) {
+    const inBucket = byReviews.filter((p) => p.priceLevel === bucket);
+    take(inBucket, PLACE_IMAGE_PER_PRICE_BUCKET);
+  }
+
+  return Array.from(selected.values());
+}
+
 async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[], apiKey: string): Promise<void> {
-  const targets = rankedPlaces.slice(0, PLACE_IMAGE_ENRICH_LIMIT);
+  const targets = selectImageEnrichmentTargets(rankedPlaces);
 
   for (let i = 0; i < targets.length; i += PLACE_IMAGE_BATCH_SIZE) {
     const batch = targets.slice(i, i + PLACE_IMAGE_BATCH_SIZE);
@@ -661,7 +712,14 @@ export async function getTopPlaces(
 
         const shouldRefreshForAge = daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS;
         const shouldRefreshForCoverage = isBudgetSensitive(type) && !hasBudgetCoverage(cachedPlaces);
-        const shouldRefreshForImages = !cachedPlaces.some((place) => !!place.imageUrl);
+        // Re-enrich when the cards the UI will actually show lack images,
+        // not merely when every single cached place is imageless. The UI
+        // ranks by userRatingCount (desc) and shows the top 5.
+        const displayedTop = [...cachedPlaces]
+          .sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0))
+          .slice(0, 5);
+        const shouldRefreshForImages =
+          displayedTop.length > 0 && !displayedTop.some((place) => !!place.imageUrl);
 
         if (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages) {
           refreshPlacesInBackground(cityName, type, opts).catch(() => {});
