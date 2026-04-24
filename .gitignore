@@ -56,3 +56,6 @@ __pycache__/
 .agent
 .agent/*
 .agents/*
+
+# local seed data (large; not for version control)
+/data/worldcities.csv
