@@ -64,18 +64,23 @@ export function hasServerClient(): boolean {
 
 /** Lazy Proxy: constructs the underlying anon client on first property access. */
 function lazyAnonProxy(): SupabaseClient {
+  // Resolved client captured after first successful build so subsequent
+  // property accesses skip the `getAnonClient()` hop entirely.
+  let resolved: SupabaseClient | null = null;
   return new Proxy(
     {},
     {
       get(_target, prop, receiver) {
-        const real = getAnonClient();
-        if (!real) {
-          throw new Error(
-            "[supabase] anon client is unavailable — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
-          );
+        if (!resolved) {
+          resolved = getAnonClient();
+          if (!resolved) {
+            throw new Error(
+              "[supabase] anon client is unavailable — set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
+            );
+          }
         }
-        const value = Reflect.get(real as unknown as object, prop, receiver);
-        return typeof value === "function" ? value.bind(real) : value;
+        const value = Reflect.get(resolved as unknown as object, prop, receiver);
+        return typeof value === "function" ? value.bind(resolved) : value;
       },
     }
   ) as unknown as SupabaseClient;

@@ -63,8 +63,8 @@ export async function GET(req: Request) {
     categories: SPHERE_CATEGORIES.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
   };
 
-  // ETag = hash of the payload. Short-circuit with 304 if the client already
-  // has this exact version.
+  // ETag = SHA-1 hash of the payload. SHA-1 is used here only as a fast
+  // non-cryptographic fingerprint for cache validation — not for security.
   const etag = `"${createHash("sha1").update(JSON.stringify(body)).digest("hex").slice(0, 16)}"`;
   const ifNoneMatch = req.headers.get("if-none-match");
   if (ifNoneMatch === etag) {

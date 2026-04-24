@@ -78,8 +78,13 @@ export type CacheFreshness = "fresh" | "swr" | "stale" | "expired";
 /** Classify an `updatedAt` timestamp against a tier. */
 export function classifyAge(updatedAt: string | null | undefined, tier: CacheTier, now = Date.now()): CacheFreshness {
   if (!updatedAt) return "expired";
-  const age = now - new Date(updatedAt).getTime();
-  if (Number.isNaN(age) || age < 0) return "fresh";
+  const parsed = new Date(updatedAt).getTime();
+  if (Number.isNaN(parsed)) return "expired";
+  const age = now - parsed;
+  // Negative age = timestamp is in the future (clock skew or freshly written
+  // record whose clock is slightly ahead). Treat as fresh — it's the most
+  // recent value we have.
+  if (age < 0) return "fresh";
   if (age < tier.freshMs) return "fresh";
   if (age < tier.freshMs + tier.swrMs) return "swr";
   if (age < tier.hardMs) return "stale";
