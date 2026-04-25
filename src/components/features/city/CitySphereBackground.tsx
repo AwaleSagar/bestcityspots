@@ -9,12 +9,12 @@ const MAX_CITIES = 120;
 const SPHERE_RADIUS = 420;
 const PARTICLE_COUNT = 50;
 
-// Aurora-inspired color palette
+// Biophilic atlas palette sourced from global design tokens.
 const COLORS = {
-  primary: { r: 139, g: 92, b: 246 },   // Purple
-  secondary: { r: 6, g: 182, b: 212 },   // Cyan
-  accent: { r: 236, g: 72, b: 153 },     // Pink
-  warm: { r: 251, g: 146, b: 60 },       // Orange
+  earth: { solid: "var(--color-earth)", soft: "var(--color-earth-soft)" },
+  leaf: { solid: "var(--color-leaf)", soft: "var(--color-leaf-soft)" },
+  water: { solid: "var(--color-water)", soft: "var(--color-water-soft)" },
+  accent: { solid: "var(--color-accent)", soft: "var(--color-accent-soft)" },
 };
 
 // Pre-computed color values array for safe indexed access
@@ -55,16 +55,16 @@ function getNodeColor(index: number, total: number, isActive: boolean) {
   const color = COLOR_VALUES[colorIndex % COLOR_VALUES.length];
 
   if (isActive) {
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
+    return color.solid;
   }
-  return `rgba(${color.r}, ${color.g}, ${color.b}, 0.6)`;
+  return color.soft;
 }
 
 function getGlowColor(index: number, total: number) {
   const t = index / total;
   const colorIndex = Math.floor(t * COLOR_VALUES.length) % COLOR_VALUES.length;
   const color = COLOR_VALUES[colorIndex % COLOR_VALUES.length];
-  return `rgba(${color.r}, ${color.g}, ${color.b}, 0.8)`;
+  return color.solid;
 }
 
 // Floating particle component
@@ -87,14 +87,14 @@ function FloatingParticle({
 
   return (
     <div
-      className="absolute rounded-full animate-float-particle"
+      className="animate-float-particle absolute rounded-full"
       style={{
         width: size,
         height: size,
         left: `${startX}%`,
         top: `${startY}%`,
-        background: `rgba(${color.r}, ${color.g}, ${color.b}, 0.4)`,
-        boxShadow: `0 0 ${size * 2}px rgba(${color.r}, ${color.g}, ${color.b}, 0.3)`,
+        background: color.soft,
+        boxShadow: `0 0 ${size * 2}px ${color.soft}`,
         animationDelay: `${delay}s`,
         animationDuration: `${duration}s`,
       }}
@@ -141,7 +141,7 @@ export default function CitySphereBackground() {
   // Handle mouse movement for parallax
   useEffect(() => {
     if (shouldReduceMotion) return;
-    
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseRef.current = {
         x: (e.clientX / window.innerWidth - 0.5) * 50,
@@ -158,7 +158,7 @@ export default function CitySphereBackground() {
   useEffect(() => {
     const interval = setInterval(() => {
       const count = Math.floor(Math.random() * 4) + 3; // 3-6 active labels
-      setActiveIndices(prev => {
+      setActiveIndices((prev) => {
         // Use Set for O(1) lookups instead of O(k) includes()
         const activeSet = new Set(prev);
         const next = [...prev];
@@ -202,14 +202,14 @@ export default function CitySphereBackground() {
 
     const tick = () => {
       t += 0.0006; // Slower, more elegant rotation
-      
+
       currentX += (mouseRef.current.y - currentX) * 0.03;
       currentY += (mouseRef.current.x - currentY) * 0.03;
 
       const rotY = t * 6 + currentY;
       const rotX = 8 + Math.sin(t * 0.25) * 5 - currentX;
       const rotZ = Math.cos(t * 0.15) * 1.5;
-      
+
       el.style.transform = `translate(-50%, -50%) rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg)`;
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -225,29 +225,29 @@ export default function CitySphereBackground() {
   const activeIndicesSet = useMemo(() => new Set(activeIndices), [activeIndices]);
 
   return (
-    <div className="city-sphere-layer pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background">
-      {/* Aurora gradient background */}
-      <div 
+    <div className="city-sphere-layer bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden">
+      {/* Organic atlas wash */}
+      <div
         className="absolute inset-0 opacity-30 dark:opacity-40"
         style={{
           background: `
-            radial-gradient(ellipse 80% 50% at 20% 40%, rgba(139, 92, 246, 0.15), transparent 50%),
-            radial-gradient(ellipse 60% 40% at 80% 60%, rgba(6, 182, 212, 0.12), transparent 50%),
-            radial-gradient(ellipse 50% 30% at 50% 80%, rgba(236, 72, 153, 0.1), transparent 50%)
+            radial-gradient(ellipse 80% 50% at 20% 40%, var(--color-leaf-soft), transparent 50%),
+            radial-gradient(ellipse 60% 40% at 80% 60%, var(--color-water-soft), transparent 50%),
+            radial-gradient(ellipse 50% 30% at 50% 80%, var(--color-earth-soft), transparent 50%)
           `,
         }}
       />
-      
-      {/* Animated starfield */}
-      <div 
-        className="absolute inset-0 opacity-40 dark:opacity-50" 
-        style={{ 
-          backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 0.5px, transparent 0)', 
-          backgroundSize: '40px 40px',
-          color: 'var(--color-foreground)',
-        }} 
+
+      {/* Fine terrain grain */}
+      <div
+        className="absolute inset-0 opacity-40 dark:opacity-50"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, currentColor 0.5px, transparent 0)",
+          backgroundSize: "40px 40px",
+          color: "var(--color-foreground)",
+        }}
       />
-      
+
       {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden">
         {particles.map((p) => (
@@ -263,34 +263,34 @@ export default function CitySphereBackground() {
         ))}
       </div>
 
-      {/* Connection lines layer (subtle grid effect) */}
-      <div 
+      {/* Connection lines layer (subtle atlas grid) */}
+      <div
         className="absolute inset-0 opacity-5 dark:opacity-10"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(139, 92, 246, 0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(139, 92, 246, 0.3) 1px, transparent 1px)
+            linear-gradient(var(--pattern-terrain) 1px, transparent 1px),
+            linear-gradient(90deg, var(--pattern-terrain) 1px, transparent 1px)
           `,
-          backgroundSize: '60px 60px',
+          backgroundSize: "60px 60px",
         }}
       />
-      
+
       <div ref={containerRef} className="city-sphere">
         {points.map((p, i) => {
           const label = labels.at(i) ?? "";
           // O(1) Set.has() instead of O(k) Array.includes()
           const isActive = activeIndicesSet.has(i);
           const depth = (p.z / SPHERE_RADIUS + 1) / 2;
-          
+
           // Enhanced visibility with color-based opacity
           const baseOpacity = 0.08 + depth * 0.25;
           const activeOpacity = 0.4 + depth * 0.6;
           const dotOpacity = isActive ? activeOpacity : baseOpacity;
-          const labelOpacity = isActive ? (0.5 + depth * 0.5) : 0;
-          
+          const labelOpacity = isActive ? 0.5 + depth * 0.5 : 0;
+
           const scale = 0.6 + depth * 0.5;
           const dotSize = isActive ? 6 : 2 + depth * 2;
-          
+
           const nodeColor = getNodeColor(i, points.length, isActive);
           const glowColor = getGlowColor(i, points.length);
 
@@ -303,7 +303,7 @@ export default function CitySphereBackground() {
                 transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
                 backfaceVisibility: "hidden",
                 zIndex: Math.floor(depth * 100),
-                willChange: 'transform',
+                willChange: "transform",
               }}
             >
               {/* Node with multi-layer glow */}
@@ -311,8 +311,8 @@ export default function CitySphereBackground() {
                 {/* Outer glow ring */}
                 {isActive && (
                   <>
-                    <div 
-                      className="absolute rounded-full animate-pulse"
+                    <div
+                      className="absolute animate-pulse rounded-full"
                       style={{
                         width: dotSize * 4,
                         height: dotSize * 4,
@@ -320,8 +320,8 @@ export default function CitySphereBackground() {
                         opacity: 0.6,
                       }}
                     />
-                    <div 
-                      className="absolute rounded-full animate-ping"
+                    <div
+                      className="absolute animate-ping rounded-full"
                       style={{
                         width: dotSize * 2.5,
                         height: dotSize * 2.5,
@@ -331,33 +331,33 @@ export default function CitySphereBackground() {
                     />
                   </>
                 )}
-                
+
                 {/* Core dot */}
-                <div 
+                <div
                   className="rounded-full transition-all duration-700"
-                  style={{ 
+                  style={{
                     width: dotSize,
                     height: dotSize,
                     background: nodeColor,
                     opacity: dotOpacity,
-                    boxShadow: isActive 
+                    boxShadow: isActive
                       ? `0 0 ${dotSize * 3}px ${glowColor}, 0 0 ${dotSize * 6}px ${glowColor}`
                       : `0 0 ${dotSize}px ${glowColor}`,
                   }}
                 />
               </div>
-              
+
               {/* Label with glow effect */}
               <span
-                className="text-[11px] font-black uppercase tracking-[0.15em] transition-all duration-700 whitespace-nowrap"
+                className="text-[11px] font-black tracking-[0.15em] whitespace-nowrap uppercase transition-all duration-700"
                 style={{
                   opacity: labelOpacity,
                   transform: `translateX(${isActive ? 0 : -12}px)`,
-                  color: isActive ? nodeColor : 'var(--color-foreground)',
-                  textShadow: isActive 
-                    ? `0 0 8px ${glowColor}, 0 0 16px ${glowColor}, 0 0 24px ${glowColor}` 
-                    : 'none',
-                  filter: isActive ? 'none' : 'blur(2px)',
+                  color: isActive ? nodeColor : "var(--color-foreground)",
+                  textShadow: isActive
+                    ? `0 0 8px ${glowColor}, 0 0 16px ${glowColor}, 0 0 24px ${glowColor}`
+                    : "none",
+                  filter: isActive ? "none" : "blur(2px)",
                 }}
               >
                 {label}
@@ -368,23 +368,23 @@ export default function CitySphereBackground() {
       </div>
 
       {/* Central vignette with color tint */}
-      <div 
-        className="absolute inset-0 z-10 pointer-events-none" 
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
         style={{
           background: `
             radial-gradient(circle at center, transparent 0%, transparent 20%, var(--color-background) 45%, var(--color-vignette-outer) 100%)
           `,
         }}
       />
-      
+
       {/* Subtle color overlay vignette */}
-      <div 
+      <div
         className="city-sphere-vignette absolute inset-0 z-10"
         style={{
           background: `
-            radial-gradient(ellipse 120% 60% at 50% 35%, rgba(139, 92, 246, 0.08), transparent 50%),
-            radial-gradient(ellipse 100% 50% at 30% 70%, rgba(6, 182, 212, 0.06), transparent 50%),
-            radial-gradient(ellipse 80% 40% at 70% 60%, rgba(236, 72, 153, 0.05), transparent 50%)
+            radial-gradient(ellipse 120% 60% at 50% 35%, var(--color-leaf-soft), transparent 50%),
+            radial-gradient(ellipse 100% 50% at 30% 70%, var(--color-water-soft), transparent 50%),
+            radial-gradient(ellipse 80% 40% at 70% 60%, var(--color-earth-soft), transparent 50%)
           `,
         }}
       />

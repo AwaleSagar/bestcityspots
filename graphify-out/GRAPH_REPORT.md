@@ -1,656 +1,693 @@
 # Graph Report - .  (2026-04-25)
 
 ## Corpus Check
-- 102 files · ~83,467 words
+- 87 files · ~89,225 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 415 nodes · 459 edges · 99 communities detected
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.76)
+- 387 nodes · 422 edges · 102 communities detected
+- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.65)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_places.ts  fetchFreshPlaces()|places.ts / fetchFreshPlaces()]]
-- [[_COMMUNITY_intelligence.ts service (AI insights + trending)  weather.ts service|intelligence.ts service (AI insights + trending) / weather.ts service]]
-- [[_COMMUNITY_warm-cache.ts  main()|warm-cache.ts / main()]]
-- [[_COMMUNITY_ExperiencesSection.tsx  persistCityNotes()|ExperiencesSection.tsx / persistCityNotes()]]
-- [[_COMMUNITY_http.ts  httpFetch()|http.ts / httpFetch()]]
-- [[_COMMUNITY_analytics-report.ts  main()|analytics-report.ts / main()]]
-- [[_COMMUNITY_test-google-places.ts  testGooglePlaces()|test-google-places.ts / testGooglePlaces()]]
-- [[_COMMUNITY_ConstellationBackground.tsx  generateConnections()|ConstellationBackground.tsx / generateConnections()]]
-- [[_COMMUNITY_analytics.ts  processAnalyticsBatch()|analytics.ts / processAnalyticsBatch()]]
-- [[_COMMUNITY_AnalyticsProvider.tsx  getOrCreateSession()|AnalyticsProvider.tsx / getOrCreateSession()]]
-- [[_COMMUNITY_cities.ts  findNearestCity()|cities.ts / findNearestCity()]]
-- [[_COMMUNITY_LruCache  .delete()|LruCache / .delete()]]
-- [[_COMMUNITY_supabase.ts  getServerClient()|supabase.ts / getServerClient()]]
-- [[_COMMUNITY_CitySphereBackground.tsx  load()|CitySphereBackground.tsx / load()]]
-- [[_COMMUNITY_RankingEngine  .getScore()|RankingEngine / .getScore()]]
-- [[_COMMUNITY_storage.ts  hasStorage()|storage.ts / hasStorage()]]
-- [[_COMMUNITY_cache-config.ts  isCacheFresh()|cache-config.ts / isCacheFresh()]]
-- [[_COMMUNITY_env.ts  publicEnv()|env.ts / publicEnv()]]
-- [[_COMMUNITY_metrics.ts  fetchAndCacheMetrics()|metrics.ts / fetchAndCacheMetrics()]]
-- [[_COMMUNITY_googlePlaces.ts  searchText()|googlePlaces.ts / searchText()]]
-- [[_COMMUNITY_README.md — Project overview  AGENTS.md — Backend context & discipline|README.md — Project overview / AGENTS.md — Backend context & discipline]]
-- [[_COMMUNITY_logger.ts  emit()|logger.ts / emit()]]
-- [[_COMMUNITY_mapping.ts  aqiLabelFromOwm()|mapping.ts / aqiLabelFromOwm()]]
-- [[_COMMUNITY_intelligence.ts  getIntelligentTrendingCities()|intelligence.ts / getIntelligentTrendingCities()]]
-- [[_COMMUNITY_sphere-categories.ts  fisherYatesShuffle()|sphere-categories.ts / fisherYatesShuffle()]]
-- [[_COMMUNITY_gemini.ts  generateText()|gemini.ts / generateText()]]
-- [[_COMMUNITY_GET()  route.ts|GET() / route.ts]]
-- [[_COMMUNITY_OptimizedImage.tsx  shouldBypassNextImageOptimization()|OptimizedImage.tsx / shouldBypassNextImageOptimization()]]
-- [[_COMMUNITY_CityVitals.tsx  getTempIconColor()|CityVitals.tsx / getTempIconColor()]]
-- [[_COMMUNITY_GeoConsentBanner.tsx  handleDecline()|GeoConsentBanner.tsx / handleDecline()]]
-- [[_COMMUNITY_useNetworkQuality.ts  useNetworkQuality()|useNetworkQuality.ts / useNetworkQuality()]]
-- [[_COMMUNITY_getCityWeather()  weather.ts|getCityWeather() / weather.ts]]
-- [[_COMMUNITY_openMeteo.ts  conditionFromWeatherCode()|openMeteo.ts / conditionFromWeatherCode()]]
-- [[_COMMUNITY_parseCsvLine()  seed-cities.ts|parseCsvLine() / seed-cities.ts]]
-- [[_COMMUNITY_ExperiencesSkeleton.tsx  ExperienceCardSkeleton()|ExperiencesSkeleton.tsx / ExperienceCardSkeleton()]]
-- [[_COMMUNITY_page.tsx  CityVitalsFallback()|page.tsx / CityVitalsFallback()]]
-- [[_COMMUNITY_ScrollReveal.tsx  StaggerContainer()|ScrollReveal.tsx / StaggerContainer()]]
-- [[_COMMUNITY_CitySearch.tsx  handleLocate()|CitySearch.tsx / handleLocate()]]
-- [[_COMMUNITY_image-transforms.ts  getQualityValue()|image-transforms.ts / getQualityValue()]]
-- [[_COMMUNITY_Supabase RPC search_cities_elastic  Elastic City Search (FTS + trigram + alias|Supabase RPC: search_cities_elastic / Elastic City Search (FTS + trigram + alias]]
-- [[_COMMUNITY_test-supabase.ts  testSearch()|test-supabase.ts / testSearch()]]
-- [[_COMMUNITY_robots.ts  robots()|robots.ts / robots()]]
-- [[_COMMUNITY_actions.ts  fetchTrendingDestinations()|actions.ts / fetchTrendingDestinations()]]
-- [[_COMMUNITY_sitemap.ts  sitemap()|sitemap.ts / sitemap()]]
-- [[_COMMUNITY_RootLayout()  layout.tsx|RootLayout() / layout.tsx]]
-- [[_COMMUNITY_page.tsx  Home()|page.tsx / Home()]]
-- [[_COMMUNITY_TopCitiesPage()  page.tsx|TopCitiesPage() / page.tsx]]
-- [[_COMMUNITY_AboutPage()  page.tsx|AboutPage() / page.tsx]]
-- [[_COMMUNITY_AIBriefingClient.tsx  getSeasonColor()|AIBriefingClient.tsx / getSeasonColor()]]
-- [[_COMMUNITY_AIBriefingSection()  AIBriefingSection.tsx|AIBriefingSection() / AIBriefingSection.tsx]]
-- [[_COMMUNITY_route.ts  POST()|route.ts / POST()]]
-- [[_COMMUNITY_Hotspot.tsx  Hotspot()|Hotspot.tsx / Hotspot()]]
-- [[_COMMUNITY_FreeResourceCTA.tsx  FreeResourceCTA()|FreeResourceCTA.tsx / FreeResourceCTA()]]
-- [[_COMMUNITY_SiteFooter()  SiteFooter.tsx|SiteFooter() / SiteFooter.tsx]]
-- [[_COMMUNITY_MobileBottomNav.tsx  MobileBottomNav()|MobileBottomNav.tsx / MobileBottomNav()]]
-- [[_COMMUNITY_ThemeProvider()  ThemeProvider.tsx|ThemeProvider() / ThemeProvider.tsx]]
-- [[_COMMUNITY_SiteNav()  SiteNav.tsx|SiteNav() / SiteNav.tsx]]
-- [[_COMMUNITY_ClientEffects()  ClientEffects.tsx|ClientEffects() / ClientEffects.tsx]]
-- [[_COMMUNITY_FloralAccent()  FloralAccent.tsx|FloralAccent() / FloralAccent.tsx]]
-- [[_COMMUNITY_TopCitiesPageContent.tsx  CityCard()|TopCitiesPageContent.tsx / CityCard()]]
-- [[_COMMUNITY_PageTracker.tsx  PageTracker()|PageTracker.tsx / PageTracker()]]
-- [[_COMMUNITY_useRecentSearches()  useRecentSearches.ts|useRecentSearches() / useRecentSearches.ts]]
-- [[_COMMUNITY_useDeviceType()  useDeviceType.ts|useDeviceType() / useDeviceType.ts]]
-- [[_COMMUNITY_format.ts  formatPopulation()|format.ts / formatPopulation()]]
-- [[_COMMUNITY_getHealth()  health.ts|getHealth() / health.ts]]
-- [[_COMMUNITY_useAnalytics.ts  useAnalytics()|useAnalytics.ts / useAnalytics()]]
-- [[_COMMUNITY_haversineKm()  geo.ts|haversineKm() / geo.ts]]
-- [[_COMMUNITY_fetchCurrentWeather()  openweather.ts|fetchCurrentWeather() / openweather.ts]]
-- [[_COMMUNITY_Supabase Table city_metrics  metrics.ts service|Supabase Table: city_metrics / metrics.ts service]]
-- [[_COMMUNITY_GET apihealth route  health.ts service|GET /api/health route / health.ts service]]
-- [[_COMMUNITY_CLAUDE.md — Graphify pointer  GRAPH_REPORT.md (prior graphify output)|CLAUDE.md — Graphify pointer / GRAPH_REPORT.md (prior graphify output)]]
-- [[_COMMUNITY_next-env.d.ts|next-env.d.ts]]
-- [[_COMMUNITY_next.config.ts|next.config.ts]]
-- [[_COMMUNITY_trending-destinations.ts|trending-destinations.ts]]
-- [[_COMMUNITY_test-ranking.ts|test-ranking.ts]]
-- [[_COMMUNITY_diagnose-images.ts|diagnose-images.ts]]
-- [[_COMMUNITY_clear-places-cache.ts|clear-places-cache.ts]]
-- [[_COMMUNITY_opengraph-image.tsx|opengraph-image.tsx]]
-- [[_COMMUNITY_AIBriefingSkeleton.tsx|AIBriefingSkeleton.tsx]]
-- [[_COMMUNITY_ScrollProgress.tsx|ScrollProgress.tsx]]
-- [[_COMMUNITY_InteractiveButton.tsx|InteractiveButton.tsx]]
-- [[_COMMUNITY_Breadcrumbs.tsx|Breadcrumbs.tsx]]
-- [[_COMMUNITY_TrustIndicators.tsx|TrustIndicators.tsx]]
-- [[_COMMUNITY_HeroHeader.tsx|HeroHeader.tsx]]
-- [[_COMMUNITY_HomeSearchShowcase.tsx|HomeSearchShowcase.tsx]]
-- [[_COMMUNITY_TestimonialsSection.tsx|TestimonialsSection.tsx]]
-- [[_COMMUNITY_ThemeToggle.tsx|ThemeToggle.tsx]]
-- [[_COMMUNITY_VisualEffects.tsx|VisualEffects.tsx]]
-- [[_COMMUNITY_AboutPageContent.tsx|AboutPageContent.tsx]]
-- [[_COMMUNITY_index.ts|index.ts]]
-- [[_COMMUNITY_validation.ts|validation.ts]]
-- [[_COMMUNITY_Liquid Glass UI System|Liquid Glass UI System]]
-- [[_COMMUNITY_cache.ts (cache utilities)|cache.ts (cache utilities)]]
-- [[_COMMUNITY_Top AI candidate cities dataset|Top AI candidate cities dataset]]
-- [[_COMMUNITY_Globe UI icon|Globe UI icon]]
-- [[_COMMUNITY_Window UI icon|Window UI icon]]
-- [[_COMMUNITY_File UI icon|File UI icon]]
-- [[_COMMUNITY_Next.js wordmark icon|Next.js wordmark icon]]
-- [[_COMMUNITY_Vercel wordmark icon|Vercel wordmark icon]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 28|Community 28]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 35|Community 35]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 40|Community 40]]
+- [[_COMMUNITY_Community 41|Community 41]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 47|Community 47]]
+- [[_COMMUNITY_Community 48|Community 48]]
+- [[_COMMUNITY_Community 49|Community 49]]
+- [[_COMMUNITY_Community 50|Community 50]]
+- [[_COMMUNITY_Community 51|Community 51]]
+- [[_COMMUNITY_Community 52|Community 52]]
+- [[_COMMUNITY_Community 53|Community 53]]
+- [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
+- [[_COMMUNITY_Community 56|Community 56]]
+- [[_COMMUNITY_Community 57|Community 57]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 65|Community 65]]
+- [[_COMMUNITY_Community 66|Community 66]]
+- [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
+- [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
+- [[_COMMUNITY_Community 83|Community 83]]
+- [[_COMMUNITY_Community 84|Community 84]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 87|Community 87]]
+- [[_COMMUNITY_Community 88|Community 88]]
+- [[_COMMUNITY_Community 89|Community 89]]
+- [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 98|Community 98]]
+- [[_COMMUNITY_Community 99|Community 99]]
+- [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `places.ts` - 29 edges
-2. `warm-cache.ts` - 20 edges
-3. `ExperiencesSection.tsx` - 19 edges
-4. `analytics-report.ts` - 12 edges
-5. `main()` - 12 edges
-6. `http.ts` - 12 edges
-7. `intelligence.ts service (AI insights + trending)` - 12 edges
-8. `fetchFreshPlaces()` - 11 edges
-9. `test-google-places.ts` - 10 edges
-10. `ConstellationBackground.tsx` - 10 edges
+1. `main()` - 12 edges
+2. `fetchFreshPlaces()` - 11 edges
+3. `processAnalyticsBatch()` - 10 edges
+4. `httpFetch()` - 8 edges
+5. `main()` - 7 edges
+6. `LruCache` - 7 edges
+7. `getTopPlaces()` - 7 edges
+8. `RankingEngine` - 6 edges
+9. `testGooglePlaces()` - 5 edges
+10. `resolveCities()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
-- None detected - all connections are within the same source files.
+- `README.md — Project overview` --conceptually_related_to--> `Hero image (product landing)`  [INFERRED]
+  README.md → public/hero.png
+- `README.md — Project overview` --conceptually_related_to--> `Best City Spots logo`  [INFERRED]
+  README.md → public/logo.svg
+- `AGENTS.md — Backend context & discipline` --conceptually_related_to--> `supabase/migrations/README.md`  [INFERRED]
+  AGENTS.md → supabase/migrations/README.md
+- `README.md — Project overview` --references--> `AGENTS.md — Backend context & discipline`  [EXTRACTED]
+  README.md → AGENTS.md
+- `CLAUDE.md — Graphify pointer` --references--> `GRAPH_REPORT.md (prior graphify output)`  [EXTRACTED]
+  CLAUDE.md → graphify-out/GRAPH_REPORT.md
+
+## Hyperedges (group relationships)
+- **AI insight pipeline (Gemini → Zod → Cache)** — service_intelligence, provider_gemini, table_city_ai_insights, concept_zod_validation, concept_prompt_versioning [EXTRACTED 1.00]
+- **Places enrichment flow (Google Places → cache → image backfill)** — service_places, provider_googlePlaces, table_city_places_cache, table_place_images [EXTRACTED 1.00]
+- **Weather/AQI fusion flow (OpenWeather + Open-Meteo)** — service_weather, provider_openweather, provider_openMeteo, table_city_weather_cache [EXTRACTED 1.00]
 
 ## Communities
 
-### Community 0 - "places.ts / fetchFreshPlaces()"
+### Community 0 - "Community 0"
 Cohesion: 0.13
 Nodes (27): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+19 more)
 
-### Community 1 - "intelligence.ts service (AI insights + trending) / weather.ts service"
-Cohesion: 0.08
-Nodes (30): Cache-First + Stale-While-Revalidate Pattern, Fire-and-Forget Background Cache Upsert, Graceful Degradation on Provider Failure, Privacy-Conscious Aggregate Analytics, AI Prompt Versioning for Cache Invalidation, Supabase RLS Security Boundary, Thin Route Handlers / Fat Service Layer, Zod Validation at Boundaries (+22 more)
-
-### Community 2 - "warm-cache.ts / main()"
+### Community 1 - "Community 1"
 Cohesion: 0.18
 Nodes (20): checkInsightsCacheStatus(), checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus(), createSupabaseClient(), getAqiLabel(), getTopCitiesByPopulation(), getTopCitiesByTraffic() (+12 more)
 
-### Community 3 - "ExperiencesSection.tsx / persistCityNotes()"
+### Community 2 - "Community 2"
 Cohesion: 0.15
 Nodes (10): clearNote(), getInsiderTips(), getNeighborhood(), parseStoredNotes(), persistCityNotes(), sanitizeKey(), sanitizeNotes(), saveNote() (+2 more)
 
-### Community 4 - "http.ts / httpFetch()"
+### Community 3 - "Community 3"
 Cohesion: 0.23
 Nodes (11): backoffMs(), CircuitOpenError, getBreaker(), HttpError, httpFetch(), httpJson(), isCircuitOpen(), isIdempotent() (+3 more)
 
-### Community 5 - "analytics-report.ts / main()"
+### Community 4 - "Community 4"
 Cohesion: 0.32
 Nodes (12): c(), formatNumber(), getCityViews(), getDailyTrend(), getDeviceStats(), getGeoStats(), getOverview(), getTrafficSources() (+4 more)
 
-### Community 6 - "test-google-places.ts / testGooglePlaces()"
+### Community 5 - "Community 5"
 Cohesion: 0.31
 Nodes (10): extractErrorMessage(), extractPlaces(), formatSample(), isPlaceResult(), isValidDisplayName(), jsonType(), mapJsonLayout(), parseArgs() (+2 more)
 
-### Community 7 - "ConstellationBackground.tsx / generateConnections()"
+### Community 6 - "Community 6"
 Cohesion: 0.22
 Nodes (3): buildSpatialGrid(), generateConnections(), getNeighborStars()
 
-### Community 8 - "analytics.ts / processAnalyticsBatch()"
+### Community 7 - "Community 7"
 Cohesion: 0.35
 Nodes (10): getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats(), recordDeviceStats(), recordGeoStats() (+2 more)
 
-### Community 9 - "AnalyticsProvider.tsx / getOrCreateSession()"
+### Community 8 - "Community 8"
 Cohesion: 0.29
 Nodes (2): generateSessionId(), getOrCreateSession()
 
-### Community 10 - "cities.ts / findNearestCity()"
+### Community 9 - "Community 9"
 Cohesion: 0.39
 Nodes (6): findNearest(), findNearestCity(), getTopCities(), normalizeQuery(), queryCitiesInBox(), searchCities()
 
-### Community 11 - "LruCache / .delete()"
+### Community 10 - "Community 10"
 Cohesion: 0.36
 Nodes (1): LruCache
 
-### Community 12 - "supabase.ts / getServerClient()"
+### Community 11 - "Community 11"
 Cohesion: 0.36
 Nodes (5): buildAnonClient(), buildServerClient(), getAnonClient(), getServerClient(), hasServerClient()
 
-### Community 13 - "CitySphereBackground.tsx / load()"
+### Community 12 - "Community 12"
 Cohesion: 0.29
 Nodes (0): 
 
-### Community 14 - "RankingEngine / .getScore()"
+### Community 13 - "Community 13"
 Cohesion: 0.38
 Nodes (1): RankingEngine
 
-### Community 15 - "storage.ts / hasStorage()"
+### Community 14 - "Community 14"
 Cohesion: 0.52
 Nodes (6): getJsonStorageItem(), getStorageItem(), hasStorage(), removeStorageItem(), setJsonStorageItem(), setStorageItem()
 
-### Community 16 - "cache-config.ts / isCacheFresh()"
+### Community 15 - "Community 15"
 Cohesion: 0.29
 Nodes (0): 
 
-### Community 17 - "env.ts / publicEnv()"
+### Community 16 - "Community 16"
 Cohesion: 0.52
 Nodes (5): publicEnv(), requirePublicEnv(), requireServerEnv(), serverEnv(), warnOnce()
 
-### Community 18 - "metrics.ts / fetchAndCacheMetrics()"
+### Community 17 - "Community 17"
 Cohesion: 0.52
 Nodes (6): comfortFromTemp(), fetchAndCacheMetrics(), getCityMetrics(), getOpenMeteoAirQuality(), getOpenMeteoWeather(), toMetrics()
 
-### Community 19 - "googlePlaces.ts / searchText()"
+### Community 18 - "Community 18"
 Cohesion: 0.62
 Nodes (6): capRadius(), fetchPhotoBytes(), getApiKey(), runPlacesRequest(), searchNearby(), searchText()
 
-### Community 20 - "README.md — Project overview / AGENTS.md — Backend context & discipline"
+### Community 19 - "Community 19"
 Cohesion: 0.29
 Nodes (5): AGENTS.md — Backend context & discipline, README.md — Project overview, supabase/migrations/README.md, Hero image (product landing), Best City Spots logo
 
-### Community 21 - "logger.ts / emit()"
+### Community 20 - "Community 20"
 Cohesion: 0.47
 Nodes (3): currentLevel(), emit(), isStructured()
 
-### Community 22 - "mapping.ts / aqiLabelFromOwm()"
+### Community 21 - "Community 21"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 23 - "intelligence.ts / getIntelligentTrendingCities()"
+### Community 22 - "Community 22"
 Cohesion: 0.6
 Nodes (4): getCityInsight(), getIntelligentTrendingCities(), isFresh(), matchCitiesInDb()
 
-### Community 24 - "sphere-categories.ts / fisherYatesShuffle()"
+### Community 23 - "Community 23"
 Cohesion: 0.5
 Nodes (2): fisherYatesShuffle(), getMixedCitiesFromCategories()
 
-### Community 25 - "gemini.ts / generateText()"
+### Community 24 - "Community 24"
 Cohesion: 0.5
 Nodes (2): generateText(), getClient()
 
-### Community 26 - "GET() / route.ts"
+### Community 25 - "Community 25"
 Cohesion: 0.5
 Nodes (1): GET()
 
-### Community 27 - "OptimizedImage.tsx / shouldBypassNextImageOptimization()"
+### Community 26 - "Community 26"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 28 - "CityVitals.tsx / getTempIconColor()"
+### Community 27 - "Community 27"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 29 - "GeoConsentBanner.tsx / handleDecline()"
+### Community 28 - "Community 28"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 30 - "useNetworkQuality.ts / useNetworkQuality()"
+### Community 29 - "Community 29"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 31 - "getCityWeather() / weather.ts"
+### Community 30 - "Community 30"
 Cohesion: 0.83
 Nodes (3): fetchFreshWeather(), getCityWeather(), parseCachedWeather()
 
-### Community 32 - "openMeteo.ts / conditionFromWeatherCode()"
+### Community 31 - "Community 31"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 33 - "parseCsvLine() / seed-cities.ts"
+### Community 32 - "Community 32"
 Cohesion: 1.0
 Nodes (2): main(), parseCsvLine()
 
-### Community 34 - "ExperiencesSkeleton.tsx / ExperienceCardSkeleton()"
+### Community 33 - "Community 33"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 35 - "page.tsx / CityVitalsFallback()"
+### Community 34 - "Community 34"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 36 - "ScrollReveal.tsx / StaggerContainer()"
+### Community 35 - "Community 35"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 37 - "CitySearch.tsx / handleLocate()"
+### Community 36 - "Community 36"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 38 - "image-transforms.ts / getQualityValue()"
+### Community 37 - "Community 37"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 39 - "Supabase RPC: search_cities_elastic / Elastic City Search (FTS + trigram + alias"
-Cohesion: 0.67
-Nodes (3): Elastic City Search (FTS + trigram + alias), Rationale: Heavy logic pushed into Supabase RPC for atomicity, Supabase RPC: search_cities_elastic
-
-### Community 40 - "test-supabase.ts / testSearch()"
+### Community 38 - "Community 38"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 41 - "robots.ts / robots()"
+### Community 39 - "Community 39"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 42 - "actions.ts / fetchTrendingDestinations()"
+### Community 40 - "Community 40"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 43 - "sitemap.ts / sitemap()"
+### Community 41 - "Community 41"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 44 - "RootLayout() / layout.tsx"
+### Community 42 - "Community 42"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 45 - "page.tsx / Home()"
+### Community 43 - "Community 43"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 46 - "TopCitiesPage() / page.tsx"
+### Community 44 - "Community 44"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 47 - "AboutPage() / page.tsx"
+### Community 45 - "Community 45"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 48 - "AIBriefingClient.tsx / getSeasonColor()"
+### Community 46 - "Community 46"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 49 - "AIBriefingSection() / AIBriefingSection.tsx"
+### Community 47 - "Community 47"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 50 - "route.ts / POST()"
+### Community 48 - "Community 48"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 51 - "Hotspot.tsx / Hotspot()"
+### Community 49 - "Community 49"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 52 - "FreeResourceCTA.tsx / FreeResourceCTA()"
+### Community 50 - "Community 50"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 53 - "SiteFooter() / SiteFooter.tsx"
+### Community 51 - "Community 51"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 54 - "MobileBottomNav.tsx / MobileBottomNav()"
+### Community 52 - "Community 52"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 55 - "ThemeProvider() / ThemeProvider.tsx"
+### Community 53 - "Community 53"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 56 - "SiteNav() / SiteNav.tsx"
+### Community 54 - "Community 54"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 57 - "ClientEffects() / ClientEffects.tsx"
+### Community 55 - "Community 55"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 58 - "FloralAccent() / FloralAccent.tsx"
+### Community 56 - "Community 56"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 59 - "TopCitiesPageContent.tsx / CityCard()"
+### Community 57 - "Community 57"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 60 - "PageTracker.tsx / PageTracker()"
+### Community 58 - "Community 58"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 61 - "useRecentSearches() / useRecentSearches.ts"
+### Community 59 - "Community 59"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 62 - "useDeviceType() / useDeviceType.ts"
+### Community 60 - "Community 60"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 63 - "format.ts / formatPopulation()"
+### Community 61 - "Community 61"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 64 - "getHealth() / health.ts"
+### Community 62 - "Community 62"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 65 - "useAnalytics.ts / useAnalytics()"
+### Community 63 - "Community 63"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 66 - "haversineKm() / geo.ts"
+### Community 64 - "Community 64"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 67 - "fetchCurrentWeather() / openweather.ts"
+### Community 65 - "Community 65"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 68 - "Supabase Table: city_metrics / metrics.ts service"
+### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (2): metrics.ts service, Supabase Table: city_metrics
+Nodes (2): Cache-First + Stale-While-Revalidate Pattern, Rationale: No dedicated Redis — Postgres cache tables suffice
 
-### Community 69 - "GET /api/health route / health.ts service"
+### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (2): GET /api/health route, health.ts service
+Nodes (2): Supabase RLS Security Boundary, Rationale: No end-user auth — public-read product
 
-### Community 70 - "CLAUDE.md — Graphify pointer / GRAPH_REPORT.md (prior graphify output)"
+### Community 68 - "Community 68"
 Cohesion: 1.0
 Nodes (2): CLAUDE.md — Graphify pointer, GRAPH_REPORT.md (prior graphify output)
 
-### Community 71 - "next-env.d.ts"
+### Community 69 - "Community 69"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 72 - "next.config.ts"
+### Community 70 - "Community 70"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 73 - "trending-destinations.ts"
+### Community 71 - "Community 71"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 74 - "test-ranking.ts"
+### Community 72 - "Community 72"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 75 - "diagnose-images.ts"
+### Community 73 - "Community 73"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 76 - "clear-places-cache.ts"
+### Community 74 - "Community 74"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 77 - "opengraph-image.tsx"
+### Community 75 - "Community 75"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 78 - "AIBriefingSkeleton.tsx"
+### Community 76 - "Community 76"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 79 - "ScrollProgress.tsx"
+### Community 77 - "Community 77"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 80 - "InteractiveButton.tsx"
+### Community 78 - "Community 78"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 81 - "Breadcrumbs.tsx"
+### Community 79 - "Community 79"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 82 - "TrustIndicators.tsx"
+### Community 80 - "Community 80"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 83 - "HeroHeader.tsx"
+### Community 81 - "Community 81"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 84 - "HomeSearchShowcase.tsx"
+### Community 82 - "Community 82"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 85 - "TestimonialsSection.tsx"
+### Community 83 - "Community 83"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 86 - "ThemeToggle.tsx"
+### Community 84 - "Community 84"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 87 - "VisualEffects.tsx"
+### Community 85 - "Community 85"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 88 - "AboutPageContent.tsx"
+### Community 86 - "Community 86"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 89 - "index.ts"
+### Community 87 - "Community 87"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 90 - "validation.ts"
+### Community 88 - "Community 88"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 91 - "Liquid Glass UI System"
+### Community 89 - "Community 89"
+Cohesion: 1.0
+Nodes (1): Zod Validation at Boundaries
+
+### Community 90 - "Community 90"
 Cohesion: 1.0
 Nodes (1): Liquid Glass UI System
 
-### Community 92 - "cache.ts (cache utilities)"
+### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (1): cache.ts (cache utilities)
+Nodes (1): Thin Route Handlers / Fat Service Layer
 
-### Community 93 - "Top AI candidate cities dataset"
+### Community 92 - "Community 92"
+Cohesion: 1.0
+Nodes (1): Privacy-Conscious Aggregate Analytics
+
+### Community 93 - "Community 93"
+Cohesion: 1.0
+Nodes (1): Elastic City Search (FTS + trigram + alias)
+
+### Community 94 - "Community 94"
+Cohesion: 1.0
+Nodes (1): Graceful Degradation on Provider Failure
+
+### Community 95 - "Community 95"
+Cohesion: 1.0
+Nodes (1): Rationale: Heavy logic pushed into Supabase RPC for atomicity
+
+### Community 96 - "Community 96"
 Cohesion: 1.0
 Nodes (1): Top AI candidate cities dataset
 
-### Community 94 - "Globe UI icon"
+### Community 97 - "Community 97"
 Cohesion: 1.0
 Nodes (1): Globe UI icon
 
-### Community 95 - "Window UI icon"
+### Community 98 - "Community 98"
 Cohesion: 1.0
 Nodes (1): Window UI icon
 
-### Community 96 - "File UI icon"
+### Community 99 - "Community 99"
 Cohesion: 1.0
 Nodes (1): File UI icon
 
-### Community 97 - "Next.js wordmark icon"
+### Community 100 - "Community 100"
 Cohesion: 1.0
 Nodes (1): Next.js wordmark icon
 
-### Community 98 - "Vercel wordmark icon"
+### Community 101 - "Community 101"
 Cohesion: 1.0
 Nodes (1): Vercel wordmark icon
 
 ## Knowledge Gaps
-- **34 isolated node(s):** `Zod Validation at Boundaries`, `Liquid Glass UI System`, `Privacy-Conscious Aggregate Analytics`, `Elastic City Search (FTS + trigram + alias)`, `Graceful Degradation on Provider Failure` (+29 more)
+- **22 isolated node(s):** `Cache-First + Stale-While-Revalidate Pattern`, `Supabase RLS Security Boundary`, `Zod Validation at Boundaries`, `Liquid Glass UI System`, `Thin Route Handlers / Fat Service Layer` (+17 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `test-supabase.ts / testSearch()`** (2 nodes): `testSearch()`, `test-supabase.ts`
+- **Thin community `Community 38`** (2 nodes): `testSearch()`, `test-supabase.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `robots.ts / robots()`** (2 nodes): `robots()`, `robots.ts`
+- **Thin community `Community 39`** (2 nodes): `robots()`, `robots.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `actions.ts / fetchTrendingDestinations()`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
+- **Thin community `Community 40`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `sitemap.ts / sitemap()`** (2 nodes): `sitemap()`, `sitemap.ts`
+- **Thin community `Community 41`** (2 nodes): `sitemap()`, `sitemap.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `RootLayout() / layout.tsx`** (2 nodes): `RootLayout()`, `layout.tsx`
+- **Thin community `Community 42`** (2 nodes): `RootLayout()`, `layout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `page.tsx / Home()`** (2 nodes): `Home()`, `page.tsx`
+- **Thin community `Community 43`** (2 nodes): `Home()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `TopCitiesPage() / page.tsx`** (2 nodes): `TopCitiesPage()`, `page.tsx`
+- **Thin community `Community 44`** (2 nodes): `TopCitiesPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AboutPage() / page.tsx`** (2 nodes): `AboutPage()`, `page.tsx`
+- **Thin community `Community 45`** (2 nodes): `AboutPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AIBriefingClient.tsx / getSeasonColor()`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
+- **Thin community `Community 46`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AIBriefingSection() / AIBriefingSection.tsx`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
+- **Thin community `Community 47`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `route.ts / POST()`** (2 nodes): `POST()`, `route.ts`
+- **Thin community `Community 48`** (2 nodes): `POST()`, `route.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hotspot.tsx / Hotspot()`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
+- **Thin community `Community 49`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `FreeResourceCTA.tsx / FreeResourceCTA()`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
+- **Thin community `Community 50`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `SiteFooter() / SiteFooter.tsx`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
+- **Thin community `Community 51`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `MobileBottomNav.tsx / MobileBottomNav()`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
+- **Thin community `Community 52`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `ThemeProvider() / ThemeProvider.tsx`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
+- **Thin community `Community 53`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `SiteNav() / SiteNav.tsx`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
+- **Thin community `Community 54`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `ClientEffects() / ClientEffects.tsx`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
+- **Thin community `Community 55`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `FloralAccent() / FloralAccent.tsx`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
+- **Thin community `Community 56`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `TopCitiesPageContent.tsx / CityCard()`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
+- **Thin community `Community 57`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `PageTracker.tsx / PageTracker()`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
+- **Thin community `Community 58`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `useRecentSearches() / useRecentSearches.ts`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
+- **Thin community `Community 59`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `useDeviceType() / useDeviceType.ts`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
+- **Thin community `Community 60`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `format.ts / formatPopulation()`** (2 nodes): `formatPopulation()`, `format.ts`
+- **Thin community `Community 61`** (2 nodes): `formatPopulation()`, `format.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `getHealth() / health.ts`** (2 nodes): `getHealth()`, `health.ts`
+- **Thin community `Community 62`** (2 nodes): `getHealth()`, `health.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `useAnalytics.ts / useAnalytics()`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
+- **Thin community `Community 63`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `haversineKm() / geo.ts`** (2 nodes): `haversineKm()`, `geo.ts`
+- **Thin community `Community 64`** (2 nodes): `haversineKm()`, `geo.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `fetchCurrentWeather() / openweather.ts`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
+- **Thin community `Community 65`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Supabase Table: city_metrics / metrics.ts service`** (2 nodes): `metrics.ts service`, `Supabase Table: city_metrics`
+- **Thin community `Community 66`** (2 nodes): `Cache-First + Stale-While-Revalidate Pattern`, `Rationale: No dedicated Redis — Postgres cache tables suffice`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `GET /api/health route / health.ts service`** (2 nodes): `GET /api/health route`, `health.ts service`
+- **Thin community `Community 67`** (2 nodes): `Supabase RLS Security Boundary`, `Rationale: No end-user auth — public-read product`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `CLAUDE.md — Graphify pointer / GRAPH_REPORT.md (prior graphify output)`** (2 nodes): `CLAUDE.md — Graphify pointer`, `GRAPH_REPORT.md (prior graphify output)`
+- **Thin community `Community 68`** (2 nodes): `CLAUDE.md — Graphify pointer`, `GRAPH_REPORT.md (prior graphify output)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `next-env.d.ts`** (1 nodes): `next-env.d.ts`
+- **Thin community `Community 69`** (1 nodes): `next-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `next.config.ts`** (1 nodes): `next.config.ts`
+- **Thin community `Community 70`** (1 nodes): `next.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `trending-destinations.ts`** (1 nodes): `trending-destinations.ts`
+- **Thin community `Community 71`** (1 nodes): `trending-destinations.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `test-ranking.ts`** (1 nodes): `test-ranking.ts`
+- **Thin community `Community 72`** (1 nodes): `test-ranking.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `diagnose-images.ts`** (1 nodes): `diagnose-images.ts`
+- **Thin community `Community 73`** (1 nodes): `diagnose-images.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `clear-places-cache.ts`** (1 nodes): `clear-places-cache.ts`
+- **Thin community `Community 74`** (1 nodes): `clear-places-cache.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `opengraph-image.tsx`** (1 nodes): `opengraph-image.tsx`
+- **Thin community `Community 75`** (1 nodes): `opengraph-image.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AIBriefingSkeleton.tsx`** (1 nodes): `AIBriefingSkeleton.tsx`
+- **Thin community `Community 76`** (1 nodes): `AIBriefingSkeleton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `ScrollProgress.tsx`** (1 nodes): `ScrollProgress.tsx`
+- **Thin community `Community 77`** (1 nodes): `ScrollProgress.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `InteractiveButton.tsx`** (1 nodes): `InteractiveButton.tsx`
+- **Thin community `Community 78`** (1 nodes): `InteractiveButton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Breadcrumbs.tsx`** (1 nodes): `Breadcrumbs.tsx`
+- **Thin community `Community 79`** (1 nodes): `Breadcrumbs.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `TrustIndicators.tsx`** (1 nodes): `TrustIndicators.tsx`
+- **Thin community `Community 80`** (1 nodes): `TrustIndicators.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `HeroHeader.tsx`** (1 nodes): `HeroHeader.tsx`
+- **Thin community `Community 81`** (1 nodes): `HeroHeader.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `HomeSearchShowcase.tsx`** (1 nodes): `HomeSearchShowcase.tsx`
+- **Thin community `Community 82`** (1 nodes): `HomeSearchShowcase.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `TestimonialsSection.tsx`** (1 nodes): `TestimonialsSection.tsx`
+- **Thin community `Community 83`** (1 nodes): `TestimonialsSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `ThemeToggle.tsx`** (1 nodes): `ThemeToggle.tsx`
+- **Thin community `Community 84`** (1 nodes): `ThemeToggle.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `VisualEffects.tsx`** (1 nodes): `VisualEffects.tsx`
+- **Thin community `Community 85`** (1 nodes): `VisualEffects.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `AboutPageContent.tsx`** (1 nodes): `AboutPageContent.tsx`
+- **Thin community `Community 86`** (1 nodes): `AboutPageContent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `index.ts`** (1 nodes): `index.ts`
+- **Thin community `Community 87`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `validation.ts`** (1 nodes): `validation.ts`
+- **Thin community `Community 88`** (1 nodes): `validation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Liquid Glass UI System`** (1 nodes): `Liquid Glass UI System`
+- **Thin community `Community 89`** (1 nodes): `Zod Validation at Boundaries`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `cache.ts (cache utilities)`** (1 nodes): `cache.ts (cache utilities)`
+- **Thin community `Community 90`** (1 nodes): `Liquid Glass UI System`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Top AI candidate cities dataset`** (1 nodes): `Top AI candidate cities dataset`
+- **Thin community `Community 91`** (1 nodes): `Thin Route Handlers / Fat Service Layer`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Globe UI icon`** (1 nodes): `Globe UI icon`
+- **Thin community `Community 92`** (1 nodes): `Privacy-Conscious Aggregate Analytics`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Window UI icon`** (1 nodes): `Window UI icon`
+- **Thin community `Community 93`** (1 nodes): `Elastic City Search (FTS + trigram + alias)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `File UI icon`** (1 nodes): `File UI icon`
+- **Thin community `Community 94`** (1 nodes): `Graceful Degradation on Provider Failure`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Next.js wordmark icon`** (1 nodes): `Next.js wordmark icon`
+- **Thin community `Community 95`** (1 nodes): `Rationale: Heavy logic pushed into Supabase RPC for atomicity`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Vercel wordmark icon`** (1 nodes): `Vercel wordmark icon`
+- **Thin community `Community 96`** (1 nodes): `Top AI candidate cities dataset`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 97`** (1 nodes): `Globe UI icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 98`** (1 nodes): `Window UI icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 99`** (1 nodes): `File UI icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 100`** (1 nodes): `Next.js wordmark icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 101`** (1 nodes): `Vercel wordmark icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **What depends on 'places.ts'?**
-  _Bridges distant communities or touches a god node._
-- **What depends on 'warm-cache.ts'?**
-  _Bridges distant communities or touches a god node._
-- **What depends on 'ExperiencesSection.tsx'?**
-  _Bridges distant communities or touches a god node._
+- **What connects `Cache-First + Stale-While-Revalidate Pattern`, `Supabase RLS Security Boundary`, `Zod Validation at Boundaries` to the rest of the system?**
+  _22 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.13 - nodes in this community are weakly interconnected._

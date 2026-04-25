@@ -3,6 +3,7 @@
 import type { City } from "@/lib/cities";
 import CitySearch from "@/components/features/city/CitySearch";
 import { motion, useReducedMotion } from "framer-motion";
+import { CloudSun, Compass, MapPinned, Moon, Utensils } from "lucide-react";
 import Link from "next/link";
 
 interface HomeSearchShowcaseProps {
@@ -11,51 +12,117 @@ interface HomeSearchShowcaseProps {
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+const intentModes = [
+  {
+    icon: Compass,
+    label: "Find a city",
+    detail: "Start with a name, region, or travel mood.",
+  },
+  {
+    icon: CloudSun,
+    label: "Compare climates",
+    detail: "Use weather and comfort signals before you commit.",
+  },
+  {
+    icon: Moon,
+    label: "Plan the timing",
+    detail: "Read seasonal notes and live conditions together.",
+  },
+  {
+    icon: Utensils,
+    label: "Follow local texture",
+    detail: "Move from landmarks into dining, stays, and saved notes.",
+  },
+];
+
+const trendingSignals = [
+  "Strong first shortlist",
+  "Culture-rich baseline",
+  "Easy planning entry",
+  "Live guide ready",
+  "Urban scale signal",
+  "Good comparison anchor",
+];
+
 export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProps) {
   const shouldReduceMotion = useReducedMotion();
   const cityPreview = topCities.slice(0, 6);
 
   return (
     <motion.section
+      id="discovery"
       initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
       whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, ease }}
-      className="mt-8 grid gap-8 pb-16 sm:mt-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-start lg:gap-12 lg:pb-24"
+      className="grid gap-10 pb-16 sm:pb-20 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-start lg:gap-12 lg:pb-24"
+      aria-labelledby="discovery-heading"
     >
       <div className="lg:sticky lg:top-24">
-        <h2 className="text-foreground text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]">
-          Find a city by name, region, or vibe
+        <p className="section-heading">Intent-first discovery</p>
+        <h2
+          id="discovery-heading"
+          className="text-foreground mt-4 max-w-xl text-[clamp(1.9rem,3.6vw,3.35rem)] leading-[1.02]"
+        >
+          Tell the atlas what kind of trip you are trying to shape.
         </h2>
-        <p className="text-muted mt-2 max-w-lg text-sm leading-relaxed md:text-base">
-          Search by city name, jump from your current location, or start with trending destinations.
+        <p className="text-muted mt-4 max-w-lg text-sm leading-relaxed md:text-base">
+          Search stays simple up front. The richer signals appear as you move from choosing a
+          destination to comparing, saving, and planning.
         </p>
 
-        <div className="mt-6">
+        <div className="mt-7">
           <CitySearch topCities={topCities} />
         </div>
       </div>
 
-      <div className="space-y-6">
-        <div className="rounded-xl border border-line p-5 sm:p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">Trending Guides</p>
-          <div className="mt-4 space-y-0">
+      <div className="space-y-5">
+        <div className="flow-grid">
+          {intentModes.map(({ icon: Icon, label, detail }, index) => (
+            <motion.article
+              key={label}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.42, delay: shouldReduceMotion ? 0 : index * 0.05, ease }}
+              className="intent-card rounded-[1.25rem] p-4 sm:p-5"
+            >
+              <Icon className="text-accent h-4 w-4" aria-hidden />
+              <h3 className="text-foreground mt-4 text-base leading-tight">{label}</h3>
+              <p className="text-muted mt-2 text-sm leading-relaxed">{detail}</p>
+            </motion.article>
+          ))}
+        </div>
+
+        <div className="organic-panel destination-story-card rounded-[1.6rem] p-5 sm:p-6">
+          <div>
+            <p className="source-chip">
+              <MapPinned className="h-3.5 w-3.5" aria-hidden />
+              Trending guides
+            </p>
+            <h3 className="text-foreground mt-4 max-w-md text-3xl leading-none">
+              Start with a city that already has context.
+            </h3>
+          </div>
+          <div className="mt-6 space-y-0 lg:mt-0">
             {cityPreview.map((city, index) => (
               <Link
                 key={city.id}
                 href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
-                className="group flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0"
+                className="group border-line flex items-center justify-between gap-4 border-b py-3.5 last:border-b-0"
               >
                 <div className="flex items-baseline gap-3">
-                  <span className="text-xs tabular-nums text-muted">
+                  <span className="text-muted text-xs tabular-nums">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <div>
                     <h3 className="text-foreground text-lg leading-tight">{city.city}</h3>
-                    <p className="text-muted text-sm">{city.country}</p>
+                    <p className="text-muted text-sm">
+                      {city.country} / {trendingSignals.at(index) ?? "Guide ready"}
+                    </p>
                   </div>
                 </div>
-                <span className="text-xs font-medium text-muted transition-colors group-hover:text-foreground">
+                <span className="text-muted group-hover:text-foreground text-xs font-medium transition-colors">
                   &rarr;
                 </span>
               </Link>
@@ -63,24 +130,26 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
           </div>
         </div>
 
-        <div className="rounded-xl border border-line p-5 sm:p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted">What makes this different</p>
-          <div className="mt-4 space-y-3">
+        <div className="border-line terrain-lines rounded-[1.4rem] border p-5 sm:p-6">
+          <p className="text-muted text-xs font-medium tracking-wider uppercase">
+            What makes this different
+          </p>
+          <div className="mt-4 grid gap-3">
             {[
               {
-                title: "Signal-first data",
-                text: "Climate, scale, and sourcing stay visible as you compare.",
+                title: "Signals stay visible",
+                text: "Climate, scale, places, and sourcing remain close to the decision.",
               },
               {
-                title: "Editorial clarity",
-                text: "Clean defaults and strong hierarchy in every screen.",
+                title: "AI is labeled",
+                text: "Machine synthesis is framed as assistance, never hidden authority.",
               },
               {
-                title: "Mobile-native",
-                text: "Search and navigation adapt to your device.",
+                title: "Planning remains personal",
+                text: "Saved places and notes live on your device without an account gate.",
               },
             ].map(({ title, text }) => (
-              <div key={title} className="border-l-2 border-line py-1 pl-4">
+              <div key={title} className="border-line bg-surface/72 rounded-[1rem] border p-4">
                 <h3 className="text-foreground text-sm font-medium">{title}</h3>
                 <p className="text-muted mt-0.5 text-sm leading-relaxed">{text}</p>
               </div>

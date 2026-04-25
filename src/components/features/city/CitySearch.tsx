@@ -45,6 +45,21 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
   const isTouchDevice = isMobile || isTablet;
   const shouldReduceMotion = useReducedMotion();
+  const timeOfDay = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "Morning planning";
+    if (hour < 17) return "Afternoon comparison";
+    if (hour < 21) return "Evening shortlist";
+    return "Late-night dreaming";
+  }, []);
+  const adaptiveHints = useMemo(
+    () => [
+      timeOfDay,
+      recentCities.length > 0 ? "Recent cities ready" : "No account needed",
+      isTouchDevice ? "Touch-friendly results" : "Keyboard-ready search",
+    ],
+    [isTouchDevice, recentCities.length, timeOfDay]
+  );
 
   // Rotate placeholder hints
   useEffect(() => {
@@ -320,6 +335,14 @@ export default function CitySearch({ topCities }: CitySearchProps) {
             </motion.div>
           </AnimatePresence>
         </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2 px-1 sm:px-2" aria-label="Adaptive search context">
+        {adaptiveHints.map((hint) => (
+          <span key={hint} className="source-chip">
+            {hint}
+          </span>
+        ))}
       </div>
 
       {/* Progressive Disclosure - Show trending/recent when empty */}

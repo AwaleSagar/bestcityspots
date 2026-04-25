@@ -29,11 +29,14 @@ const pillars = [
 
 export default function TrustIndicators() {
   return (
-    <section className="mx-auto max-w-7xl" aria-labelledby="trust-heading">
+    <section
+      className="organic-panel mx-auto max-w-7xl rounded-[1.8rem] p-5 sm:rounded-[2.2rem] sm:p-7 md:p-10"
+      aria-labelledby="trust-heading"
+    >
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <ScrollReveal animation="fade-up">
           <div className="lg:sticky lg:top-24">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted">Trust Signals</p>
+            <p className="source-chip">Trust signals</p>
             <h2
               id="trust-heading"
               className="text-foreground mt-3 max-w-md text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
@@ -50,13 +53,11 @@ export default function TrustIndicators() {
         <div className="space-y-4">
           {pillars.map(({ icon: Icon, title, detail, iconColor }, index) => (
             <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.08}>
-              <article className="rounded-xl border border-line p-5">
+              <article className="intent-card rounded-[1.25rem] p-5">
                 <div className="flex items-start gap-3">
                   <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} aria-hidden />
                   <div>
-                    <h3 className="text-foreground text-base font-medium leading-snug">
-                      {title}
-                    </h3>
+                    <h3 className="text-foreground text-base leading-snug font-medium">{title}</h3>
                     <p className="text-muted mt-1 text-sm leading-relaxed">{detail}</p>
                   </div>
                 </div>
@@ -65,8 +66,10 @@ export default function TrustIndicators() {
           ))}
 
           <ScrollReveal animation="fade-up" delay={0.2}>
-            <div className="rounded-xl border border-line p-5">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">Verification</p>
+            <div className="border-line bg-surface/72 rounded-[1.25rem] border p-5">
+              <p className="text-muted text-xs font-medium tracking-wider uppercase">
+                Verification
+              </p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {[
                   "Google Places verified",

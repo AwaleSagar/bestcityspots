@@ -17,6 +17,9 @@ import {
   Activity,
   Cloud as CloudIcon,
   ThermometerSun,
+  Leaf,
+  ShieldCheck,
+  Clock3,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -27,10 +30,10 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 function CityVitalsFallback() {
   return (
     <div className="atlas-panel rounded-[1.8rem] p-7 md:p-8">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted">
+      <div className="text-muted text-[11px] font-semibold tracking-[0.2em] uppercase">
         Live City Vitals
       </div>
-      <p className="mt-4 text-sm text-muted">
+      <p className="text-muted mt-4 text-sm">
         Vitals unavailable right now. Please check back soon.
       </p>
     </div>
@@ -55,11 +58,11 @@ function MetricCard({
     <span className="text-foreground/25">N/A</span>
   ) : (
     <div className="flex flex-col items-start leading-tight">
-      <span className="text-2xl font-bold tracking-tight text-foreground">
+      <span className="text-foreground text-2xl font-bold tracking-tight">
         {typeof value === "number" ? value.toLocaleString() : value}
       </span>
       {unit && (
-        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] text-foreground/45">
+        <span className="text-foreground/45 text-[10px] font-semibold tracking-[0.15em] uppercase">
           {unit}
         </span>
       )}
@@ -67,15 +70,15 @@ function MetricCard({
   );
 
   return (
-    <div className="atlas-panel group/metric rounded-[1.1rem] p-4 flex flex-col gap-3 transition-all duration-300 active:scale-[0.98] sm:rounded-[1.3rem] sm:gap-4 sm:p-5 md:hover:border-accent/14 md:duration-500">
+    <div className="atlas-panel group/metric md:hover:border-accent/14 flex flex-col gap-3 rounded-[1.1rem] p-4 transition-all duration-300 active:scale-[0.98] sm:gap-4 sm:rounded-[1.3rem] sm:p-5 md:duration-500">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] border border-line bg-background/55 transition-all duration-300 md:group-hover/metric:border-accent/20 md:group-hover/metric:bg-accent-soft/60">
-            <Icon className="h-5 w-5 text-accent transition-colors duration-300" />
+          <div className="border-line bg-background/55 md:group-hover/metric:border-accent/20 md:group-hover/metric:bg-accent-soft/60 flex h-10 w-10 items-center justify-center rounded-[0.9rem] border transition-all duration-300">
+            <Icon className="text-accent h-5 w-5 transition-colors duration-300" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-muted">
+              <div className="text-muted text-[10px] font-semibold tracking-[0.15em] uppercase">
                 {label}
               </div>
             </div>
@@ -83,16 +86,29 @@ function MetricCard({
           </div>
         </div>
       </div>
-      <div className="flex items-center justify-between border-t border-line pt-3">
-        <div className="text-[9px] font-semibold uppercase tracking-[0.15em] text-muted">
+      <div className="border-line flex items-center justify-between border-t pt-3">
+        <div className="text-muted text-[9px] font-semibold tracking-[0.15em] uppercase">
           Data Source
         </div>
-        <div className="text-[9px] font-semibold uppercase tracking-[0.1em] text-muted-strong text-right max-w-[120px] leading-relaxed">
+        <div className="text-muted-strong max-w-[120px] text-right text-[9px] leading-relaxed font-semibold tracking-[0.1em] uppercase">
           {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
         </div>
       </div>
     </div>
   );
+}
+
+function getArrivalMood(temp?: number) {
+  if (typeof temp !== "number") {
+    return "A practical first read before you compare neighborhoods, seasons, and places.";
+  }
+  if (temp <= 8)
+    return "Cold-weather pacing: plan warm interiors, museums, and shorter outdoor loops.";
+  if (temp <= 18)
+    return "Comfortable walking weather: a good day for slow neighborhoods and long routes.";
+  if (temp <= 28)
+    return "Balanced conditions: keep outdoor landmarks, dining, and transit options in play.";
+  return "Heat-aware planning: favor shaded routes, early starts, and indoor pauses.";
 }
 
 async function ExperiencesWrapper({
@@ -114,7 +130,7 @@ async function ExperiencesWrapper({
     <div className="space-y-10">
       <div className="space-y-3">
         <h2 className="labelled-rule">Top Experiences</h2>
-        <p className="max-w-lg text-sm tracking-wide text-muted">
+        <p className="text-muted max-w-lg text-sm tracking-wide">
           Curated landmarks, dining, and stays ranked by traveler interest and local pulse.
         </p>
       </div>
@@ -131,9 +147,9 @@ async function ExperiencesWrapper({
 function CityVitalsSkeleton() {
   return (
     <div className="atlas-panel animate-pulse rounded-[1.8rem] p-7 md:p-8">
-      <div className="h-2 w-32 rounded bg-foreground/10" />
-      <div className="mt-4 h-6 w-24 rounded bg-foreground/10" />
-      <div className="mt-6 h-10 w-full rounded bg-foreground/10" />
+      <div className="bg-foreground/10 h-2 w-32 rounded" />
+      <div className="bg-foreground/10 mt-4 h-6 w-24 rounded" />
+      <div className="bg-foreground/10 mt-6 h-10 w-full rounded" />
     </div>
   );
 }
@@ -210,16 +226,10 @@ export default async function CityPage({
 
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
-  const [metrics, weather] = await Promise.all([
-    getCityMetrics(city),
-    getCityWeather(city),
-  ]);
+  const [metrics, weather] = await Promise.all([getCityMetrics(city), getCityWeather(city)]);
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-transparent font-sans text-foreground"
-    >
+    <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -228,16 +238,11 @@ export default async function CityPage({
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
       >
-        <Breadcrumbs
-          items={[
-            { label: "Cities", href: "/" },
-            { label: city.city },
-          ]}
-        />
+        <Breadcrumbs items={[{ label: "Cities", href: "/" }, { label: city.city }]} />
         <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
           <Link
             href="/"
-            className="inline-flex items-center gap-3 rounded-full border border-line bg-background/65 px-4 py-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-muted-strong transition-colors duration-300 hover:text-foreground"
+            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
           >
             <ArrowLeft className="h-4 w-4" />
             Return to explorer
@@ -247,23 +252,56 @@ export default async function CityPage({
         <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
-            <header className="atlas-frame relative space-y-5 overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:space-y-6 md:rounded-[2.4rem] md:p-8">
-              <div className="pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px] animate-pulse-glow" />
+            <header className="organic-panel relative space-y-6 overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:space-y-7 md:rounded-[2.4rem] md:p-8">
+              <div className="animate-pulse-glow pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px]" />
               <div className="flex flex-wrap items-center gap-3">
                 <span className="eyebrow">
-                  <Navigation className="h-3.5 w-3.5 text-accent" />
+                  <Navigation className="text-accent h-3.5 w-3.5" />
                   {city.iso3 || "CITY"}
                 </span>
                 <span className="atlas-chip">{city.capital || "Urban center"}</span>
+                <span className="source-chip">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Public data
+                </span>
               </div>
-              <h1 className="text-[clamp(3.2rem,8vw,6.8rem)] leading-[0.88] text-foreground break-words block pb-2">
+              <h1 className="text-foreground block pb-2 text-[clamp(3.2rem,8vw,6.8rem)] leading-[0.88] break-words">
                 {city.city}
               </h1>
               <div className="flex items-center gap-6">
-                <p className="text-xl font-semibold uppercase tracking-[0.16em] text-muted-strong md:text-2xl">
+                <p className="text-muted-strong text-xl font-semibold tracking-[0.16em] uppercase md:text-2xl">
                   {city.country}
                 </p>
-                <div className="h-px flex-1 bg-gradient-to-r from-line to-transparent" />
+                <div className="from-line h-px flex-1 bg-gradient-to-r to-transparent" />
+              </div>
+              <div className="grid gap-3 pt-2 sm:grid-cols-3">
+                {[
+                  {
+                    icon: Leaf,
+                    label: "Arrival mood",
+                    value: getArrivalMood(weather?.temp),
+                  },
+                  {
+                    icon: Clock3,
+                    label: "Best next step",
+                    value: "Scan the AI briefing, then save places into a personal route.",
+                  },
+                  {
+                    icon: Activity,
+                    label: "Live context",
+                    value: weather
+                      ? `${Math.round(weather.temp)}°C now with ${weather.aqi_label.toLowerCase()} air quality.`
+                      : "Weather and air quality are checked when available.",
+                  },
+                ].map(({ icon: ItemIcon, label, value }) => (
+                  <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
+                    <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
+                      <ItemIcon className="text-accent h-3.5 w-3.5" />
+                      {label}
+                    </div>
+                    <p className="text-muted-strong mt-2 text-sm leading-relaxed">{value}</p>
+                  </div>
+                ))}
               </div>
             </header>
 
@@ -273,7 +311,7 @@ export default async function CityPage({
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
               <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
-                <div className="mb-6 flex items-center gap-4 text-muted">
+                <div className="text-muted mb-6 flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
                     <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
                   </div>
@@ -281,16 +319,16 @@ export default async function CityPage({
                     Census Data
                   </span>
                 </div>
-                <div className="mb-2 text-4xl font-bold tracking-[-0.02em] text-foreground md:text-5xl">
+                <div className="text-foreground mb-2 text-4xl font-bold tracking-[-0.02em] md:text-5xl">
                   {formatPopulation(city.population)}
                 </div>
-                <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">
+                <div className="text-muted text-[11px] font-medium tracking-[0.15em] uppercase">
                   Global Residents
                 </div>
               </div>
 
               <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
-                <div className="mb-4 flex items-center gap-4 text-muted sm:mb-6">
+                <div className="text-muted mb-4 flex items-center gap-4 sm:mb-6">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
                     <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
                   </div>
@@ -298,10 +336,10 @@ export default async function CityPage({
                     Territory
                   </span>
                 </div>
-                <div className="mb-2 text-2xl font-bold leading-tight tracking-tight text-foreground md:text-3xl">
+                <div className="text-foreground mb-2 text-2xl leading-tight font-bold tracking-tight md:text-3xl">
                   {city.admin_name || "Autonomous"}
                 </div>
-                <div className="text-[11px] font-medium tracking-[0.15em] text-muted uppercase">
+                <div className="text-muted text-[11px] font-medium tracking-[0.15em] uppercase">
                   Regional Hub
                 </div>
               </div>
@@ -316,44 +354,44 @@ export default async function CityPage({
 
             <section className="space-y-6">
               <h2 className="labelled-rule">Travel Essentials</h2>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5">
+              <div className="flow-grid">
                 {[
                   {
                     icon: MapPin,
-                    title: "Best Neighborhoods",
+                    title: "Neighborhood texture",
                     color: "text-[color:var(--color-cat-dining)]",
                     text: city.admin_name
-                      ? `Explore the diverse neighborhoods across the ${city.admin_name} region of ${city.city}. Browse landmarks below for specific areas.`
-                      : `Explore the diverse neighborhoods of ${city.city}. Browse landmarks below for specific areas.`,
+                      ? `Use the ${city.admin_name} context as a starting layer, then let landmarks reveal the smaller local pockets.`
+                      : `Start with landmarks, then use saved notes to build a more personal read of ${city.city}.`,
                   },
                   {
                     icon: Users,
-                    title: "Budget Tips",
+                    title: "Budget transparency",
                     color: "text-[color:var(--color-brand-accent)]",
-                    text: "Use the price filter in Dining and Stays below to find options matching your budget. Filter by $ to $$$$ to plan your trip spending.",
+                    text: "Use Dining and Stays price filters to keep high-interest places grounded in realistic trip spending.",
                   },
                   {
                     icon: Navigation,
-                    title: "Getting Around",
+                    title: "On-trip handoff",
                     color: "text-[color:var(--color-brand-secondary)]",
-                    text: `Open any listed spot in Maps for directions and transit options. Save places to build your personal itinerary for ${city.city}.`,
+                    text: `Open any listed spot in Maps for directions, then keep your personal ${city.city} shortlist in saved places.`,
                   },
                   {
                     icon: Activity,
-                    title: "Data Sources",
+                    title: "Source posture",
                     color: "text-accent",
-                    text: "All data sourced from Google Places API, public census databases, and AI-verified summaries. Metrics are refreshed regularly.",
+                    text: "Google Places, public city data, weather providers, and AI-assisted summaries are labeled so the guide stays auditable.",
                   },
                 ].map(({ icon: ItemIcon, title, text, color }) => (
                   <div
                     key={title}
-                    className="atlas-panel rounded-[1.1rem] p-4 transition-all duration-500 hover:border-accent/12 sm:rounded-[1.3rem] sm:p-5"
+                    className="intent-card rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5"
                   >
-                    <div className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.15em] text-muted">
+                    <div className="text-muted mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase">
                       <ItemIcon className={`h-4 w-4 ${color}`} />
                       {title}
                     </div>
-                    <p className="text-sm leading-relaxed text-muted">{text}</p>
+                    <p className="text-muted text-sm leading-relaxed">{text}</p>
                   </div>
                 ))}
               </div>
@@ -361,16 +399,14 @@ export default async function CityPage({
 
             {/* Mobile-only CTA - shown before experiences */}
             <div className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden">
-              <h3 className="text-xl font-bold leading-tight tracking-[-0.02em] text-foreground sm:text-2xl">
+              <h3 className="text-foreground text-xl leading-tight font-bold tracking-[-0.02em] sm:text-2xl">
                 Plan Your {city.city} Trip
               </h3>
-              <p className="text-sm leading-relaxed text-muted">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences — all free, no sign-up required.
+              <p className="text-muted text-sm leading-relaxed">
+                Explore AI-powered briefings, live weather data, budget filters, and curated local
+                experiences — all free, no sign-up required.
               </p>
-              <Link
-                href="/resources/top-cities"
-                className="btn-primary w-full"
-              >
+              <Link href="/resources/top-cities" className="btn-primary w-full">
                 Browse Free City Guide
               </Link>
             </div>
@@ -383,22 +419,21 @@ export default async function CityPage({
           {/* Sidebar */}
           <div className="hidden space-y-8 lg:sticky lg:top-20 lg:col-span-4 lg:block">
             <div className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h3 className="text-2xl md:text-3xl leading-tight font-bold tracking-[-0.02em] text-foreground">
+              <h3 className="text-foreground text-2xl leading-tight font-bold tracking-[-0.02em] md:text-3xl">
                 Plan Your <br /> {city.city} Trip
               </h3>
-              <p className="text-sm leading-relaxed text-muted">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local experiences. Save your favorite spots to build a personal itinerary — all free, no sign-up required.
+              <p className="text-muted text-sm leading-relaxed">
+                Explore AI-powered briefings, live weather data, budget filters, and curated local
+                experiences. Save your favorite spots to build a personal itinerary — all free, no
+                sign-up required.
               </p>
-              <Link
-                href="/resources/top-cities"
-                className="btn-primary w-full"
-              >
+              <Link href="/resources/top-cities" className="btn-primary w-full">
                 Browse Free City Guide
               </Link>
             </div>
 
             <div className="atlas-panel rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h4 className="text-[11px] font-semibold tracking-[0.25em] text-muted uppercase">
+              <h4 className="text-muted text-[11px] font-semibold tracking-[0.25em] uppercase">
                 Core Metrics
               </h4>
               <div className="grid grid-cols-1 gap-4">
@@ -416,9 +451,11 @@ export default async function CityPage({
                   source={metrics?.source?.climate as string | undefined}
                 />
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-muted">
+              <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
                 <Activity className="h-3.5 w-3.5" />
-                {metrics?.updated_at ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}` : "Pending data"}
+                {metrics?.updated_at
+                  ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}`
+                  : "Pending data"}
               </div>
             </div>
           </div>

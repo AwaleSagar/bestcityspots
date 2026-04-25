@@ -14,10 +14,10 @@ export default function FreeResourceCTA() {
   return (
     <section className="mx-auto max-w-7xl" aria-labelledby="free-resource-heading">
       <ScrollReveal animation="fade-up">
-        <div className="rounded-xl border border-line bg-surface-strong p-6 sm:p-8 md:p-10">
+        <div className="organic-panel rounded-[1.8rem] p-6 sm:rounded-[2.2rem] sm:p-8 md:p-10">
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
             <div>
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">Free Reference Guide</p>
+              <p className="source-chip">Free reference guide</p>
               <h2
                 id="free-resource-heading"
                 className="text-foreground mt-3 max-w-xl text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
@@ -39,13 +39,15 @@ export default function FreeResourceCTA() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-line bg-surface p-5">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">Inside The Edition</p>
+            <div className="border-line bg-surface/78 rounded-[1.25rem] border p-5">
+              <p className="text-muted text-xs font-medium tracking-wider uppercase">
+                Inside The Edition
+              </p>
               <div className="mt-3 space-y-2">
                 {guideHighlights.map(({ icon: Icon, text }) => (
                   <div key={text} className="flex items-center gap-3 py-1.5">
-                    <Icon className="h-4 w-4 shrink-0 text-muted" aria-hidden />
-                    <span className="text-sm font-medium text-foreground">{text}</span>
+                    <Icon className="text-muted h-4 w-4 shrink-0" aria-hidden />
+                    <span className="text-foreground text-sm font-medium">{text}</span>
                   </div>
                 ))}
               </div>
