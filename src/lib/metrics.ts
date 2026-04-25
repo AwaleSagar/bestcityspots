@@ -68,10 +68,7 @@ async function fetchAndCacheMetrics(city: City): Promise<CityMetrics> {
 
   const db = supabaseServer ?? supabase;
   db.from("city_metrics")
-    .upsert(
-      { city_id: city.id, ...metrics },
-      { onConflict: "city_id" },
-    )
+    .upsert({ city_id: city.id, ...metrics }, { onConflict: "city_id" })
     .then(({ error }: { error: unknown }) => {
       if (error) log.error("cache_write_failed", { cityId: city.id, error: String(error) });
     });
@@ -103,14 +100,20 @@ export async function getCityMetrics(city: City): Promise<CityMetrics | null> {
       return cached;
     }
   } catch (e) {
-    log.warn("cache_read_failed", { cityId: city.id, error: e instanceof Error ? e.message : String(e) });
+    log.warn("cache_read_failed", {
+      cityId: city.id,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 
   // No cache at all -- fetch fresh (blocking)
   try {
     return await fetchAndCacheMetrics(city);
   } catch (e) {
-    log.error("live_fetch_failed", { cityId: city.id, error: e instanceof Error ? e.message : String(e) });
+    log.error("live_fetch_failed", {
+      cityId: city.id,
+      error: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }

@@ -50,11 +50,16 @@ async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {
 
 function findNearest(cities: City[], lat: number, lng: number) {
   if (cities.length === 0) return null;
-  return cities.reduce((best, city) => {
-    const distance = haversineKm(lat, lng, city.lat, city.lng);
-    if (!best) return { city, distance };
-    return distance < best.distance ? { city, distance } : best;
-  }, null as { city: City; distance: number } | null)?.city ?? null;
+  return (
+    cities.reduce(
+      (best, city) => {
+        const distance = haversineKm(lat, lng, city.lat, city.lng);
+        if (!best) return { city, distance };
+        return distance < best.distance ? { city, distance } : best;
+      },
+      null as { city: City; distance: number } | null
+    )?.city ?? null
+  );
 }
 
 export async function findNearestCity(lat: number, lng: number) {
@@ -76,7 +81,7 @@ export async function findNearestCity(lat: number, lng: number) {
 export async function searchCities(
   query: string,
   limit = 10,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<CitySearchResult[]> {
   const cleanQuery = normalizeQuery(query);
   if (!cleanQuery || cleanQuery.length < 1) return [];

@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 
 import { getTopCities } from "@/lib/cities";
+import { publicEnv } from "@/lib/env";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
+const siteUrl = publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const revalidate = 86400;
 

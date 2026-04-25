@@ -36,14 +36,20 @@ export async function getHealth(): Promise<HealthReport> {
   const anon = getAnonClient();
   if (anon) {
     try {
-      const { error } = await anon.from("cities").select("id", { count: "exact", head: true }).limit(1);
+      const { error } = await anon
+        .from("cities")
+        .select("id", { count: "exact", head: true })
+        .limit(1);
       anonCheck = error ? "error" : "ok";
     } catch {
       anonCheck = "error";
     }
   }
 
-  function providerState(key: string | undefined, provider: string): "configured" | "missing" | "circuit_open" {
+  function providerState(
+    key: string | undefined,
+    provider: string
+  ): "configured" | "missing" | "circuit_open" {
     if (!key) return "missing";
     return isCircuitOpen(provider) ? "circuit_open" : "configured";
   }

@@ -76,17 +76,14 @@ export function parseUserAgent(ua: string): {
   else if (uaLower.includes("edg")) browser = "Edge";
   else if (uaLower.includes("chrome")) browser = "Chrome";
   else if (uaLower.includes("safari")) browser = "Safari";
-  else if (uaLower.includes("opera") || uaLower.includes("opr"))
-    browser = "Opera";
+  else if (uaLower.includes("opera") || uaLower.includes("opr")) browser = "Opera";
 
   let os: string | null = null;
   if (uaLower.includes("windows")) os = "Windows";
-  else if (uaLower.includes("mac os") || uaLower.includes("macos"))
-    os = "macOS";
+  else if (uaLower.includes("mac os") || uaLower.includes("macos")) os = "macOS";
   else if (uaLower.includes("linux")) os = "Linux";
   else if (uaLower.includes("android")) os = "Android";
-  else if (uaLower.includes("iphone") || uaLower.includes("ipad"))
-    os = "iOS";
+  else if (uaLower.includes("iphone") || uaLower.includes("ipad")) os = "iOS";
 
   return { deviceType, browser, os };
 }
@@ -103,41 +100,22 @@ export function parseReferrer(referrer: string | null): {
 
   if (refLower.includes("facebook") || refLower.includes("fb.com"))
     return { sourceType: "social", sourceName: "Facebook" };
-  if (
-    refLower.includes("twitter") ||
-    refLower.includes("t.co") ||
-    refLower.includes("x.com")
-  )
+  if (refLower.includes("twitter") || refLower.includes("t.co") || refLower.includes("x.com"))
     return { sourceType: "social", sourceName: "Twitter/X" };
-  if (refLower.includes("instagram"))
-    return { sourceType: "social", sourceName: "Instagram" };
-  if (refLower.includes("linkedin"))
-    return { sourceType: "social", sourceName: "LinkedIn" };
-  if (refLower.includes("pinterest"))
-    return { sourceType: "social", sourceName: "Pinterest" };
-  if (refLower.includes("reddit"))
-    return { sourceType: "social", sourceName: "Reddit" };
-  if (refLower.includes("tiktok"))
-    return { sourceType: "social", sourceName: "TikTok" };
-  if (refLower.includes("youtube"))
-    return { sourceType: "social", sourceName: "YouTube" };
+  if (refLower.includes("instagram")) return { sourceType: "social", sourceName: "Instagram" };
+  if (refLower.includes("linkedin")) return { sourceType: "social", sourceName: "LinkedIn" };
+  if (refLower.includes("pinterest")) return { sourceType: "social", sourceName: "Pinterest" };
+  if (refLower.includes("reddit")) return { sourceType: "social", sourceName: "Reddit" };
+  if (refLower.includes("tiktok")) return { sourceType: "social", sourceName: "TikTok" };
+  if (refLower.includes("youtube")) return { sourceType: "social", sourceName: "YouTube" };
 
-  if (refLower.includes("google"))
-    return { sourceType: "organic", sourceName: "Google" };
-  if (refLower.includes("bing"))
-    return { sourceType: "organic", sourceName: "Bing" };
-  if (refLower.includes("duckduckgo"))
-    return { sourceType: "organic", sourceName: "DuckDuckGo" };
-  if (refLower.includes("yahoo"))
-    return { sourceType: "organic", sourceName: "Yahoo" };
-  if (refLower.includes("baidu"))
-    return { sourceType: "organic", sourceName: "Baidu" };
+  if (refLower.includes("google")) return { sourceType: "organic", sourceName: "Google" };
+  if (refLower.includes("bing")) return { sourceType: "organic", sourceName: "Bing" };
+  if (refLower.includes("duckduckgo")) return { sourceType: "organic", sourceName: "DuckDuckGo" };
+  if (refLower.includes("yahoo")) return { sourceType: "organic", sourceName: "Yahoo" };
+  if (refLower.includes("baidu")) return { sourceType: "organic", sourceName: "Baidu" };
 
-  if (
-    refLower.includes("mail.") ||
-    refLower.includes("outlook") ||
-    refLower.includes("gmail")
-  )
+  if (refLower.includes("mail.") || refLower.includes("outlook") || refLower.includes("gmail"))
     return { sourceType: "email", sourceName: "Email" };
 
   try {
@@ -188,8 +166,7 @@ export function recordDailyVisitorStats(
       p_returning: returningVisitors,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update daily visitor stats:", error);
+      if (error) console.error("[analytics] Failed to update daily visitor stats:", error);
     });
 }
 
@@ -210,8 +187,7 @@ export function recordTrafficSource(
       p_unique: uniqueVisitors,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update traffic sources:", error);
+      if (error) console.error("[analytics] Failed to update traffic sources:", error);
     });
 }
 
@@ -231,8 +207,7 @@ export function recordDeviceStats(
       p_os: os,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update device stats:", error);
+      if (error) console.error("[analytics] Failed to update device stats:", error);
     });
 }
 
@@ -252,8 +227,7 @@ export function recordGeoStats(
       p_city: city,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update geo stats:", error);
+      if (error) console.error("[analytics] Failed to update geo stats:", error);
     });
 }
 
@@ -266,15 +240,11 @@ export function recordCityView(date: string, cityId: number): void {
       p_city_id: cityId,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update city views:", error);
+      if (error) console.error("[analytics] Failed to update city views:", error);
     });
 }
 
-export function recordUserAction(
-  date: string,
-  actionType: z.infer<typeof ActionType>
-): void {
+export function recordUserAction(date: string, actionType: z.infer<typeof ActionType>): void {
   if (!supabaseServer) return;
 
   supabaseServer
@@ -283,8 +253,7 @@ export function recordUserAction(
       p_action: actionType,
     })
     .then(({ error }) => {
-      if (error)
-        console.error("[analytics] Failed to update user actions:", error);
+      if (error) console.error("[analytics] Failed to update user actions:", error);
     });
 }
 

@@ -378,7 +378,7 @@ html {
   opacity: 0.46;
 }
 
-.organic-panel > * {
+.organic-panel > *:not(.absolute) {
   position: relative;
   z-index: 1;
 }

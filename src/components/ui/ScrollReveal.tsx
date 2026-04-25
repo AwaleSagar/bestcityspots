@@ -1,15 +1,16 @@
 "use client";
 
 import { ReactNode, useRef } from "react";
-import {
-  motion,
-  useInView,
-  useReducedMotion,
-  Variants,
-  HTMLMotionProps,
-} from "framer-motion";
+import { motion, useInView, useReducedMotion, Variants, HTMLMotionProps } from "framer-motion";
 
-type AnimationType = "fade-up" | "fade-down" | "fade-left" | "fade-right" | "scale" | "blur" | "none";
+type AnimationType =
+  | "fade-up"
+  | "fade-down"
+  | "fade-left"
+  | "fade-right"
+  | "scale"
+  | "blur"
+  | "none";
 
 interface ScrollRevealProps extends Omit<HTMLMotionProps<"div">, "children"> {
   children: ReactNode;

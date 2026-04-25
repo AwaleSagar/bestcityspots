@@ -36,7 +36,7 @@ function mapJsonLayout(
     maxDepth?: number;
     maxArrayItemsToSample?: number;
     maxSamplesPerPath?: number;
-  },
+  }
 ): Map<string, PathStats> {
   const maxDepth = opts?.maxDepth ?? 12;
   const maxArrayItemsToSample = opts?.maxArrayItemsToSample ?? 3;
@@ -61,25 +61,25 @@ function mapJsonLayout(
       seen.add(value as object);
     }
 
-  if (Array.isArray(value)) {
-    const limit = Math.min(value.length, maxArrayItemsToSample);
-    for (let i = 0; i < limit; i++) {
-      const entry = value.at(i);
-      if (entry !== undefined) {
-        walk(entry, `${path}[]`, depth + 1);
+    if (Array.isArray(value)) {
+      const limit = Math.min(value.length, maxArrayItemsToSample);
+      for (let i = 0; i < limit; i++) {
+        const entry = value.at(i);
+        if (entry !== undefined) {
+          walk(entry, `${path}[]`, depth + 1);
+        }
       }
+      return;
     }
-    return;
-  }
 
-  if (value && typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    const sortedEntries = Object.entries(obj).sort(([a], [b]) => a.localeCompare(b));
-    sortedEntries.forEach(([key, val]) => {
-      walk(val, path ? `${path}.${key}` : key, depth + 1);
-    });
+    if (value && typeof value === "object") {
+      const obj = value as Record<string, unknown>;
+      const sortedEntries = Object.entries(obj).sort(([a], [b]) => a.localeCompare(b));
+      sortedEntries.forEach(([key, val]) => {
+        walk(val, path ? `${path}.${key}` : key, depth + 1);
+      });
+    }
   }
-}
 
   walk(root, "", 0);
   return stats;

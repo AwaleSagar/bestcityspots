@@ -25,7 +25,9 @@ const supabaseKey =
 
 if (!supabaseUrl || !supabaseKey) {
   console.error("Error: Missing Supabase credentials in environment variables");
-  console.error("Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)");
+  console.error(
+    "Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)"
+  );
   process.exit(1);
 }
 
@@ -74,20 +76,30 @@ function formatNumber(num: number): string {
 
 function printHeader() {
   console.log();
-  console.log(c("bold", c("blue", "═══════════════════════════════════════════════════════════════════")));
+  console.log(
+    c("bold", c("blue", "═══════════════════════════════════════════════════════════════════"))
+  );
   console.log(c("bold", c("blue", "     📊  BESTCITYSPOTS ANALYTICS REPORT")));
-  console.log(c("bold", c("blue", "═══════════════════════════════════════════════════════════════════")));
+  console.log(
+    c("bold", c("blue", "═══════════════════════════════════════════════════════════════════"))
+  );
   console.log();
-  console.log(`${c("dim", "Report Period:")} ${c("bold", DATE_FROM)} ${c("dim", "to")} ${c("bold", DATE_TO)}`);
+  console.log(
+    `${c("dim", "Report Period:")} ${c("bold", DATE_FROM)} ${c("dim", "to")} ${c("bold", DATE_TO)}`
+  );
   console.log(`${c("dim", "Generated:")}     ${new Date().toISOString()}`);
   console.log();
 }
 
 function printSection(title: string, icon: string) {
   console.log();
-  console.log(c("bold", c("cyan", "─────────────────────────────────────────────────────────────────")));
+  console.log(
+    c("bold", c("cyan", "─────────────────────────────────────────────────────────────────"))
+  );
   console.log(c("bold", c("cyan", `  ${icon}  ${title}`)));
-  console.log(c("bold", c("cyan", "─────────────────────────────────────────────────────────────────")));
+  console.log(
+    c("bold", c("cyan", "─────────────────────────────────────────────────────────────────"))
+  );
 }
 
 // =============================================================================
@@ -255,7 +267,8 @@ async function getGeoStats() {
 async function getCityViews() {
   const { data, error } = await supabase
     .from("city_views_daily")
-    .select(`
+    .select(
+      `
       city_id,
       views,
       unique_viewers,
@@ -263,7 +276,8 @@ async function getCityViews() {
         city,
         country
       )
-    `)
+    `
+    )
     .gte("stat_date", DATE_FROM)
     .lte("stat_date", DATE_TO);
 
@@ -272,7 +286,10 @@ async function getCityViews() {
     return null;
   }
 
-  const byCity = new Map<number, { name: string; country: string; views: number; unique: number }>();
+  const byCity = new Map<
+    number,
+    { name: string; country: string; views: number; unique: number }
+  >();
 
   for (const row of data || []) {
     // Supabase returns the joined table as an object (or null)
@@ -382,7 +399,9 @@ async function main() {
     console.log(`  ${c("bold", "Bounce Rate:")}         ${overview.bounceRate}%`);
     console.log();
     console.log(`  ${c("green", "New Visitors:")}        ${formatNumber(overview.newVisitors)}`);
-    console.log(`  ${c("blue", "Returning:")}           ${formatNumber(overview.returningVisitors)}`);
+    console.log(
+      `  ${c("blue", "Returning:")}           ${formatNumber(overview.returningVisitors)}`
+    );
   } else {
     console.log(`  ${c("dim", "No data available for this period")}`);
   }
@@ -392,10 +411,14 @@ async function main() {
   const traffic = await getTrafficSources();
   if (traffic && traffic.byType.length > 0) {
     console.log();
-    console.log(`  ${c("bold", "Source".padEnd(15))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`);
+    console.log(
+      `  ${c("bold", "Source".padEnd(15))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`
+    );
     console.log("  ─────────────────────────────────────────");
     for (const source of traffic.byType) {
-      console.log(`  ${source.type.padEnd(15)} ${formatNumber(source.visits).padStart(12)} ${formatNumber(source.unique).padStart(12)}`);
+      console.log(
+        `  ${source.type.padEnd(15)} ${formatNumber(source.visits).padStart(12)} ${formatNumber(source.unique).padStart(12)}`
+      );
     }
     if (traffic.topReferrers.length > 0) {
       console.log();
@@ -413,10 +436,14 @@ async function main() {
   const devices = await getDeviceStats();
   if (devices && devices.devices.length > 0) {
     console.log();
-    console.log(`  ${c("bold", "Device".padEnd(12))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Share".padStart(8))}`);
+    console.log(
+      `  ${c("bold", "Device".padEnd(12))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Share".padStart(8))}`
+    );
     console.log("  ────────────────────────────────────");
     for (const device of devices.devices) {
-      console.log(`  ${device.device.padEnd(12)} ${formatNumber(device.visits).padStart(12)} ${(device.share + "%").padStart(7)}`);
+      console.log(
+        `  ${device.device.padEnd(12)} ${formatNumber(device.visits).padStart(12)} ${(device.share + "%").padStart(7)}`
+      );
     }
     if (devices.browsers.length > 0) {
       console.log();
@@ -434,10 +461,14 @@ async function main() {
   const geo = await getGeoStats();
   if (geo && geo.length > 0) {
     console.log();
-    console.log(`  ${c("bold", "Country".padEnd(8))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`);
+    console.log(
+      `  ${c("bold", "Country".padEnd(8))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`
+    );
     console.log("  ─────────────────────────────────────");
     for (const country of geo) {
-      console.log(`  ${country.country.padEnd(8)} ${formatNumber(country.visits).padStart(12)} ${formatNumber(country.unique).padStart(12)}`);
+      console.log(
+        `  ${country.country.padEnd(8)} ${formatNumber(country.visits).padStart(12)} ${formatNumber(country.unique).padStart(12)}`
+      );
     }
   } else {
     console.log(`  ${c("dim", "No geographic data available (consent-based)")}`);
@@ -448,12 +479,16 @@ async function main() {
   const cities = await getCityViews();
   if (cities && cities.length > 0) {
     console.log();
-    console.log(`  ${c("bold", "City".padEnd(25))} ${c("bold", "Country".padEnd(15))} ${c("bold", "Views".padStart(10))} ${c("bold", "Unique".padStart(10))}`);
+    console.log(
+      `  ${c("bold", "City".padEnd(25))} ${c("bold", "Country".padEnd(15))} ${c("bold", "Views".padStart(10))} ${c("bold", "Unique".padStart(10))}`
+    );
     console.log("  ────────────────────────────────────────────────────────────────");
     let rank = 1;
     for (const city of cities) {
       const name = city.name.length > 22 ? city.name.substring(0, 22) + "..." : city.name;
-      console.log(`  ${(rank + ".").padEnd(4)}${name.padEnd(21)} ${city.country.padEnd(15)} ${formatNumber(city.views).padStart(10)} ${formatNumber(city.unique).padStart(10)}`);
+      console.log(
+        `  ${(rank + ".").padEnd(4)}${name.padEnd(21)} ${city.country.padEnd(15)} ${formatNumber(city.views).padStart(10)} ${formatNumber(city.unique).padStart(10)}`
+      );
       rank++;
     }
   } else {
@@ -479,19 +514,27 @@ async function main() {
   const trend = await getDailyTrend();
   if (trend && trend.length > 0) {
     console.log();
-    console.log(`  ${c("bold", "Date".padEnd(12))} ${c("bold", "Visits".padStart(10))} ${c("bold", "Unique".padStart(10))} ${c("bold", "Views".padStart(10))}`);
+    console.log(
+      `  ${c("bold", "Date".padEnd(12))} ${c("bold", "Visits".padStart(10))} ${c("bold", "Unique".padStart(10))} ${c("bold", "Views".padStart(10))}`
+    );
     console.log("  ─────────────────────────────────────────────");
     for (const day of trend) {
-      console.log(`  ${day.stat_date.padEnd(12)} ${formatNumber(day.total_visits || 0).padStart(10)} ${formatNumber(day.unique_visitors || 0).padStart(10)} ${formatNumber(day.page_views || 0).padStart(10)}`);
+      console.log(
+        `  ${day.stat_date.padEnd(12)} ${formatNumber(day.total_visits || 0).padStart(10)} ${formatNumber(day.unique_visitors || 0).padStart(10)} ${formatNumber(day.page_views || 0).padStart(10)}`
+      );
     }
   } else {
     console.log(`  ${c("dim", "No trend data available")}`);
   }
 
   console.log();
-  console.log(c("bold", c("blue", "═══════════════════════════════════════════════════════════════════")));
+  console.log(
+    c("bold", c("blue", "═══════════════════════════════════════════════════════════════════"))
+  );
   console.log(c("dim", "  Run with --json for machine-readable output"));
-  console.log(c("bold", c("blue", "═══════════════════════════════════════════════════════════════════")));
+  console.log(
+    c("bold", c("blue", "═══════════════════════════════════════════════════════════════════"))
+  );
   console.log();
 }
 

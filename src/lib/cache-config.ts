@@ -76,7 +76,11 @@ export const CACHE_TTL = {
 export type CacheFreshness = "fresh" | "swr" | "stale" | "expired";
 
 /** Classify an `updatedAt` timestamp against a tier. */
-export function classifyAge(updatedAt: string | null | undefined, tier: CacheTier, now = Date.now()): CacheFreshness {
+export function classifyAge(
+  updatedAt: string | null | undefined,
+  tier: CacheTier,
+  now = Date.now()
+): CacheFreshness {
   if (!updatedAt) return "expired";
   const parsed = new Date(updatedAt).getTime();
   if (Number.isNaN(parsed)) return "expired";
@@ -99,9 +103,15 @@ export function isCacheFresh(updatedAt: string | null | undefined, ttlMs: number
 }
 
 /** Convenience conversions. */
-export function minutes(n: number) { return n * minute; }
-export function hours(n: number) { return n * hour; }
-export function days(n: number) { return n * day; }
+export function minutes(n: number) {
+  return n * minute;
+}
+export function hours(n: number) {
+  return n * hour;
+}
+export function days(n: number) {
+  return n * day;
+}
 
 // ---------------------------------------------------------------------------
 // Tag helpers — stable strings used for admin invalidation and Next's

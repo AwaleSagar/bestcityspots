@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { getTopCities } from "@/lib/cities";
 import TopCitiesPageContent from "@/components/pages/TopCitiesPageContent";
+import { publicEnv } from "@/lib/env";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
+const siteUrl = publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const metadata: Metadata = {
   title: "Top 50 Cities to Explore | Free City Guide",

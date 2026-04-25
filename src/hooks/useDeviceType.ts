@@ -50,8 +50,7 @@ export function useDeviceType(): DeviceType {
     coarseMq.addEventListener("change", syncBreakpoints);
 
     // Virtual keyboard detection via visualViewport
-    initialViewportHeight.current =
-      window.visualViewport?.height ?? window.innerHeight;
+    initialViewportHeight.current = window.visualViewport?.height ?? window.innerHeight;
 
     const handleViewportResize = () => {
       if (!window.visualViewport) return;
@@ -62,8 +61,7 @@ export function useDeviceType(): DeviceType {
         initialViewportHeight.current = current;
       }
 
-      const shrunk =
-        initialViewportHeight.current - current > KEYBOARD_HEIGHT_THRESHOLD;
+      const shrunk = initialViewportHeight.current - current > KEYBOARD_HEIGHT_THRESHOLD;
 
       setState((prev) => ({
         ...prev,
@@ -78,8 +76,7 @@ export function useDeviceType(): DeviceType {
     } else {
       // Fallback for browsers without visualViewport
       fallbackHandler = () => {
-        const shrunk =
-          window.outerHeight - window.innerHeight > KEYBOARD_HEIGHT_THRESHOLD;
+        const shrunk = window.outerHeight - window.innerHeight > KEYBOARD_HEIGHT_THRESHOLD;
         const active = document.activeElement?.tagName === "INPUT";
         setState((prev) => ({
           ...prev,
@@ -94,10 +91,7 @@ export function useDeviceType(): DeviceType {
       tabletMq.removeEventListener("change", syncBreakpoints);
       coarseMq.removeEventListener("change", syncBreakpoints);
       if (window.visualViewport) {
-        window.visualViewport.removeEventListener(
-          "resize",
-          handleViewportResize,
-        );
+        window.visualViewport.removeEventListener("resize", handleViewportResize);
       }
       if (fallbackHandler) {
         window.removeEventListener("resize", fallbackHandler);

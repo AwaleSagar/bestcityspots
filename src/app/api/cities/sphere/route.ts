@@ -23,10 +23,7 @@ export async function GET(req: Request) {
   });
 
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Invalid parameters" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
   }
 
   const { limit, mode, category } = parsed.data;
@@ -85,5 +82,3 @@ export async function GET(req: Request) {
     },
   });
 }
-
-

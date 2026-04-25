@@ -1,11 +1,11 @@
 # Graph Report - .  (2026-04-25)
 
 ## Corpus Check
-- 87 files · ~89,225 words
+- 91 files · ~89,610 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 387 nodes · 422 edges · 102 communities detected
+- 396 nodes · 423 edges · 106 communities detected
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 4 edges (avg confidence: 0.65)
 - Token cost: 0 input · 0 output
 
@@ -112,6 +112,10 @@
 - [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
 - [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
+- [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
+- [[_COMMUNITY_Community 105|Community 105]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `main()` - 12 edges
@@ -145,28 +149,28 @@
 ## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.13
-Nodes (27): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+19 more)
+Cohesion: 0.16
+Nodes (23): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+15 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.18
 Nodes (20): checkInsightsCacheStatus(), checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus(), createSupabaseClient(), getAqiLabel(), getTopCitiesByPopulation(), getTopCitiesByTraffic() (+12 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.15
-Nodes (10): clearNote(), getInsiderTips(), getNeighborhood(), parseStoredNotes(), persistCityNotes(), sanitizeKey(), sanitizeNotes(), saveNote() (+2 more)
-
-### Community 3 - "Community 3"
 Cohesion: 0.23
 Nodes (11): backoffMs(), CircuitOpenError, getBreaker(), HttpError, httpFetch(), httpJson(), isCircuitOpen(), isIdempotent() (+3 more)
 
-### Community 4 - "Community 4"
+### Community 3 - "Community 3"
 Cohesion: 0.32
 Nodes (12): c(), formatNumber(), getCityViews(), getDailyTrend(), getDeviceStats(), getGeoStats(), getOverview(), getTrafficSources() (+4 more)
 
-### Community 5 - "Community 5"
+### Community 4 - "Community 4"
 Cohesion: 0.31
 Nodes (10): extractErrorMessage(), extractPlaces(), formatSample(), isPlaceResult(), isValidDisplayName(), jsonType(), mapJsonLayout(), parseArgs() (+2 more)
+
+### Community 5 - "Community 5"
+Cohesion: 0.24
+Nodes (4): clearNote(), saveNote(), updateDraftNotes(), updatePlaceNotes()
 
 ### Community 6 - "Community 6"
 Cohesion: 0.22
@@ -177,84 +181,84 @@ Cohesion: 0.35
 Nodes (10): getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats(), recordDeviceStats(), recordGeoStats() (+2 more)
 
 ### Community 8 - "Community 8"
+Cohesion: 0.22
+Nodes (2): getInsiderTips(), getNeighborhood()
+
+### Community 9 - "Community 9"
+Cohesion: 0.36
+Nodes (9): getJsonStorageItem(), getSessionStorageItem(), getStorageItem(), hasLocalStorage(), hasSessionStorage(), removeStorageItem(), setJsonStorageItem(), setSessionStorageItem() (+1 more)
+
+### Community 10 - "Community 10"
+Cohesion: 0.25
+Nodes (0): 
+
+### Community 11 - "Community 11"
 Cohesion: 0.29
 Nodes (2): generateSessionId(), getOrCreateSession()
 
-### Community 9 - "Community 9"
+### Community 12 - "Community 12"
 Cohesion: 0.39
 Nodes (6): findNearest(), findNearestCity(), getTopCities(), normalizeQuery(), queryCitiesInBox(), searchCities()
 
-### Community 10 - "Community 10"
+### Community 13 - "Community 13"
 Cohesion: 0.36
 Nodes (1): LruCache
 
-### Community 11 - "Community 11"
+### Community 14 - "Community 14"
 Cohesion: 0.36
 Nodes (5): buildAnonClient(), buildServerClient(), getAnonClient(), getServerClient(), hasServerClient()
 
-### Community 12 - "Community 12"
-Cohesion: 0.29
-Nodes (0): 
-
-### Community 13 - "Community 13"
+### Community 15 - "Community 15"
 Cohesion: 0.38
 Nodes (1): RankingEngine
 
-### Community 14 - "Community 14"
-Cohesion: 0.52
-Nodes (6): getJsonStorageItem(), getStorageItem(), hasStorage(), removeStorageItem(), setJsonStorageItem(), setStorageItem()
-
-### Community 15 - "Community 15"
+### Community 16 - "Community 16"
 Cohesion: 0.29
 Nodes (0): 
-
-### Community 16 - "Community 16"
-Cohesion: 0.52
-Nodes (5): publicEnv(), requirePublicEnv(), requireServerEnv(), serverEnv(), warnOnce()
 
 ### Community 17 - "Community 17"
 Cohesion: 0.52
-Nodes (6): comfortFromTemp(), fetchAndCacheMetrics(), getCityMetrics(), getOpenMeteoAirQuality(), getOpenMeteoWeather(), toMetrics()
+Nodes (5): publicEnv(), requirePublicEnv(), requireServerEnv(), serverEnv(), warnOnce()
 
 ### Community 18 - "Community 18"
+Cohesion: 0.52
+Nodes (6): comfortFromTemp(), fetchAndCacheMetrics(), getCityMetrics(), getOpenMeteoAirQuality(), getOpenMeteoWeather(), toMetrics()
+
+### Community 19 - "Community 19"
 Cohesion: 0.62
 Nodes (6): capRadius(), fetchPhotoBytes(), getApiKey(), runPlacesRequest(), searchNearby(), searchText()
 
-### Community 19 - "Community 19"
+### Community 20 - "Community 20"
 Cohesion: 0.29
 Nodes (5): AGENTS.md — Backend context & discipline, README.md — Project overview, supabase/migrations/README.md, Hero image (product landing), Best City Spots logo
 
-### Community 20 - "Community 20"
+### Community 21 - "Community 21"
+Cohesion: 0.4
+Nodes (2): isWithinMaxPriceTier(), mapPriceLevel()
+
+### Community 22 - "Community 22"
 Cohesion: 0.47
 Nodes (3): currentLevel(), emit(), isStructured()
 
-### Community 21 - "Community 21"
+### Community 23 - "Community 23"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 22 - "Community 22"
+### Community 24 - "Community 24"
 Cohesion: 0.6
 Nodes (4): getCityInsight(), getIntelligentTrendingCities(), isFresh(), matchCitiesInDb()
 
-### Community 23 - "Community 23"
+### Community 25 - "Community 25"
 Cohesion: 0.5
 Nodes (2): fisherYatesShuffle(), getMixedCitiesFromCategories()
 
-### Community 24 - "Community 24"
+### Community 26 - "Community 26"
 Cohesion: 0.5
 Nodes (2): generateText(), getClient()
 
-### Community 25 - "Community 25"
-Cohesion: 0.5
-Nodes (1): GET()
-
-### Community 26 - "Community 26"
-Cohesion: 0.5
-Nodes (0): 
-
 ### Community 27 - "Community 27"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): GET()
 
 ### Community 28 - "Community 28"
 Cohesion: 0.5
@@ -265,24 +269,24 @@ Cohesion: 0.5
 Nodes (0): 
 
 ### Community 30 - "Community 30"
-Cohesion: 0.83
-Nodes (3): fetchFreshWeather(), getCityWeather(), parseCachedWeather()
+Cohesion: 0.5
+Nodes (0): 
 
 ### Community 31 - "Community 31"
 Cohesion: 0.5
 Nodes (0): 
 
 ### Community 32 - "Community 32"
-Cohesion: 1.0
-Nodes (2): main(), parseCsvLine()
+Cohesion: 0.83
+Nodes (3): fetchFreshWeather(), getCityWeather(), parseCachedWeather()
 
 ### Community 33 - "Community 33"
-Cohesion: 0.67
+Cohesion: 0.5
 Nodes (0): 
 
 ### Community 34 - "Community 34"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 1.0
+Nodes (2): main(), parseCsvLine()
 
 ### Community 35 - "Community 35"
 Cohesion: 0.67
@@ -297,11 +301,11 @@ Cohesion: 0.67
 Nodes (0): 
 
 ### Community 38 - "Community 38"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 39 - "Community 39"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 40 - "Community 40"
@@ -410,27 +414,27 @@ Nodes (0):
 
 ### Community 66 - "Community 66"
 Cohesion: 1.0
-Nodes (2): Cache-First + Stale-While-Revalidate Pattern, Rationale: No dedicated Redis — Postgres cache tables suffice
+Nodes (0): 
 
 ### Community 67 - "Community 67"
 Cohesion: 1.0
-Nodes (2): Supabase RLS Security Boundary, Rationale: No end-user auth — public-read product
+Nodes (0): 
 
 ### Community 68 - "Community 68"
 Cohesion: 1.0
-Nodes (2): CLAUDE.md — Graphify pointer, GRAPH_REPORT.md (prior graphify output)
+Nodes (0): 
 
 ### Community 69 - "Community 69"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): Cache-First + Stale-While-Revalidate Pattern, Rationale: No dedicated Redis — Postgres cache tables suffice
 
 ### Community 70 - "Community 70"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): Supabase RLS Security Boundary, Rationale: No end-user auth — public-read product
 
 ### Community 71 - "Community 71"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (2): CLAUDE.md — Graphify pointer, GRAPH_REPORT.md (prior graphify output)
 
 ### Community 72 - "Community 72"
 Cohesion: 1.0
@@ -502,186 +506,206 @@ Nodes (0):
 
 ### Community 89 - "Community 89"
 Cohesion: 1.0
-Nodes (1): Zod Validation at Boundaries
+Nodes (0): 
 
 ### Community 90 - "Community 90"
 Cohesion: 1.0
-Nodes (1): Liquid Glass UI System
+Nodes (0): 
 
 ### Community 91 - "Community 91"
 Cohesion: 1.0
-Nodes (1): Thin Route Handlers / Fat Service Layer
+Nodes (0): 
 
 ### Community 92 - "Community 92"
 Cohesion: 1.0
-Nodes (1): Privacy-Conscious Aggregate Analytics
+Nodes (0): 
 
 ### Community 93 - "Community 93"
 Cohesion: 1.0
-Nodes (1): Elastic City Search (FTS + trigram + alias)
+Nodes (1): Zod Validation at Boundaries
 
 ### Community 94 - "Community 94"
 Cohesion: 1.0
-Nodes (1): Graceful Degradation on Provider Failure
+Nodes (1): Liquid Glass UI System
 
 ### Community 95 - "Community 95"
 Cohesion: 1.0
-Nodes (1): Rationale: Heavy logic pushed into Supabase RPC for atomicity
+Nodes (1): Thin Route Handlers / Fat Service Layer
 
 ### Community 96 - "Community 96"
 Cohesion: 1.0
-Nodes (1): Top AI candidate cities dataset
+Nodes (1): Privacy-Conscious Aggregate Analytics
 
 ### Community 97 - "Community 97"
 Cohesion: 1.0
-Nodes (1): Globe UI icon
+Nodes (1): Elastic City Search (FTS + trigram + alias)
 
 ### Community 98 - "Community 98"
 Cohesion: 1.0
-Nodes (1): Window UI icon
+Nodes (1): Graceful Degradation on Provider Failure
 
 ### Community 99 - "Community 99"
 Cohesion: 1.0
-Nodes (1): File UI icon
+Nodes (1): Rationale: Heavy logic pushed into Supabase RPC for atomicity
 
 ### Community 100 - "Community 100"
 Cohesion: 1.0
-Nodes (1): Next.js wordmark icon
+Nodes (1): Top AI candidate cities dataset
 
 ### Community 101 - "Community 101"
+Cohesion: 1.0
+Nodes (1): Globe UI icon
+
+### Community 102 - "Community 102"
+Cohesion: 1.0
+Nodes (1): Window UI icon
+
+### Community 103 - "Community 103"
+Cohesion: 1.0
+Nodes (1): File UI icon
+
+### Community 104 - "Community 104"
+Cohesion: 1.0
+Nodes (1): Next.js wordmark icon
+
+### Community 105 - "Community 105"
 Cohesion: 1.0
 Nodes (1): Vercel wordmark icon
 
 ## Knowledge Gaps
 - **22 isolated node(s):** `Cache-First + Stale-While-Revalidate Pattern`, `Supabase RLS Security Boundary`, `Zod Validation at Boundaries`, `Liquid Glass UI System`, `Thin Route Handlers / Fat Service Layer` (+17 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 38`** (2 nodes): `testSearch()`, `test-supabase.ts`
+- **Thin community `Community 40`** (2 nodes): `testSearch()`, `test-supabase.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (2 nodes): `robots()`, `robots.ts`
+- **Thin community `Community 41`** (2 nodes): `robots()`, `robots.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
+- **Thin community `Community 42`** (2 nodes): `fetchTrendingDestinations()`, `actions.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (2 nodes): `sitemap()`, `sitemap.ts`
+- **Thin community `Community 43`** (2 nodes): `sitemap()`, `sitemap.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (2 nodes): `RootLayout()`, `layout.tsx`
+- **Thin community `Community 44`** (2 nodes): `RootLayout()`, `layout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (2 nodes): `Home()`, `page.tsx`
+- **Thin community `Community 45`** (2 nodes): `Home()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (2 nodes): `TopCitiesPage()`, `page.tsx`
+- **Thin community `Community 46`** (2 nodes): `TopCitiesPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (2 nodes): `AboutPage()`, `page.tsx`
+- **Thin community `Community 47`** (2 nodes): `AboutPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
+- **Thin community `Community 48`** (2 nodes): `CityVitalsFallback()`, `city-page-parts.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
+- **Thin community `Community 49`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (2 nodes): `POST()`, `route.ts`
+- **Thin community `Community 50`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
+- **Thin community `Community 51`** (2 nodes): `POST()`, `route.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
+- **Thin community `Community 52`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
+- **Thin community `Community 53`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
+- **Thin community `Community 54`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
+- **Thin community `Community 55`** (2 nodes): `MobileBottomNav()`, `MobileBottomNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
+- **Thin community `Community 56`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
+- **Thin community `Community 57`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
+- **Thin community `Community 58`** (2 nodes): `ClientEffects()`, `ClientEffects.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
+- **Thin community `Community 59`** (2 nodes): `FloralAccent()`, `FloralAccent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
+- **Thin community `Community 60`** (2 nodes): `TopCitiesPageContent.tsx`, `CityCard()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
+- **Thin community `Community 61`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
+- **Thin community `Community 62`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (2 nodes): `formatPopulation()`, `format.ts`
+- **Thin community `Community 63`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (2 nodes): `getHealth()`, `health.ts`
+- **Thin community `Community 64`** (2 nodes): `formatPopulation()`, `format.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
+- **Thin community `Community 65`** (2 nodes): `getHealth()`, `health.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (2 nodes): `haversineKm()`, `geo.ts`
+- **Thin community `Community 66`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
+- **Thin community `Community 67`** (2 nodes): `haversineKm()`, `geo.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (2 nodes): `Cache-First + Stale-While-Revalidate Pattern`, `Rationale: No dedicated Redis — Postgres cache tables suffice`
+- **Thin community `Community 68`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (2 nodes): `Supabase RLS Security Boundary`, `Rationale: No end-user auth — public-read product`
+- **Thin community `Community 69`** (2 nodes): `Cache-First + Stale-While-Revalidate Pattern`, `Rationale: No dedicated Redis — Postgres cache tables suffice`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (2 nodes): `CLAUDE.md — Graphify pointer`, `GRAPH_REPORT.md (prior graphify output)`
+- **Thin community `Community 70`** (2 nodes): `Supabase RLS Security Boundary`, `Rationale: No end-user auth — public-read product`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `next-env.d.ts`
+- **Thin community `Community 71`** (2 nodes): `CLAUDE.md — Graphify pointer`, `GRAPH_REPORT.md (prior graphify output)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 70`** (1 nodes): `next.config.ts`
+- **Thin community `Community 72`** (1 nodes): `next-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 71`** (1 nodes): `trending-destinations.ts`
+- **Thin community `Community 73`** (1 nodes): `next.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 72`** (1 nodes): `test-ranking.ts`
+- **Thin community `Community 74`** (1 nodes): `trending-destinations.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 73`** (1 nodes): `diagnose-images.ts`
+- **Thin community `Community 75`** (1 nodes): `test-ranking.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 74`** (1 nodes): `clear-places-cache.ts`
+- **Thin community `Community 76`** (1 nodes): `diagnose-images.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 75`** (1 nodes): `opengraph-image.tsx`
+- **Thin community `Community 77`** (1 nodes): `clear-places-cache.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 76`** (1 nodes): `AIBriefingSkeleton.tsx`
+- **Thin community `Community 78`** (1 nodes): `verify-refactor.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 77`** (1 nodes): `ScrollProgress.tsx`
+- **Thin community `Community 79`** (1 nodes): `opengraph-image.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 78`** (1 nodes): `InteractiveButton.tsx`
+- **Thin community `Community 80`** (1 nodes): `AIBriefingSkeleton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 79`** (1 nodes): `Breadcrumbs.tsx`
+- **Thin community `Community 81`** (1 nodes): `ScrollProgress.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 80`** (1 nodes): `TrustIndicators.tsx`
+- **Thin community `Community 82`** (1 nodes): `InteractiveButton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 81`** (1 nodes): `HeroHeader.tsx`
+- **Thin community `Community 83`** (1 nodes): `Breadcrumbs.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 82`** (1 nodes): `HomeSearchShowcase.tsx`
+- **Thin community `Community 84`** (1 nodes): `TrustIndicators.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 83`** (1 nodes): `TestimonialsSection.tsx`
+- **Thin community `Community 85`** (1 nodes): `HeroHeader.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 84`** (1 nodes): `ThemeToggle.tsx`
+- **Thin community `Community 86`** (1 nodes): `HomeSearchShowcase.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 85`** (1 nodes): `VisualEffects.tsx`
+- **Thin community `Community 87`** (1 nodes): `TestimonialsSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 86`** (1 nodes): `AboutPageContent.tsx`
+- **Thin community `Community 88`** (1 nodes): `ThemeToggle.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 87`** (1 nodes): `index.ts`
+- **Thin community `Community 89`** (1 nodes): `VisualEffects.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 88`** (1 nodes): `validation.ts`
+- **Thin community `Community 90`** (1 nodes): `AboutPageContent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 89`** (1 nodes): `Zod Validation at Boundaries`
+- **Thin community `Community 91`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 90`** (1 nodes): `Liquid Glass UI System`
+- **Thin community `Community 92`** (1 nodes): `validation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 91`** (1 nodes): `Thin Route Handlers / Fat Service Layer`
+- **Thin community `Community 93`** (1 nodes): `Zod Validation at Boundaries`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 92`** (1 nodes): `Privacy-Conscious Aggregate Analytics`
+- **Thin community `Community 94`** (1 nodes): `Liquid Glass UI System`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 93`** (1 nodes): `Elastic City Search (FTS + trigram + alias)`
+- **Thin community `Community 95`** (1 nodes): `Thin Route Handlers / Fat Service Layer`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 94`** (1 nodes): `Graceful Degradation on Provider Failure`
+- **Thin community `Community 96`** (1 nodes): `Privacy-Conscious Aggregate Analytics`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 95`** (1 nodes): `Rationale: Heavy logic pushed into Supabase RPC for atomicity`
+- **Thin community `Community 97`** (1 nodes): `Elastic City Search (FTS + trigram + alias)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 96`** (1 nodes): `Top AI candidate cities dataset`
+- **Thin community `Community 98`** (1 nodes): `Graceful Degradation on Provider Failure`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 97`** (1 nodes): `Globe UI icon`
+- **Thin community `Community 99`** (1 nodes): `Rationale: Heavy logic pushed into Supabase RPC for atomicity`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 98`** (1 nodes): `Window UI icon`
+- **Thin community `Community 100`** (1 nodes): `Top AI candidate cities dataset`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 99`** (1 nodes): `File UI icon`
+- **Thin community `Community 101`** (1 nodes): `Globe UI icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 100`** (1 nodes): `Next.js wordmark icon`
+- **Thin community `Community 102`** (1 nodes): `Window UI icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 101`** (1 nodes): `Vercel wordmark icon`
+- **Thin community `Community 103`** (1 nodes): `File UI icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 104`** (1 nodes): `Next.js wordmark icon`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 105`** (1 nodes): `Vercel wordmark icon`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
@@ -689,5 +713,3 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What connects `Cache-First + Stale-While-Revalidate Pattern`, `Supabase RLS Security Boundary`, `Zod Validation at Boundaries` to the rest of the system?**
   _22 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.13 - nodes in this community are weakly interconnected._

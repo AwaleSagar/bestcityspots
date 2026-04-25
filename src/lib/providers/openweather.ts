@@ -36,13 +36,19 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Owm
   try {
     const [weather, aqi] = await Promise.all([
       httpJson<{
-        main: { temp: number; feels_like: number; temp_min: number; temp_max: number; humidity: number };
+        main: {
+          temp: number;
+          feels_like: number;
+          temp_min: number;
+          temp_max: number;
+          humidity: number;
+        };
         wind: { speed: number };
         weather: { main: string; description: string; icon: string }[];
-      }>(
-        `${API}/weather?lat=${lat}&lon=${lng}&units=metric&appid=${encodeURIComponent(apiKey)}`,
-        { provider: PROVIDER, timeoutMs: 10_000 }
-      ),
+      }>(`${API}/weather?lat=${lat}&lon=${lng}&units=metric&appid=${encodeURIComponent(apiKey)}`, {
+        provider: PROVIDER,
+        timeoutMs: 10_000,
+      }),
       httpJson<{ list: { main: { aqi: number } }[] }>(
         `${API}/air_pollution?lat=${lat}&lon=${lng}&appid=${encodeURIComponent(apiKey)}`,
         { provider: PROVIDER, timeoutMs: 10_000 }

@@ -24,92 +24,14 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
-
-function CityVitalsFallback() {
-  return (
-    <div className="atlas-panel rounded-[1.8rem] p-7 md:p-8">
-      <div className="text-muted text-[11px] font-semibold tracking-[0.2em] uppercase">
-        Live City Vitals
-      </div>
-      <p className="text-muted mt-4 text-sm">
-        Vitals unavailable right now. Please check back soon.
-      </p>
-    </div>
-  );
-}
-
-function MetricCard({
-  label,
-  value,
-  unit,
-  icon: Icon,
-  source,
-}: {
-  label: string;
-  value: string | number | null | undefined;
-  unit?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  source?: string;
-}) {
-  const isEmpty = value === null || value === undefined || value === "";
-  const display = isEmpty ? (
-    <span className="text-foreground/25">N/A</span>
-  ) : (
-    <div className="flex flex-col items-start leading-tight">
-      <span className="text-foreground text-2xl font-bold tracking-tight">
-        {typeof value === "number" ? value.toLocaleString() : value}
-      </span>
-      {unit && (
-        <span className="text-foreground/45 text-[10px] font-semibold tracking-[0.15em] uppercase">
-          {unit}
-        </span>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="atlas-panel group/metric md:hover:border-accent/14 flex flex-col gap-3 rounded-[1.1rem] p-4 transition-all duration-300 active:scale-[0.98] sm:gap-4 sm:rounded-[1.3rem] sm:p-5 md:duration-500">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="border-line bg-background/55 md:group-hover/metric:border-accent/20 md:group-hover/metric:bg-accent-soft/60 flex h-10 w-10 items-center justify-center rounded-[0.9rem] border transition-all duration-300">
-            <Icon className="text-accent h-5 w-5 transition-colors duration-300" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="text-muted text-[10px] font-semibold tracking-[0.15em] uppercase">
-                {label}
-              </div>
-            </div>
-            {display}
-          </div>
-        </div>
-      </div>
-      <div className="border-line flex items-center justify-between border-t pt-3">
-        <div className="text-muted text-[9px] font-semibold tracking-[0.15em] uppercase">
-          Data Source
-        </div>
-        <div className="text-muted-strong max-w-[120px] text-right text-[9px] leading-relaxed font-semibold tracking-[0.1em] uppercase">
-          {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function getArrivalMood(temp?: number) {
-  if (typeof temp !== "number") {
-    return "A practical first read before you compare neighborhoods, seasons, and places.";
-  }
-  if (temp <= 8)
-    return "Cold-weather pacing: plan warm interiors, museums, and shorter outdoor loops.";
-  if (temp <= 18)
-    return "Comfortable walking weather: a good day for slow neighborhoods and long routes.";
-  if (temp <= 28)
-    return "Balanced conditions: keep outdoor landmarks, dining, and transit options in play.";
-  return "Heat-aware planning: favor shaded routes, early starts, and indoor pauses.";
-}
+import {
+  CityVitalsFallback,
+  CityVitalsSkeleton,
+  getArrivalMood,
+  MetricCard,
+} from "./city-page-parts";
 
 async function ExperiencesWrapper({
   cityName,
@@ -140,16 +62,6 @@ async function ExperiencesWrapper({
         restaurants={restaurants}
         hotels={hotels}
       />
-    </div>
-  );
-}
-
-function CityVitalsSkeleton() {
-  return (
-    <div className="atlas-panel animate-pulse rounded-[1.8rem] p-7 md:p-8">
-      <div className="bg-foreground/10 h-2 w-32 rounded" />
-      <div className="bg-foreground/10 mt-4 h-6 w-24 rounded" />
-      <div className="bg-foreground/10 mt-6 h-10 w-full rounded" />
     </div>
   );
 }
@@ -252,9 +164,9 @@ export default async function CityPage({
         <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
-            <header className="organic-panel relative space-y-6 overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:space-y-7 md:rounded-[2.4rem] md:p-8">
+            <header className="organic-panel relative overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:rounded-[2.4rem] md:p-8">
               <div className="animate-pulse-glow pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px]" />
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="mb-3 flex flex-wrap items-center gap-3 md:mb-4">
                 <span className="eyebrow">
                   <Navigation className="text-accent h-3.5 w-3.5" />
                   {city.iso3 || "CITY"}
@@ -265,16 +177,16 @@ export default async function CityPage({
                   Public data
                 </span>
               </div>
-              <h1 className="text-foreground block pb-2 text-[clamp(3.2rem,8vw,6.8rem)] leading-[0.88] break-words">
+              <h1 className="text-foreground block text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.95] break-words">
                 {city.city}
               </h1>
-              <div className="flex items-center gap-6">
+              <div className="mt-3 flex items-center gap-6 md:mt-4">
                 <p className="text-muted-strong text-xl font-semibold tracking-[0.16em] uppercase md:text-2xl">
                   {city.country}
                 </p>
                 <div className="from-line h-px flex-1 bg-gradient-to-r to-transparent" />
               </div>
-              <div className="grid gap-3 pt-2 sm:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-3 md:mt-7">
                 {[
                   {
                     icon: Leaf,

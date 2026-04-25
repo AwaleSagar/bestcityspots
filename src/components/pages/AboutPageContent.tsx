@@ -1,15 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Database,
-  Globe2,
-  Radar,
-  Shield,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, Database, Globe2, Radar, Shield, Sparkles } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
@@ -62,7 +54,7 @@ export default function AboutPageContent() {
     <>
       <ScrollProgress />
 
-      <main id="main-content" className="min-h-screen bg-transparent text-foreground">
+      <main id="main-content" className="text-foreground min-h-screen bg-transparent">
         <div
           className="container-gutter mx-auto max-w-6xl px-4 py-12 sm:px-6"
           style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
@@ -71,7 +63,7 @@ export default function AboutPageContent() {
             <nav className="mb-10" aria-label="Breadcrumb">
               <Link
                 href="/"
-                className="inline-flex items-center gap-3 rounded-full border border-line bg-background/65 px-4 py-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-muted-strong transition-colors duration-300 hover:text-foreground"
+                className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden />
                 Back to explorer
@@ -82,19 +74,19 @@ export default function AboutPageContent() {
           <header className="atlas-frame rounded-[1.6rem] p-5 sm:rounded-[2rem] md:rounded-[2.4rem] md:p-8 lg:p-10">
             <ScrollReveal animation="fade-up">
               <span className="eyebrow">
-                <Sparkles className="h-3.5 w-3.5 text-accent" aria-hidden />
+                <Sparkles className="text-accent h-3.5 w-3.5" aria-hidden />
                 About the atlas
               </span>
             </ScrollReveal>
 
             <ScrollReveal animation="fade-up" delay={0.1}>
-              <h1 className="mt-6 max-w-4xl page-title text-foreground">
+              <h1 className="page-title text-foreground mt-6 max-w-4xl">
                 We design for trust, legibility, and calmer travel decisions.
               </h1>
             </ScrollReveal>
 
             <ScrollReveal animation="fade-up" delay={0.2}>
-              <p className="mt-5 max-w-3xl lede">
+              <p className="lede mt-5 max-w-3xl">
                 Best City Spots exists to make destination research feel edited instead of chaotic.
                 We combine public data, live city conditions, and AI-assisted summaries so travelers
                 can compare places without fighting a noisy interface.
@@ -106,7 +98,7 @@ export default function AboutPageContent() {
             <ScrollReveal animation="fade-up">
               <div className="lg:sticky lg:top-24">
                 <span className="section-heading">Principles</span>
-                <h2 className="mt-5 text-[clamp(2.1rem,3.8vw,3.6rem)] leading-[0.92] text-foreground">
+                <h2 className="text-foreground mt-5 text-[clamp(2.1rem,3.8vw,3.6rem)] leading-[0.92]">
                   The product should feel honest before it feels clever.
                 </h2>
               </div>
@@ -114,13 +106,18 @@ export default function AboutPageContent() {
 
             <div className="grid gap-4 md:grid-cols-2">
               {principles.map((item, index) => (
-                <ScrollReveal key={item.title} animation="fade-up" staggerIndex={index} staggerDelay={0.1}>
+                <ScrollReveal
+                  key={item.title}
+                  animation="fade-up"
+                  staggerIndex={index}
+                  staggerDelay={0.1}
+                >
                   <article className="atlas-panel interactive-card rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.8rem] md:p-6">
-                    <p className="font-mono text-[0.68rem] uppercase tracking-[0.24em] text-muted">
+                    <p className="text-muted font-mono text-[0.68rem] tracking-[0.24em] uppercase">
                       Principle 0{index + 1}
                     </p>
-                    <h3 className="mt-3 text-[2rem] leading-none text-foreground">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-muted">{item.text}</p>
+                    <h3 className="text-foreground mt-3 text-[2rem] leading-none">{item.title}</h3>
+                    <p className="text-muted mt-3 text-sm leading-7">{item.text}</p>
                   </article>
                 </ScrollReveal>
               ))}
@@ -131,11 +128,11 @@ export default function AboutPageContent() {
             {stack.map(({ icon: Icon, title, text }, index) => (
               <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.1}>
                 <article className="atlas-frame rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.9rem] md:p-6">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] border border-line bg-background/60">
-                    <Icon className="h-5 w-5 text-accent" aria-hidden />
+                  <div className="border-line bg-background/60 flex h-12 w-12 items-center justify-center rounded-[1rem] border">
+                    <Icon className="text-accent h-5 w-5" aria-hidden />
                   </div>
-                  <h2 className="mt-5 text-[2rem] leading-none text-foreground">{title}</h2>
-                  <p className="mt-3 text-sm leading-7 text-muted">{text}</p>
+                  <h2 className="text-foreground mt-5 text-[2rem] leading-none">{title}</h2>
+                  <p className="text-muted mt-3 text-sm leading-7">{text}</p>
                 </article>
               </ScrollReveal>
             ))}
@@ -143,11 +140,17 @@ export default function AboutPageContent() {
 
           <section className="mt-16 grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <ScrollReveal animation="fade-up">
-              <div id="source-stack" className="atlas-panel-strong rounded-[1.4rem] p-5 sm:rounded-[1.7rem] md:rounded-[2rem] md:p-7">
+              <div
+                id="source-stack"
+                className="atlas-panel-strong rounded-[1.4rem] p-5 sm:rounded-[1.7rem] md:rounded-[2rem] md:p-7"
+              >
                 <div className="labelled-rule">Source Stack</div>
-                <ul className="mt-5 space-y-4 text-sm leading-7 text-muted-strong">
+                <ul className="text-muted-strong mt-5 space-y-4 text-sm leading-7">
                   {sources.map((item) => (
-                    <li key={item} className="rounded-[1.15rem] border border-line bg-background/45 px-4 py-3">
+                    <li
+                      key={item}
+                      className="border-line bg-background/45 rounded-[1.15rem] border px-4 py-3"
+                    >
                       {item}
                     </li>
                   ))}
@@ -158,18 +161,19 @@ export default function AboutPageContent() {
             <ScrollReveal animation="fade-up" delay={0.1}>
               <div className="atlas-frame rounded-[1.4rem] p-5 sm:rounded-[1.7rem] md:rounded-[2rem] md:p-7">
                 <div className="labelled-rule">How to read the product</div>
-                <div className="mt-5 space-y-4 text-sm leading-7 text-muted">
+                <div className="text-muted mt-5 space-y-4 text-sm leading-7">
                   <p>
                     Search is the front door. City pages combine population context, weather, and AI
                     briefings with places you can save locally while planning.
                   </p>
                   <p>
-                    We treat AI as an assistant for synthesis and copy structure. We do not present it
-                    as a hidden oracle, and we keep the product explicit about where factual data comes from.
+                    We treat AI as an assistant for synthesis and copy structure. We do not present
+                    it as a hidden oracle, and we keep the product explicit about where factual data
+                    comes from.
                   </p>
                   <p>
-                    That design choice matters. Travelers should know what is live, what is estimated,
-                    and what is curated.
+                    That design choice matters. Travelers should know what is live, what is
+                    estimated, and what is curated.
                   </p>
                 </div>
               </div>
@@ -181,8 +185,9 @@ export default function AboutPageContent() {
               <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <div>
                   <div className="labelled-rule">Next step</div>
-                  <p className="mt-5 max-w-2xl text-base leading-8 text-muted-strong md:text-lg">
-                    Explore the ranked city index or jump straight into the search desk to start building a shortlist.
+                  <p className="text-muted-strong mt-5 max-w-2xl text-base leading-8 md:text-lg">
+                    Explore the ranked city index or jump straight into the search desk to start
+                    building a shortlist.
                   </p>
                 </div>
 

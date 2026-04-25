@@ -84,13 +84,17 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       cachedInsight = parsed.success ? parsed.data : null;
 
       // Only treat a row as a hit if prompt_version matches the current one.
-      const versionMatches = cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
+      const versionMatches =
+        cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
       if (cachedInsight && versionMatches && isFresh(cachedUpdatedAt, 365)) {
         return cachedInsight;
       }
     }
   } catch (e) {
-    log.warn("cache_read_failed", { cityId: city.id, error: e instanceof Error ? e.message : String(e) });
+    log.warn("cache_read_failed", {
+      cityId: city.id,
+      error: e instanceof Error ? e.message : String(e),
+    });
   }
 
   // 2) Call the AI. Any failure path below falls through to the stale cache.

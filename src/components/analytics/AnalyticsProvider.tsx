@@ -1,13 +1,13 @@
 "use client";
 
+import { createContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { publicEnv } from "@/lib/env";
 import {
-  createContext,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+  getSessionStorageItem,
+  getStorageItem,
+  setSessionStorageItem,
+  setStorageItem,
+} from "@/lib/storage";
 
 // =============================================================================
 // Types
@@ -50,9 +50,7 @@ interface AnalyticsContextValue {
 // Context
 // =============================================================================
 
-export const AnalyticsContext = createContext<AnalyticsContextValue | null>(
-  null
-);
+export const AnalyticsContext = createContext<AnalyticsContextValue | null>(null);
 
 // =============================================================================
 // Constants
@@ -79,12 +77,12 @@ function getOrCreateSession(): { sessionId: string; isNew: boolean } {
     return { sessionId: "", isNew: false };
   }
 
-  let sessionId = sessionStorage.getItem(SESSION_KEY);
+  let sessionId = getSessionStorageItem(SESSION_KEY);
   let isNew = false;
 
   if (!sessionId) {
     sessionId = generateSessionId();
-    sessionStorage.setItem(SESSION_KEY, sessionId);
+    setSessionStorageItem(SESSION_KEY, sessionId);
     isNew = true;
   }
 
@@ -94,9 +92,9 @@ function getOrCreateSession(): { sessionId: string; isNew: boolean } {
 function isNewVisitor(): boolean {
   if (typeof window === "undefined") return false;
 
-  const visited = localStorage.getItem(NEW_VISITOR_KEY);
+  const visited = getStorageItem(NEW_VISITOR_KEY);
   if (!visited) {
-    localStorage.setItem(NEW_VISITOR_KEY, "1");
+    setStorageItem(NEW_VISITOR_KEY, "1");
     return true;
   }
   return false;
@@ -104,12 +102,12 @@ function isNewVisitor(): boolean {
 
 function getGeoConsent(): boolean {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem(GEO_CONSENT_KEY) === "true";
+  return getStorageItem(GEO_CONSENT_KEY) === "true";
 }
 
 function setGeoConsentStorage(consent: boolean): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(GEO_CONSENT_KEY, consent ? "true" : "false");
+  setStorageItem(GEO_CONSENT_KEY, consent ? "true" : "false");
 }
 
 function shouldTrack(): boolean {
@@ -119,10 +117,8 @@ function shouldTrack(): boolean {
   if (navigator.doNotTrack === "1") return false;
 
   // Don't track in development by default (can be overridden)
-  if (
-    process.env.NODE_ENV === "development" &&
-    !process.env.NEXT_PUBLIC_ANALYTICS_DEV
-  ) {
+  const env = publicEnv();
+  if (env.NODE_ENV === "development" && !env.NEXT_PUBLIC_ANALYTICS_DEV) {
     return false;
   }
 
@@ -216,9 +212,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     if (!shouldTrack()) return;
 
     const handleUnload = () => {
-      const sessionDuration = Math.round(
-        (Date.now() - sessionRef.current.startTime) / 1000
-      );
+      const sessionDuration = Math.round((Date.now() - sessionRef.current.startTime) / 1000);
 
       // Add session end event
       eventsQueue.current.push({
@@ -294,19 +288,16 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   }, []);
 
   // Track city view (convenience method)
-  const trackCityView = useCallback(
-    (cityId: number) => {
-      if (!shouldTrack()) return;
+  const trackCityView = useCallback((cityId: number) => {
+    if (!shouldTrack()) return;
 
-      eventsQueue.current.push({
-        type: "action",
-        sessionId: sessionRef.current.id,
-        action: "view_city",
-        cityId,
-      });
-    },
-    []
-  );
+    eventsQueue.current.push({
+      type: "action",
+      sessionId: sessionRef.current.id,
+      action: "view_city",
+      cityId,
+    });
+  }, []);
 
   // Set geo consent
   const handleSetGeoConsent = useCallback((consent: boolean) => {
@@ -322,9 +313,5 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     hasGeoConsent,
   };
 
-  return (
-    <AnalyticsContext.Provider value={contextValue}>
-      {children}
-    </AnalyticsContext.Provider>
-  );
+  return <AnalyticsContext.Provider value={contextValue}>{children}</AnalyticsContext.Provider>;
 }

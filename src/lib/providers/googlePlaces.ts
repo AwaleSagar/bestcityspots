@@ -30,7 +30,9 @@ const FIELD_MASKS: Record<FieldMaskTier, string> = {
     "places.id,places.displayName,places.formattedAddress,places.location,places.types,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.photos,places.websiteUri,places.editorialSummary",
 };
 
-export interface GooglePlacePhoto { name: string }
+export interface GooglePlacePhoto {
+  name: string;
+}
 
 export interface GooglePlaceNative {
   id: string;
@@ -107,7 +109,10 @@ export async function searchText(params: SearchTextParams): Promise<PlacesResult
     const r = capRadius(params.locationRestriction.radiusKm, correlationId);
     body.locationRestriction = {
       circle: {
-        center: { latitude: params.locationRestriction.lat, longitude: params.locationRestriction.lng },
+        center: {
+          latitude: params.locationRestriction.lat,
+          longitude: params.locationRestriction.lng,
+        },
         radius: r * 1000,
       },
     };
@@ -201,7 +206,10 @@ async function runPlacesRequest(
 }
 
 /** Best-effort resolution of a photo reference to raw image bytes. */
-export async function fetchPhotoBytes(photoName: string, opts: { maxWidth: number; maxHeight: number }): Promise<ArrayBuffer | null> {
+export async function fetchPhotoBytes(
+  photoName: string,
+  opts: { maxWidth: number; maxHeight: number }
+): Promise<ArrayBuffer | null> {
   const apiKey = getApiKey();
   if (!apiKey) return null;
   const url = `${API_BASE}/${photoName}/media?maxWidthPx=${opts.maxWidth}&maxHeightPx=${opts.maxHeight}&key=${encodeURIComponent(apiKey)}`;

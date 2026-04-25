@@ -52,7 +52,9 @@ function emit(level: LogLevel, base: LogContext, event: string, fields?: LogCont
     ...base,
     ...(fields ?? {}),
   };
-  const message = isStructured() ? JSON.stringify(record) : `[${level}] ${event} ${JSON.stringify({ ...base, ...(fields ?? {}) })}`;
+  const message = isStructured()
+    ? JSON.stringify(record)
+    : `[${level}] ${event} ${JSON.stringify({ ...base, ...(fields ?? {}) })}`;
   switch (level) {
     case "debug":
     case "info":

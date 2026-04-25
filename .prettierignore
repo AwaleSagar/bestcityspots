@@ -3,6 +3,11 @@ node_modules/
 /.pnp
 .pnp.js
 
+# Generated / local tool output
+graphify-out/
+.firecrawl/
+.claude/
+
 # Testing
 /coverage
 

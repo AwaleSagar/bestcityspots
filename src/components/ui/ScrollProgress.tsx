@@ -12,8 +12,8 @@ interface ScrollProgressProps {
 
 export default function ScrollProgress({
   showPercentage = false,
-  gradientFrom = "rgb(147, 51, 234)",
-  gradientTo = "rgb(59, 130, 246)",
+  gradientFrom = "var(--color-accent)",
+  gradientTo = "var(--color-brand-secondary)",
 }: ScrollProgressProps) {
   const shouldReduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
@@ -27,7 +27,7 @@ export default function ScrollProgress({
 
   return (
     <div
-      className="fixed left-0 right-0 top-0 z-50 h-1"
+      className="fixed top-0 right-0 left-0 z-50 h-1"
       role="progressbar"
       aria-label="Reading progress"
       aria-valuenow={0}
@@ -35,7 +35,7 @@ export default function ScrollProgress({
       aria-valuemax={100}
     >
       {/* Background track */}
-      <div className="absolute inset-0 bg-foreground/5" />
+      <div className="bg-foreground/5 absolute inset-0" />
 
       {/* Progress bar */}
       <motion.div
@@ -59,12 +59,10 @@ export default function ScrollProgress({
       {/* Percentage indicator */}
       {showPercentage && (
         <motion.div
-          className="absolute right-4 top-3 rounded-full bg-background/80 px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm"
+          className="bg-background/80 absolute top-3 right-4 rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm"
           style={{ opacity: scrollYProgress }}
         >
-          <motion.span>
-            {/* This updates reactively based on scroll */}
-          </motion.span>
+          <motion.span>{/* This updates reactively based on scroll */}</motion.span>
         </motion.div>
       )}
     </div>

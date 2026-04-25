@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
+import SiteFooter from "@/components/layout/SiteFooter";
+import SiteNav from "@/components/layout/SiteNav";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { publicEnv } from "@/lib/env";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -32,7 +37,8 @@ const ibmPlexMono = IBM_Plex_Mono({
   weight: ["400", "500", "600"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
+const publicConfig = publicEnv();
+const siteUrl = publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -90,15 +96,10 @@ export const metadata: Metadata = {
       "Discover hidden gems, plan smarter trips, and explore cities with curated guides and AI-powered insights.",
     images: ["/opengraph-image"],
   },
-  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+  verification: publicConfig.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: publicConfig.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
     : undefined,
 };
-
-import { ThemeProvider } from "@/components/layout/ThemeProvider";
-import SiteNav from "@/components/layout/SiteNav";
-import SiteFooter from "@/components/layout/SiteFooter";
-import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
 
 const jsonLd = [
   {
@@ -151,7 +152,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link fixed top-3 left-3 z-[210] rounded-lg border border-line bg-surface px-4 py-2 text-xs font-semibold text-foreground opacity-0 shadow-md transition focus-visible:opacity-100 sm:top-4 sm:left-4"
+              className="skip-link border-line bg-surface text-foreground fixed top-3 left-3 z-[210] rounded-lg border px-4 py-2 text-xs font-semibold opacity-0 shadow-md transition focus-visible:opacity-100 sm:top-4 sm:left-4"
               style={{
                 marginLeft: "env(safe-area-inset-left, 0)",
                 marginTop: "env(safe-area-inset-top, 0)",

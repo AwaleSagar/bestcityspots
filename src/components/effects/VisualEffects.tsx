@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { Terminal, Shield, Cpu, Activity, Database, Globe } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -44,32 +44,32 @@ export default function VisualEffects() {
         {isAtlasMode && (
           <div
             onClick={() => setIsAtlasMode(false)}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm p-6"
+            className="bg-background/95 fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm"
             role="dialog"
             aria-modal="true"
             aria-label="Atlas system diagnostics"
           >
             <div
-              className="w-full max-w-2xl rounded-xl border border-line bg-surface p-8"
+              className="border-line bg-surface w-full max-w-2xl rounded-xl border p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft">
-                    <Terminal className="h-4 w-4 text-accent" />
+                  <div className="bg-accent-soft flex h-9 w-9 items-center justify-center rounded-lg">
+                    <Terminal className="text-accent h-4 w-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-semibold tracking-wider text-muted uppercase">
+                    <div className="text-muted text-xs font-semibold tracking-wider uppercase">
                       System Diagnostics
                     </div>
-                    <div className="text-base font-bold tracking-tight text-foreground">
+                    <div className="text-foreground text-base font-bold tracking-tight">
                       ATLAS CORE v1.0.1
                     </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsAtlasMode(false)}
-                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-muted hover:bg-surface-strong"
+                  className="border-line text-muted hover:bg-surface-strong rounded-lg border px-3 py-1.5 text-xs font-medium"
                 >
                   Close
                 </button>
@@ -84,12 +84,12 @@ export default function VisualEffects() {
                   { icon: Globe, label: "Global Nodes", val: "CITIES_INTEL.V4" },
                   { icon: Activity, label: "Uptime", val: "99.982% // SYNC" },
                 ].map((item, i) => (
-                  <div key={i} className="rounded-lg border border-line bg-surface-strong p-3">
-                    <div className="mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted">
+                  <div key={i} className="border-line bg-surface-strong rounded-lg border p-3">
+                    <div className="text-muted mb-1.5 flex items-center gap-1.5 text-[10px] font-semibold tracking-wider uppercase">
                       <item.icon className="h-3 w-3" />
                       {item.label}
                     </div>
-                    <div className="font-mono text-xs text-accent">{item.val}</div>
+                    <div className="text-accent font-mono text-xs">{item.val}</div>
                   </div>
                 ))}
               </div>

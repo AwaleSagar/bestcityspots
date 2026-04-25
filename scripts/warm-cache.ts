@@ -317,7 +317,9 @@ async function resolveTrendingCities(supabase: SupabaseClient): Promise<City[]> 
     if (data) {
       cities.push(data as City);
     } else {
-      console.warn(`  Warning: Could not find city "${destination.name}, ${destination.country}" in database`);
+      console.warn(
+        `  Warning: Could not find city "${destination.name}, ${destination.country}" in database`
+      );
     }
   }
 
@@ -353,7 +355,10 @@ async function getTopCitiesByTraffic(supabase: SupabaseClient, limit: number): P
 
     if (fbErr || !fallback?.length) return [];
 
-    const cityIds = [...new Set(fallback.map((r: { city_id: number }) => r.city_id))].slice(0, limit);
+    const cityIds = [...new Set(fallback.map((r: { city_id: number }) => r.city_id))].slice(
+      0,
+      limit
+    );
     const { data: cities } = await supabase
       .from("cities")
       .select("id, city, city_ascii, country, lat, lng, population, admin_name")
@@ -638,7 +643,10 @@ async function checkWeatherCacheStatus(
 
   const ageMs = Date.now() - new Date(data.updated_at).getTime();
   const ageInMinutes = ageMs / (1000 * 60);
-  return { isFresh: ageInMinutes < WEATHER_WARM_THRESHOLD_MINUTES, ageInMinutes: Math.round(ageInMinutes) };
+  return {
+    isFresh: ageInMinutes < WEATHER_WARM_THRESHOLD_MINUTES,
+    ageInMinutes: Math.round(ageInMinutes),
+  };
 }
 
 async function warmWeatherCache(
@@ -658,8 +666,14 @@ async function warmWeatherCache(
 
   try {
     const [weatherRes, aqiRes] = await Promise.all([
-      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`, { signal: AbortSignal.timeout(10_000) }),
-      fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`, { signal: AbortSignal.timeout(10_000) }),
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}&units=metric`,
+        { signal: AbortSignal.timeout(10_000) }
+      ),
+      fetch(
+        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${apiKey}`,
+        { signal: AbortSignal.timeout(10_000) }
+      ),
     ]);
 
     if (!weatherRes.ok || !aqiRes.ok) return { warmed: false, cached: false, error: true };
@@ -706,7 +720,10 @@ async function checkMetricsCacheStatus(
 
   const ageMs = Date.now() - new Date(data.updated_at).getTime();
   const ageInMinutes = ageMs / (1000 * 60);
-  return { isFresh: ageInMinutes < METRICS_WARM_THRESHOLD_MINUTES, ageInMinutes: Math.round(ageInMinutes) };
+  return {
+    isFresh: ageInMinutes < METRICS_WARM_THRESHOLD_MINUTES,
+    ageInMinutes: Math.round(ageInMinutes),
+  };
 }
 
 async function warmMetricsCache(
@@ -720,8 +737,14 @@ async function warmMetricsCache(
 
   try {
     const [aqRes, tempRes] = await Promise.all([
-      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lng}&hourly=pm2_5&past_days=1&forecast_days=1&timezone=auto`, { signal: AbortSignal.timeout(10_000) }),
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m&timezone=auto`, { signal: AbortSignal.timeout(10_000) }),
+      fetch(
+        `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${city.lat}&longitude=${city.lng}&hourly=pm2_5&past_days=1&forecast_days=1&timezone=auto`,
+        { signal: AbortSignal.timeout(10_000) }
+      ),
+      fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lng}&current=temperature_2m&timezone=auto`,
+        { signal: AbortSignal.timeout(10_000) }
+      ),
     ]);
 
     let pm25: number | null = null;
@@ -740,13 +763,16 @@ async function warmMetricsCache(
       }
     }
 
-    await supabase.from("city_metrics").upsert({
-      city_id: city.id,
-      pollution_pm25: pm25,
-      climate_comfort: comfort,
-      updated_at: new Date().toISOString(),
-      source: { pollution: "open-meteo/air-quality", climate: "open-meteo/weather" },
-    }, { onConflict: "city_id" });
+    await supabase.from("city_metrics").upsert(
+      {
+        city_id: city.id,
+        pollution_pm25: pm25,
+        climate_comfort: comfort,
+        updated_at: new Date().toISOString(),
+        source: { pollution: "open-meteo/air-quality", climate: "open-meteo/weather" },
+      },
+      { onConflict: "city_id" }
+    );
 
     return { warmed: true, cached: false, error: false };
   } catch (err) {
@@ -789,14 +815,23 @@ async function warmCacheForCity(
   // Warm places cache (all three types in parallel)
   if (options.places) {
     const placeResults = await Promise.all(
-      PLACE_TYPES.map((pt) => warmPlacesCache(supabase, city, pt, options.dryRun).then((r) => ({ type: pt, ...r })))
+      PLACE_TYPES.map((pt) =>
+        warmPlacesCache(supabase, city, pt, options.dryRun).then((r) => ({ type: pt, ...r }))
+      )
     );
 
     const labels: string[] = [];
     for (const pr of placeResults) {
-      if (pr.cached) { result.placesCached++; labels.push(`${pr.type}: cached`); }
-      else if (pr.warmed) { result.placesWarmed++; labels.push(`${pr.type}: ${options.dryRun ? "would warm" : "warmed"}`); }
-      else if (pr.error) { result.placesErrors++; labels.push(`${pr.type}: error`); }
+      if (pr.cached) {
+        result.placesCached++;
+        labels.push(`${pr.type}: cached`);
+      } else if (pr.warmed) {
+        result.placesWarmed++;
+        labels.push(`${pr.type}: ${options.dryRun ? "would warm" : "warmed"}`);
+      } else if (pr.error) {
+        result.placesErrors++;
+        labels.push(`${pr.type}: error`);
+      }
     }
     console.log(`  Places: ${labels.join(", ")}`);
   }
@@ -807,8 +842,12 @@ async function warmCacheForCity(
   if (options.insights) {
     parallel.push(
       warmInsightsCache(supabase, city, options.dryRun).then((r) => {
-        result.insightsCached = r.cached; result.insightsWarmed = r.warmed; result.insightsError = r.error;
-        console.log(`  Insights: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+        result.insightsCached = r.cached;
+        result.insightsWarmed = r.warmed;
+        result.insightsError = r.error;
+        console.log(
+          `  Insights: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`
+        );
       })
     );
   }
@@ -816,8 +855,12 @@ async function warmCacheForCity(
   if (options.weather) {
     parallel.push(
       warmWeatherCache(supabase, city, options.dryRun).then((r) => {
-        result.weatherCached = r.cached; result.weatherWarmed = r.warmed; result.weatherError = r.error;
-        console.log(`  Weather: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+        result.weatherCached = r.cached;
+        result.weatherWarmed = r.warmed;
+        result.weatherError = r.error;
+        console.log(
+          `  Weather: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`
+        );
       })
     );
   }
@@ -825,8 +868,12 @@ async function warmCacheForCity(
   if (options.metrics) {
     parallel.push(
       warmMetricsCache(supabase, city, options.dryRun).then((r) => {
-        result.metricsCached = r.cached; result.metricsWarmed = r.warmed; result.metricsError = r.error;
-        console.log(`  Metrics: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`);
+        result.metricsCached = r.cached;
+        result.metricsWarmed = r.warmed;
+        result.metricsError = r.error;
+        console.log(
+          `  Metrics: ${r.cached ? "cached" : r.warmed ? (options.dryRun ? "would warm" : "warmed") : "error"}`
+        );
       })
     );
   }
@@ -908,12 +955,21 @@ Duration: ${durationStr}
 ================================================================================
 `);
 
-  const totalErrors = stats.placesErrors + stats.insightsErrors + stats.weatherErrors + stats.metricsErrors;
+  const totalErrors =
+    stats.placesErrors + stats.insightsErrors + stats.weatherErrors + stats.metricsErrors;
   const totalAttempts =
-    stats.placesWarmed + stats.placesCached + stats.placesErrors +
-    stats.insightsWarmed + stats.insightsCached + stats.insightsErrors +
-    stats.weatherWarmed + stats.weatherCached + stats.weatherErrors +
-    stats.metricsWarmed + stats.metricsCached + stats.metricsErrors;
+    stats.placesWarmed +
+    stats.placesCached +
+    stats.placesErrors +
+    stats.insightsWarmed +
+    stats.insightsCached +
+    stats.insightsErrors +
+    stats.weatherWarmed +
+    stats.weatherCached +
+    stats.weatherErrors +
+    stats.metricsWarmed +
+    stats.metricsCached +
+    stats.metricsErrors;
   const errorRate = totalAttempts > 0 ? totalErrors / totalAttempts : 0;
 
   if (errorRate > 0.1) {
@@ -939,7 +995,9 @@ async function main(): Promise<void> {
     args.insights && "insights",
     args.weather && "weather",
     args.metrics && "metrics",
-  ].filter(Boolean).join(", ");
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   console.log(`
 ================================================================================

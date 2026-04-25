@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 interface Star {
@@ -37,14 +37,14 @@ const STAR_COLORS = [
 
 // Vibrant color palette for labels
 const LABEL_COLORS = [
-  { r: 139, g: 92, b: 246 },  // Purple
-  { r: 6, g: 182, b: 212 },   // Cyan
-  { r: 236, g: 72, b: 153 },  // Pink
-  { r: 251, g: 146, b: 60 },  // Orange
-  { r: 34, g: 211, b: 238 },  // Teal
+  { r: 139, g: 92, b: 246 }, // Purple
+  { r: 6, g: 182, b: 212 }, // Cyan
+  { r: 236, g: 72, b: 153 }, // Pink
+  { r: 251, g: 146, b: 60 }, // Orange
+  { r: 34, g: 211, b: 238 }, // Teal
   { r: 167, g: 139, b: 250 }, // Light purple
-  { r: 74, g: 222, b: 128 },  // Green
-  { r: 251, g: 191, b: 36 },  // Amber
+  { r: 74, g: 222, b: 128 }, // Green
+  { r: 251, g: 191, b: 36 }, // Amber
 ];
 
 function getStarColor(brightness: number) {
@@ -115,7 +115,7 @@ function getNeighborStars(grid: Map<string, Star[]>, star: Star, cellSize: numbe
   const cellX = Math.floor(star.x / cellSize);
   const cellY = Math.floor(star.y / cellSize);
   const neighbors: Star[] = [];
-  
+
   // Check current cell and 8 adjacent cells
   for (let dx = -1; dx <= 1; dx++) {
     for (let dy = -1; dy <= 1; dy++) {
@@ -155,7 +155,7 @@ function generateConnections(stars: Star[]): Connection[] {
 
     // Only check stars in nearby grid cells - O(k) where k is local density
     const nearbyStars = getNeighborStars(grid, star, cellSize);
-    
+
     // Find nearby stars to connect (filter by distance and connection count)
     const candidates: Star[] = [];
     for (const other of nearbyStars) {
@@ -168,23 +168,21 @@ function generateConnections(stars: Star[]): Connection[] {
       if (distance < CONNECTION_DISTANCE / 10) {
         candidates.push(other);
       }
-      
+
       if (candidates.length >= MAX_CONNECTIONS_PER_STAR - currentCount) break;
     }
 
     for (const other of candidates) {
       // O(1) duplicate check using Set
-      const connKey = star.id < other.id 
-        ? `${star.id}-${other.id}` 
-        : `${other.id}-${star.id}`;
-      
+      const connKey = star.id < other.id ? `${star.id}-${other.id}` : `${other.id}-${star.id}`;
+
       if (!connectionSet.has(connKey)) {
         connectionSet.add(connKey);
-        
+
         const dx = (star.x - other.x) * 10;
         const dy = (star.y - other.y) * 10;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const opacity = Math.max(0.1, 0.4 - distance / (CONNECTION_DISTANCE / 10) * 0.3);
+        const opacity = Math.max(0.1, 0.4 - (distance / (CONNECTION_DISTANCE / 10)) * 0.3);
 
         connections.push({
           from: star.id,
@@ -371,7 +369,7 @@ export default function ConstellationBackground() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-background"
+      className="bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       {/* Subtle gradient overlay */}
       <div
@@ -385,15 +383,11 @@ export default function ConstellationBackground() {
       />
 
       {/* Star canvas */}
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 h-full w-full"
-        style={{ opacity: 0.9 }}
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" style={{ opacity: 0.9 }} />
 
       {/* Central vignette */}
       <div
-        className="absolute inset-0 z-10 pointer-events-none"
+        className="pointer-events-none absolute inset-0 z-10"
         style={{
           background: `radial-gradient(circle at center, transparent 0%, transparent 25%, var(--color-background) 50%, var(--color-vignette-outer) 100%)`,
         }}

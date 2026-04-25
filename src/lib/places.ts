@@ -5,8 +5,16 @@ import { haversineKm } from "./geo";
 import sharp from "sharp";
 import { encode } from "blurhash";
 import { CACHE_TTL } from "./cache-config";
+import { publicEnv, serverEnv } from "./env";
+import {
+  getDistanceKm,
+  isWithinMaxPriceTier,
+  matchesQuery,
+  sortPlaces,
+} from "./place-search-utils";
+import { fetchPhotoBytes, searchText, type GooglePlaceNative } from "./providers/googlePlaces";
 
-const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const API_KEY = serverEnv().GOOGLE_PLACES_API_KEY;
 if (!API_KEY) {
   console.warn("[places] GOOGLE_PLACES_API_KEY not set — place enrichment disabled.");
 }
@@ -32,7 +40,6 @@ const PRICE_BUCKETS = [
 const MIN_RESULTS_BEFORE_FALLBACK = 8;
 const MIN_BUDGET_RESULTS = 2;
 const BUDGET_PRICE_LEVELS = new Set(["PRICE_LEVEL_FREE", "PRICE_LEVEL_INEXPENSIVE"]);
-const PRICE_TIER_ORDER: PlacePriceTier[] = ["free", "inexpensive", "moderate", "expensive", "very_expensive"];
 const inFlightPlacesRequests = new Map<string, Promise<Landmark[]>>();
 
 let hasWarnedMissingServiceRole = false;
@@ -99,9 +106,10 @@ export interface Landmark {
 
 type GooglePlacePhoto = { name: string };
 
-type GooglePlace = Landmark & {
-  photos?: GooglePlacePhoto[];
-};
+type GooglePlace = GooglePlaceNative &
+  Landmark & {
+    photos?: GooglePlacePhoto[];
+  };
 
 function getPlacesWriteClient() {
   if (supabaseServer) {
@@ -110,7 +118,9 @@ function getPlacesWriteClient() {
 
   if (!hasWarnedMissingServiceRole) {
     hasWarnedMissingServiceRole = true;
-    console.warn("[places] SUPABASE_SERVICE_ROLE_KEY missing; cache writes and image uploads are disabled.");
+    console.warn(
+      "[places] SUPABASE_SERVICE_ROLE_KEY missing; cache writes and image uploads are disabled."
+    );
   }
 
   return null;
@@ -176,73 +186,6 @@ function hasBudgetCoverage(places: Landmark[]): boolean {
 
 function isBudgetSensitive(type: PlaceType): boolean {
   return type === "restaurants" || type === "hotels";
-}
-
-function mapPriceLevel(priceLevel?: string): PlacePriceTier | null {
-  switch (priceLevel) {
-    case "PRICE_LEVEL_FREE":
-      return "free";
-    case "PRICE_LEVEL_INEXPENSIVE":
-      return "inexpensive";
-    case "PRICE_LEVEL_MODERATE":
-      return "moderate";
-    case "PRICE_LEVEL_EXPENSIVE":
-      return "expensive";
-    case "PRICE_LEVEL_VERY_EXPENSIVE":
-      return "very_expensive";
-    default:
-      return null;
-  }
-}
-
-function isWithinMaxPriceTier(priceLevel: string | undefined, maxTier?: PlacePriceTier): boolean {
-  if (!maxTier) return true;
-
-  const normalized = mapPriceLevel(priceLevel);
-  if (!normalized) return true;
-
-  return PRICE_TIER_ORDER.indexOf(normalized) <= PRICE_TIER_ORDER.indexOf(maxTier);
-}
-
-function matchesQuery(place: Landmark, normalizedQuery: string): boolean {
-  const haystack = [
-    place.displayName?.text,
-    place.formattedAddress,
-    ...(place.types ?? []),
-  ]
-    .filter((value): value is string => typeof value === "string")
-    .join(" ")
-    .toLowerCase();
-
-  return haystack.includes(normalizedQuery);
-}
-
-function getDistanceKm(place: Landmark, lat?: number, lng?: number): number {
-  const placeLat = place.location?.latitude;
-  const placeLng = place.location?.longitude;
-
-  if (typeof lat !== "number" || typeof lng !== "number") return Number.POSITIVE_INFINITY;
-  if (typeof placeLat !== "number" || typeof placeLng !== "number") return Number.POSITIVE_INFINITY;
-
-  return haversineKm(lat, lng, placeLat, placeLng);
-}
-
-function sortPlaces(places: Landmark[], sortBy: PlaceSort, lat?: number, lng?: number): Landmark[] {
-  const sorted = [...places];
-
-  if (sortBy === "distance" && typeof lat === "number" && typeof lng === "number") {
-    return sorted.sort((a, b) => getDistanceKm(a, lat, lng) - getDistanceKm(b, lat, lng));
-  }
-
-  if (sortBy === "rating") {
-    return sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-  }
-
-  if (sortBy === "reviews") {
-    return sorted.sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0));
-  }
-
-  return sorted.sort((a, b) => rankingEngine.getScore(b) - rankingEngine.getScore(a));
 }
 
 function stripPhotoMetadata(places: GooglePlace[]): void {
@@ -355,7 +298,7 @@ function selectImageEnrichmentTargets(rankedPlaces: GooglePlace[]): GooglePlace[
   return Array.from(selected.values());
 }
 
-async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[], apiKey: string): Promise<void> {
+async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[]): Promise<void> {
   const targets = selectImageEnrichmentTargets(rankedPlaces);
 
   for (let i = 0; i < targets.length; i += PLACE_IMAGE_BATCH_SIZE) {
@@ -366,12 +309,7 @@ async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[], apiKey: stri
         if (!photo?.name || !place.id) return;
 
         const landmark = place as Landmark;
-        const result = await resolvePlaceImage(
-          place.id,
-          photo.name,
-          apiKey,
-          landmark.blurhash
-        );
+        const result = await resolvePlaceImage(place.id, photo.name, landmark.blurhash);
 
         if (result) {
           landmark.imageUrl = result.imageUrl;
@@ -385,7 +323,6 @@ async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[], apiKey: stri
 async function fetchFreshPlaces(
   cityName: string,
   type: PlaceType,
-  apiKey: string,
   opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
   const requestedRadiusKm = opts?.radiusKm ?? 90;
@@ -395,7 +332,7 @@ async function fetchFreshPlaces(
   const centerLng = opts?.lng;
   const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
 
-  const primaryPlaces = await fetchFromGoogle(cityName, getPrimaryQuery(cityName, type), apiKey, {
+  const primaryPlaces = await fetchFromGoogle(getPrimaryQuery(cityName, type), {
     lat: centerLat,
     lng: centerLng,
     effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
@@ -410,14 +347,13 @@ async function fetchFreshPlaces(
   let rankedPlaces = rankingEngine.rank(dedupePlaces(places));
   const fallbackQuery = getFallbackBudgetQuery(cityName, type);
   const shouldRunFallback = Boolean(
-    fallbackQuery && (
-      rankedPlaces.length < MIN_RESULTS_BEFORE_FALLBACK ||
-      (isBudgetSensitive(type) && !hasBudgetCoverage(rankedPlaces))
-    )
+    fallbackQuery &&
+    (rankedPlaces.length < MIN_RESULTS_BEFORE_FALLBACK ||
+      (isBudgetSensitive(type) && !hasBudgetCoverage(rankedPlaces)))
   );
 
   if (shouldRunFallback && fallbackQuery) {
-    const fallbackPlaces = await fetchFromGoogle(cityName, fallbackQuery, apiKey, {
+    const fallbackPlaces = await fetchFromGoogle(fallbackQuery, {
       lat: centerLat,
       lng: centerLng,
       effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
@@ -426,7 +362,12 @@ async function fetchFreshPlaces(
     inferBudgetPlaces(fallbackPlaces);
 
     const mergedPlaces = hasCoords
-      ? filterPlacesByRadius([...places, ...fallbackPlaces], centerLat, centerLng, effectiveRadiusKm)
+      ? filterPlacesByRadius(
+          [...places, ...fallbackPlaces],
+          centerLat,
+          centerLng,
+          effectiveRadiusKm
+        )
       : [...places, ...fallbackPlaces];
 
     rankedPlaces = rankingEngine.rank(dedupePlaces(mergedPlaces));
@@ -438,7 +379,7 @@ async function fetchFreshPlaces(
   }
 
   const rankedGooglePlaces = rankedPlaces as GooglePlace[];
-  await enrichRankedPlaceImages(rankedGooglePlaces, apiKey);
+  await enrichRankedPlaceImages(rankedGooglePlaces);
   stripPhotoMetadata(rankedGooglePlaces);
 
   return rankedGooglePlaces;
@@ -457,7 +398,7 @@ async function fetchAndCachePlaces(
 
   const request = (async () => {
     recordPlacesCacheEvent(type, false);
-    const freshPlaces = await fetchFreshPlaces(cityName, type, API_KEY!, opts);
+    const freshPlaces = await fetchFreshPlaces(cityName, type, opts);
 
     if (freshPlaces.length > 0) {
       await savePlacesCache(cityName, type, freshPlaces);
@@ -502,7 +443,10 @@ function buildPlaceImagePublicUrl(placeId: string, supabaseUrl: string): string 
   return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${placeId}.jpg`;
 }
 
-function normalizeCachedPlace(place: Landmark, supabaseUrl: string): {
+function normalizeCachedPlace(
+  place: Landmark,
+  supabaseUrl: string
+): {
   place: CachedLandmark;
   changed: boolean;
 } {
@@ -545,11 +489,10 @@ function normalizeCachedPlace(place: Landmark, supabaseUrl: string): {
 async function resolvePlaceImage(
   placeId: string,
   photoName: string,
-  apiKey: string,
   existingBlurhash?: string
 ): Promise<ImageResult | undefined> {
   const client = getPlacesWriteClient();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
   if (!supabaseUrl) return undefined;
 
   const storagePath = `${placeId}.jpg`;
@@ -573,12 +516,11 @@ async function resolvePlaceImage(
       return { imageUrl: publicUrl, blurhash: "" };
     }
 
-    // Fetch from Google Places API
-    const mediaUrl = `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${IMAGE_MAX_WIDTH}&maxHeightPx=${IMAGE_MAX_HEIGHT}&key=${apiKey}`;
-    const imageRes = await fetch(mediaUrl, { redirect: "follow", signal: AbortSignal.timeout(15_000) });
-    if (!imageRes.ok) return undefined;
-
-    const arrayBuffer = await imageRes.arrayBuffer();
+    const arrayBuffer = await fetchPhotoBytes(photoName, {
+      maxWidth: IMAGE_MAX_WIDTH,
+      maxHeight: IMAGE_MAX_HEIGHT,
+    });
+    if (!arrayBuffer) return undefined;
 
     // Generate BlurHash before uploading
     const blurhash = await generateBlurhash(arrayBuffer);
@@ -588,12 +530,10 @@ async function resolvePlaceImage(
     }
 
     // Upload to Supabase Storage
-    const { error } = await client.storage
-      .from(BUCKET)
-      .upload(storagePath, arrayBuffer, {
-        contentType: "image/jpeg",
-        upsert: true,
-      });
+    const { error } = await client.storage.from(BUCKET).upload(storagePath, arrayBuffer, {
+      contentType: "image/jpeg",
+      upsert: true,
+    });
 
     if (error) {
       console.warn(`[places] Failed to upload image for ${placeId}:`, error.message);
@@ -609,46 +549,28 @@ async function resolvePlaceImage(
 
 // Helper to fetch from Google Places API
 async function fetchFromGoogle(
-  cityName: string,
   queryText: string,
-  apiKey: string,
   opts?: { lat?: number; lng?: number; effectiveRadiusKm?: number }
 ): Promise<GooglePlace[]> {
   try {
-    const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "places.displayName,places.formattedAddress,places.id,places.rating,places.userRatingCount,places.types,places.googleMapsUri,places.priceLevel,places.location,places.photos",
-      },
-      body: JSON.stringify({
-        textQuery: queryText,
-        maxResultCount: PLACE_QUERY_RESULT_LIMIT,
-        locationBias:
-          opts?.lat && opts?.lng && opts?.effectiveRadiusKm
-            ? {
-              circle: {
-                center: { latitude: opts.lat, longitude: opts.lng },
-                radius: opts.effectiveRadiusKm * 1000,
-              },
-            }
-            : undefined,
-      }),
-      signal: AbortSignal.timeout(15_000),
+    const result = await searchText({
+      textQuery: queryText,
+      maxResultCount: PLACE_QUERY_RESULT_LIMIT,
+      fieldMask: "enrichment",
+      locationBias:
+        typeof opts?.lat === "number" &&
+        typeof opts.lng === "number" &&
+        typeof opts.effectiveRadiusKm === "number"
+          ? { lat: opts.lat, lng: opts.lng, radiusKm: opts.effectiveRadiusKm }
+          : undefined,
     });
 
-    if (!response.ok) {
-      console.warn(
-        `[places] Google Places response not ok for query "${queryText}"`,
-        response.status
-      );
+    if (!result.ok) {
+      console.warn(`[places] Google Places request failed for query "${queryText}"`, result.reason);
       return [];
     }
 
-    const data = await response.json();
-    return (data.places || []) as GooglePlace[];
+    return result.places as GooglePlace[];
   } catch (e) {
     console.error(`[places] Failed to fetch for query "${queryText}":`, e);
     return [];
@@ -662,7 +584,7 @@ async function fetchFromGoogle(
 async function refreshPlacesInBackground(
   cityName: string,
   type: PlaceType,
-  opts?: TopPlacesOptions,
+  opts?: TopPlacesOptions
 ): Promise<void> {
   try {
     await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
@@ -684,12 +606,14 @@ export async function getTopPlaces(
   try {
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
-    const { data: cache } = bypassCache ? { data: null } : await supabase
-      .from("city_places_cache")
-      .select("places_data, updated_at")
-      .eq("city_name", cityName)
-      .eq("place_type", type)
-      .maybeSingle();
+    const { data: cache } = bypassCache
+      ? { data: null }
+      : await supabase
+          .from("city_places_cache")
+          .select("places_data, updated_at")
+          .eq("city_name", cityName)
+          .eq("place_type", type)
+          .maybeSingle();
 
     if (cache) {
       const updatedAt = new Date(cache.updated_at);
@@ -698,7 +622,7 @@ export async function getTopPlaces(
 
       if (daysSinceUpdate < CACHE_TTL.PLACES_FRESH_DAYS) {
         recordPlacesCacheEvent(type, true);
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
         const cachedPlacesRaw = (cache.places_data || []) as Landmark[];
         const normalizedResults = supabaseUrl
           ? cachedPlacesRaw.map((place) => normalizeCachedPlace(place, supabaseUrl))
@@ -711,7 +635,8 @@ export async function getTopPlaces(
         }
 
         const shouldRefreshForAge = daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS;
-        const shouldRefreshForCoverage = isBudgetSensitive(type) && !hasBudgetCoverage(cachedPlaces);
+        const shouldRefreshForCoverage =
+          isBudgetSensitive(type) && !hasBudgetCoverage(cachedPlaces);
         // Re-enrich when the cards the UI will actually show lack images,
         // not merely when every single cached place is imageless. The UI
         // ranks by userRatingCount (desc) and shows the top 5.
@@ -763,7 +688,11 @@ export async function searchPlaces(options: PlaceSearchOptions): Promise<PlaceSe
     if (!isWithinMaxPriceTier(place.priceLevel, options.maxPriceTier)) return false;
     if (normalizedQuery && !matchesQuery(place, normalizedQuery)) return false;
 
-    if (sortBy === "distance" && typeof options.lat === "number" && typeof options.lng === "number") {
+    if (
+      sortBy === "distance" &&
+      typeof options.lat === "number" &&
+      typeof options.lng === "number"
+    ) {
       return getDistanceKm(place, options.lat, options.lng) <= (options.radiusKm ?? 25);
     }
 

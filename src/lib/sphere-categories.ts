@@ -298,9 +298,7 @@ export function getMixedCitiesFromCategories(limit: number = 120): string[] {
 }
 
 // Pre-built Map for O(1) category lookup instead of O(c) Array.find()
-const categoryMap = new Map<string, SphereCategory>(
-  SPHERE_CATEGORIES.map(cat => [cat.id, cat])
-);
+const categoryMap = new Map<string, SphereCategory>(SPHERE_CATEGORIES.map((cat) => [cat.id, cat]));
 
 /**
  * Get cities from a specific category

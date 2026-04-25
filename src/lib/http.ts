@@ -150,7 +150,13 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
 
       if (response.ok) {
         recordSuccess(provider);
-        log.debug("http.ok", { provider, correlationId, status: response.status, latencyMs, attempt });
+        log.debug("http.ok", {
+          provider,
+          correlationId,
+          status: response.status,
+          latencyMs,
+          attempt,
+        });
         return response;
       }
 
@@ -168,7 +174,13 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
 
       // Non-retryable HTTP failure — count as breaker failure only for 5xx.
       if (response.status >= 500) recordFailure(provider);
-      log.warn("http.error", { provider, correlationId, status: response.status, latencyMs, attempt });
+      log.warn("http.error", {
+        provider,
+        correlationId,
+        status: response.status,
+        latencyMs,
+        attempt,
+      });
       return response; // Let caller inspect the body/status.
     } catch (err) {
       lastError = err;

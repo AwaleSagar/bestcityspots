@@ -6,7 +6,7 @@ import { getTopCities, City } from "@/lib/cities";
 export async function fetchTrendingDestinations(): Promise<City[]> {
   // Try intelligent AI-based trending first
   const aiCities = await getIntelligentTrendingCities();
-  
+
   if (aiCities.length > 0) {
     return aiCities;
   }

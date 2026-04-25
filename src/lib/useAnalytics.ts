@@ -1,10 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import {
-  AnalyticsContext,
-  type ActionType,
-} from "@/components/analytics/AnalyticsProvider";
+import { AnalyticsContext, type ActionType } from "@/components/analytics/AnalyticsProvider";
 
 /**
  * Hook for tracking analytics events.

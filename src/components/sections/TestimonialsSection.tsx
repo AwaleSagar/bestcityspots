@@ -45,7 +45,7 @@ export default function TestimonialsSection() {
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
         <ScrollReveal animation="fade-up">
           <div className="lg:sticky lg:top-24">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted">Use The Atlas</p>
+            <p className="text-muted text-xs font-medium tracking-wider uppercase">Use The Atlas</p>
             <h2
               id="highlights-heading"
               className="text-foreground mt-3 max-w-md text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
@@ -53,7 +53,8 @@ export default function TestimonialsSection() {
               Designed for real trip decisions.
             </h2>
             <p className="text-muted mt-3 text-sm leading-relaxed md:text-base">
-              Quieter defaults, stronger headlines, and better sequencing from search to context to action.
+              Quieter defaults, stronger headlines, and better sequencing from search to context to
+              action.
             </p>
           </div>
         </ScrollReveal>
@@ -67,9 +68,9 @@ export default function TestimonialsSection() {
                 staggerIndex={index}
                 staggerDelay={0.08}
               >
-                <article className="rounded-xl border border-line p-4 sm:p-5">
-                  <Icon className="h-5 w-5 text-muted" aria-hidden />
-                  <h3 className="text-foreground mt-3 text-sm font-medium leading-snug">{title}</h3>
+                <article className="border-line rounded-xl border p-4 sm:p-5">
+                  <Icon className="text-muted h-5 w-5" aria-hidden />
+                  <h3 className="text-foreground mt-3 text-sm leading-snug font-medium">{title}</h3>
                   <p className="text-muted mt-1 text-sm leading-relaxed">{text}</p>
                 </article>
               </ScrollReveal>
@@ -77,8 +78,10 @@ export default function TestimonialsSection() {
           </div>
 
           <ScrollReveal animation="fade-up" delay={0.15}>
-            <div className="rounded-xl border border-line p-5 sm:p-6">
-              <p className="text-xs font-medium uppercase tracking-wider text-muted">What Changes</p>
+            <div className="border-line rounded-xl border p-5 sm:p-6">
+              <p className="text-muted text-xs font-medium tracking-wider uppercase">
+                What Changes
+              </p>
               <div className="mt-4 grid gap-4 sm:grid-cols-3">
                 {outcomes.map(({ icon: Icon, title, text }) => (
                   <div key={title}>

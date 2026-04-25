@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 type Point3 = { x: number; y: number; z: number };
@@ -20,16 +20,25 @@ const COLORS = {
 // Pre-computed color values array for safe indexed access
 const COLOR_VALUES = Object.values(COLORS);
 
-// Pre-generate particle data at module level to avoid impure calls during render
+function createSeededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
+
+// Pre-generate stable particle data to avoid render-time randomness and hydration drift.
 const PARTICLE_DATA = (() => {
+  const random = createSeededRandom(20260425);
   return Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
     id: i,
-    delay: Math.random() * 10,
-    duration: 15 + Math.random() * 20,
-    size: Math.random() * 3 + 1,
-    startX: Math.random() * 100,
-    startY: Math.random() * 100,
-    colorIndex: Math.floor(Math.random() * COLOR_VALUES.length),
+    delay: random() * 10,
+    duration: 15 + random() * 20,
+    size: random() * 3 + 1,
+    startX: random() * 100,
+    startY: random() * 100,
+    colorIndex: Math.floor(random() * COLOR_VALUES.length),
   }));
 })();
 
@@ -156,6 +165,11 @@ export default function CitySphereBackground() {
   // Periodically change active labels with more variety
   // Optimized: Use Set for O(1) membership check instead of O(k) includes()
   useEffect(() => {
+    if (shouldReduceMotion || labels.length === 0) {
+      queueMicrotask(() => setActiveIndices([]));
+      return;
+    }
+
     const interval = setInterval(() => {
       const count = Math.floor(Math.random() * 4) + 3; // 3-6 active labels
       setActiveIndices((prev) => {
@@ -178,7 +192,7 @@ export default function CitySphereBackground() {
       });
     }, 2500);
     return () => clearInterval(interval);
-  }, [labels.length]);
+  }, [labels.length, shouldReduceMotion]);
 
   const points = useMemo(() => {
     const n = Math.max(0, Math.min(MAX_CITIES, labels.length || 0));

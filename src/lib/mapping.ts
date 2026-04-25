@@ -168,7 +168,7 @@ export function googlePlaceToCanonical(input: GooglePlaceInput): CanonicalPlace 
         : undefined,
     rating: typeof input.rating === "number" ? input.rating : undefined,
     ratingCount: typeof input.userRatingCount === "number" ? input.userRatingCount : undefined,
-    priceLevel: input.priceLevel ? GOOGLE_PRICE_MAP[input.priceLevel] ?? "unknown" : "unknown",
+    priceLevel: input.priceLevel ? (GOOGLE_PRICE_MAP[input.priceLevel] ?? "unknown") : "unknown",
     types: Array.isArray(input.types) ? input.types : [],
     images: input.imageUrl
       ? [
@@ -195,7 +195,9 @@ export function googlePlaceToCanonical(input: GooglePlaceInput): CanonicalPlace 
 // source of truth for cross-provider reconciliation.
 // ---------------------------------------------------------------------------
 
-export function conditionFromOpenWeather(main: string | undefined | null): CanonicalWeatherCondition {
+export function conditionFromOpenWeather(
+  main: string | undefined | null
+): CanonicalWeatherCondition {
   if (!main) return "unknown";
   const m = main.toLowerCase();
   if (m.includes("clear")) return "clear";
@@ -203,17 +205,24 @@ export function conditionFromOpenWeather(main: string | undefined | null): Canon
   if (m.includes("rain") || m.includes("drizzle")) return "rain";
   if (m.includes("snow")) return "snow";
   if (m.includes("thunder") || m.includes("storm")) return "storm";
-  if (m.includes("fog") || m.includes("mist") || m.includes("haze") || m.includes("smoke")) return "fog";
+  if (m.includes("fog") || m.includes("mist") || m.includes("haze") || m.includes("smoke"))
+    return "fog";
   return "unknown";
 }
 
 export function aqiLabelFromOwm(aqi: number): string {
   switch (aqi) {
-    case 1: return "Good";
-    case 2: return "Fair";
-    case 3: return "Moderate";
-    case 4: return "Poor";
-    case 5: return "Very Poor";
-    default: return "Unknown";
+    case 1:
+      return "Good";
+    case 2:
+      return "Fair";
+    case 3:
+      return "Moderate";
+    case 4:
+      return "Poor";
+    case 5:
+      return "Very Poor";
+    default:
+      return "Unknown";
   }
 }

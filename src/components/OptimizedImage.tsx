@@ -197,15 +197,15 @@ function OptimizedImageInner({
       {/* Fallback gradient for missing blurhash */}
       {!placeholderUrl && !isLoaded && !hasError && (
         <div
-          className="absolute inset-0 z-0 animate-pulse bg-gradient-to-br from-muted/50 to-muted"
+          className="from-muted/50 to-muted absolute inset-0 z-0 animate-pulse bg-gradient-to-br"
           aria-hidden="true"
         />
       )}
 
       {/* Error state */}
       {hasError && (
-        <div className="absolute inset-0 z-0 flex items-center justify-center bg-muted/50">
-          <span className="text-sm text-muted-foreground">Image unavailable</span>
+        <div className="bg-muted/50 absolute inset-0 z-0 flex items-center justify-center">
+          <span className="text-muted-foreground text-sm">Image unavailable</span>
         </div>
       )}
 

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import AboutPageContent from "@/components/pages/AboutPageContent";
+import { publicEnv } from "@/lib/env";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
+const siteUrl = publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com";
 
 export const metadata: Metadata = {
   title: "About Best City Spots",

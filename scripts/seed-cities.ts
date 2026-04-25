@@ -108,7 +108,7 @@ async function main() {
 
     const get = (col: string) => {
       const idx = header!.indexOf(col);
-      return idx >= 0 ? fields[idx]?.replace(/^"|"$/g, "") ?? "" : "";
+      return idx >= 0 ? (fields[idx]?.replace(/^"|"$/g, "") ?? "") : "";
     };
 
     const idStr = get("id");

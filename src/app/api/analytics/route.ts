@@ -9,10 +9,7 @@ import { AnalyticsPayloadSchema, processAnalyticsBatch } from "@/lib/analytics";
 export async function POST(request: NextRequest) {
   try {
     if (!supabaseServer) {
-      return NextResponse.json(
-        { error: "Analytics service unavailable" },
-        { status: 503 }
-      );
+      return NextResponse.json({ error: "Analytics service unavailable" }, { status: 503 });
     }
 
     // Reject oversized payloads early to protect the service.
@@ -37,10 +34,7 @@ export async function POST(request: NextRequest) {
     // Fire-and-forget: all DB writes happen in the background
     processAnalyticsBatch(result.data.events, {
       userAgent: request.headers.get("user-agent") || "",
-      referrer:
-        request.headers.get("referer") ||
-        result.data.events[0]?.referrer ||
-        null,
+      referrer: request.headers.get("referer") || result.data.events[0]?.referrer || null,
       countryCode: request.headers.get("x-vercel-ip-country") || null,
       countryName:
         request.headers.get("x-vercel-ip-country-region") ||
@@ -52,10 +46,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("[analytics] Request processing failed:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
