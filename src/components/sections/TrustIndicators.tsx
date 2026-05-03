@@ -51,19 +51,21 @@ export default function TrustIndicators() {
         </ScrollReveal>
 
         <div className="space-y-4">
-          {pillars.map(({ icon: Icon, title, detail, iconColor }, index) => (
-            <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.08}>
-              <article className="intent-card rounded-[1.25rem] p-5">
-                <div className="flex items-start gap-3">
-                  <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} aria-hidden />
-                  <div>
-                    <h3 className="text-foreground text-base leading-snug font-medium">{title}</h3>
-                    <p className="text-muted mt-1 text-sm leading-relaxed">{detail}</p>
+          <ScrollReveal animation="fade-up">
+            <div className="space-y-4">
+              {pillars.map(({ icon: Icon, title, detail, iconColor }) => (
+                <article key={title} className="intent-card rounded-[1.25rem] p-5">
+                  <div className="flex items-start gap-3">
+                    <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} aria-hidden />
+                    <div>
+                      <h3 className="text-foreground text-base leading-snug font-medium">{title}</h3>
+                      <p className="text-muted mt-1 text-sm leading-relaxed">{detail}</p>
+                    </div>
                   </div>
-                </div>
-              </article>
-            </ScrollReveal>
-          ))}
+                </article>
+              ))}
+            </div>
+          </ScrollReveal>
 
           <ScrollReveal animation="fade-up" delay={0.2}>
             <div className="border-line bg-surface/72 rounded-[1.25rem] border p-5">

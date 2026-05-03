@@ -1,23 +1,18 @@
 import Link from "next/link";
 import { MapPinned } from "lucide-react";
+import DesktopNavLinks from "@/components/layout/DesktopNavLinks";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-
-const navLinks = [
-  { href: "/", label: "Explore" },
-  { href: "/resources/top-cities", label: "Top Cities" },
-  { href: "/about", label: "About" },
-] as const;
 
 export default function SiteNav() {
   return (
-    <header className="border-line bg-background/90 sticky top-0 z-[200] w-full border-b backdrop-blur-lg">
+    <header className="border-line bg-background/90 sticky top-0 z-[200] w-full border-b backdrop-blur-md">
       <div className="container-gutter mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="group flex min-w-0 items-center gap-2.5"
+          className="group flex min-h-11 min-w-0 items-center gap-2.5"
           aria-label="Best City Spots home"
         >
-          <div className="bg-accent text-accent-contrast flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+          <div className="bg-accent text-accent-contrast flex h-11 w-11 shrink-0 items-center justify-center rounded-lg">
             <MapPinned className="h-4 w-4" aria-hidden />
           </div>
           <span className="text-foreground truncate text-base font-semibold tracking-tight">
@@ -26,17 +21,7 @@ export default function SiteNav() {
         </Link>
 
         <div className="flex items-center gap-1">
-          <nav className="flex items-center gap-0.5" aria-label="Main navigation">
-            {navLinks.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="nav-pill text-muted-strong hover:text-foreground rounded-lg px-2.5 py-2 text-xs font-medium transition-colors sm:px-3 sm:text-sm"
-              >
-                {label}
-              </Link>
-            ))}
-          </nav>
+          <DesktopNavLinks />
           <ThemeToggle />
         </div>
       </div>

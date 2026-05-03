@@ -79,6 +79,65 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
   );
 }
 
+async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
+  if (!city) return null;
+  const weather = await getCityWeather(city);
+
+  return (
+    <>
+      {[
+        {
+          icon: Leaf,
+          label: "Arrival mood",
+          value: getArrivalMood(weather?.temp),
+        },
+        {
+          icon: Clock3,
+          label: "Best next step",
+          value: "Scan the AI briefing, then save places into a personal route.",
+        },
+        {
+          icon: Activity,
+          label: "Live context",
+          value: weather
+            ? `${Math.round(weather.temp)}°C now with ${weather.aqi_label.toLowerCase()} air quality.`
+            : "Weather and air quality are checked when available.",
+        },
+      ].map(({ icon: ItemIcon, label, value }) => (
+        <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
+          <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
+            <ItemIcon className="text-accent h-3.5 w-3.5" />
+            {label}
+          </div>
+          <p className="text-muted-strong mt-2 text-sm leading-relaxed">{value}</p>
+        </div>
+      ))}
+    </>
+  );
+}
+
+function WeatherSummaryFallback() {
+  return (
+    <>
+      {["Arrival mood", "Best next step", "Live context"].map((label) => (
+        <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
+          <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
+            <Activity className="text-accent h-3.5 w-3.5" />
+            {label}
+          </div>
+          <div className="bg-muted/15 mt-3 h-10 animate-pulse rounded-[0.8rem]" />
+        </div>
+      ))}
+    </>
+  );
+}
+
+async function CityVitalsSection({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
+  if (!city) return <CityVitalsFallback />;
+  const weather = await getCityWeather(city);
+  return weather ? <CityVitals data={weather} /> : <CityVitalsFallback />;
+}
+
 async function ExperiencesWrapper({
   cityName,
   lat,
@@ -184,10 +243,6 @@ export default async function CityPage({
 
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
-  // `metrics` is sidebar-only and slow; defer via Suspense so it streams.
-  // Weather is referenced in three above-the-fold spots so it stays awaited.
-  const weather = await getCityWeather(city);
-
   return (
     <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <script
@@ -199,7 +254,7 @@ export default async function CityPage({
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
       >
         <Breadcrumbs items={[{ label: "Cities", href: "/" }, { label: city.city }]} />
-        <nav className="mb-10 md:mb-14" aria-label="Breadcrumb">
+        <nav className="mb-10 md:mb-14" aria-label="City navigation">
           <Link
             href="/"
             className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
@@ -235,33 +290,9 @@ export default async function CityPage({
                 <div className="from-line h-px flex-1 bg-gradient-to-r to-transparent" />
               </div>
               <div className="mt-6 grid gap-3 sm:grid-cols-3 md:mt-7">
-                {[
-                  {
-                    icon: Leaf,
-                    label: "Arrival mood",
-                    value: getArrivalMood(weather?.temp),
-                  },
-                  {
-                    icon: Clock3,
-                    label: "Best next step",
-                    value: "Scan the AI briefing, then save places into a personal route.",
-                  },
-                  {
-                    icon: Activity,
-                    label: "Live context",
-                    value: weather
-                      ? `${Math.round(weather.temp)}°C now with ${weather.aqi_label.toLowerCase()} air quality.`
-                      : "Weather and air quality are checked when available.",
-                  },
-                ].map(({ icon: ItemIcon, label, value }) => (
-                  <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
-                    <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
-                      <ItemIcon className="text-accent h-3.5 w-3.5" />
-                      {label}
-                    </div>
-                    <p className="text-muted-strong mt-2 text-sm leading-relaxed">{value}</p>
-                  </div>
-                ))}
+                <Suspense fallback={<WeatherSummaryFallback />}>
+                  <WeatherSummaryCards city={city} />
+                </Suspense>
               </div>
             </header>
 
@@ -307,7 +338,9 @@ export default async function CityPage({
 
             <section className="space-y-10">
               <h2 className="labelled-rule">Structural Profile</h2>
-              {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
+              <Suspense fallback={<CityVitalsFallback />}>
+                <CityVitalsSection city={city} />
+              </Suspense>
             </section>
 
             <section className="space-y-6">

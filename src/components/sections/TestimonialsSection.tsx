@@ -60,22 +60,17 @@ export default function TestimonialsSection() {
         </ScrollReveal>
 
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {principles.map(({ icon: Icon, title, text }, index) => (
-              <ScrollReveal
-                key={title}
-                animation="fade-up"
-                staggerIndex={index}
-                staggerDelay={0.08}
-              >
-                <article className="border-line rounded-xl border p-4 sm:p-5">
+          <ScrollReveal animation="fade-up">
+            <div className="grid gap-4 sm:grid-cols-3">
+              {principles.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="border-line rounded-xl border p-4 sm:p-5">
                   <Icon className="text-muted h-5 w-5" aria-hidden />
                   <h3 className="text-foreground mt-3 text-sm leading-snug font-medium">{title}</h3>
                   <p className="text-muted mt-1 text-sm leading-relaxed">{text}</p>
                 </article>
-              </ScrollReveal>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollReveal>
 
           <ScrollReveal animation="fade-up" delay={0.15}>
             <div className="border-line rounded-xl border p-5 sm:p-6">

@@ -127,15 +127,15 @@ export function parseReferrer(referrer: string | null): {
 }
 
 // =============================================================================
-// Database Operations (fire-and-forget — never block the response)
+// Database Operations
 // =============================================================================
 
-export function recordDailyVisitorStats(
+export async function recordDailyVisitorStats(
   date: string,
   events: AnalyticsEvent[],
   sessionDuration: number | null,
   pageCount: number | null
-): void {
+): Promise<void> {
   if (!supabaseServer) return;
 
   const sessions = new Set<string>();
@@ -150,12 +150,11 @@ export function recordDailyVisitorStats(
     if (event.type === "pageview") pageViews++;
   }
 
-  const totalVisits = sessions.size;
+  const totalVisits = pageViews;
   const uniqueVisitors = sessions.size;
   const isBounce = pageCount !== null && pageCount <= 1;
 
-  supabaseServer
-    .rpc("upsert_daily_visitor_stats", {
+  const { error } = await supabaseServer.rpc("upsert_daily_visitor_stats", {
       p_date: date,
       p_visits: totalVisits,
       p_unique: uniqueVisitors,
@@ -164,104 +163,90 @@ export function recordDailyVisitorStats(
       p_bounce: isBounce ? 1 : 0,
       p_new: newVisitors,
       p_returning: returningVisitors,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update daily visitor stats:", error);
     });
+  if (error) console.error("[analytics] Failed to update daily visitor stats:", error);
 }
 
-export function recordTrafficSource(
+export async function recordTrafficSource(
   date: string,
   sourceType: SourceTypeValue,
   sourceName: string,
   uniqueVisitors: number
-): void {
+): Promise<void> {
   if (!supabaseServer) return;
 
-  supabaseServer
-    .rpc("upsert_traffic_source", {
+  const { error } = await supabaseServer.rpc("upsert_traffic_source", {
       p_date: date,
       p_source_type: sourceType,
       p_source_name: sourceName,
       p_visits: 1,
       p_unique: uniqueVisitors,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update traffic sources:", error);
     });
+  if (error) console.error("[analytics] Failed to update traffic sources:", error);
 }
 
-export function recordDeviceStats(
+export async function recordDeviceStats(
   date: string,
   deviceType: DeviceTypeValue,
   browser: string | null,
   os: string | null
-): void {
+): Promise<void> {
   if (!supabaseServer) return;
 
-  supabaseServer
-    .rpc("upsert_device_stats", {
+  const { error } = await supabaseServer.rpc("upsert_device_stats", {
       p_date: date,
       p_device: deviceType,
       p_browser: browser,
       p_os: os,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update device stats:", error);
     });
+  if (error) console.error("[analytics] Failed to update device stats:", error);
 }
 
-export function recordGeoStats(
+export async function recordGeoStats(
   date: string,
   countryCode: string,
   countryName: string,
   city: string | null
-): void {
+): Promise<void> {
   if (!supabaseServer) return;
 
-  supabaseServer
-    .rpc("upsert_geo_stats", {
+  const { error } = await supabaseServer.rpc("upsert_geo_stats", {
       p_date: date,
       p_country_code: countryCode,
       p_country_name: countryName,
       p_city: city,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update geo stats:", error);
     });
+  if (error) console.error("[analytics] Failed to update geo stats:", error);
 }
 
-export function recordCityView(date: string, cityId: number): void {
+export async function recordCityView(date: string, cityId: number): Promise<void> {
   if (!supabaseServer) return;
 
-  supabaseServer
-    .rpc("upsert_city_views", {
+  const { error } = await supabaseServer.rpc("upsert_city_views", {
       p_date: date,
       p_city_id: cityId,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update city views:", error);
     });
+  if (error) console.error("[analytics] Failed to update city views:", error);
 }
 
-export function recordUserAction(date: string, actionType: z.infer<typeof ActionType>): void {
+export async function recordUserAction(
+  date: string,
+  actionType: z.infer<typeof ActionType>
+): Promise<void> {
   if (!supabaseServer) return;
 
-  supabaseServer
-    .rpc("upsert_user_action", {
+  const { error } = await supabaseServer.rpc("upsert_user_action", {
       p_date: date,
       p_action: actionType,
-    })
-    .then(({ error }) => {
-      if (error) console.error("[analytics] Failed to update user actions:", error);
     });
+  if (error) console.error("[analytics] Failed to update user actions:", error);
 }
 
 // =============================================================================
-// Orchestrator — fires all analytics writes (non-blocking)
+// Orchestrator
 // =============================================================================
 
-export function processAnalyticsBatch(
+export async function processAnalyticsBatch(
   events: AnalyticsEvent[],
   metadata: {
     userAgent: string;
@@ -270,7 +255,7 @@ export function processAnalyticsBatch(
     countryName: string | null;
     city: string | null;
   }
-): void {
+): Promise<void> {
   const today = getToday();
 
   const { deviceType, browser, os } = parseUserAgent(metadata.userAgent);
@@ -282,17 +267,20 @@ export function processAnalyticsBatch(
   const hasGeoConsent = events.some((e) => e.hasGeoConsent === true);
   const isNewVisitor = events.some((e) => e.isNewVisitor === true);
 
-  // Fire all writes — none of these block the response
-  recordDailyVisitorStats(today, events, sessionDuration, pageCount);
-  recordTrafficSource(today, sourceType, sourceName, isNewVisitor ? 1 : 0);
-  recordDeviceStats(today, deviceType, browser, os);
+  const writes: Promise<void>[] = [
+    recordDailyVisitorStats(today, events, sessionDuration, pageCount),
+    recordTrafficSource(today, sourceType, sourceName, isNewVisitor ? 1 : 0),
+    recordDeviceStats(today, deviceType, browser, os),
+  ];
 
   if (hasGeoConsent && metadata.countryCode) {
-    recordGeoStats(
-      today,
-      metadata.countryCode,
-      metadata.countryName || metadata.countryCode,
-      metadata.city
+    writes.push(
+      recordGeoStats(
+        today,
+        metadata.countryCode,
+        metadata.countryName || metadata.countryCode,
+        metadata.city
+      )
     );
   }
 
@@ -305,6 +293,8 @@ export function processAnalyticsBatch(
     if (event.cityId) cityIds.add(event.cityId);
     if (event.action) actions.add(event.action);
   }
-  for (const cityId of cityIds) recordCityView(today, cityId);
-  for (const action of actions) recordUserAction(today, action);
+  for (const cityId of cityIds) writes.push(recordCityView(today, cityId));
+  for (const action of actions) writes.push(recordUserAction(today, action));
+
+  await Promise.allSettled(writes);
 }

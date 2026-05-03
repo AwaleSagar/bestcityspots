@@ -28,6 +28,16 @@ export class LruCache<K, V> {
     return entry.value;
   }
 
+  peek(key: K, now = Date.now()): V | undefined {
+    const entry = this.map.get(key);
+    if (!entry) return undefined;
+    if (entry.expiresAt <= now) {
+      this.map.delete(key);
+      return undefined;
+    }
+    return entry.value;
+  }
+
   set(key: K, value: V, ttlMs: number, now = Date.now()): void {
     // Single Map mutation — `delete` is a no-op if missing, so the explicit
     // `has` check just doubled the lookup. Re-inserting moves to LRU tail.
@@ -60,5 +70,17 @@ export class LruCache<K, V> {
 
   get size(): number {
     return this.map.size;
+  }
+
+  validSize(now = Date.now()): number {
+    let count = 0;
+    for (const [key, entry] of this.map) {
+      if (entry.expiresAt <= now) {
+        this.map.delete(key);
+      } else {
+        count++;
+      }
+    }
+    return count;
   }
 }

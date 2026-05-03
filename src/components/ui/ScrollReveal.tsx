@@ -34,27 +34,27 @@ interface ScrollRevealProps extends Omit<HTMLMotionProps<"div">, "children"> {
 
 const animations: Record<AnimationType, Variants> = {
   "fade-up": {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 24 },
     visible: { opacity: 1, y: 0 },
   },
   "fade-down": {
-    hidden: { opacity: 0, y: -40 },
+    hidden: { opacity: 0, y: -20 },
     visible: { opacity: 1, y: 0 },
   },
   "fade-left": {
-    hidden: { opacity: 0, x: 40 },
+    hidden: { opacity: 0, x: 24 },
     visible: { opacity: 1, x: 0 },
   },
   "fade-right": {
-    hidden: { opacity: 0, x: -40 },
+    hidden: { opacity: 0, x: -24 },
     visible: { opacity: 1, x: 0 },
   },
   scale: {
-    hidden: { opacity: 0, scale: 0.8 },
+    hidden: { opacity: 0, scale: 0.96 },
     visible: { opacity: 1, scale: 1 },
   },
   blur: {
-    hidden: { opacity: 0, filter: "blur(10px)" },
+    hidden: { opacity: 0, filter: "blur(6px)" },
     visible: { opacity: 1, filter: "blur(0px)" },
   },
   none: {
@@ -67,12 +67,12 @@ export default function ScrollReveal({
   children,
   animation = "fade-up",
   delay = 0,
-  duration = 0.6,
+  duration = 0.42,
   threshold = 0.2,
   once = true,
   className = "",
   staggerIndex = 0,
-  staggerDelay = 0.1,
+  staggerDelay = 0.06,
   ...motionProps
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -121,7 +121,7 @@ interface StaggerContainerProps {
 export function StaggerContainer({
   children,
   className = "",
-  staggerDelay = 0.1,
+  staggerDelay = 0.06,
   animation = "fade-up",
   once = true,
 }: StaggerContainerProps) {

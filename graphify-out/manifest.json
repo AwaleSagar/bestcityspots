@@ -1,17 +1,518 @@
 {
-  "version": "0.4.10",
-  "generated_at": "2026-04-24T18:42:43.250104+00:00",
-  "source_path": ".",
-  "stats": {
-    "total_files": 102,
-    "total_words": 83467,
-    "nodes": 415,
-    "edges": 459,
-    "hyperedges": 3
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/test-google-places.ts": {
+    "mtime": 1777104442.1822047,
+    "hash": "2bb0ffa3fb5b77eaff18fbbf17427788"
   },
-  "outputs": {
-    "graph_json": "graphify-out/graph.json",
-    "graph_html": "graphify-out/graph.html",
-    "report": "graphify-out/GRAPH_REPORT.md"
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/postcss.config.mjs": {
+    "mtime": 1768144152.0024323,
+    "hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/test-supabase.ts": {
+    "mtime": 1768146303.3649836,
+    "hash": "b613d559b4c43df28afeabd498edc860"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/next-env.d.ts": {
+    "mtime": 1777825846.7555063,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/eslint.config.mjs": {
+    "mtime": 1768370546.1568654,
+    "hash": "c84bf4e65212fb729842553637527d2c"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/next.config.ts": {
+    "mtime": 1773538400.7400558,
+    "hash": "0fa093475cb241f7f1b3f7e233f477b8"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/place_images_bucket.sql": {
+    "mtime": 1777051763.361599,
+    "hash": "632b457841bb469f6988cb91c82087dc"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/cache_optimization.sql": {
+    "mtime": 1777051763.35988,
+    "hash": "f8beb0b2a065113ea426c3a241a4a467"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/visitor_analytics.sql": {
+    "mtime": 1777051763.3621306,
+    "hash": "c5d11b7f34f914e126de818e5a24abf1"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/performance.sql": {
+    "mtime": 1777051763.3612685,
+    "hash": "fa13b593595a8731be7343221b00c190"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/city_ai_insights.sql": {
+    "mtime": 1777051763.3601058,
+    "hash": "b4c11dce6ef41c23ea330790fc44aed2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/20260311_places_cache_cost_optimization.sql": {
+    "mtime": 1777051763.359043,
+    "hash": "db8a59c18f8b5956c640b5feb07dfee2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/security.sql": {
+    "mtime": 1777051763.3618274,
+    "hash": "ce8d716c9c046603ea81330d2aeebcc2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/20260412_places_search_filters.sql": {
+    "mtime": 1777055408.0670283,
+    "hash": "6e68caf97a626fd6cd692fef3383ac9d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/analytics_functions.sql": {
+    "mtime": 1777051763.3596325,
+    "hash": "4c29ee7d6d1801336c74980816502a4f"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/fix_city_ai_insights_rls.sql": {
+    "mtime": 1777051763.3608148,
+    "hash": "b21cf26c8742c25aedf79ee0fd04ec0f"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/elastic_search.sql": {
+    "mtime": 1777051763.3605897,
+    "hash": "1c3ff53b3040f6d288c3642bfecdd2df"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/harden_security.sql": {
+    "mtime": 1777051763.361026,
+    "hash": "136c027d21df37e59ae8b22a07bfe95d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/city_metrics.sql": {
+    "mtime": 1777051763.3603222,
+    "hash": "8bcb6509c5c72925765f4c6480d3e80d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/migrations/202604241700_cache_schema_versions.sql": {
+    "mtime": 1777055408.961364,
+    "hash": "8ce47aa2bd501dfbd8d82a3d0af1ca80"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/test-supabase-backend.ts": {
+    "mtime": 1777801540.0439177,
+    "hash": "4b9fc75a097611babe4c0a15667c5a6e"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/seed-cities.ts": {
+    "mtime": 1777104441.717457,
+    "hash": "49d505a57aadbde82ed3b6a849b3176a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/trending-destinations.ts": {
+    "mtime": 1777104441.7255125,
+    "hash": "62328af9f970c637045f1c14b8870379"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/analytics-report.ts": {
+    "mtime": 1777104441.7018704,
+    "hash": "98c61a5419b4914236b29ca11bcd2ca5"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/test-ranking.ts": {
+    "mtime": 1777104441.7212265,
+    "hash": "7e6b8233ef9834340e397b4d03ba61a2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/warm-cache.ts": {
+    "mtime": 1777104441.750615,
+    "hash": "62e351f5019f710d6756da30e78573a4"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/backfillCityInsights.mjs": {
+    "mtime": 1768316129.384843,
+    "hash": "73f368f0dcb0590362eaf989eb2048f3"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/diagnose-images.ts": {
+    "mtime": 1777104441.710615,
+    "hash": "d49ef6d1151589a88a05f2a2a77b57e0"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/clear-places-cache.ts": {
+    "mtime": 1777055408.9577053,
+    "hash": "5c66febfb6d12af06e9775a0885ca26a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/scripts/verify-refactor.ts": {
+    "mtime": 1777104794.9229393,
+    "hash": "e310c9e6b7124c0a684ae68fe6b80204"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/robots.ts": {
+    "mtime": 1777104555.384322,
+    "hash": "ac425064c2f7963d70864b2a8462cdb1"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/opengraph-image.tsx": {
+    "mtime": 1777104441.888186,
+    "hash": "0809704e944948620d6fc5341d459160"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/actions.ts": {
+    "mtime": 1777826135.5115929,
+    "hash": "64ef9713d6d49d8005a86097f3df2845"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/sitemap.ts": {
+    "mtime": 1777104555.3847458,
+    "hash": "4603a4051344239df0027f8d46e3a988"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/layout.tsx": {
+    "mtime": 1777827763.7343812,
+    "hash": "f56ea098bc3bacc1b40714326991873d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/page.tsx": {
+    "mtime": 1777826134.17352,
+    "hash": "b0fbfcdec7b568aa6154320d8c594269"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/resources/top-cities/page.tsx": {
+    "mtime": 1777104555.3838766,
+    "hash": "2da5e3c234de9cee5d8c427b25125eaf"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/about/page.tsx": {
+    "mtime": 1777104555.383528,
+    "hash": "c859a95a953b2a929246351c1b723084"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/ExperiencesSkeleton.tsx": {
+    "mtime": 1777826746.4072323,
+    "hash": "ac931ca642a8f499c3c91f7a7a62ae57"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/city-page-parts.tsx": {
+    "mtime": 1777104770.8660355,
+    "hash": "0a699fe1d970b11a26068e4f09862973"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/AIBriefingSkeleton.tsx": {
+    "mtime": 1777104441.8021457,
+    "hash": "5c3613dcd5948f9f37b105165bcd5403"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/experience-helpers.ts": {
+    "mtime": 1777825962.265805,
+    "hash": "ab8336ac460c21d62d5ae723ce0e6304"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/AIBriefingClient.tsx": {
+    "mtime": 1777827763.739,
+    "hash": "54db956380591da1662e11a3bd591727"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/AIBriefingSection.tsx": {
+    "mtime": 1777827890.1033297,
+    "hash": "e481677ea53eaabf15d462d5807883dd"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/page.tsx": {
+    "mtime": 1777827890.1031666,
+    "hash": "c3b551880984f93ab9f882e6e46df57b"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/cities/[id]/ExperiencesSection.tsx": {
+    "mtime": 1777827890.1038077,
+    "hash": "a68548e085b6c861eed5d754a02400ec"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/api/places/search/route.ts": {
+    "mtime": 1777826317.9732509,
+    "hash": "6c11a4d43ca451ba77ab7153abdbfb50"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/api/health/route.ts": {
+    "mtime": 1777827831.142095,
+    "hash": "fe5809bb564afbd81b969edb50e62732"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/api/cities/sphere/route.ts": {
+    "mtime": 1777827831.1486428,
+    "hash": "2c0668a516c89b7b607708c87ba46920"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/app/api/analytics/route.ts": {
+    "mtime": 1777827831.1414301,
+    "hash": "dba4b9420dda35d80a477defc9be351d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/config/nav.ts": {
+    "mtime": 1777827649.3863485,
+    "hash": "cf7754cd8060db128f462809e8f726af"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/OptimizedImage.tsx": {
+    "mtime": 1777826746.411116,
+    "hash": "e628f84d58886e5f49d571de90c3acf6"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/ui/ScrollProgress.tsx": {
+    "mtime": 1777825962.2696748,
+    "hash": "d0642cfdb5478e327db5fb16edb7d80c"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/ui/InteractiveButton.tsx": {
+    "mtime": 1777827803.6263056,
+    "hash": "a43f263b3f6f1356047f190877528b6c"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/ui/Breadcrumbs.tsx": {
+    "mtime": 1777827763.7388985,
+    "hash": "9415a4597555d801e38d031e5a01a867"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/ui/ScrollReveal.tsx": {
+    "mtime": 1777827224.4045124,
+    "hash": "5aafcaddcfaab7e9860393a901cb385a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/ui/Hotspot.tsx": {
+    "mtime": 1777827803.6302013,
+    "hash": "8c4f5951e3edc5494db5b4f52d78fc6d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/sections/TrustIndicators.tsx": {
+    "mtime": 1777827224.408891,
+    "hash": "a3765fc1a5b7d799203177543678a705"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/sections/HeroHeader.tsx": {
+    "mtime": 1777827224.4045043,
+    "hash": "e8657901aa4ccf12c4a11489426d3ff4"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/sections/FreeResourceCTA.tsx": {
+    "mtime": 1777089933.2383957,
+    "hash": "80859920fa63e90f48e81e529b95bca5"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/sections/HomeSearchShowcase.tsx": {
+    "mtime": 1777089933.227708,
+    "hash": "8f70ad26beba172570b7314790f90e5d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/sections/TestimonialsSection.tsx": {
+    "mtime": 1777827224.4046586,
+    "hash": "a0d69ed944e24e6a78001843b706faf4"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/SiteFooter.tsx": {
+    "mtime": 1777825962.269672,
+    "hash": "d5855f283730f1267474173e6085e10f"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/MobileBottomNav.tsx": {
+    "mtime": 1777827649.3824987,
+    "hash": "02ef1854c83d70726a8df7c9b03d786f"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/ThemeToggle.tsx": {
+    "mtime": 1777827649.382513,
+    "hash": "a94b002356f69e6856baf4e42f89a171"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/ThemeProvider.tsx": {
+    "mtime": 1768381420.1513436,
+    "hash": "c00fa9d4a460ac4f9c808ad29d573581"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/DesktopNavLinks.tsx": {
+    "mtime": 1777827649.3825498,
+    "hash": "cd5495506e3b20b0d7d8f135423babfe"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/layout/SiteNav.tsx": {
+    "mtime": 1777827649.3824744,
+    "hash": "8e3ba91a93c4088cd5fcaabce87eab72"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/features/city/CityVitals.tsx": {
+    "mtime": 1777827763.7389,
+    "hash": "5997ce3f80822238db122c27c572bca9"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/features/city/CitySearch.tsx": {
+    "mtime": 1777827763.7388496,
+    "hash": "0b19702d3471b2987a50fac0f8130174"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/pages/TopCitiesPageContent.tsx": {
+    "mtime": 1777827224.404534,
+    "hash": "fdcbf408ccdbf0e682c598858cac66a2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/pages/AboutPageContent.tsx": {
+    "mtime": 1777827224.404554,
+    "hash": "e53bbcfdcad16c911de572a44285eee9"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/analytics/AnalyticsProvider.tsx": {
+    "mtime": 1777826746.4172337,
+    "hash": "ac360b15492bad34a356b6597f3e1835"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/analytics/LazyGeoConsentBanner.tsx": {
+    "mtime": 1777826746.425173,
+    "hash": "4f9e25309f90ddb0cf87936f3e3a6f54"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/analytics/PageTracker.tsx": {
+    "mtime": 1770337683.3880942,
+    "hash": "9e8c0f2b157a5e08bad2486fcbd0bc70"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/analytics/index.ts": {
+    "mtime": 1777826746.4214258,
+    "hash": "76f6672af8d8321eb1f7bff906476da1"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/components/analytics/GeoConsentBanner.tsx": {
+    "mtime": 1777826746.4173636,
+    "hash": "f181740ff5b725d572e32bcca7b4b0d3"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/hooks/useRecentSearches.ts": {
+    "mtime": 1777827932.8777704,
+    "hash": "d5b0dde2fe2157c5d050c01253879d0f"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/hooks/useDeviceType.ts": {
+    "mtime": 1777827763.7513022,
+    "hash": "70bd2f378c1b3f02951b362068e1e968"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/hooks/useNetworkQuality.ts": {
+    "mtime": 1777827763.751304,
+    "hash": "9d011b2e8a6c6472a0a86262fbd62655"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/validation.ts": {
+    "mtime": 1777825962.2658036,
+    "hash": "e887307b5a80eef71d359e86d80e5bf0"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/mapping.ts": {
+    "mtime": 1777801540.0487013,
+    "hash": "100278d3750005b655346f2e3346e4e8"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/analytics.ts": {
+    "mtime": 1777827831.1500201,
+    "hash": "6ac97c5c8cdf06b36e257252d94eae44"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/cities.ts": {
+    "mtime": 1777801540.0477796,
+    "hash": "a95bb32c4c8fa2068607a06896f90aa7"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/ranking.ts": {
+    "mtime": 1777801540.0504851,
+    "hash": "35adda2afb190ce913302b9a5e62c13e"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/http.ts": {
+    "mtime": 1777826317.972705,
+    "hash": "d47e9e00d7ca856c1b14a619ff5fc632"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/storage.ts": {
+    "mtime": 1777801540.0507996,
+    "hash": "53b3f29e67a37024f8c4c56bb07bf71e"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/place-search-utils.ts": {
+    "mtime": 1777801540.0489268,
+    "hash": "7cc9a281056e9d38f498fd2736081396"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/cache-config.ts": {
+    "mtime": 1777801540.0473418,
+    "hash": "5005b55ee36d0265d12e3ea0b8a3d320"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/logger.ts": {
+    "mtime": 1777104442.102566,
+    "hash": "94ef90427b3882a9045594cee858df0d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/format.ts": {
+    "mtime": 1777827763.7414935,
+    "hash": "350043a4a7254071174051abc73c03c2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/intelligence.ts": {
+    "mtime": 1777801540.0484521,
+    "hash": "1ae76eb9ad5d96cace882e557982b747"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/weather.ts": {
+    "mtime": 1777801540.0510747,
+    "hash": "c65d2e48340c6c2492527df5d9cfc4cc"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/cache.ts": {
+    "mtime": 1777827854.5547507,
+    "hash": "e7ed0affa730e3df265d44d88ddbcf8d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/places.ts": {
+    "mtime": 1777826317.973208,
+    "hash": "f59edc5e5434f391ce779fc0858e9ef9"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/health.ts": {
+    "mtime": 1777104442.0854235,
+    "hash": "14d923a572dd6d8fd6dd30d7441bb214"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/supabase.ts": {
+    "mtime": 1777055408.9610403,
+    "hash": "d31daf66d8c259685a5a4cce6b260d2a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/env.ts": {
+    "mtime": 1777827854.5547357,
+    "hash": "42a95bb605d4bff3001e2c804ef58dea"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/metrics.ts": {
+    "mtime": 1777104442.1130488,
+    "hash": "265df7e7927544ac39a7d3de03d17d5a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/useAnalytics.ts": {
+    "mtime": 1777104442.1629407,
+    "hash": "805c9f7c44d284d3d284242cd3a8778b"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/image-transforms.ts": {
+    "mtime": 1771864739.731413,
+    "hash": "30646ccbade2c7dc4d6bfd5b05ce86c2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/sphere-categories.ts": {
+    "mtime": 1777104442.1539137,
+    "hash": "db448f77bdea30c579913841e9d284f1"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/geo.ts": {
+    "mtime": 1777801540.047964,
+    "hash": "87f41be51c6892f7776e0a343791f129"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/providers/openMeteo.ts": {
+    "mtime": 1777801540.0500305,
+    "hash": "2a38954dd83dda7b5a7f3352677a4b6d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/providers/gemini.ts": {
+    "mtime": 1777801540.0495765,
+    "hash": "9759966195355edd22d94f5700041eaf"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/providers/openweather.ts": {
+    "mtime": 1777801540.0502799,
+    "hash": "32472202d29a771d999e47e3c025d8fb"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/src/lib/providers/googlePlaces.ts": {
+    "mtime": 1777826317.9727142,
+    "hash": "faf626919a442d14fff8a8f529d76921"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/PROJECT.md": {
+    "mtime": 1777801540.022882,
+    "hash": "cb1b1601a823931962578e38b105992d"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/README.md": {
+    "mtime": 1777051763.3559136,
+    "hash": "4ee34fb7bd27060a5009301a198cbecd"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/CODE_STYLE.md": {
+    "mtime": 1768146303.3619096,
+    "hash": "f7a968d315bc2a6c0d89e87c49477bd1"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/CONTRIBUTING.md": {
+    "mtime": 1768146303.362129,
+    "hash": "d017b50c1b9114a36349ef92092541c7"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/docker-compose.yml": {
+    "mtime": 1769434459.1677394,
+    "hash": "690f83912f454b46dc7f28e8f547550b"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/AGENTS.md": {
+    "mtime": 1773536541.1888175,
+    "hash": "92e344488f05408583cb0662c658c6e0"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/CLAUDE.md": {
+    "mtime": 1777104441.5734076,
+    "hash": "121920a2551baa2347339fb94eea7a93"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/docs/Award-Winning Travel Website Design.md": {
+    "mtime": 1777104441.649287,
+    "hash": "c1659c2eab2aecdfe04a6e45c6c5160c"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/docs/front-end_AUDIT.md": {
+    "mtime": 1777824374.3152752,
+    "hash": "0dcfdb9b4d2d56af209f317bd37b8813"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/docs/AUDIT_REPORT.md": {
+    "mtime": 1777801540.0434718,
+    "hash": "6a041d216455e4487015cdbdd4dd9a53"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/docs/analytics-privacy.md": {
+    "mtime": 1777827866.3447716,
+    "hash": "76e016c3a3c3fadddcd39e92ebcce39a"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/supabase/migrations/README.md": {
+    "mtime": 1777055408.961474,
+    "hash": "72310dff443bfc4768275862ac6d9cbb"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/fallbackPage/index.html": {
+    "mtime": 1772854829.289956,
+    "hash": "d4818da300ecc18066cdc9c67f6abeba"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/google83792ae278071723.html": {
+    "mtime": 1768452067.330005,
+    "hash": "34d00f4dc50d334b3f4f1655206a20fc"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/data/city_ai_candidates.txt": {
+    "mtime": 1768318963.7633104,
+    "hash": "fc5a6153a7da3449c130057af63b65d2"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/hero.png": {
+    "mtime": 1768144152.009962,
+    "hash": "78497a1c59199d859387da166b33b60b"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/file.svg": {
+    "mtime": 1768144152.0025847,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/vercel.svg": {
+    "mtime": 1768144152.0028687,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/next.svg": {
+    "mtime": 1768144152.002781,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/globe.svg": {
+    "mtime": 1768144152.0026848,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/window.svg": {
+    "mtime": 1768144152.0029693,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "/Users/sagarawale/Documents/codeBase/bestcityspots/public/logo.svg": {
+    "mtime": 1768374226.575214,
+    "hash": "3e91472f6be182c1d3b2f0e12f4cc343"
   }
 }

@@ -54,6 +54,7 @@ export function getAnonClient(): SupabaseClient | null {
 }
 
 export function getServerClient(): SupabaseClient | null {
+  if (typeof window !== "undefined") return null;
   if (serverCache === undefined) serverCache = buildServerClient();
   return serverCache;
 }
@@ -90,10 +91,14 @@ function lazyAnonProxy(): SupabaseClient {
 export const supabase: SupabaseClient = lazyAnonProxy();
 
 /**
- * Service-role client or `null` when `SUPABASE_SERVICE_ROLE_KEY` is missing.
- * Preserves the legacy truthy-check pattern used across the codebase.
+ * Service-role client or `null` when `SUPABASE_SERVICE_ROLE_KEY` is missing
+ * (or when accessed from a client bundle). Preserves the legacy truthy-check
+ * pattern used across the codebase. Resolved only on the server to avoid
+ * triggering `serverEnv()` during client-bundle module evaluation when
+ * shared modules (e.g. `cities.ts`) are imported by client components.
  */
-export const supabaseServer: SupabaseClient | null = getServerClient();
+export const supabaseServer: SupabaseClient | null =
+  typeof window === "undefined" ? getServerClient() : null;
 
 /** Test-only reset. Not exported from any index file. */
 export function __resetSupabaseCache(): void {

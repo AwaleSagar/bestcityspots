@@ -115,6 +115,11 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
 
   const featuredCities = cities.slice(0, 6);
 
+  const scrollToTop = () => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  };
+
   return (
     <>
       <ScrollProgress />
@@ -184,18 +189,13 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
 
           <section className="mt-12">
             <div className="labelled-rule">Featured Cities</div>
-            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {featuredCities.map((city, index) => (
-                <ScrollReveal
-                  key={city.id}
-                  animation="fade-up"
-                  staggerIndex={index}
-                  staggerDelay={0.08}
-                >
-                  <CityCard city={city} rank={index + 1} />
-                </ScrollReveal>
-              ))}
-            </div>
+            <ScrollReveal animation="fade-up">
+              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {featuredCities.map((city, index) => (
+                  <CityCard key={city.id} city={city} rank={index + 1} />
+                ))}
+              </div>
+            </ScrollReveal>
           </section>
 
           <section className="mt-16" aria-labelledby="cities-list-heading">
@@ -208,34 +208,29 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
               const startRank = cities.indexOf(bandCities[0]) + 1;
 
               return (
-                <div key={band.label} className="mt-10">
-                  <div className="labelled-rule">
-                    {band.label} / {band.title}
-                  </div>
-                  <div className="atlas-frame mt-4 rounded-[1.2rem] p-3 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-4">
-                    <div className="text-muted mb-2 hidden items-center gap-4 px-4 py-2 text-[0.68rem] font-bold tracking-[0.2em] uppercase sm:flex">
-                      <span className="w-10">Rank</span>
-                      <span className="flex-1">City</span>
-                      <span>Country</span>
-                      <span className="hidden md:block">Region</span>
-                      <span className="w-20 text-right">Population</span>
-                      <span className="w-4" />
+                <ScrollReveal key={band.label} animation="fade-up">
+                  <div className="mt-10">
+                    <div className="labelled-rule">
+                      {band.label} / {band.title}
                     </div>
+                    <div className="atlas-frame mt-4 rounded-[1.2rem] p-3 sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-4">
+                      <div className="text-muted mb-2 hidden items-center gap-4 px-4 py-2 text-[0.68rem] font-bold tracking-[0.2em] uppercase sm:flex">
+                        <span className="w-10">Rank</span>
+                        <span className="flex-1">City</span>
+                        <span>Country</span>
+                        <span className="hidden md:block">Region</span>
+                        <span className="w-20 text-right">Population</span>
+                        <span className="w-4" />
+                      </div>
 
-                    <div className="divide-line/80 divide-y">
-                      {bandCities.map((city, index) => (
-                        <ScrollReveal
-                          key={city.id}
-                          animation="fade-up"
-                          staggerIndex={index}
-                          staggerDelay={0.03}
-                        >
-                          <CityRow city={city} rank={startRank + index} />
-                        </ScrollReveal>
-                      ))}
+                      <div className="divide-line/80 divide-y">
+                        {bandCities.map((city, index) => (
+                          <CityRow key={city.id} city={city} rank={startRank + index} />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </ScrollReveal>
               );
             })}
           </section>
@@ -254,7 +249,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                   </Link>
                   <button
                     type="button"
-                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    onClick={scrollToTop}
                     className="btn-secondary"
                   >
                     Back to top

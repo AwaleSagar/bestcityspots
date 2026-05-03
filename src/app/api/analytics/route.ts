@@ -1,6 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase";
 import { AnalyticsPayloadSchema, processAnalyticsBatch } from "@/lib/analytics";
+
+const MAX_PAYLOAD_BYTES = 64 * 1024;
+
+async function readJsonBodyWithLimit(request: NextRequest) {
+  const reader = request.body?.getReader();
+  if (!reader) return null;
+
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_PAYLOAD_BYTES) {
+      return { tooLarge: true as const };
+    }
+    chunks.push(value);
+  }
+
+  const body = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    body.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+
+  return { value: JSON.parse(new TextDecoder().decode(body)) as unknown };
+}
 
 // =============================================================================
 // Route Handler — thin: validate, delegate, respond
@@ -16,13 +45,17 @@ export async function POST(request: NextRequest) {
     const contentLengthHeader = request.headers.get("content-length");
     if (contentLengthHeader) {
       const contentLength = Number(contentLengthHeader);
-      if (Number.isFinite(contentLength) && contentLength > 64 * 1024) {
+      if (Number.isFinite(contentLength) && contentLength > MAX_PAYLOAD_BYTES) {
         return NextResponse.json({ error: "Payload too large" }, { status: 413 });
       }
     }
 
-    const body = await request.json();
-    const result = AnalyticsPayloadSchema.safeParse(body);
+    const body = await readJsonBodyWithLimit(request);
+    if (body?.tooLarge) {
+      return NextResponse.json({ error: "Payload too large" }, { status: 413 });
+    }
+
+    const result = AnalyticsPayloadSchema.safeParse(body?.value);
 
     if (!result.success) {
       return NextResponse.json(
@@ -31,16 +64,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fire-and-forget: all DB writes happen in the background
-    processAnalyticsBatch(result.data.events, {
+    const countryCode = request.headers.get("x-vercel-ip-country") || null;
+    const metadata = {
       userAgent: request.headers.get("user-agent") || "",
       referrer: request.headers.get("referer") || result.data.events[0]?.referrer || null,
-      countryCode: request.headers.get("x-vercel-ip-country") || null,
-      countryName:
-        request.headers.get("x-vercel-ip-country-region") ||
-        request.headers.get("x-vercel-ip-country") ||
-        null,
+      countryCode,
+      countryName: countryCode,
       city: request.headers.get("x-vercel-ip-city") || null,
+    };
+
+    after(() => {
+      processAnalyticsBatch(result.data.events, metadata).catch((error) => {
+        console.error("[analytics] Background processing failed:", error);
+      });
     });
 
     return NextResponse.json({ success: true });

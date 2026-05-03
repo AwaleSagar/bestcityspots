@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MapPin, X } from "lucide-react";
 import { useAnalytics } from "@/lib/useAnalytics";
@@ -17,19 +17,9 @@ export function GeoConsentBanner() {
   const [isVisible, setIsVisible] = useState(false);
   const { setGeoConsent, hasGeoConsent } = useAnalytics();
   const shouldReduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    // Check if we've already asked
-    const alreadyAsked = getStorageItem(GEO_ASKED_KEY);
-    if (alreadyAsked) return;
-
-    // Show banner after a short delay (don't interrupt initial load)
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const handleAccept = () => {
     setGeoConsent(true);
@@ -44,9 +34,40 @@ export function GeoConsentBanner() {
   };
 
   const handleDismiss = () => {
-    // Just dismiss without saving preference - will ask again next session
+    setStorageItem(GEO_ASKED_KEY, "true");
     setIsVisible(false);
   };
+
+  useEffect(() => {
+    // Check if we've already asked
+    const alreadyAsked = getStorageItem(GEO_ASKED_KEY);
+    if (alreadyAsked) return;
+
+    // Show banner after a short delay (don't interrupt initial load)
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeButtonRef.current?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        handleDismiss();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocusRef.current?.focus();
+    };
+  }, [isVisible]);
 
   // Don't show if already consented
   if (hasGeoConsent) return null;
@@ -61,14 +82,16 @@ export function GeoConsentBanner() {
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="fixed right-4 bottom-[calc(var(--mobile-bottom-nav-height)+1rem)] left-4 z-50 mx-auto max-w-md md:right-6 md:bottom-6 md:left-auto"
           role="dialog"
+          aria-modal="true"
           aria-labelledby="geo-consent-title"
           aria-describedby="geo-consent-description"
         >
-          <div className="border-line bg-surface-strong/95 relative overflow-hidden rounded-[1.8rem] border p-5 shadow-2xl backdrop-blur-xl">
+          <div ref={panelRef} className="border-line bg-surface-strong/95 relative overflow-hidden rounded-[1.8rem] border p-5 shadow-2xl backdrop-blur-xl">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[color:var(--color-brand-secondary)] via-[color:var(--color-accent)] to-[color:var(--color-accent-strong)]" />
 
             {/* Close button */}
             <button
+              ref={closeButtonRef}
               onClick={handleDismiss}
               className="text-muted hover:bg-background/60 hover:text-foreground absolute top-3 right-3 rounded-full p-1.5 transition-colors"
               aria-label="Dismiss"

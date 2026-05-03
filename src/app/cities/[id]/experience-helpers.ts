@@ -18,7 +18,8 @@ export type CityNotes = Record<string, string>;
 
 const NOTE_KEY_PREFIX = "k_";
 
-export const sanitizeKey = (key: string) => `${NOTE_KEY_PREFIX}${encodeURIComponent(key)}`;
+export const sanitizeKey = (key: string) =>
+  key.startsWith(NOTE_KEY_PREFIX) ? key : `${NOTE_KEY_PREFIX}${encodeURIComponent(key)}`;
 
 export const toNoteMap = (notes: CityNotes) => {
   const map = new Map<string, string>();

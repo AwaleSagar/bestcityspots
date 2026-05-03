@@ -1,7 +1,7 @@
 "use client";
 
 import type { KeyboardEvent, ReactNode } from "react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
@@ -62,6 +62,8 @@ function CitySearch({ topCities }: CitySearchProps) {
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastInteractionRef = useRef<"keyboard" | "pointer">("pointer");
+  const resultsListId = useId();
   const router = useRouter();
   const { trackAction } = useAnalytics();
   const hasTrackedSearch = useRef(false);
@@ -70,15 +72,13 @@ function CitySearch({ topCities }: CitySearchProps) {
   const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
   const isTouchDevice = isMobile || isTablet;
   const shouldReduceMotion = useReducedMotion();
-  const timeOfDay = (() => {
-    // Computed each render so the label stays correct across midnight without
-    // needing a setInterval. Cheap: 1 Date construction + 3 comparisons.
+  const timeOfDay = useMemo(() => {
     const hour = new Date().getHours();
     if (hour < 11) return "Morning planning";
     if (hour < 17) return "Afternoon comparison";
     if (hour < 21) return "Evening shortlist";
     return "Late-night dreaming";
-  })();
+  }, []);
   const adaptiveHints = useMemo(
     () => [
       timeOfDay,
@@ -169,10 +169,9 @@ function CitySearch({ topCities }: CitySearchProps) {
     return null;
   }, [shouldShowResults, searchResults]);
 
-  const highlightMatch = highlightMatchFn;
-
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      lastInteractionRef.current = "keyboard";
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setActiveIndex((prev) => {
@@ -232,7 +231,6 @@ function CitySearch({ topCities }: CitySearchProps) {
     );
   }, [isLocating, addRecentCity, router]);
 
-  const resultsListId = "city-search-results";
   const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
   const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
 
@@ -275,7 +273,7 @@ function CitySearch({ topCities }: CitySearchProps) {
           autoComplete="off"
           value={searchQuery}
           onChange={(e) => {
-            const val = e.target.value.replace(/[^a-zA-Z0-9\s-]/g, "");
+            const val = e.target.value.replace(/[<>{}|\\^`[\]]/g, "");
             if (val.length <= 100) setSearchQuery(val);
           }}
           onKeyDown={handleKeyDown}
@@ -475,7 +473,6 @@ function CitySearch({ topCities }: CitySearchProps) {
             >
               {searchResults.map((city, idx) => (
                 <motion.li
-                  layout
                   key={city.id}
                   initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
                   animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
@@ -488,7 +485,11 @@ function CitySearch({ topCities }: CitySearchProps) {
                   role="option"
                   aria-selected={activeIndex === idx}
                   id={`city-option-${city.id}`}
-                  onMouseEnter={() => setActiveIndex(idx)}
+                  onPointerMove={(event) => {
+                    if (event.pointerType !== "mouse") return;
+                    lastInteractionRef.current = "pointer";
+                    setActiveIndex(idx);
+                  }}
                 >
                   <Link
                     href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
@@ -519,7 +520,7 @@ function CitySearch({ topCities }: CitySearchProps) {
                               : "text-muted-strong group-hover/item:text-foreground"
                           }`}
                         >
-                          {highlightMatch(city.city, searchQuery)}
+                          {highlightMatchFn(city.city, searchQuery)}
                         </div>
                         <div
                           className={`mt-0.5 flex items-center gap-1.5 text-xs font-medium tracking-wide transition-colors duration-200 ${
@@ -562,7 +563,7 @@ function CitySearch({ topCities }: CitySearchProps) {
                 </motion.li>
               ))}
               {searchResults.length === 0 && !isSearching && (
-                <li className="px-8 py-14 text-center" role="status" aria-live="polite">
+                <li className="px-8 py-14 text-center" aria-live="polite">
                   <div className="text-foreground/50 mb-2 text-sm font-semibold">
                     No matches for &quot;{searchQuery}&quot;
                   </div>

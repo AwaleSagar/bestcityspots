@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { Ticket, Utensils, Hotel, Compass, Star } from "lucide-react";
 
 // Shimmer animation component
@@ -11,12 +8,9 @@ function Shimmer() {
 }
 
 // Skeleton for a single experience card
-function ExperienceCardSkeleton({ index, isFeatured }: { index: number; isFeatured: boolean }) {
+function ExperienceCardSkeleton({ isFeatured }: { isFeatured: boolean }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.08, duration: 0.4 }}
+    <div
       className={`liquid-glass overflow-hidden rounded-2xl md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
     >
       {/* Image skeleton with overlaid elements */}
@@ -97,7 +91,7 @@ function ExperienceCardSkeleton({ index, isFeatured }: { index: number; isFeatur
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -175,37 +169,25 @@ export default function ExperiencesSkeleton() {
         </div>
 
         {/* Loading indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex items-center justify-center gap-3 py-4"
-        >
+        <div className="flex items-center justify-center gap-3 py-4">
           <div className="flex gap-1">
             {[0, 1, 2].map((i) => (
-              <motion.div
+              <div
                 key={i}
-                className="bg-accent h-1.5 w-1.5 rounded-full"
-                animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.3, 1, 0.3],
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                }}
+                className="bg-accent h-1.5 w-1.5 animate-pulse rounded-full"
+                style={{ animationDelay: `${i * 160}ms` }}
               />
             ))}
           </div>
           <span className="text-foreground/40 text-[10px] font-black tracking-[0.2em] uppercase">
             Discovering experiences...
           </span>
-        </motion.div>
+        </div>
 
         {/* Cards skeleton — featured + grid */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5">
           {[0, 1, 2].map((index) => (
-            <ExperienceCardSkeleton key={index} index={index} isFeatured={index === 0} />
+            <ExperienceCardSkeleton key={index} isFeatured={index === 0} />
           ))}
         </div>
       </div>

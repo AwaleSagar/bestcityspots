@@ -49,6 +49,7 @@ const imageVariants = {
 // BlurHash placeholder dimensions (small for fast decode)
 const PLACEHOLDER_WIDTH = 32;
 const PLACEHOLDER_HEIGHT = 32;
+const blurhashDataUrlCache = new Map<string, string | null>();
 
 function shouldBypassNextImageOptimization(src: string): boolean {
   try {
@@ -62,6 +63,10 @@ function shouldBypassNextImageOptimization(src: string): boolean {
  * Decode BlurHash to a base64 data URL for instant placeholder rendering
  */
 function blurhashToDataURL(hash: string): string | null {
+  if (blurhashDataUrlCache.has(hash)) {
+    return blurhashDataUrlCache.get(hash) ?? null;
+  }
+
   try {
     const pixels = decode(hash, PLACEHOLDER_WIDTH, PLACEHOLDER_HEIGHT);
 
@@ -77,8 +82,11 @@ function blurhashToDataURL(hash: string): string | null {
     imageData.data.set(pixels);
     ctx.putImageData(imageData, 0, 0);
 
-    return canvas.toDataURL();
+    const dataUrl = canvas.toDataURL();
+    blurhashDataUrlCache.set(hash, dataUrl);
+    return dataUrl;
   } catch {
+    blurhashDataUrlCache.set(hash, null);
     return null;
   }
 }
@@ -216,9 +224,6 @@ function OptimizedImageInner({
           animate={isLoaded ? "visible" : "hidden"}
           variants={imageVariants}
           className="absolute inset-0 z-10"
-          style={{
-            willChange: "transform, opacity",
-          }}
         >
           {useFillMode ? (
             <Image

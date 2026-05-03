@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Compass, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -23,11 +24,21 @@ const fadeUp = {
 
 export default function HeroHeader() {
   const shouldReduceMotion = useReducedMotion();
+  const focusTimeoutRef = useRef<number | null>(null);
   const signalItems = [
     { icon: Leaf, label: "Live city signals" },
     { icon: Sparkles, label: "AI-labeled briefings" },
     { icon: ShieldCheck, label: "Visible sources" },
   ];
+
+  useEffect(
+    () => () => {
+      if (focusTimeoutRef.current) {
+        window.clearTimeout(focusTimeoutRef.current);
+      }
+    },
+    []
+  );
 
   return (
     <motion.header
@@ -68,7 +79,13 @@ export default function HeroHeader() {
                   behavior: shouldReduceMotion ? "auto" : "smooth",
                   block: "center",
                 });
-                window.setTimeout(() => searchInput?.focus(), shouldReduceMotion ? 0 : 200);
+                if (focusTimeoutRef.current) {
+                  window.clearTimeout(focusTimeoutRef.current);
+                }
+                focusTimeoutRef.current = window.setTimeout(
+                  () => searchInput?.focus(),
+                  shouldReduceMotion ? 0 : 200
+                );
               }}
             >
               Start with intent

@@ -209,16 +209,22 @@ export default function ExperiencesSection({
   const priceLevels = PRICE_LEVELS;
 
   // Logic to filter and slice data
-  const rawData =
-    activeTab === "landmarks" ? landmarks : activeTab === "restaurants" ? restaurants : hotels;
+  const rawData = useMemo(
+    () => (activeTab === "landmarks" ? landmarks : activeTab === "restaurants" ? restaurants : hotels),
+    [activeTab, hotels, landmarks, restaurants]
+  );
 
-  const filteredData = selectedPrice
-    ? rawData.filter((item) => item.priceLevel === selectedPrice)
-    : rawData;
+  const filteredData = useMemo(
+    () => (selectedPrice ? rawData.filter((item) => item.priceLevel === selectedPrice) : rawData),
+    [rawData, selectedPrice]
+  );
 
   // Always take top 5 based on reviews
   // Optimized: O(n log k) partial sort instead of O(n log n) full sort
-  const displayData = topK(filteredData, 5, (item) => item.userRatingCount || 0);
+  const displayData = useMemo(
+    () => topK(filteredData, 5, (item) => item.userRatingCount || 0),
+    [filteredData]
+  );
 
   const formatType = (types?: string[]) => {
     if (!types || types.length === 0) return "Point of Interest";
@@ -253,7 +259,7 @@ export default function ExperiencesSection({
           icon: "text-emerald-500 dark:text-emerald-400/70",
           iconBg: "border-emerald-500/15 bg-emerald-500/10",
           dot: "bg-emerald-500/40",
-          save: "border-emerald-500/25 bg-emerald-500/8 text-emerald-500 dark:text-emerald-300",
+          save: "border-emerald-500/25 bg-emerald-500/10 text-emerald-500 dark:text-emerald-300",
           saveHover: "hover:border-emerald-500/20",
           note: "border-emerald-500/15 bg-emerald-500/5",
           noteLabel: "text-emerald-500 dark:text-emerald-400/80",
@@ -270,7 +276,7 @@ export default function ExperiencesSection({
           icon: "text-sky-500 dark:text-sky-400/70",
           iconBg: "border-sky-500/15 bg-sky-500/10",
           dot: "bg-sky-500/40",
-          save: "border-sky-500/25 bg-sky-500/8 text-sky-500 dark:text-sky-300",
+          save: "border-sky-500/25 bg-sky-500/10 text-sky-500 dark:text-sky-300",
           saveHover: "hover:border-sky-500/20",
           note: "border-sky-500/15 bg-sky-500/5",
           noteLabel: "text-sky-500 dark:text-sky-400/80",
@@ -287,7 +293,7 @@ export default function ExperiencesSection({
           icon: "text-orange-500 dark:text-orange-400/70",
           iconBg: "border-orange-500/15 bg-orange-500/10",
           dot: "bg-orange-500/40",
-          save: "border-orange-500/25 bg-orange-500/8 text-orange-500 dark:text-orange-300",
+          save: "border-orange-500/25 bg-orange-500/10 text-orange-500 dark:text-orange-300",
           saveHover: "hover:border-orange-500/20",
           note: "border-orange-500/15 bg-orange-500/5",
           noteLabel: "text-orange-500 dark:text-orange-400/80",
@@ -324,11 +330,14 @@ export default function ExperiencesSection({
     });
   };
 
-  const tabCounts = {
-    landmarks: landmarks.length,
-    restaurants: restaurants.length,
-    hotels: hotels.length,
-  };
+  const tabCounts = useMemo(
+    () => ({
+      landmarks: landmarks.length,
+      restaurants: restaurants.length,
+      hotels: hotels.length,
+    }),
+    [hotels.length, landmarks.length, restaurants.length]
+  );
 
   const renderCard = (item: Landmark, index: number) => {
     const isFeatured = index === 0;
@@ -368,6 +377,7 @@ export default function ExperiencesSection({
               alt={item.displayName.text}
               className="h-full w-full transition-transform duration-500 group-hover/card:scale-105"
               objectFit="cover"
+              priority={index === 0}
             />
             {/* Gradient overlay */}
             <div
@@ -480,8 +490,8 @@ export default function ExperiencesSection({
               onClick={() => toggleSave(item, activeTab)}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition-all active:scale-[0.97] ${
                 savedIds.has(item.id)
-                  ? "border-orange-500/25 bg-orange-500/8 text-orange-300"
-                  : "border-foreground/8 bg-foreground/[0.03] text-foreground/50 hover:text-foreground/75 hover:border-orange-500/20"
+                  ? catColor.save
+                  : `border-foreground/8 bg-foreground/[0.03] text-foreground/50 hover:text-foreground/75 ${catColor.saveHover}`
               }`}
               aria-pressed={savedIds.has(item.id)}
             >

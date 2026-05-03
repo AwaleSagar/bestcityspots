@@ -45,6 +45,11 @@ function determineQuality(connection: NetworkInformation | undefined): QualityTi
   // If data saver is enabled, always use low quality
   if (connection?.saveData) return "low";
 
+  if (typeof connection?.downlink === "number" && connection.downlink > 0) {
+    if (connection.downlink < 0.8) return "low";
+    if (connection.downlink < 3) return "medium";
+  }
+
   // Determine quality based on effective connection type
   const effectiveType = connection?.effectiveType;
   switch (effectiveType) {
@@ -82,12 +87,13 @@ export function useNetworkQuality(): NetworkQualityState {
 
   useEffect(() => {
     const connection = getConnection();
+    const initialDpr = Math.min(window.devicePixelRatio || 1, 3);
 
     const updateState = (conn: NetworkInformation | undefined) => {
       setState({
         quality: determineQuality(conn),
         saveData: conn?.saveData ?? false,
-        dpr: Math.min(window.devicePixelRatio || 1, 3),
+        dpr: initialDpr,
         effectiveType: conn?.effectiveType ?? null,
         isSupported: !!conn,
       });

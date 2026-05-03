@@ -20,8 +20,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
             className="text-foreground/60 hover:text-foreground flex items-center gap-1.5 transition-colors duration-100"
             aria-label="Home"
           >
-            <Home className="h-4 w-4" />
-            <span className="sr-only">Home</span>
+            <Home className="h-4 w-4" aria-hidden />
           </Link>
         </li>
         {items.map((item, index) => (

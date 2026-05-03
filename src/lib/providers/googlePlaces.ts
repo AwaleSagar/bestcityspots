@@ -57,6 +57,7 @@ export interface SearchTextParams {
   locationBias?: { lat: number; lng: number; radiusKm: number };
   locationRestriction?: { lat: number; lng: number; radiusKm: number };
   includedType?: string;
+  signal?: AbortSignal;
 }
 
 export interface SearchNearbyParams {
@@ -69,6 +70,7 @@ export interface SearchNearbyParams {
   languageCode?: string;
   regionCode?: string;
   fieldMask?: FieldMaskTier;
+  signal?: AbortSignal;
 }
 
 export type PlacesResult =
@@ -129,7 +131,7 @@ export async function searchText(params: SearchTextParams): Promise<PlacesResult
     };
   }
 
-  return runPlacesRequest(`${API_BASE}/places:searchText`, body, tier, apiKey, correlationId);
+  return runPlacesRequest(`${API_BASE}/places:searchText`, body, tier, apiKey, correlationId, params.signal);
 }
 
 export async function searchNearby(params: SearchNearbyParams): Promise<PlacesResult> {
@@ -154,7 +156,7 @@ export async function searchNearby(params: SearchNearbyParams): Promise<PlacesRe
   if (params.languageCode) body.languageCode = params.languageCode;
   if (params.regionCode) body.regionCode = params.regionCode;
 
-  return runPlacesRequest(`${API_BASE}/places:searchNearby`, body, tier, apiKey, correlationId);
+  return runPlacesRequest(`${API_BASE}/places:searchNearby`, body, tier, apiKey, correlationId, params.signal);
 }
 
 async function runPlacesRequest(
@@ -162,7 +164,8 @@ async function runPlacesRequest(
   body: Record<string, unknown>,
   tier: FieldMaskTier,
   apiKey: string,
-  correlationId: string
+  correlationId: string,
+  signal?: AbortSignal
 ): Promise<PlacesResult> {
   try {
     const response = await httpFetch(url, {
@@ -177,6 +180,7 @@ async function runPlacesRequest(
         "X-Goog-Api-Key": apiKey,
         "X-Goog-FieldMask": FIELD_MASKS[tier],
       },
+      signal,
       body: JSON.stringify(body),
     });
 
@@ -204,6 +208,9 @@ async function runPlacesRequest(
     log.debug("ok", { correlationId, count: places.length, tier });
     return { ok: true, places };
   } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw err;
+    }
     if (err instanceof CircuitOpenError) {
       return { ok: false, reason: "outage" };
     }
@@ -218,7 +225,7 @@ async function runPlacesRequest(
 /** Best-effort resolution of a photo reference to raw image bytes. */
 export async function fetchPhotoBytes(
   photoName: string,
-  opts: { maxWidth: number; maxHeight: number }
+  opts: { maxWidth: number; maxHeight: number; signal?: AbortSignal }
 ): Promise<ArrayBuffer | null> {
   const apiKey = getApiKey();
   if (!apiKey) return null;
@@ -229,6 +236,7 @@ export async function fetchPhotoBytes(
       method: "GET",
       timeoutMs: 15_000,
       redirect: "follow",
+      signal: opts.signal,
     });
     if (!res.ok) return null;
     return await res.arrayBuffer();

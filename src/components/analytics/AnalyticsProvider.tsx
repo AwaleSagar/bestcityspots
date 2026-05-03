@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { publicEnv } from "@/lib/env";
 import {
   getSessionStorageItem,
@@ -110,6 +110,15 @@ function setGeoConsentStorage(consent: boolean): void {
   setStorageItem(GEO_CONSENT_KEY, consent ? "true" : "false");
 }
 
+function getReferrerOrigin(): string | undefined {
+  if (typeof document === "undefined" || !document.referrer) return undefined;
+  try {
+    return new URL(document.referrer).origin;
+  } catch {
+    return undefined;
+  }
+}
+
 function shouldTrack(): boolean {
   if (typeof window === "undefined") return false;
 
@@ -143,6 +152,9 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const eventsQueue = useRef<AnalyticsEvent[]>([]);
   const isNewVisitorRef = useRef<boolean | null>(null);
   const isSendingRef = useRef(false);
+  const sessionEndedRef = useRef(false);
+  const shouldTrackRef = useRef(false);
+  const referrerOriginRef = useRef<string | undefined>(undefined);
 
   // Initialize session on mount
   useEffect(() => {
@@ -162,6 +174,8 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
     // Load geo consent
     setHasGeoConsent(getGeoConsent());
+    shouldTrackRef.current = shouldTrack();
+    referrerOriginRef.current = getReferrerOrigin();
   }, []);
 
   // Send events to API
@@ -200,7 +214,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
   // Batch interval timer
   useEffect(() => {
-    if (!shouldTrack()) return;
+    if (!shouldTrackRef.current) return;
 
     const interval = setInterval(flushEvents, BATCH_INTERVAL_MS);
 
@@ -209,9 +223,11 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
   // Send session end on page unload
   useEffect(() => {
-    if (!shouldTrack()) return;
+    if (!shouldTrackRef.current) return;
 
-    const handleUnload = () => {
+    const handlePageHide = () => {
+      if (sessionEndedRef.current) return;
+      sessionEndedRef.current = true;
       const sessionDuration = Math.round((Date.now() - sessionRef.current.startTime) / 1000);
 
       // Add session end event
@@ -229,12 +245,18 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
       // Use sendBeacon for reliability on unload
       if (navigator.sendBeacon) {
+        const payload = new Blob(
+          [
+            JSON.stringify({
+              events,
+              timestamp: new Date().toISOString(),
+            }),
+          ],
+          { type: "application/json" }
+        );
         navigator.sendBeacon(
           "/api/analytics",
-          JSON.stringify({
-            events,
-            timestamp: new Date().toISOString(),
-          })
+          payload
         );
       } else {
         // Fallback to fetch with keepalive
@@ -242,19 +264,17 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       }
     };
 
-    window.addEventListener("beforeunload", handleUnload);
-    window.addEventListener("pagehide", handleUnload);
+    window.addEventListener("pagehide", handlePageHide);
 
     return () => {
-      window.removeEventListener("beforeunload", handleUnload);
-      window.removeEventListener("pagehide", handleUnload);
+      window.removeEventListener("pagehide", handlePageHide);
     };
   }, [hasGeoConsent, sendEvents]);
 
   // Track page view
   const trackPageView = useCallback(
     (path: string, cityId?: number) => {
-      if (!shouldTrack()) return;
+      if (!shouldTrackRef.current) return;
 
       sessionRef.current.pageCount++;
 
@@ -264,7 +284,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
         isNewVisitor: isNewVisitorRef.current === true,
         path,
         cityId,
-        referrer: typeof document !== "undefined" ? document.referrer : undefined,
+        referrer: referrerOriginRef.current,
         hasGeoConsent,
       });
 
@@ -278,7 +298,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
   // Track action
   const trackAction = useCallback((action: ActionType) => {
-    if (!shouldTrack()) return;
+    if (!shouldTrackRef.current) return;
 
     eventsQueue.current.push({
       type: "action",
@@ -289,7 +309,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
   // Track city view (convenience method)
   const trackCityView = useCallback((cityId: number) => {
-    if (!shouldTrack()) return;
+    if (!shouldTrackRef.current) return;
 
     eventsQueue.current.push({
       type: "action",
@@ -305,13 +325,16 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
     setHasGeoConsent(consent);
   }, []);
 
-  const contextValue: AnalyticsContextValue = {
-    trackPageView,
-    trackAction,
-    trackCityView,
-    setGeoConsent: handleSetGeoConsent,
-    hasGeoConsent,
-  };
+  const contextValue: AnalyticsContextValue = useMemo(
+    () => ({
+      trackPageView,
+      trackAction,
+      trackCityView,
+      setGeoConsent: handleSetGeoConsent,
+      hasGeoConsent,
+    }),
+    [handleSetGeoConsent, hasGeoConsent, trackAction, trackCityView, trackPageView]
+  );
 
   return <AnalyticsContext.Provider value={contextValue}>{children}</AnalyticsContext.Provider>;
 }

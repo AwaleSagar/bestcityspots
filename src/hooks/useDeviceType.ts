@@ -13,7 +13,7 @@ export interface DeviceType {
 const SSR_DEFAULTS: DeviceType = {
   isMobile: false,
   isTablet: false,
-  isDesktop: true,
+  isDesktop: false,
   hasCoarsePointer: false,
   isVirtualKeyboardOpen: false,
 };
@@ -25,8 +25,6 @@ export function useDeviceType(): DeviceType {
   const initialViewportHeight = useRef(0);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const mobileMq = window.matchMedia("(max-width: 768px)");
     const tabletMq = window.matchMedia("(min-width: 769px) and (max-width: 1024px)");
     const coarseMq = window.matchMedia("(pointer: coarse)");
