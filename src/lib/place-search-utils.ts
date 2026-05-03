@@ -68,8 +68,16 @@ export function sortPlaces(
 ): Landmark[] {
   const sorted = [...places];
 
+  // Score each place once and sort by the precomputed value. Avoids the
+  // O(n log n) recomputation that the naive comparator triggers per pair.
   if (sortBy === "distance" && typeof lat === "number" && typeof lng === "number") {
-    return sorted.sort((a, b) => getDistanceKm(a, lat, lng) - getDistanceKm(b, lat, lng));
+    const distances = new Map<Landmark, number>();
+    for (const p of sorted) distances.set(p, getDistanceKm(p, lat, lng));
+    return sorted.sort(
+      (a, b) =>
+        (distances.get(a) ?? Number.POSITIVE_INFINITY) -
+        (distances.get(b) ?? Number.POSITIVE_INFINITY)
+    );
   }
 
   if (sortBy === "rating") {
@@ -80,5 +88,7 @@ export function sortPlaces(
     return sorted.sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0));
   }
 
-  return sorted.sort((a, b) => rankingEngine.getScore(b) - rankingEngine.getScore(a));
+  const scores = new Map<Landmark, number>();
+  for (const p of sorted) scores.set(p, rankingEngine.getScore(p));
+  return sorted.sort((a, b) => (scores.get(b) ?? 0) - (scores.get(a) ?? 0));
 }

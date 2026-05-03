@@ -226,3 +226,21 @@ export function aqiLabelFromOwm(aqi: number): string {
       return "Unknown";
   }
 }
+
+/**
+ * Map a raw PM2.5 concentration (µg/m³) to a coarse 1–5 OWM-equivalent
+ * index. Boundaries follow the OpenWeather AQI bucket definitions:
+ * https://openweathermap.org/api/air-pollution
+ */
+export function owmAqiFromPm25(pm25: number): number {
+  if (pm25 < 10) return 1;
+  if (pm25 < 25) return 2;
+  if (pm25 < 50) return 3;
+  if (pm25 < 75) return 4;
+  return 5;
+}
+
+/** Human-readable label for a raw PM2.5 concentration (µg/m³). */
+export function aqiLabelFromPm25(pm25: number): string {
+  return aqiLabelFromOwm(owmAqiFromPm25(pm25));
+}

@@ -52,21 +52,28 @@ export function useDeviceType(): DeviceType {
     // Virtual keyboard detection via visualViewport
     initialViewportHeight.current = window.visualViewport?.height ?? window.innerHeight;
 
+    // visualViewport.resize fires at ~60fps during keyboard animation. We
+    // only need the steady-state height, so throttle via rAF coalescing.
+    let viewportRafId: number | null = null;
     const handleViewportResize = () => {
-      if (!window.visualViewport) return;
-      const current = window.visualViewport.height;
+      if (viewportRafId !== null) return;
+      viewportRafId = requestAnimationFrame(() => {
+        viewportRafId = null;
+        if (!window.visualViewport) return;
+        const current = window.visualViewport.height;
 
-      // Track the largest viewport height seen (accounts for orientation changes)
-      if (current > initialViewportHeight.current) {
-        initialViewportHeight.current = current;
-      }
+        // Track the largest viewport height seen (accounts for orientation changes)
+        if (current > initialViewportHeight.current) {
+          initialViewportHeight.current = current;
+        }
 
-      const shrunk = initialViewportHeight.current - current > KEYBOARD_HEIGHT_THRESHOLD;
+        const shrunk = initialViewportHeight.current - current > KEYBOARD_HEIGHT_THRESHOLD;
 
-      setState((prev) => ({
-        ...prev,
-        isVirtualKeyboardOpen: shrunk && coarseMq.matches,
-      }));
+        setState((prev) => ({
+          ...prev,
+          isVirtualKeyboardOpen: shrunk && coarseMq.matches,
+        }));
+      });
     };
 
     let fallbackHandler: (() => void) | null = null;
@@ -96,6 +103,7 @@ export function useDeviceType(): DeviceType {
       if (fallbackHandler) {
         window.removeEventListener("resize", fallbackHandler);
       }
+      if (viewportRafId !== null) cancelAnimationFrame(viewportRafId);
     };
   }, []);
 

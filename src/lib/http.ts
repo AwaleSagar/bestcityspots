@@ -33,20 +33,58 @@ export interface HttpOptions extends RequestInit {
 interface BreakerState {
   consecutiveFailures: number;
   openedAt: number | null;
+  /** True when a half-open trial is in flight. Prevents thundering herd. */
+  halfOpenInFlight: boolean;
 }
 
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 const BREAKER_THRESHOLD = 5;
 const BREAKER_COOLDOWN_MS = 30_000;
+
+// Bounded set of allowed provider keys. Keeps `breakers` from growing
+// unboundedly when callers pass dynamic strings (memory leak in long-running
+// processes / serverless reuse). Unknown providers are still tracked but
+// share a single "_other" bucket.
+const KNOWN_PROVIDERS = new Set<string>([
+  "gemini",
+  "openweather",
+  "open-meteo",
+  "google-places",
+]);
 const breakers = new Map<string, BreakerState>();
 
+function breakerKey(provider: string): string {
+  return KNOWN_PROVIDERS.has(provider) ? provider : "_other";
+}
+
 function getBreaker(provider: string): BreakerState {
-  let state = breakers.get(provider);
+  const key = breakerKey(provider);
+  let state = breakers.get(key);
   if (!state) {
-    state = { consecutiveFailures: 0, openedAt: null };
-    breakers.set(provider, state);
+    state = { consecutiveFailures: 0, openedAt: null, halfOpenInFlight: false };
+    breakers.set(key, state);
   }
   return state;
+}
+
+/**
+ * Atomically attempts to enter the half-open state. Returns true if the caller
+ * is the elected trial requester (and therefore allowed to proceed). Returns
+ * false if the breaker is still firmly open or another trial is already in
+ * flight — caller must short-circuit.
+ */
+function tryAcquireHalfOpen(provider: string): boolean {
+  const s = getBreaker(provider);
+  if (s.openedAt === null) return true; // closed
+  if (Date.now() - s.openedAt < BREAKER_COOLDOWN_MS) return false; // still open
+  if (s.halfOpenInFlight) return false; // another trial running
+  s.halfOpenInFlight = true;
+  return true;
+}
+
+function releaseHalfOpen(provider: string): void {
+  const s = getBreaker(provider);
+  s.halfOpenInFlight = false;
 }
 
 export function isCircuitOpen(provider: string): boolean {
@@ -81,26 +119,54 @@ function recordSuccess(provider: string) {
   const s = getBreaker(provider);
   s.consecutiveFailures = 0;
   s.openedAt = null;
+  s.halfOpenInFlight = false;
 }
 
 function recordFailure(provider: string) {
   const s = getBreaker(provider);
   s.consecutiveFailures += 1;
+  s.halfOpenInFlight = false;
   if (s.consecutiveFailures >= BREAKER_THRESHOLD && s.openedAt === null) {
     s.openedAt = Date.now();
     log.warn("breaker.open", { provider, cooldownMs: BREAKER_COOLDOWN_MS });
+  } else if (s.openedAt !== null) {
+    // Half-open trial failed — reset the cooldown clock.
+    s.openedAt = Date.now();
   }
 }
 
-function isIdempotent(method: string | undefined): boolean {
-  const m = (method || "GET").toUpperCase();
-  return m === "GET" || m === "HEAD" || m === "OPTIONS";
+function isIdempotent(method: string): boolean {
+  // Caller already normalises to uppercase; avoid the redundant call per
+  // attempt inside the retry loop.
+  return method === "GET" || method === "HEAD" || method === "OPTIONS";
 }
 
 function backoffMs(attempt: number): number {
   // Exponential (250ms, 500, 1000, ...) with full jitter.
   const base = Math.min(250 * 2 ** attempt, 4_000);
   return Math.floor(Math.random() * base);
+}
+
+/** Maximum honoured Retry-After value to avoid pathological waits. */
+const MAX_RETRY_AFTER_MS = 30_000;
+
+/**
+ * Parse a `Retry-After` header per RFC 7231 — either delta-seconds or HTTP-date.
+ * Returns ms to wait, capped at MAX_RETRY_AFTER_MS, or null if unparseable.
+ */
+function parseRetryAfter(header: string | null): number | null {
+  if (!header) return null;
+  const trimmed = header.trim();
+  if (!trimmed) return null;
+  const seconds = Number(trimmed);
+  if (Number.isFinite(seconds) && seconds >= 0) {
+    return Math.min(seconds * 1000, MAX_RETRY_AFTER_MS);
+  }
+  const dateMs = Date.parse(trimmed);
+  if (Number.isNaN(dateMs)) return null;
+  const delta = dateMs - Date.now();
+  if (delta <= 0) return 0;
+  return Math.min(delta, MAX_RETRY_AFTER_MS);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -123,13 +189,21 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
     ...init
   } = options;
 
-  if (isCircuitOpen(provider)) {
+  if (!tryAcquireHalfOpen(provider)) {
     log.warn("breaker.short_circuit", { provider, correlationId });
     throw new CircuitOpenError(provider);
   }
 
   const method = (init.method || "GET").toUpperCase();
   const maxRetries = rawRetries ?? (isIdempotent(method) || retryOnNonIdempotent ? 2 : 0);
+
+  // Build the headers object once — it does not change between retry attempts
+  // and it can be expensive when callers pass dozens of entries.
+  const mergedHeaders: Record<string, string> = {
+    "x-correlation-id": correlationId,
+    "user-agent": "bestcityspots-backend/1.0",
+    ...(headers as Record<string, string> | undefined),
+  };
 
   let lastError: unknown;
 
@@ -138,11 +212,7 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
     try {
       const response = await fetch(url, {
         ...init,
-        headers: {
-          "x-correlation-id": correlationId,
-          "user-agent": "bestcityspots-backend/1.0",
-          ...(headers as Record<string, string> | undefined),
-        },
+        headers: mergedHeaders,
         signal: init.signal ?? AbortSignal.timeout(timeoutMs),
       });
 
@@ -168,12 +238,21 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
           latencyMs,
           attempt,
         });
-        await sleep(backoffMs(attempt));
+        const retryAfter =
+          response.status === 429 || response.status === 503
+            ? parseRetryAfter(response.headers.get("retry-after"))
+            : null;
+        await sleep(retryAfter ?? backoffMs(attempt));
         continue;
       }
 
       // Non-retryable HTTP failure — count as breaker failure only for 5xx.
-      if (response.status >= 500) recordFailure(provider);
+      if (response.status >= 500) {
+        recordFailure(provider);
+      } else {
+        // 4xx means server is reachable; release the half-open guard.
+        releaseHalfOpen(provider);
+      }
       log.warn("http.error", {
         provider,
         correlationId,

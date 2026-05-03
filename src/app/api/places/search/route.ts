@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { placeSearchSchema } from "@/lib/validation";
 import { searchPlaces } from "@/lib/places";
 
+const REQUEST_TIMEOUT_MS = 25_000;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -27,7 +29,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const data = await searchPlaces(parsed.data);
+    // Bound the cold path so we surface 504 before serverless kills us with a generic error.
+    const data = await Promise.race([
+      searchPlaces(parsed.data),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), REQUEST_TIMEOUT_MS)
+      ),
+    ]);
 
     return NextResponse.json(
       {
@@ -41,6 +49,10 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
+    if (error instanceof Error && error.message === "timeout") {
+      console.warn("[places/search] Request timed out");
+      return NextResponse.json({ error: "Request timed out" }, { status: 504 });
+    }
     console.error("[places/search] Request failed:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

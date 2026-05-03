@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 type Point3 = { x: number; y: number; z: number };
@@ -111,13 +111,123 @@ function FloatingParticle({
   );
 }
 
+interface SphereNodeProps {
+  index: number;
+  total: number;
+  point: Point3;
+  label: string;
+  isActive: boolean;
+}
+
+const SphereNode = memo(function SphereNode({
+  index,
+  total,
+  point,
+  label,
+  isActive,
+}: SphereNodeProps) {
+  const depth = (point.z / SPHERE_RADIUS + 1) / 2;
+
+  const baseOpacity = 0.08 + depth * 0.25;
+  const activeOpacity = 0.4 + depth * 0.6;
+  const dotOpacity = isActive ? activeOpacity : baseOpacity;
+  const labelOpacity = isActive ? 0.5 + depth * 0.5 : 0;
+
+  const scale = 0.6 + depth * 0.5;
+  const dotSize = isActive ? 6 : 2 + depth * 2;
+
+  const nodeColor = getNodeColor(index, total, isActive);
+  const glowColor = getGlowColor(index, total);
+
+  return (
+    <div
+      className="absolute top-0 left-0 flex items-center gap-3"
+      style={{
+        transform: `translate3d(${point.x}px, ${point.y}px, ${point.z}px) scale(${scale})`,
+        backfaceVisibility: "hidden",
+        zIndex: Math.floor(depth * 100),
+      }}
+    >
+      <div className="relative flex items-center justify-center">
+        {isActive && (
+          <>
+            <div
+              className="absolute animate-pulse rounded-full"
+              style={{
+                width: dotSize * 4,
+                height: dotSize * 4,
+                background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+                opacity: 0.6,
+              }}
+            />
+            <div
+              className="absolute animate-ping rounded-full"
+              style={{
+                width: dotSize * 2.5,
+                height: dotSize * 2.5,
+                border: `1px solid ${glowColor}`,
+                opacity: 0.4,
+              }}
+            />
+          </>
+        )}
+
+        <div
+          className="rounded-full transition-all duration-700"
+          style={{
+            width: dotSize,
+            height: dotSize,
+            background: nodeColor,
+            opacity: dotOpacity,
+            boxShadow: isActive
+              ? `0 0 ${dotSize * 3}px ${glowColor}, 0 0 ${dotSize * 6}px ${glowColor}`
+              : `0 0 ${dotSize}px ${glowColor}`,
+          }}
+        />
+      </div>
+
+      <span
+        className="text-[11px] font-black tracking-[0.15em] whitespace-nowrap uppercase transition-all duration-700"
+        style={{
+          opacity: labelOpacity,
+          transform: `translateX(${isActive ? 0 : -12}px)`,
+          color: isActive ? nodeColor : "var(--color-foreground)",
+          textShadow: isActive
+            ? `0 0 8px ${glowColor}, 0 0 16px ${glowColor}, 0 0 24px ${glowColor}`
+            : "none",
+          filter: isActive ? "none" : "blur(2px)",
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+});
+
 export default function CitySphereBackground() {
   const shouldReduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const [labels, setLabels] = useState<string[]>([]);
   const [activeIndices, setActiveIndices] = useState<number[]>([]);
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Pause RAF + active-index interval when the sphere is fully off-screen.
+  // Cuts background CPU on long pages and prevents pinned 60fps loops.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -165,7 +275,8 @@ export default function CitySphereBackground() {
   // Periodically change active labels with more variety
   // Optimized: Use Set for O(1) membership check instead of O(k) includes()
   useEffect(() => {
-    if (shouldReduceMotion || labels.length === 0) {
+    if (shouldReduceMotion || labels.length === 0 || !isVisible) {
+      if (!isVisible) return;
       queueMicrotask(() => setActiveIndices([]));
       return;
     }
@@ -192,7 +303,7 @@ export default function CitySphereBackground() {
       });
     }, 2500);
     return () => clearInterval(interval);
-  }, [labels.length, shouldReduceMotion]);
+  }, [labels.length, shouldReduceMotion, isVisible]);
 
   const points = useMemo(() => {
     const n = Math.max(0, Math.min(MAX_CITIES, labels.length || 0));
@@ -209,6 +320,7 @@ export default function CitySphereBackground() {
       el.style.transform = "translate(-50%, -50%) rotateX(12deg) rotateY(-18deg)";
       return;
     }
+    if (!isVisible) return;
 
     let t = 0;
     let currentX = 0;
@@ -233,13 +345,13 @@ export default function CitySphereBackground() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
     };
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, isVisible]);
 
   // Pre-compute Set for O(1) active index lookups in render loop
   const activeIndicesSet = useMemo(() => new Set(activeIndices), [activeIndices]);
 
   return (
-    <div className="city-sphere-layer bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden">
+    <div ref={rootRef} className="city-sphere-layer bg-background pointer-events-none fixed inset-0 z-0 overflow-hidden">
       {/* Organic atlas wash */}
       <div
         className="absolute inset-0 opacity-30 dark:opacity-40"
@@ -294,89 +406,15 @@ export default function CitySphereBackground() {
           const label = labels.at(i) ?? "";
           // O(1) Set.has() instead of O(k) Array.includes()
           const isActive = activeIndicesSet.has(i);
-          const depth = (p.z / SPHERE_RADIUS + 1) / 2;
-
-          // Enhanced visibility with color-based opacity
-          const baseOpacity = 0.08 + depth * 0.25;
-          const activeOpacity = 0.4 + depth * 0.6;
-          const dotOpacity = isActive ? activeOpacity : baseOpacity;
-          const labelOpacity = isActive ? 0.5 + depth * 0.5 : 0;
-
-          const scale = 0.6 + depth * 0.5;
-          const dotSize = isActive ? 6 : 2 + depth * 2;
-
-          const nodeColor = getNodeColor(i, points.length, isActive);
-          const glowColor = getGlowColor(i, points.length);
-
           return (
-            <div
-              key={`${label}-${i}`}
-              className="absolute top-0 left-0 flex items-center gap-3"
-              style={{
-                transform: `translate3d(${p.x}px, ${p.y}px, ${p.z}px) scale(${scale})`,
-                transition: "transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)",
-                backfaceVisibility: "hidden",
-                zIndex: Math.floor(depth * 100),
-                willChange: "transform",
-              }}
-            >
-              {/* Node with multi-layer glow */}
-              <div className="relative flex items-center justify-center">
-                {/* Outer glow ring */}
-                {isActive && (
-                  <>
-                    <div
-                      className="absolute animate-pulse rounded-full"
-                      style={{
-                        width: dotSize * 4,
-                        height: dotSize * 4,
-                        background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
-                        opacity: 0.6,
-                      }}
-                    />
-                    <div
-                      className="absolute animate-ping rounded-full"
-                      style={{
-                        width: dotSize * 2.5,
-                        height: dotSize * 2.5,
-                        border: `1px solid ${glowColor}`,
-                        opacity: 0.4,
-                      }}
-                    />
-                  </>
-                )}
-
-                {/* Core dot */}
-                <div
-                  className="rounded-full transition-all duration-700"
-                  style={{
-                    width: dotSize,
-                    height: dotSize,
-                    background: nodeColor,
-                    opacity: dotOpacity,
-                    boxShadow: isActive
-                      ? `0 0 ${dotSize * 3}px ${glowColor}, 0 0 ${dotSize * 6}px ${glowColor}`
-                      : `0 0 ${dotSize}px ${glowColor}`,
-                  }}
-                />
-              </div>
-
-              {/* Label with glow effect */}
-              <span
-                className="text-[11px] font-black tracking-[0.15em] whitespace-nowrap uppercase transition-all duration-700"
-                style={{
-                  opacity: labelOpacity,
-                  transform: `translateX(${isActive ? 0 : -12}px)`,
-                  color: isActive ? nodeColor : "var(--color-foreground)",
-                  textShadow: isActive
-                    ? `0 0 8px ${glowColor}, 0 0 16px ${glowColor}, 0 0 24px ${glowColor}`
-                    : "none",
-                  filter: isActive ? "none" : "blur(2px)",
-                }}
-              >
-                {label}
-              </span>
-            </div>
+            <SphereNode
+              key={i}
+              index={i}
+              total={points.length}
+              point={p}
+              label={label}
+              isActive={isActive}
+            />
           );
         })}
       </div>

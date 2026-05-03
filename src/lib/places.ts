@@ -23,7 +23,7 @@ const IMAGE_MAX_WIDTH = 800;
 const IMAGE_MAX_HEIGHT = 600;
 const BLURHASH_COMPONENT_X = 4;
 const BLURHASH_COMPONENT_Y = 3;
-const PLACE_IMAGE_BATCH_SIZE = 3;
+const PLACE_IMAGE_BATCH_SIZE = 8;
 // Kept separate from display count so enrichment covers UI permutations.
 // UI shows top 5 by userRatingCount, and can filter by 4 price levels.
 // We enrich the union of: top 20 by Bayesian rank + top 5 per price bucket,
@@ -237,6 +237,10 @@ async function savePlacesCache(
 }
 
 function recordPlacesCacheEvent(type: PlaceType, isHit: boolean): void {
+  // Sample analytics writes — a high-volume warm cache hit otherwise issues
+  // an RPC per request just to record "hit: true" indistinguishably. 10% is
+  // statistically sufficient for ratio tracking while cutting DB write load.
+  if (Math.random() > 0.1) return;
   const client = getPlacesWriteClient();
   if (!client) {
     return;
@@ -298,7 +302,10 @@ function selectImageEnrichmentTargets(rankedPlaces: GooglePlace[]): GooglePlace[
   return Array.from(selected.values());
 }
 
-async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[]): Promise<void> {
+async function enrichRankedPlaceImages(
+  rankedPlaces: GooglePlace[],
+  existingBlurhashes?: Map<string, string>
+): Promise<void> {
   const targets = selectImageEnrichmentTargets(rankedPlaces);
 
   for (let i = 0; i < targets.length; i += PLACE_IMAGE_BATCH_SIZE) {
@@ -309,7 +316,10 @@ async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[]): Promise<voi
         if (!photo?.name || !place.id) return;
 
         const landmark = place as Landmark;
-        const result = await resolvePlaceImage(place.id, photo.name, landmark.blurhash);
+        // Reuse a blurhash from a previous cache row when available so we
+        // don't re-download the storage image just to recompute it.
+        const seededBlurhash = landmark.blurhash || existingBlurhashes?.get(place.id);
+        const result = await resolvePlaceImage(place.id, photo.name, seededBlurhash);
 
         if (result) {
           landmark.imageUrl = result.imageUrl;
@@ -318,6 +328,30 @@ async function enrichRankedPlaceImages(rankedPlaces: GooglePlace[]): Promise<voi
       })
     );
   }
+}
+
+async function loadExistingBlurhashes(
+  cityName: string,
+  type: PlaceType
+): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  try {
+    const { data } = await supabase
+      .from("city_places_cache")
+      .select("places_data")
+      .eq("city_name", cityName)
+      .eq("place_type", type)
+      .maybeSingle();
+    const places = (data?.places_data ?? []) as Landmark[];
+    for (const p of places) {
+      if (p.id && typeof p.blurhash === "string" && p.blurhash.length > 0) {
+        map.set(p.id, p.blurhash);
+      }
+    }
+  } catch {
+    // Best-effort — enrichment falls back to in-storage re-hash if needed.
+  }
+  return map;
 }
 
 async function fetchFreshPlaces(
@@ -344,7 +378,10 @@ async function fetchFreshPlaces(
     places = filterPlacesByRadius(places, centerLat, centerLng, effectiveRadiusKm);
   }
 
-  let rankedPlaces = rankingEngine.rank(dedupePlaces(places));
+  // Dedupe once up-front so the fallback path can reuse the result and only
+  // dedupe the additional fallback batch against the primary id set.
+  const dedupedPrimary = dedupePlaces(places);
+  let rankedPlaces = rankingEngine.rank(dedupedPrimary);
   const fallbackQuery = getFallbackBudgetQuery(cityName, type);
   const shouldRunFallback = Boolean(
     fallbackQuery &&
@@ -361,16 +398,12 @@ async function fetchFreshPlaces(
 
     inferBudgetPlaces(fallbackPlaces);
 
-    const mergedPlaces = hasCoords
-      ? filterPlacesByRadius(
-          [...places, ...fallbackPlaces],
-          centerLat,
-          centerLng,
-          effectiveRadiusKm
-        )
-      : [...places, ...fallbackPlaces];
+    const filteredFallback = hasCoords
+      ? filterPlacesByRadius(fallbackPlaces, centerLat, centerLng, effectiveRadiusKm)
+      : fallbackPlaces;
 
-    rankedPlaces = rankingEngine.rank(dedupePlaces(mergedPlaces));
+    const mergedPlaces = dedupePlaces([...dedupedPrimary, ...filteredFallback]);
+    rankedPlaces = rankingEngine.rank(mergedPlaces);
   }
 
   if (rankedPlaces.length === 0) {
@@ -379,7 +412,10 @@ async function fetchFreshPlaces(
   }
 
   const rankedGooglePlaces = rankedPlaces as GooglePlace[];
-  await enrichRankedPlaceImages(rankedGooglePlaces);
+  // Look up any blurhashes we've already computed for this (city, type) so
+  // background SWR refreshes don't re-download storage images.
+  const existingBlurhashes = await loadExistingBlurhashes(cityName, type);
+  await enrichRankedPlaceImages(rankedGooglePlaces, existingBlurhashes);
   stripPhotoMetadata(rankedGooglePlaces);
 
   return rankedGooglePlaces;
@@ -470,7 +506,12 @@ function normalizeCachedPlace(
       .filter((value): value is string => typeof value === "string" && value.length > 0)
       .map((value) => (value.includes(bucketPath) ? expectedUrl : value));
 
-    if (JSON.stringify(extraImageUrls) !== JSON.stringify(normalizedImageUrls)) {
+    // Compare element-wise instead of stringifying — avoids two full
+    // JSON.stringify passes per cached place on every cache hit.
+    const arrayChanged =
+      normalizedImageUrls.length !== extraImageUrls.length ||
+      !normalizedImageUrls.every((value, idx) => value === extraImageUrls.at(idx));
+    if (arrayChanged) {
       normalizedPlace.imageUrls = normalizedImageUrls;
       changed = true;
     }
@@ -640,11 +681,15 @@ export async function getTopPlaces(
         // Re-enrich when the cards the UI will actually show lack images,
         // not merely when every single cached place is imageless. The UI
         // ranks by userRatingCount (desc) and shows the top 5.
-        const displayedTop = [...cachedPlaces]
-          .sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0))
-          .slice(0, 5);
-        const shouldRefreshForImages =
-          displayedTop.length > 0 && !displayedTop.some((place) => !!place.imageUrl);
+        // Fast path: if every cached place already has an image, no top-5
+        // sort is needed at all (common warm cache shape).
+        let shouldRefreshForImages = false;
+        if (cachedPlaces.length > 0 && !cachedPlaces.every((p) => !!p.imageUrl)) {
+          const displayedTop = [...cachedPlaces]
+            .sort((a, b) => (b.userRatingCount ?? 0) - (a.userRatingCount ?? 0))
+            .slice(0, 5);
+          shouldRefreshForImages = !displayedTop.some((place) => !!place.imageUrl);
+        }
 
         if (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages) {
           refreshPlacesInBackground(cityName, type, opts).catch(() => {});

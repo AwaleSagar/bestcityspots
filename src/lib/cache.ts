@@ -29,12 +29,24 @@ export class LruCache<K, V> {
   }
 
   set(key: K, value: V, ttlMs: number, now = Date.now()): void {
-    if (this.map.has(key)) this.map.delete(key);
+    // Single Map mutation — `delete` is a no-op if missing, so the explicit
+    // `has` check just doubled the lookup. Re-inserting moves to LRU tail.
+    this.map.delete(key);
     this.map.set(key, { value, expiresAt: now + ttlMs });
-    while (this.map.size > this.maxSize) {
+    // Sweep at most a handful of expired entries from the LRU head so we don't
+    // evict still-valid entries solely because of recency. Keeps `set` O(1)
+    // amortized while preventing TTL-expired entries from blocking writes.
+    let swept = 0;
+    for (const [k, entry] of this.map) {
+      if (entry.expiresAt > now || swept >= 4) break;
+      this.map.delete(k);
+      swept++;
+    }
+    // Bounded; LRU eviction. The map only ever exceeds maxSize by 1 because
+    // we just inserted, so a single delete is sufficient — no `while` needed.
+    if (this.map.size > this.maxSize) {
       const firstKey = this.map.keys().next().value;
-      if (firstKey === undefined) break;
-      this.map.delete(firstKey);
+      if (firstKey !== undefined) this.map.delete(firstKey);
     }
   }
 

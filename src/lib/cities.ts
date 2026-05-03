@@ -1,5 +1,8 @@
 import { supabase } from "./supabase";
 import { haversineKm } from "./geo";
+import { LruCache } from "./cache";
+import { minutes } from "./cache-config";
+import { cache as reactCache } from "react";
 
 export interface City {
   id: number;
@@ -20,13 +23,16 @@ export interface CitySearchResult extends City {
   match_type: "fts" | "fuzzy" | "alias";
 }
 
-const searchCache = new Map<string, CitySearchResult[]>();
+// Bounded LRU with per-entry TTL. Replaces the prior FIFO map so hot
+// autocomplete prefixes stay resident and stale entries don't linger.
+const searchCache = new LruCache<string, CitySearchResult[]>(100);
+const SEARCH_CACHE_TTL_MS = minutes(5);
 
 function normalizeQuery(q: string) {
   return q.trim().toLowerCase();
 }
 
-async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {
+async function queryCitiesInBox(lat: number, lng: number, boxSize: number, limit = 200) {
   try {
     const { data, error } = await supabase
       .from("cities")
@@ -35,7 +41,8 @@ async function queryCitiesInBox(lat: number, lng: number, boxSize: number) {
       .lte("lat", lat + boxSize)
       .gte("lng", lng - boxSize)
       .lte("lng", lng + boxSize)
-      .limit(200);
+      .order("population", { ascending: false, nullsFirst: false })
+      .limit(limit);
 
     if (error) {
       console.warn("Error fetching nearby cities:", error);
@@ -63,13 +70,15 @@ function findNearest(cities: City[], lat: number, lng: number) {
 }
 
 export async function findNearestCity(lat: number, lng: number) {
-  const boxSizes = [0.5, 1, 2, 5, 10];
-  for (const boxSize of boxSizes) {
-    const candidates = await queryCitiesInBox(lat, lng, boxSize);
-    const nearest = findNearest(candidates, lat, lng);
-    if (nearest) return nearest;
-  }
+  // Single bbox query at a generous radius (±10° ≈ ±1100km at the equator)
+  // followed by in-process haversine sort. Replaces the prior waterfall of
+  // up to 6 sequential round trips.
+  const candidates = await queryCitiesInBox(lat, lng, 10, 500);
+  const nearest = findNearest(candidates, lat, lng);
+  if (nearest) return nearest;
 
+  // Fallback for points with no city within ~1100km (open ocean, polar): pick
+  // the nearest among the most populous cities globally.
   const fallback = await getTopCities(200);
   return findNearest(fallback, lat, lng);
 }
@@ -87,9 +96,8 @@ export async function searchCities(
   if (!cleanQuery || cleanQuery.length < 1) return [];
   if (signal?.aborted) return [];
 
-  if (searchCache.has(cleanQuery)) {
-    return searchCache.get(cleanQuery) || [];
-  }
+  const cached = searchCache.get(cleanQuery);
+  if (cached) return cached;
 
   try {
     const safeLimit = Math.max(1, Math.min(50, limit));
@@ -107,11 +115,7 @@ export async function searchCities(
 
     const results = (data ?? []) as CitySearchResult[];
 
-    searchCache.set(cleanQuery, results);
-    if (searchCache.size > 100) {
-      const firstKey = searchCache.keys().next().value;
-      if (firstKey !== undefined) searchCache.delete(firstKey);
-    }
+    searchCache.set(cleanQuery, results, SEARCH_CACHE_TTL_MS);
 
     return results;
   } catch (e) {
@@ -123,8 +127,12 @@ export async function searchCities(
 
 /**
  * Fetches the top cities globally by population.
+ *
+ * Wrapped with React `cache()` so multiple Server Component callers within
+ * the same request (e.g. layout + page + sphere) share a single DB round
+ * trip rather than re-querying.
  */
-export async function getTopCities(limit = 10) {
+export const getTopCities = reactCache(async (limit = 10) => {
   try {
     // Allow larger batches for UI/background visualizations (e.g. tag spheres),
     // while still enforcing a reasonable upper bound.
@@ -145,7 +153,7 @@ export async function getTopCities(limit = 10) {
     console.error("Error fetching top cities:", e);
     return [];
   }
-}
+});
 
 /**
  * Fetches a single city by its ID.

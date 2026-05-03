@@ -8,9 +8,13 @@ import {
   sanitizeJsonArrayResponse,
   PROMPT_VERSIONS,
 } from "./providers/gemini";
+import { isCacheFresh, CACHE_TIERS } from "./cache-config";
 import { createLogger } from "./logger";
 
 const log = createLogger({ component: "intelligence" });
+
+// Module-scope schema reused across calls (no re-allocation per request).
+const TrendingCitiesSchema = z.array(z.string().min(1).max(100));
 
 // --- Zod Schemas for Runtime Safety ---
 const AttractionSchema = z.object({
@@ -38,14 +42,6 @@ const CityInsightSchema = z.object({
 });
 
 export type CityInsight = z.infer<typeof CityInsightSchema>;
-
-function isFresh(updated_at?: string | null, ttlDays = 365): boolean {
-  if (!updated_at) return false;
-  const updated = new Date(updated_at);
-  const now = new Date();
-  const days = (now.getTime() - updated.getTime()) / (1000 * 60 * 60 * 24);
-  return days < ttlDays;
-}
 
 /**
  * Stale-While-Revalidate fetch for a city's AI-generated insight.
@@ -86,7 +82,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
       // Only treat a row as a hit if prompt_version matches the current one.
       const versionMatches =
         cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
-      if (cachedInsight && versionMatches && isFresh(cachedUpdatedAt, 365)) {
+      if (cachedInsight && versionMatches && isCacheFresh(cachedUpdatedAt, CACHE_TIERS.INSIGHTS.freshMs)) {
         return cachedInsight;
       }
     }
@@ -170,12 +166,9 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
       cachedNames = Array.isArray(cache.city_names) ? cache.city_names : [];
       cachedUpdatedAt = cache.updated_at ?? null;
       cachedVersion = typeof cache.prompt_version === "number" ? cache.prompt_version : null;
-      const hoursSinceUpdate = cachedUpdatedAt
-        ? (Date.now() - new Date(cachedUpdatedAt).getTime()) / (1000 * 60 * 60)
-        : Infinity;
       const versionMatches =
         cachedVersion === null || cachedVersion === PROMPT_VERSIONS.TRENDING_CITIES;
-      if (versionMatches && hoursSinceUpdate < 24 && cachedNames.length > 0) {
+      if (versionMatches && isCacheFresh(cachedUpdatedAt, CACHE_TIERS.TRENDING.freshMs) && cachedNames.length > 0) {
         return await matchCitiesInDb(cachedNames);
       }
     }
@@ -187,8 +180,9 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
   const prompt = `
     List 8 world cities that are currently trending for travelers in 2026. 
     Consider seasonal events, major sports, or emerging travel hotspots.
-    Return ONLY a JSON array of strings containing just the city names.
-    Example: ["Tokyo", "Paris", "Seoul"]
+    Return ONLY a JSON array of strings in the format "City, Country" so the
+    pair can be uniquely identified (e.g. ambiguous names like Springfield).
+    Example: ["Tokyo, Japan", "Paris, France", "Seoul, South Korea"]
   `;
   const aiResult = await generateText(prompt);
   if (!aiResult.ok) {
@@ -199,7 +193,6 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
   let cityNames: string[];
   try {
     const cleaned = sanitizeJsonArrayResponse(aiResult.text);
-    const TrendingCitiesSchema = z.array(z.string().min(1).max(100));
     cityNames = TrendingCitiesSchema.parse(JSON.parse(cleaned));
   } catch (e) {
     log.warn("trending_parse_failed", {
@@ -227,18 +220,55 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
 }
 
 async function matchCitiesInDb(cityNames: string[]): Promise<City[]> {
+  // Inputs may be "City" (legacy / pre-v3 cache) or "City, Country" (v3+).
+  // Build a list of (city, country?) pairs and resolve uniquely when country
+  // is present so non-unique names (Springfield, Paris, etc.) don't collide.
+  const pairs = cityNames
+    .map((entry) => {
+      const [cityRaw, ...rest] = entry.split(",");
+      const city = (cityRaw || "").trim();
+      const country = rest.join(",").trim() || null;
+      return city ? { city, country } : null;
+    })
+    .filter((p): p is { city: string; country: string | null } => p !== null);
+
+  if (pairs.length === 0) return [];
+  const uniqueCityNames = Array.from(new Set(pairs.map((p) => p.city)));
+
   try {
     const { data: matchedCities, error } = await supabase
       .from("cities")
-      .select("id, city, country, population, lat, lng")
-      .in("city", cityNames)
-      .order("population", { ascending: false })
-      .limit(5);
+      .select(
+        "id, city, city_ascii, country, iso2, iso3, admin_name, capital, population, lat, lng"
+      )
+      .in("city", uniqueCityNames)
+      .order("population", { ascending: false });
     if (error) {
       log.warn("match_cities_failed", { error: error.message });
       return [];
     }
-    return (matchedCities as City[]) || [];
+    const rows = (matchedCities as City[]) || [];
+
+    // For each requested pair, prefer an exact (city, country) match; else
+    // fall back to the most populous city with that name.
+    const seen = new Set<number>();
+    const resolved: City[] = [];
+    for (const pair of pairs) {
+      const candidates = rows.filter((r) => r.city === pair.city);
+      if (candidates.length === 0) continue;
+      const exact = pair.country
+        ? candidates.find(
+            (r) => r.country.toLowerCase() === (pair.country as string).toLowerCase()
+          )
+        : null;
+      const pick = exact ?? candidates[0];
+      if (!seen.has(pick.id)) {
+        seen.add(pick.id);
+        resolved.push(pick);
+      }
+      if (resolved.length >= 5) break;
+    }
+    return resolved;
   } catch (e) {
     log.warn("match_cities_exception", { error: e instanceof Error ? e.message : String(e) });
     return [];

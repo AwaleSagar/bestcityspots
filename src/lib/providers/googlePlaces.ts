@@ -77,8 +77,11 @@ export type PlacesResult =
 
 const API_MAX_RADIUS_KM = 50;
 
+let cachedApiKey: string | null | undefined;
 function getApiKey(): string | null {
-  return serverEnv().GOOGLE_PLACES_API_KEY ?? null;
+  if (cachedApiKey !== undefined) return cachedApiKey;
+  cachedApiKey = serverEnv().GOOGLE_PLACES_API_KEY ?? null;
+  return cachedApiKey;
 }
 
 function capRadius(radiusKm: number, correlationId: string): number {
@@ -183,7 +186,14 @@ async function runPlacesRequest(
         return { ok: false, reason: "auth", status: response.status };
       }
       if (response.status === 429) {
+        log.warn("quota_exhausted", { correlationId, status: response.status });
         return { ok: false, reason: "quota", status: response.status };
+      }
+      // 5xx — surface as outage so the circuit breaker / caller can react
+      // appropriately. 4xx (other than the cases above) stays as "error".
+      if (response.status >= 500) {
+        log.warn("upstream_outage", { correlationId, status: response.status });
+        return { ok: false, reason: "outage", status: response.status };
       }
       return { ok: false, reason: "error", status: response.status };
     }

@@ -40,6 +40,53 @@ interface ExperiencesSectionProps {
   hotels: Landmark[];
 }
 
+// Hoisted out of the component so the arrays / map are allocated once per
+// module load instead of on every render.
+const TABS = [
+  {
+    id: "landmarks",
+    label: "Landmarks",
+    icon: Ticket,
+    activeText: "text-accent",
+    activeBg: "bg-accent-soft",
+    activeBorder: "border-accent/20",
+    activeCount: "bg-accent/15 text-accent",
+  },
+  {
+    id: "restaurants",
+    label: "Dining",
+    icon: Utensils,
+    activeText: "text-cat-dining",
+    activeBg: "bg-cat-dining-soft",
+    activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-dining)_20%,transparent)]",
+    activeCount: "bg-[color:var(--color-cat-dining-soft)] text-cat-dining",
+  },
+  {
+    id: "hotels",
+    label: "Stays",
+    icon: Hotel,
+    activeText: "text-cat-stays",
+    activeBg: "bg-cat-stays-soft",
+    activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-stays)_20%,transparent)]",
+    activeCount: "bg-[color:var(--color-cat-stays-soft)] text-cat-stays",
+  },
+] as const;
+
+const PRICE_LEVEL_LABELS = new Map<string, string>([
+  ["PRICE_LEVEL_FREE", "Free"],
+  ["PRICE_LEVEL_INEXPENSIVE", "$"],
+  ["PRICE_LEVEL_MODERATE", "$$"],
+  ["PRICE_LEVEL_EXPENSIVE", "$$$"],
+  ["PRICE_LEVEL_VERY_EXPENSIVE", "$$$$"],
+]);
+
+const PRICE_LEVELS = [
+  { id: "PRICE_LEVEL_INEXPENSIVE", label: "$" },
+  { id: "PRICE_LEVEL_MODERATE", label: "$$" },
+  { id: "PRICE_LEVEL_EXPENSIVE", label: "$$$" },
+  { id: "PRICE_LEVEL_VERY_EXPENSIVE", label: "$$$$" },
+];
+
 export default function ExperiencesSection({
   cityName,
   landmarks,
@@ -155,50 +202,11 @@ export default function ExperiencesSection({
     });
   };
 
-  const tabs = [
-    {
-      id: "landmarks",
-      label: "Landmarks",
-      icon: Ticket,
-      activeText: "text-accent",
-      activeBg: "bg-accent-soft",
-      activeBorder: "border-accent/20",
-      activeCount: "bg-accent/15 text-accent",
-    },
-    {
-      id: "restaurants",
-      label: "Dining",
-      icon: Utensils,
-      activeText: "text-cat-dining",
-      activeBg: "bg-cat-dining-soft",
-      activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-dining)_20%,transparent)]",
-      activeCount: "bg-[color:var(--color-cat-dining-soft)] text-cat-dining",
-    },
-    {
-      id: "hotels",
-      label: "Stays",
-      icon: Hotel,
-      activeText: "text-cat-stays",
-      activeBg: "bg-cat-stays-soft",
-      activeBorder: "border-[color:color-mix(in_oklab,var(--color-cat-stays)_20%,transparent)]",
-      activeCount: "bg-[color:var(--color-cat-stays-soft)] text-cat-stays",
-    },
-  ] as const;
+  const tabs = TABS;
 
-  const priceLevelLabels = new Map<string, string>([
-    ["PRICE_LEVEL_FREE", "Free"],
-    ["PRICE_LEVEL_INEXPENSIVE", "$"],
-    ["PRICE_LEVEL_MODERATE", "$$"],
-    ["PRICE_LEVEL_EXPENSIVE", "$$$"],
-    ["PRICE_LEVEL_VERY_EXPENSIVE", "$$$$"],
-  ]);
+  const priceLevelLabels = PRICE_LEVEL_LABELS;
 
-  const priceLevels = [
-    { id: "PRICE_LEVEL_INEXPENSIVE", label: "$" },
-    { id: "PRICE_LEVEL_MODERATE", label: "$$" },
-    { id: "PRICE_LEVEL_EXPENSIVE", label: "$$$" },
-    { id: "PRICE_LEVEL_VERY_EXPENSIVE", label: "$$$$" },
-  ];
+  const priceLevels = PRICE_LEVELS;
 
   // Logic to filter and slice data
   const rawData =

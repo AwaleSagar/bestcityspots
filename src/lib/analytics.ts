@@ -296,8 +296,15 @@ export function processAnalyticsBatch(
     );
   }
 
+  // Dedupe per-event RPCs within the batch so a 50-event payload doesn't
+  // fan out to ~100 individual DB calls when most events share the same
+  // cityId / action.
+  const cityIds = new Set<number>();
+  const actions = new Set<z.infer<typeof ActionType>>();
   for (const event of events) {
-    if (event.cityId) recordCityView(today, event.cityId);
-    if (event.action) recordUserAction(today, event.action);
+    if (event.cityId) cityIds.add(event.cityId);
+    if (event.action) actions.add(event.action);
   }
+  for (const cityId of cityIds) recordCityView(today, cityId);
+  for (const action of actions) recordUserAction(today, action);
 }

@@ -24,14 +24,60 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, cache } from "react";
+
+// Enable ISR: regenerate pages at most once per hour. Cached responses still
+// stream fresh metrics/places via the in-route Supabase caches; this just
+// avoids re-running the full server component tree on every request.
+export const revalidate = 3600;
+
+// Request-scoped cache so generateMetadata + page body share one DB query.
+const getCachedCityById = cache(getCityById);
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import {
   CityVitalsFallback,
-  CityVitalsSkeleton,
   getArrivalMood,
   MetricCard,
 } from "./city-page-parts";
+
+function CoreMetricsSkeleton() {
+  return (
+    <div className="grid animate-pulse grid-cols-1 gap-4">
+      <div className="atlas-panel h-[120px] rounded-[1.1rem] sm:rounded-[1.3rem]" />
+      <div className="atlas-panel h-[120px] rounded-[1.1rem] sm:rounded-[1.3rem]" />
+    </div>
+  );
+}
+
+async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
+  if (!city) return null;
+  const metrics = await getCityMetrics(city);
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4">
+        <MetricCard
+          icon={CloudIcon}
+          label="Pollution (PM2.5)"
+          value={metrics?.pollution_pm25}
+          unit="µg/m³"
+          source={metrics?.source?.pollution as string | undefined}
+        />
+        <MetricCard
+          icon={ThermometerSun}
+          label="Climate Comfort"
+          value={metrics?.climate_comfort}
+          source={metrics?.source?.climate as string | undefined}
+        />
+      </div>
+      <div className="text-muted mt-4 flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
+        <Activity className="h-3.5 w-3.5" />
+        {metrics?.updated_at
+          ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}`
+          : "Pending data"}
+      </div>
+    </>
+  );
+}
 
 async function ExperiencesWrapper({
   cityName,
@@ -75,7 +121,7 @@ export async function generateMetadata({
   const result = cityIdSchema.safeParse(id);
   if (!result.success) return { title: "City Not Found" };
 
-  const city = await getCityById(result.data);
+  const city = await getCachedCityById(result.data);
   if (!city) return { title: "City Not Found" };
 
   return {
@@ -113,7 +159,7 @@ export default async function CityPage({
   const cityId = idResult.data;
   const validCoords = coordsResult.success ? coordsResult.data : {};
 
-  const city = await getCityById(cityId);
+  const city = await getCachedCityById(cityId);
 
   if (!city) {
     notFound();
@@ -138,7 +184,9 @@ export default async function CityPage({
 
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
-  const [metrics, weather] = await Promise.all([getCityMetrics(city), getCityWeather(city)]);
+  // `metrics` is sidebar-only and slow; defer via Suspense so it streams.
+  // Weather is referenced in three above-the-fold spots so it stays awaited.
+  const weather = await getCityWeather(city);
 
   return (
     <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
@@ -259,9 +307,7 @@ export default async function CityPage({
 
             <section className="space-y-10">
               <h2 className="labelled-rule">Structural Profile</h2>
-              <Suspense fallback={<CityVitalsSkeleton />}>
-                {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
-              </Suspense>
+              {weather ? <CityVitals data={weather} /> : <CityVitalsFallback />}
             </section>
 
             <section className="space-y-6">
@@ -348,27 +394,9 @@ export default async function CityPage({
               <h4 className="text-muted text-[11px] font-semibold tracking-[0.25em] uppercase">
                 Core Metrics
               </h4>
-              <div className="grid grid-cols-1 gap-4">
-                <MetricCard
-                  icon={CloudIcon}
-                  label="Pollution (PM2.5)"
-                  value={metrics?.pollution_pm25}
-                  unit="µg/m³"
-                  source={metrics?.source?.pollution as string | undefined}
-                />
-                <MetricCard
-                  icon={ThermometerSun}
-                  label="Climate Comfort"
-                  value={metrics?.climate_comfort}
-                  source={metrics?.source?.climate as string | undefined}
-                />
-              </div>
-              <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
-                <Activity className="h-3.5 w-3.5" />
-                {metrics?.updated_at
-                  ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}`
-                  : "Pending data"}
-              </div>
+              <Suspense fallback={<CoreMetricsSkeleton />}>
+                <CoreMetricsCard city={city} />
+              </Suspense>
             </div>
           </div>
         </div>

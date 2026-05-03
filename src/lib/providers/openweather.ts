@@ -52,17 +52,26 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Owm
       httpJson<{ list: { main: { aqi: number } }[] }>(
         `${API}/air_pollution?lat=${lat}&lon=${lng}&appid=${encodeURIComponent(apiKey)}`,
         { provider: PROVIDER, timeoutMs: 10_000 }
-      ).catch(() => null),
+      ).catch((err) => {
+        log.warn("aqi_failed", { error: err instanceof Error ? err.message : String(err) });
+        return null;
+      }),
     ]);
+
+    // Reject when temperature is missing — prevents "0°C" hallucinations.
+    if (typeof weather.main?.temp !== "number") {
+      log.warn("missing_temp", { lat, lng });
+      return { ok: false, reason: "error" };
+    }
 
     return {
       ok: true,
       current: {
-        temp: weather.main?.temp ?? 0,
-        feelsLike: weather.main?.feels_like ?? 0,
-        tempMin: weather.main?.temp_min ?? 0,
-        tempMax: weather.main?.temp_max ?? 0,
-        humidity: weather.main?.humidity ?? 0,
+        temp: weather.main.temp,
+        feelsLike: weather.main.feels_like ?? weather.main.temp,
+        tempMin: weather.main.temp_min ?? weather.main.temp,
+        tempMax: weather.main.temp_max ?? weather.main.temp,
+        humidity: weather.main.humidity ?? 0,
         windSpeed: weather.wind?.speed ?? 0,
         description: weather.weather?.[0]?.description ?? "unknown",
         main: weather.weather?.[0]?.main ?? "Unknown",
@@ -72,8 +81,13 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Owm
     };
   } catch (err) {
     if (err instanceof CircuitOpenError) return { ok: false, reason: "outage" };
-    if (err instanceof HttpError && (err.status === 401 || err.status === 403)) {
-      return { ok: false, reason: "auth" };
+    if (err instanceof HttpError) {
+      if (err.status === 401 || err.status === 403) return { ok: false, reason: "auth" };
+      if (err.status === 429) {
+        log.warn("rate_limited", { status: err.status });
+        return { ok: false, reason: "outage" };
+      }
+      if (err.status >= 500) return { ok: false, reason: "outage" };
     }
     log.warn("fetch_failed", { error: err instanceof Error ? err.message : String(err) });
     return { ok: false, reason: "error" };

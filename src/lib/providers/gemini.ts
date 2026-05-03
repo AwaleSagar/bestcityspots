@@ -16,10 +16,11 @@ const PROVIDER = "gemini";
 /** Increment when a prompt or expected response shape changes. */
 export const PROMPT_VERSIONS = {
   CITY_INSIGHT: 2,
-  TRENDING_CITIES: 2,
+  TRENDING_CITIES: 3,
 } as const;
 
 const MODEL = "gemini-3-flash-preview";
+const GENERATE_TIMEOUT_MS = 15_000;
 
 let cached: GoogleGenerativeAI | null | undefined;
 
@@ -32,7 +33,7 @@ function getClient(): GoogleGenerativeAI | null {
 
 export type GeminiResult =
   | { ok: true; text: string; correlationId: string }
-  | { ok: false; reason: "auth" | "error"; correlationId: string };
+  | { ok: false; reason: "auth" | "rate_limit" | "error"; correlationId: string };
 
 export async function generateText(prompt: string): Promise<GeminiResult> {
   const correlationId = newCorrelationId();
@@ -42,33 +43,40 @@ export async function generateText(prompt: string): Promise<GeminiResult> {
   }
   try {
     const model = client.getGenerativeModel({ model: MODEL });
-    const result = await model.generateContent(prompt);
-    const text = await result.response.text();
+    // Bound the call so a hung model response can't block the caller forever.
+    const result = await model.generateContent(prompt, {
+      signal: AbortSignal.timeout(GENERATE_TIMEOUT_MS),
+    } as { signal: AbortSignal });
+    // SDK's response.text() is synchronous; await is harmless but redundant.
+    const text = result.response.text();
     log.debug("ok", { correlationId, length: text.length });
     return { ok: true, text, correlationId };
   } catch (err) {
-    log.warn("exception", {
-      correlationId,
-      provider: PROVIDER,
-      error: err instanceof Error ? err.message : String(err),
-    });
+    const message = err instanceof Error ? err.message : String(err);
+    log.warn("exception", { correlationId, provider: PROVIDER, error: message });
+    // Distinguish quota / rate-limit errors so the cache layer can decide to
+    // serve stale data instead of treating it as a generic upstream failure.
+    const lower = message.toLowerCase();
+    if (lower.includes("429") || lower.includes("quota") || lower.includes("rate limit")) {
+      return { ok: false, reason: "rate_limit", correlationId };
+    }
     return { ok: false, reason: "error", correlationId };
   }
 }
 
 /**
- * Extract the first balanced JSON object from a raw AI response, stripping
- * any surrounding markdown fencing or commentary.
+ * Extract the first balanced JSON value (object or array) from a raw AI
+ * response, stripping any markdown fencing or surrounding commentary.
  */
-export function sanitizeJsonResponse(raw: string): string {
+function extractBalancedJson(raw: string, openCh: "{" | "[", closeCh: "}" | "]"): string {
   const fenced = raw.replace(/```json|```/gi, "").trim();
-  const start = fenced.indexOf("{");
+  const start = fenced.indexOf(openCh);
   if (start === -1) return fenced;
   let depth = 0;
   for (let i = start; i < fenced.length; i += 1) {
     const ch = fenced.charAt(i);
-    if (ch === "{") depth += 1;
-    if (ch === "}") {
+    if (ch === openCh) depth += 1;
+    else if (ch === closeCh) {
       depth -= 1;
       if (depth === 0) return fenced.slice(start, i + 1);
     }
@@ -76,19 +84,10 @@ export function sanitizeJsonResponse(raw: string): string {
   return fenced;
 }
 
-/** Extract a top-level JSON array from a raw AI response. */
+export function sanitizeJsonResponse(raw: string): string {
+  return extractBalancedJson(raw, "{", "}");
+}
+
 export function sanitizeJsonArrayResponse(raw: string): string {
-  const fenced = raw.replace(/```json|```/gi, "").trim();
-  const start = fenced.indexOf("[");
-  if (start === -1) return fenced;
-  let depth = 0;
-  for (let i = start; i < fenced.length; i += 1) {
-    const ch = fenced.charAt(i);
-    if (ch === "[") depth += 1;
-    if (ch === "]") {
-      depth -= 1;
-      if (depth === 0) return fenced.slice(start, i + 1);
-    }
-  }
-  return fenced;
+  return extractBalancedJson(raw, "[", "]");
 }

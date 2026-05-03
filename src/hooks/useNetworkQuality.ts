@@ -83,8 +83,7 @@ export function useNetworkQuality(): NetworkQualityState {
   useEffect(() => {
     const connection = getConnection();
 
-    const updateState = () => {
-      const conn = getConnection();
+    const updateState = (conn: NetworkInformation | undefined) => {
       setState({
         quality: determineQuality(conn),
         saveData: conn?.saveData ?? false,
@@ -95,13 +94,14 @@ export function useNetworkQuality(): NetworkQualityState {
     };
 
     // Set initial state
-    updateState();
+    updateState(connection);
 
     // Listen for network changes
     if (connection) {
-      connection.addEventListener("change", updateState);
+      const handler = () => updateState(connection);
+      connection.addEventListener("change", handler);
       return () => {
-        connection.removeEventListener("change", updateState);
+        connection.removeEventListener("change", handler);
       };
     }
   }, []);

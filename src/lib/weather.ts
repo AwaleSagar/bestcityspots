@@ -4,8 +4,12 @@ import { z } from "zod";
 import { supabase, supabaseServer } from "./supabase";
 import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
 import { fetchCurrentWeather } from "./providers/openweather";
-import { fetchCurrent as fetchOpenMeteo, conditionFromWeatherCode } from "./providers/openMeteo";
-import { aqiLabelFromOwm } from "./mapping";
+import {
+  fetchCurrent as fetchOpenMeteo,
+  fetchPm25 as fetchOpenMeteoPm25,
+  conditionFromWeatherCode,
+} from "./providers/openMeteo";
+import { aqiLabelFromOwm, owmAqiFromPm25, aqiLabelFromPm25 } from "./mapping";
 import { createLogger } from "./logger";
 
 const log = createLogger({ component: "weather" });
@@ -35,8 +39,22 @@ function parseCachedWeather(cached: unknown): WeatherData | null {
 async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
   const db = supabaseServer ?? supabase;
 
+  // Defensive validation — a corrupted City row with non-finite or out-of-range
+  // coords would otherwise be passed straight to OpenWeather/Open-Meteo.
+  if (
+    !Number.isFinite(city.lat) ||
+    !Number.isFinite(city.lng) ||
+    city.lat < -90 ||
+    city.lat > 90 ||
+    city.lng < -180 ||
+    city.lng > 180
+  ) {
+    log.warn("invalid_coords", { cityId: city.id, lat: city.lat, lng: city.lng });
+    return null;
+  }
+
   // Primary: OpenWeather (richer data when keyed).
-  let primary = await fetchCurrentWeather(city.lat, city.lng);
+  const primary = await fetchCurrentWeather(city.lat, city.lng);
 
   let normalized: WeatherData | null = null;
 
@@ -56,10 +74,15 @@ async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
       updated_at: new Date().toISOString(),
     };
   } else {
-    // Fallback chain: Open-Meteo keyless current weather.
+    // Fallback chain: Open-Meteo keyless current weather + PM2.5 air quality.
     log.warn("owm.fallback", { reason: primary.reason, cityId: city.id });
-    const fallback = await fetchOpenMeteo(city.lat, city.lng);
+    const [fallback, pm25] = await Promise.all([
+      fetchOpenMeteo(city.lat, city.lng),
+      fetchOpenMeteoPm25(city.lat, city.lng),
+    ]);
     if (!fallback || fallback.tempC === null) return null;
+    const fallbackAqi = pm25 !== null ? owmAqiFromPm25(pm25) : 0;
+    const fallbackAqiLabel = pm25 !== null ? aqiLabelFromPm25(pm25) : "Unknown";
     normalized = {
       temp: fallback.tempC,
       feels_like: fallback.tempC,
@@ -69,11 +92,11 @@ async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
       description: conditionFromWeatherCode(fallback.weatherCode),
       icon: "",
       wind_speed: fallback.windKph ?? 0,
-      aqi: 0,
-      aqi_label: "Unknown",
+      aqi: fallbackAqi,
+      aqi_label: fallbackAqiLabel,
       updated_at: new Date().toISOString(),
     };
-    primary = { ok: false, reason: primary.reason };
+    // (Previously reassigned `primary` here; the value was never read again.)
   }
 
   const parsed = WeatherDataSchema.safeParse(normalized);
@@ -104,33 +127,36 @@ export async function getCityWeather(city: City): Promise<WeatherData | null> {
   const ttlMs = minutes(CACHE_TTL.WEATHER_FRESH_MINUTES);
 
   try {
+    // Explicit projection mirrors WeatherDataSchema; avoids over-fetching
+    // unused columns (raw provider blobs etc.) from the cache row.
     const { data: cached } = await db
       .from("city_weather_cache")
-      .select("*")
+      .select(
+        "temp, feels_like, temp_min, temp_max, humidity, description, icon, wind_speed, aqi, aqi_label, updated_at"
+      )
       .eq("city_id", city.id)
       .maybeSingle();
 
-    if (cached) {
-      const validCached = parseCachedWeather(cached);
-      if (validCached) {
-        if (isCacheFresh(cached.updated_at, ttlMs)) {
-          return validCached;
-        }
-        // Stale-while-revalidate: serve stale, refresh in background.
-        fetchFreshWeather(city).catch(() => {});
+    const validCached = cached ? parseCachedWeather(cached) : null;
+    if (validCached) {
+      if (cached && isCacheFresh(cached.updated_at, ttlMs)) {
         return validCached;
       }
+      // Stale-while-revalidate: serve stale, refresh in background.
+      fetchFreshWeather(city).catch((err) => {
+        log.warn("revalidate_failed", {
+          cityId: city.id,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
+      return validCached;
     }
 
     // No usable cache — block on fresh fetch.
     const fresh = await fetchFreshWeather(city);
     if (fresh) return fresh;
 
-    // Last resort: return any stale data we can parse.
-    if (cached) {
-      const fallback = parseCachedWeather(cached);
-      if (fallback) return fallback;
-    }
+    // Last resort: return any stale data we can parse (already attempted above).
     return null;
   } catch (error) {
     log.error("fetch_failed", {

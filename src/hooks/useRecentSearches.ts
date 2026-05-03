@@ -16,7 +16,9 @@ export function useRecentSearches() {
 
   useEffect(() => {
     const saved = getJsonStorageItem<City[]>(STORAGE_KEY, []);
-    // Use queueMicrotask instead of setTimeout for better performance
+    // Defer to a microtask so the synchronous setState during effect doesn't
+    // trigger a cascading render warning under the React Compiler. Cheaper
+    // than setTimeout and runs before paint.
     queueMicrotask(() => {
       setRecentCities(saved);
       setIsLoaded(true);
@@ -30,20 +32,22 @@ export function useRecentSearches() {
       // The main optimization is avoiding repeated array scans
       const idSet = new Set(prev.map((c) => c.id));
 
-      let next: City[];
       if (idSet.has(city.id)) {
         // Remove existing and add to front - O(n) filter but n is small (5)
         const filtered = prev.filter((c) => c.id !== city.id);
-        next = [city, ...filtered];
-      } else {
-        // Just prepend - O(1) with slice
-        next = [city, ...prev].slice(0, MAX_RECENT);
+        return [city, ...filtered];
       }
-
-      setJsonStorageItem(STORAGE_KEY, next);
-      return next;
+      // Just prepend - O(1) with slice
+      return [city, ...prev].slice(0, MAX_RECENT);
     });
   }, []);
+
+  // Persist to localStorage as a side effect of state change. Avoids
+  // performing I/O inside a setState updater (which can run twice in StrictMode).
+  useEffect(() => {
+    if (!isLoaded) return;
+    setJsonStorageItem(STORAGE_KEY, recentCities);
+  }, [recentCities, isLoaded]);
 
   return { recentCities, recentCityIds, addRecentCity, isLoaded };
 }

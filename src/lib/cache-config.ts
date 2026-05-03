@@ -63,14 +63,16 @@ export type CacheTierKey = keyof typeof CACHE_TIERS;
 /**
  * Legacy flat TTL object retained for backwards compatibility with existing
  * call sites. New code should prefer `CACHE_TIERS` and the classify helper.
+ *
+ * Values are derived from `CACHE_TIERS` so the two cannot silently drift.
  */
 export const CACHE_TTL = {
-  PLACES_FRESH_DAYS: 30,
-  PLACES_SOFT_REFRESH_DAYS: 7,
-  INSIGHTS_FRESH_DAYS: 365,
-  WEATHER_FRESH_MINUTES: 60,
-  METRICS_FRESH_MINUTES: 60,
-  TRENDING_FRESH_HOURS: 24,
+  PLACES_FRESH_DAYS: CACHE_TIERS.PLACES.freshMs / day,
+  PLACES_SOFT_REFRESH_DAYS: CACHE_TIERS.PLACES.swrMs / day,
+  INSIGHTS_FRESH_DAYS: CACHE_TIERS.INSIGHTS.freshMs / day,
+  WEATHER_FRESH_MINUTES: CACHE_TIERS.WEATHER.freshMs / minute,
+  METRICS_FRESH_MINUTES: CACHE_TIERS.METRICS.freshMs / minute,
+  TRENDING_FRESH_HOURS: CACHE_TIERS.TRENDING.freshMs / hour,
 } as const;
 
 export type CacheFreshness = "fresh" | "swr" | "stale" | "expired";
@@ -82,7 +84,7 @@ export function classifyAge(
   now = Date.now()
 ): CacheFreshness {
   if (!updatedAt) return "expired";
-  const parsed = new Date(updatedAt).getTime();
+  const parsed = Date.parse(updatedAt);
   if (Number.isNaN(parsed)) return "expired";
   const age = now - parsed;
   // Negative age = timestamp is in the future (clock skew or freshly written
@@ -98,8 +100,9 @@ export function classifyAge(
 /** Returns true if the given timestamp is within `ttlMs` milliseconds. */
 export function isCacheFresh(updatedAt: string | null | undefined, ttlMs: number): boolean {
   if (!updatedAt) return false;
-  const age = Date.now() - new Date(updatedAt).getTime();
-  return age < ttlMs;
+  const parsed = Date.parse(updatedAt);
+  if (Number.isNaN(parsed)) return false;
+  return Date.now() - parsed < ttlMs;
 }
 
 /** Convenience conversions. */
@@ -137,8 +140,13 @@ export const cacheTags = {
 };
 
 /** HTTP `Cache-Control` header value for an idempotent GET endpoint. */
+const cacheControlCache = new WeakMap<CacheTier, string>();
 export function cacheControlFor(tier: CacheTier): string {
+  const cached = cacheControlCache.get(tier);
+  if (cached) return cached;
   const sMaxAge = Math.max(1, Math.floor(tier.freshMs / 1000));
   const swr = Math.max(1, Math.floor(tier.swrMs / 1000));
-  return `public, s-maxage=${sMaxAge}, stale-while-revalidate=${swr}`;
+  const value = `public, s-maxage=${sMaxAge}, stale-while-revalidate=${swr}`;
+  cacheControlCache.set(tier, value);
+  return value;
 }

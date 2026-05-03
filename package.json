@@ -13,6 +13,8 @@
     "type-check": "tsc --noEmit",
     "test:refactor": "tsx scripts/verify-refactor.ts",
     "test:google-places": "tsx test-google-places.ts",
+    "test:supabase": "tsx scripts/test-supabase-backend.ts",
+    "test:supabase:json": "tsx scripts/test-supabase-backend.ts --json",
     "warm-cache": "tsx scripts/warm-cache.ts",
     "warm-cache:trending": "tsx scripts/warm-cache.ts --trending-only",
     "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run",

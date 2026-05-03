@@ -1,7 +1,7 @@
 "use client";
 
-import type { KeyboardEvent } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
@@ -27,9 +27,34 @@ const PLACEHOLDER_HINTS = [
   "Search by city, country, or attraction...",
 ];
 
-export default function CitySearch({ topCities }: CitySearchProps) {
+// Module-scope so identity is stable across renders — no per-instance
+// useMemo allocation needed.
+function highlightMatchFn(text: string, query: string): ReactNode {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  const lowered = query.toLowerCase();
+  return (
+    <span>
+      {parts.map((part, i) =>
+        part.toLowerCase() === lowered ? (
+          <mark
+            key={i}
+            className="bg-accent-soft text-accent-strong rounded-sm px-0.5 font-bold shadow-sm"
+          >
+            {part}
+          </mark>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </span>
+  );
+}
+
+function CitySearch({ topCities }: CitySearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<CitySearchResult[]>([]);
+  const [rawSearchResults, setRawSearchResults] = useState<CitySearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -45,13 +70,15 @@ export default function CitySearch({ topCities }: CitySearchProps) {
   const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
   const isTouchDevice = isMobile || isTablet;
   const shouldReduceMotion = useReducedMotion();
-  const timeOfDay = useMemo(() => {
+  const timeOfDay = (() => {
+    // Computed each render so the label stays correct across midnight without
+    // needing a setInterval. Cheap: 1 Date construction + 3 comparisons.
     const hour = new Date().getHours();
     if (hour < 11) return "Morning planning";
     if (hour < 17) return "Afternoon comparison";
     if (hour < 21) return "Evening shortlist";
     return "Late-night dreaming";
-  }, []);
+  })();
   const adaptiveHints = useMemo(
     () => [
       timeOfDay,
@@ -93,16 +120,10 @@ export default function CitySearch({ topCities }: CitySearchProps) {
     const timer = setTimeout(async () => {
       if (searchQuery.length >= 2) {
         setIsSearching(true);
-        let results = await searchCities(searchQuery, 15, controller.signal);
-
-        if (activeFilter === "megacity") {
-          results = results.filter((c) => c.population > 5000000);
-        } else if (activeFilter === "capital") {
-          results = results.filter((c) => c.capital === "primary");
-        }
+        const results = await searchCities(searchQuery, 15, controller.signal);
 
         if (controller.signal.aborted) return;
-        setSearchResults(results.slice(0, 10));
+        setRawSearchResults(results);
         setActiveIndex(-1);
         setIsSearching(false);
 
@@ -112,7 +133,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         }
       } else {
         controller.abort();
-        setSearchResults([]);
+        setRawSearchResults([]);
         setActiveIndex(-1);
         setIsSearching(false);
         hasTrackedSearch.current = false;
@@ -123,7 +144,19 @@ export default function CitySearch({ topCities }: CitySearchProps) {
       controller.abort();
       clearTimeout(timer);
     };
-  }, [searchQuery, activeFilter, trackAction]);
+  }, [searchQuery, trackAction]);
+
+  // Apply filter client-side over the already-fetched results so toggling
+  // a filter chip does not trigger a new network request.
+  const searchResults = useMemo(() => {
+    let filtered = rawSearchResults;
+    if (activeFilter === "megacity") {
+      filtered = filtered.filter((c) => c.population > 5000000);
+    } else if (activeFilter === "capital") {
+      filtered = filtered.filter((c) => c.capital === "primary");
+    }
+    return filtered.slice(0, 10);
+  }, [rawSearchResults, activeFilter]);
 
   const shouldShowResults = searchQuery.trim().length >= 2;
 
@@ -136,60 +169,40 @@ export default function CitySearch({ topCities }: CitySearchProps) {
     return null;
   }, [shouldShowResults, searchResults]);
 
-  const highlightMatch = useMemo(() => {
-    const highlightFn = (text: string, query: string) => {
-      if (!query) return text;
-      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const parts = text.split(new RegExp(`(${escaped})`, "gi"));
-      return (
-        <span>
-          {parts.map((part, i) =>
-            part.toLowerCase() === query.toLowerCase() ? (
-              <mark
-                key={i}
-                className="bg-accent-soft text-accent-strong rounded-sm px-0.5 font-bold shadow-sm"
-              >
-                {part}
-              </mark>
-            ) : (
-              <span key={i}>{part}</span>
-            )
-          )}
-        </span>
-      );
-    };
-    return highlightFn;
-  }, []);
+  const highlightMatch = highlightMatchFn;
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIndex((prev) => {
-        if (searchResults.length === 0) return -1;
-        return prev >= searchResults.length - 1 ? 0 : prev + 1;
-      });
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((prev) => {
-        if (searchResults.length === 0) return -1;
-        return prev <= 0 ? searchResults.length - 1 : prev - 1;
-      });
-    } else if (e.key === "Enter") {
-      const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
-      if (selectedCity) {
-        router.push(`/cities/${selectedCity.id}`);
-      } else if (searchResults.length > 0) {
-        const firstCity = searchResults.at(0);
-        if (firstCity) router.push(`/cities/${firstCity.id}`);
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => {
+          if (searchResults.length === 0) return -1;
+          return prev >= searchResults.length - 1 ? 0 : prev + 1;
+        });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => {
+          if (searchResults.length === 0) return -1;
+          return prev <= 0 ? searchResults.length - 1 : prev - 1;
+        });
+      } else if (e.key === "Enter") {
+        const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
+        if (selectedCity) {
+          router.push(`/cities/${selectedCity.id}`);
+        } else if (searchResults.length > 0) {
+          const firstCity = searchResults.at(0);
+          if (firstCity) router.push(`/cities/${firstCity.id}`);
+        }
+      } else if (e.key === "Escape") {
+        setSearchQuery("");
+        setRawSearchResults([]);
+        setActiveIndex(-1);
       }
-    } else if (e.key === "Escape") {
-      setSearchQuery("");
-      setSearchResults([]);
-      setActiveIndex(-1);
-    }
-  };
+    },
+    [activeIndex, router, searchResults]
+  );
 
-  const handleLocate = () => {
+  const handleLocate = useCallback(() => {
     if (isLocating || typeof navigator === "undefined" || !navigator.geolocation) {
       return;
     }
@@ -217,7 +230,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
         setIsLocating(false);
       }
     );
-  };
+  }, [isLocating, addRecentCity, router]);
 
   const resultsListId = "city-search-results";
   const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
@@ -522,12 +535,15 @@ export default function CitySearch({ topCities }: CitySearchProps) {
                               <span className="opacity-80">{city.admin_name}</span>
                             </>
                           )}
-                          {matchTypeLabel(city) && (
-                            <>
-                              <span className="opacity-40">·</span>
-                              <span className="italic opacity-70">{matchTypeLabel(city)}</span>
-                            </>
-                          )}
+                          {(() => {
+                            const label = matchTypeLabel(city);
+                            return label ? (
+                              <>
+                                <span className="opacity-40">·</span>
+                                <span className="italic opacity-70">{label}</span>
+                              </>
+                            ) : null;
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -562,3 +578,7 @@ export default function CitySearch({ topCities }: CitySearchProps) {
     </motion.div>
   );
 }
+
+// React.memo guards against parent re-renders re-mounting the (heavy) search
+// surface when only sibling props change.
+export default memo(CitySearch);

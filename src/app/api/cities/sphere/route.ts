@@ -15,70 +15,90 @@ const SphereQuerySchema = z.object({
 });
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const parsed = SphereQuerySchema.safeParse({
-    limit: searchParams.get("limit") ?? undefined,
-    mode: searchParams.get("mode") ?? undefined,
-    category: searchParams.get("category") ?? undefined,
-  });
+  try {
+    const { searchParams } = new URL(req.url);
+    const parsed = SphereQuerySchema.safeParse({
+      limit: searchParams.get("limit") ?? undefined,
+      mode: searchParams.get("mode") ?? undefined,
+      category: searchParams.get("category") ?? undefined,
+    });
 
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
-  }
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid parameters" }, { status: 400 });
+    }
 
-  const { limit, mode, category } = parsed.data;
+    const { limit, mode, category } = parsed.data;
 
-  let labels: string[] = [];
+    // `category` mode requires the category param — reject explicitly rather
+    // than silently returning an empty payload that masks the misuse.
+    if (mode === "category" && !category) {
+      return NextResponse.json(
+        { error: "`category` query param is required when mode=category" },
+        { status: 400 }
+      );
+    }
 
-  switch (mode) {
-    case "category":
-      // Single category mode
-      if (category) {
-        labels = getCitiesFromCategory(category).slice(0, limit);
+    let labels: string[] = [];
+
+    switch (mode) {
+      case "category":
+        // Single category mode
+        if (category) {
+          labels = getCitiesFromCategory(category).slice(0, limit);
+        }
+        break;
+
+      case "population": {
+        // Legacy mode: top cities by population
+        const cities = await getTopCities(limit);
+        labels = cities
+          .map((c) => c.city)
+          .filter((s) => typeof s === "string" && s.trim().length > 0);
+        break;
       }
-      break;
 
-    case "population":
-      // Legacy mode: top cities by population
-      const cities = await getTopCities(limit);
-      labels = cities
-        .map((c) => c.city)
-        .filter((s) => typeof s === "string" && s.trim().length > 0);
-      break;
+      case "categories":
+      default:
+        // Default: diverse mix from all categories
+        labels = getMixedCitiesFromCategories(limit);
+        break;
+    }
 
-    case "categories":
-    default:
-      // Default: diverse mix from all categories
-      labels = getMixedCitiesFromCategories(limit);
-      break;
-  }
+    const body = {
+      labels,
+      limit: labels.length,
+      mode,
+      categories: SPHERE_CATEGORIES.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
+    };
 
-  const body = {
-    labels,
-    limit: labels.length,
-    mode,
-    categories: SPHERE_CATEGORIES.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
-  };
+    // ETag = SHA-1 hash of the payload. SHA-1 is used here only as a fast
+    // non-cryptographic fingerprint for cache validation — not for security.
+    const etag = `"${createHash("sha1").update(JSON.stringify(body)).digest("hex").slice(0, 16)}"`;
+    const ifNoneMatch = req.headers.get("if-none-match");
+    if (ifNoneMatch === etag) {
+      return new NextResponse(null, {
+        status: 304,
+        headers: {
+          ETag: etag,
+          "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      });
+    }
 
-  // ETag = SHA-1 hash of the payload. SHA-1 is used here only as a fast
-  // non-cryptographic fingerprint for cache validation — not for security.
-  const etag = `"${createHash("sha1").update(JSON.stringify(body)).digest("hex").slice(0, 16)}"`;
-  const ifNoneMatch = req.headers.get("if-none-match");
-  if (ifNoneMatch === etag) {
-    return new NextResponse(null, {
-      status: 304,
+    return NextResponse.json(body, {
       headers: {
-        ETag: etag,
+        // Cache at the edge for a day; city list doesn't change frequently.
         "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        ETag: etag,
       },
     });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "sphere_route_failed",
+        detail: error instanceof Error ? error.message : "unknown",
+      },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
   }
-
-  return NextResponse.json(body, {
-    headers: {
-      // Cache at the edge for a day; city list doesn't change frequently.
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-      ETag: etag,
-    },
-  });
 }
