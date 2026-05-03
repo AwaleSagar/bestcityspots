@@ -71,6 +71,7 @@ export type PlaceSearchOptions = {
   lat?: number;
   lng?: number;
   radiusKm?: number;
+  signal?: AbortSignal;
 };
 
 export type PlaceSearchResult = {
@@ -84,6 +85,7 @@ type TopPlacesOptions = {
   lat?: number;
   lng?: number;
   radiusKm?: number;
+  signal?: AbortSignal;
   _bypassCache?: boolean;
 };
 
@@ -131,6 +133,10 @@ function buildPlacesRequestKey(cityName: string, type: PlaceType, opts?: TopPlac
   const lng = typeof opts?.lng === "number" ? opts.lng.toFixed(3) : "na";
   const radius = typeof opts?.radiusKm === "number" ? opts.radiusKm.toFixed(0) : "default";
   return [cityName.toLowerCase(), type, lat, lng, radius].join(":");
+}
+
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
 }
 
 function getPrimaryQuery(cityName: string, type: PlaceType): string {
@@ -304,7 +310,8 @@ function selectImageEnrichmentTargets(rankedPlaces: GooglePlace[]): GooglePlace[
 
 async function enrichRankedPlaceImages(
   rankedPlaces: GooglePlace[],
-  existingBlurhashes?: Map<string, string>
+  existingBlurhashes?: Map<string, string>,
+  signal?: AbortSignal
 ): Promise<void> {
   const targets = selectImageEnrichmentTargets(rankedPlaces);
 
@@ -319,7 +326,7 @@ async function enrichRankedPlaceImages(
         // Reuse a blurhash from a previous cache row when available so we
         // don't re-download the storage image just to recompute it.
         const seededBlurhash = landmark.blurhash || existingBlurhashes?.get(place.id);
-        const result = await resolvePlaceImage(place.id, photo.name, seededBlurhash);
+        const result = await resolvePlaceImage(place.id, photo.name, seededBlurhash, signal);
 
         if (result) {
           landmark.imageUrl = result.imageUrl;
@@ -370,6 +377,7 @@ async function fetchFreshPlaces(
     lat: centerLat,
     lng: centerLng,
     effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
+    signal: opts?.signal,
   });
 
   let places = primaryPlaces;
@@ -394,6 +402,7 @@ async function fetchFreshPlaces(
       lat: centerLat,
       lng: centerLng,
       effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
+      signal: opts?.signal,
     });
 
     inferBudgetPlaces(fallbackPlaces);
@@ -415,7 +424,7 @@ async function fetchFreshPlaces(
   // Look up any blurhashes we've already computed for this (city, type) so
   // background SWR refreshes don't re-download storage images.
   const existingBlurhashes = await loadExistingBlurhashes(cityName, type);
-  await enrichRankedPlaceImages(rankedGooglePlaces, existingBlurhashes);
+  await enrichRankedPlaceImages(rankedGooglePlaces, existingBlurhashes, opts?.signal);
   stripPhotoMetadata(rankedGooglePlaces);
 
   return rankedGooglePlaces;
@@ -530,7 +539,8 @@ function normalizeCachedPlace(
 async function resolvePlaceImage(
   placeId: string,
   photoName: string,
-  existingBlurhash?: string
+  existingBlurhash?: string,
+  signal?: AbortSignal
 ): Promise<ImageResult | undefined> {
   const client = getPlacesWriteClient();
   const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
@@ -541,14 +551,19 @@ async function resolvePlaceImage(
 
   try {
     // Check if image already exists in storage
-    const headRes = await fetch(publicUrl, { method: "HEAD", signal: AbortSignal.timeout(5_000) });
+    const headRes = await fetch(publicUrl, {
+      method: "HEAD",
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(5_000)]) : AbortSignal.timeout(5_000),
+    });
     if (headRes.ok) {
       // Image exists, but we may need to generate blurhash if not cached
       if (existingBlurhash) {
         return { imageUrl: publicUrl, blurhash: existingBlurhash };
       }
       // Fetch image to generate blurhash for existing cached images
-      const existingImageRes = await fetch(publicUrl, { signal: AbortSignal.timeout(10_000) });
+      const existingImageRes = await fetch(publicUrl, {
+        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000),
+      });
       if (existingImageRes.ok) {
         const existingBuffer = await existingImageRes.arrayBuffer();
         const blurhash = await generateBlurhash(existingBuffer);
@@ -560,6 +575,7 @@ async function resolvePlaceImage(
     const arrayBuffer = await fetchPhotoBytes(photoName, {
       maxWidth: IMAGE_MAX_WIDTH,
       maxHeight: IMAGE_MAX_HEIGHT,
+      signal,
     });
     if (!arrayBuffer) return undefined;
 
@@ -591,7 +607,7 @@ async function resolvePlaceImage(
 // Helper to fetch from Google Places API
 async function fetchFromGoogle(
   queryText: string,
-  opts?: { lat?: number; lng?: number; effectiveRadiusKm?: number }
+  opts?: { lat?: number; lng?: number; effectiveRadiusKm?: number; signal?: AbortSignal }
 ): Promise<GooglePlace[]> {
   try {
     const result = await searchText({
@@ -604,6 +620,7 @@ async function fetchFromGoogle(
         typeof opts.effectiveRadiusKm === "number"
           ? { lat: opts.lat, lng: opts.lng, radiusKm: opts.effectiveRadiusKm }
           : undefined,
+          signal: opts?.signal,
     });
 
     if (!result.ok) {
@@ -613,6 +630,9 @@ async function fetchFromGoogle(
 
     return result.places as GooglePlace[];
   } catch (e) {
+    if (isAbortError(e)) {
+      throw e;
+    }
     console.error(`[places] Failed to fetch for query "${queryText}":`, e);
     return [];
   }
@@ -630,6 +650,9 @@ async function refreshPlacesInBackground(
   try {
     await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
   } catch (e) {
+    if (isAbortError(e)) {
+      throw e;
+    }
     console.warn(`[places] Background refresh failed for ${cityName}/${type}:`, e);
   }
 }
@@ -701,6 +724,9 @@ export async function getTopPlaces(
 
     return await fetchAndCachePlaces(cityName, type, opts);
   } catch (e) {
+    if (isAbortError(e)) {
+      throw e;
+    }
     console.error(`Failed to fetch ${type} for ${cityName}:`, e);
     return [];
   }
@@ -722,6 +748,7 @@ export async function searchPlaces(options: PlaceSearchOptions): Promise<PlaceSe
         lat: options.lat,
         lng: options.lng,
         radiusKm: options.radiusKm,
+        signal: options.signal,
       })
     )
   );

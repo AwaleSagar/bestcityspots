@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
-import { AnalyticsProvider, PageTracker, GeoConsentBanner } from "@/components/analytics";
+import { AnalyticsProvider, PageTracker } from "@/components/analytics";
+import LazyGeoConsentBanner from "@/components/analytics/LazyGeoConsentBanner";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SiteNav from "@/components/layout/SiteNav";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -23,18 +25,21 @@ export const viewport: Viewport = {
 const instrumentSans = Instrument_Sans({
   variable: "--font-instrument-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const cormorantGaramond = Cormorant_Garamond({
   variable: "--font-cormorant-garamond",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600"],
+  display: "swap",
 });
 
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400"],
+  display: "swap",
 });
 
 const publicConfig = publicEnv();
@@ -152,11 +157,7 @@ export default function RootLayout({
             <SiteNav />
             <a
               href="#main-content"
-              className="skip-link border-line bg-surface text-foreground fixed top-3 left-3 z-[210] rounded-lg border px-4 py-2 text-xs font-semibold opacity-0 shadow-md transition focus-visible:opacity-100 sm:top-4 sm:left-4"
-              style={{
-                marginLeft: "env(safe-area-inset-left, 0)",
-                marginTop: "env(safe-area-inset-top, 0)",
-              }}
+              className="skip-link border-line bg-surface text-foreground z-[210] rounded-lg border px-4 py-2 text-xs font-semibold shadow-md transition"
             >
               Skip to content
             </a>
@@ -164,7 +165,8 @@ export default function RootLayout({
               <div className="flex flex-1 flex-col">{children}</div>
               <SiteFooter />
             </div>
-            <GeoConsentBanner />
+            <MobileBottomNav />
+            <LazyGeoConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>

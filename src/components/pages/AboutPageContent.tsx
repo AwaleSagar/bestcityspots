@@ -131,7 +131,7 @@ export default function AboutPageContent() {
                   <div className="border-line bg-background/60 flex h-12 w-12 items-center justify-center rounded-[1rem] border">
                     <Icon className="text-accent h-5 w-5" aria-hidden />
                   </div>
-                  <h2 className="text-foreground mt-5 text-[2rem] leading-none">{title}</h2>
+                  <h3 className="text-foreground mt-5 text-[2rem] leading-none">{title}</h3>
                   <p className="text-muted mt-3 text-sm leading-7">{text}</p>
                 </article>
               </ScrollReveal>

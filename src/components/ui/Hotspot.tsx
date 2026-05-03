@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useCallback } from "react";
+import { ReactNode, useState, useCallback, useEffect, useId, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion, TargetAndTransition } from "framer-motion";
 import { Info, X } from "lucide-react";
 
@@ -73,10 +73,25 @@ export default function Hotspot({
 }: HotspotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const tooltipId = useId();
+  const rootRef = useRef<HTMLSpanElement | null>(null);
 
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => !prev);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -101,9 +116,14 @@ export default function Hotspot({
 
   return (
     <span
+      ref={rootRef}
       className={`relative ${inline ? "inline-flex" : "flex"} items-center`}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onPointerEnter={(event) => {
+        if (event.pointerType === "mouse") setIsOpen(true);
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === "mouse") setIsOpen(false);
+      }}
     >
       {children}
 
@@ -112,11 +132,11 @@ export default function Hotspot({
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
         aria-label={ariaLabel}
-        aria-expanded={isOpen}
+        aria-describedby={isOpen ? tooltipId : undefined}
         className={` ${inline ? "ml-1" : ""} ${sizeClass} touch-target relative flex min-h-6 min-w-6 cursor-pointer items-center justify-center rounded-full focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)]/50 focus-visible:outline-none`}
       >
         {/* Pulsing glow effect */}
-        {!shouldReduceMotion && (
+        {isOpen && !shouldReduceMotion && (
           <motion.span
             className={`absolute rounded-full ${sizeClass}`}
             style={{ backgroundColor: color }}
@@ -145,6 +165,7 @@ export default function Hotspot({
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id={tooltipId}
             initial={shouldReduceMotion ? { opacity: 1 } : animation.initial}
             animate={shouldReduceMotion ? { opacity: 1 } : animation.animate}
             exit={shouldReduceMotion ? { opacity: 0 } : animation.exit}

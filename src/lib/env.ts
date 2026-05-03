@@ -60,14 +60,16 @@ export function publicEnv(): PublicEnv {
     for (const issue of parsed.error.issues) {
       warnOnce(String(issue.path[0]), issue.message);
     }
-    publicCache = {};
-    return publicCache;
+    return {};
   }
   publicCache = parsed.data;
   return publicCache;
 }
 
 export function serverEnv(): ServerEnv {
+  if (typeof window !== "undefined") {
+    throw new Error("[env] serverEnv() cannot be called from a client bundle");
+  }
   if (serverCache) return serverCache;
   const parsed = serverSchema.safeParse({
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -82,8 +84,7 @@ export function serverEnv(): ServerEnv {
     for (const issue of parsed.error.issues) {
       warnOnce(String(issue.path[0]), issue.message);
     }
-    serverCache = { ...pub };
-    return serverCache;
+    return { ...pub };
   }
   serverCache = { ...pub, ...parsed.data };
   return serverCache;

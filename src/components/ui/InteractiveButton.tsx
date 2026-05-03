@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState, useCallback } from "react";
+import { ReactNode, useState, useCallback, useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 
@@ -54,6 +54,8 @@ const sizeStyles: Record<ButtonSize, string> = {
   lg: "px-6 py-4 text-base gap-2.5",
 };
 
+const MotionLink = motion.create(Link);
+
 export default function InteractiveButton({
   children,
   href,
@@ -70,6 +72,14 @@ export default function InteractiveButton({
 }: InteractiveButtonProps) {
   const shouldReduceMotion = useReducedMotion();
   const [ripples, setRipples] = useState<Array<{ x: number; y: number; id: number }>>([]);
+  const rippleTimeoutsRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    return () => {
+      rippleTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+      rippleTimeoutsRef.current = [];
+    };
+  }, []);
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -83,9 +93,11 @@ export default function InteractiveButton({
         const id = Date.now();
 
         setRipples((prev) => [...prev, { x, y, id }]);
-        setTimeout(() => {
+        const timeoutId = window.setTimeout(() => {
           setRipples((prev) => prev.filter((r) => r.id !== id));
+          rippleTimeoutsRef.current = rippleTimeoutsRef.current.filter((item) => item !== timeoutId);
         }, 600);
+        rippleTimeoutsRef.current.push(timeoutId);
       }
 
       onClick?.();
@@ -176,11 +188,9 @@ export default function InteractiveButton({
   // Render as link or button
   if (href && !disabled) {
     return (
-      <motion.div {...motionProps} className="inline-block">
-        <Link href={href} className={baseClasses} aria-label={ariaLabel}>
-          {content}
-        </Link>
-      </motion.div>
+      <MotionLink {...motionProps} href={href} className={baseClasses} aria-label={ariaLabel}>
+        {content}
+      </MotionLink>
     );
   }
 

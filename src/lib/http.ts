@@ -169,8 +169,24 @@ function parseRetryAfter(header: string | null): number | null {
   return Math.min(delta, MAX_RETRY_AFTER_MS);
 }
 
-async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
+async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) {
+    throw signal.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError");
+  }
+
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(resolve, ms);
+    const onAbort = () => {
+      clearTimeout(timeout);
+      reject(signal?.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError"));
+    };
+
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
 }
 
 /**
@@ -199,21 +215,26 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
 
   // Build the headers object once — it does not change between retry attempts
   // and it can be expensive when callers pass dozens of entries.
-  const mergedHeaders: Record<string, string> = {
-    "x-correlation-id": correlationId,
-    "user-agent": "bestcityspots-backend/1.0",
-    ...(headers as Record<string, string> | undefined),
-  };
+  const mergedHeaders = new Headers(headers);
+  if (!mergedHeaders.has("x-correlation-id")) {
+    mergedHeaders.set("x-correlation-id", correlationId);
+  }
+  if (!mergedHeaders.has("user-agent")) {
+    mergedHeaders.set("user-agent", "bestcityspots-backend/1.0");
+  }
 
   let lastError: unknown;
 
   for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
     const started = Date.now();
+    const attemptSignal = init.signal
+      ? AbortSignal.any([init.signal, AbortSignal.timeout(timeoutMs)])
+      : AbortSignal.timeout(timeoutMs);
     try {
       const response = await fetch(url, {
         ...init,
         headers: mergedHeaders,
-        signal: init.signal ?? AbortSignal.timeout(timeoutMs),
+        signal: attemptSignal,
       });
 
       const latencyMs = Date.now() - started;
@@ -242,7 +263,7 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
           response.status === 429 || response.status === 503
             ? parseRetryAfter(response.headers.get("retry-after"))
             : null;
-        await sleep(retryAfter ?? backoffMs(attempt));
+        await sleep(retryAfter ?? backoffMs(attempt), init.signal ?? undefined);
         continue;
       }
 
@@ -271,9 +292,14 @@ export async function httpFetch(url: string, options: HttpOptions): Promise<Resp
         attempt,
         error: err instanceof Error ? err.message : String(err),
       });
+      if (isAbortError(err)) {
+        releaseHalfOpen(provider);
+        throw err;
+      }
+
       recordFailure(provider);
       if (attempt < maxRetries) {
-        await sleep(backoffMs(attempt));
+        await sleep(backoffMs(attempt), init.signal ?? undefined);
         continue;
       }
       throw err instanceof Error ? err : new Error(String(err));

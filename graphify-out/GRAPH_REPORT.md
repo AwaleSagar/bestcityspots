@@ -1,101 +1,102 @@
-# Graph Report - .  (2026-05-03)
+# Graph Report - bestcityspots  (2026-05-03)
 
 ## Corpus Check
-- 130 files · ~106,853 words
+- 107 files · ~104,609 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 878 nodes · 1207 edges · 68 communities detected
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 88 edges (avg confidence: 0.79)
-- Token cost: 129,976 input · 59,754 output
+- 895 nodes · 1235 edges · 69 communities detected
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 89 edges (avg confidence: 0.79)
+- Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Components Analytics Effects|Components Analytics Effects]]
-- [[_COMMUNITY_Metrics Weather Providers|Metrics Weather Providers]]
-- [[_COMMUNITY_Analytics Storage Components|Analytics Storage Components]]
-- [[_COMMUNITY_Places Place Ranking|Places Place Ranking]]
-- [[_COMMUNITY_Supabase Analytics Search|Supabase Analytics Search]]
-- [[_COMMUNITY_Get Api Places|Get Api Places]]
-- [[_COMMUNITY_Env Supabase Layout|Env Supabase Layout]]
-- [[_COMMUNITY_Analytics Scripts Report|Analytics Scripts Report]]
-- [[_COMMUNITY_Scripts Warm Trending|Scripts Warm Trending]]
-- [[_COMMUNITY_Scripts Warm Insights|Scripts Warm Insights]]
-- [[_COMMUNITY_Providers Places Fallback|Providers Places Fallback]]
-- [[_COMMUNITY_Http Places Google|Http Places Google]]
-- [[_COMMUNITY_Docs Design Award|Docs Design Award]]
-- [[_COMMUNITY_Use Analytics Tracker|Use Analytics Tracker]]
-- [[_COMMUNITY_Warm Scripts Check|Warm Scripts Check]]
-- [[_COMMUNITY_Components Sections Scroll|Components Sections Scroll]]
-- [[_COMMUNITY_Test Supabase Backend|Test Supabase Backend]]
-- [[_COMMUNITY_Agents Readme Audit|Agents Readme Audit]]
-- [[_COMMUNITY_Analytics Report Scripts|Analytics Report Scripts]]
-- [[_COMMUNITY_Analytics Record Stats|Analytics Record Stats]]
-- [[_COMMUNITY_Crystal Svg Logo|Crystal Svg Logo]]
-- [[_COMMUNITY_Places Test Google|Places Test Google]]
-- [[_COMMUNITY_Constellation Background Components|Constellation Background Components]]
-- [[_COMMUNITY_Image Quality Optimized|Image Quality Optimized]]
-- [[_COMMUNITY_Components Layout Nav|Components Layout Nav]]
-- [[_COMMUNITY_Canonical Http Place|Canonical Http Place]]
-- [[_COMMUNITY_Text Line Svg|Text Line Svg]]
-- [[_COMMUNITY_Insights Backfill Mjs|Insights Backfill Mjs]]
-- [[_COMMUNITY_Hero Skyline Blue|Hero Skyline Blue]]
-- [[_COMMUNITY_Globe Path Bands|Globe Path Bands]]
-- [[_COMMUNITY_Window Circular Control|Window Circular Control]]
-- [[_COMMUNITY_Sphere Categories Get|Sphere Categories Get]]
-- [[_COMMUNITY_Next Svg Public|Next Svg Public]]
-- [[_COMMUNITY_Get Color Vitals|Get Color Vitals]]
-- [[_COMMUNITY_Top Content Components|Top Content Components]]
-- [[_COMMUNITY_Style Code Contributing|Style Code Contributing]]
-- [[_COMMUNITY_Seed Scripts Main|Seed Scripts Main]]
-- [[_COMMUNITY_About Content Transparent|About Content Transparent]]
-- [[_COMMUNITY_Parts Vitals Fallback|Parts Vitals Fallback]]
-- [[_COMMUNITY_Get Experience Helpers|Get Experience Helpers]]
-- [[_COMMUNITY_Ranking Scripts Test|Ranking Scripts Test]]
-- [[_COMMUNITY_Vercel Logo Public|Vercel Logo Public]]
-- [[_COMMUNITY_Security Eslint Next|Security Eslint Next]]
-- [[_COMMUNITY_Image Opengraph Renderer|Image Opengraph Renderer]]
-- [[_COMMUNITY_Use Network Quality|Use Network Quality]]
-- [[_COMMUNITY_Validation Place Search|Validation Place Search]]
-- [[_COMMUNITY_Ranking Engine|Ranking Engine]]
-- [[_COMMUNITY_Analytics Fallback Hook|Analytics Fallback Hook]]
-- [[_COMMUNITY_Sphere Themed Diversity|Sphere Themed Diversity]]
-- [[_COMMUNITY_Tailwind Post Css|Tailwind Post Css]]
-- [[_COMMUNITY_Next Type References|Next Type References]]
-- [[_COMMUNITY_Scripts Backfill Insights|Scripts Backfill Insights]]
-- [[_COMMUNITY_Refactor Verification Assertions|Refactor Verification Assertions]]
-- [[_COMMUNITY_Robots|Robots]]
-- [[_COMMUNITY_Opengraph Image|Opengraph Image]]
-- [[_COMMUNITY_Actions|Actions]]
-- [[_COMMUNITY_Sitemap|Sitemap]]
-- [[_COMMUNITY_Layout|Layout]]
-- [[_COMMUNITY_Project Structure|Project Structure]]
-- [[_COMMUNITY_Resources Top|Resources Top]]
-- [[_COMMUNITY_About|About]]
-- [[_COMMUNITY_Experiences Skeleton|Experiences Skeleton]]
-- [[_COMMUNITY_Parts|Parts]]
-- [[_COMMUNITY_Vitals Skeleton Parts|Vitals Skeleton Parts]]
-- [[_COMMUNITY_Aibriefing Skeleton|Aibriefing Skeleton]]
-- [[_COMMUNITY_Experience Helpers|Experience Helpers]]
-- [[_COMMUNITY_Aibriefing Client|Aibriefing Client]]
-- [[_COMMUNITY_Aibriefing Section|Aibriefing Section]]
+- [[_COMMUNITY_Community 0|Community 0]]
+- [[_COMMUNITY_Community 1|Community 1]]
+- [[_COMMUNITY_Community 2|Community 2]]
+- [[_COMMUNITY_Community 3|Community 3]]
+- [[_COMMUNITY_Community 4|Community 4]]
+- [[_COMMUNITY_Community 5|Community 5]]
+- [[_COMMUNITY_Community 6|Community 6]]
+- [[_COMMUNITY_Community 7|Community 7]]
+- [[_COMMUNITY_Community 8|Community 8]]
+- [[_COMMUNITY_Community 9|Community 9]]
+- [[_COMMUNITY_Community 10|Community 10]]
+- [[_COMMUNITY_Community 11|Community 11]]
+- [[_COMMUNITY_Community 12|Community 12]]
+- [[_COMMUNITY_Community 13|Community 13]]
+- [[_COMMUNITY_Community 14|Community 14]]
+- [[_COMMUNITY_Community 15|Community 15]]
+- [[_COMMUNITY_Community 16|Community 16]]
+- [[_COMMUNITY_Community 17|Community 17]]
+- [[_COMMUNITY_Community 18|Community 18]]
+- [[_COMMUNITY_Community 19|Community 19]]
+- [[_COMMUNITY_Community 20|Community 20]]
+- [[_COMMUNITY_Community 21|Community 21]]
+- [[_COMMUNITY_Community 22|Community 22]]
+- [[_COMMUNITY_Community 23|Community 23]]
+- [[_COMMUNITY_Community 24|Community 24]]
+- [[_COMMUNITY_Community 25|Community 25]]
+- [[_COMMUNITY_Community 26|Community 26]]
+- [[_COMMUNITY_Community 27|Community 27]]
+- [[_COMMUNITY_Community 29|Community 29]]
+- [[_COMMUNITY_Community 30|Community 30]]
+- [[_COMMUNITY_Community 31|Community 31]]
+- [[_COMMUNITY_Community 32|Community 32]]
+- [[_COMMUNITY_Community 33|Community 33]]
+- [[_COMMUNITY_Community 34|Community 34]]
+- [[_COMMUNITY_Community 36|Community 36]]
+- [[_COMMUNITY_Community 37|Community 37]]
+- [[_COMMUNITY_Community 38|Community 38]]
+- [[_COMMUNITY_Community 39|Community 39]]
+- [[_COMMUNITY_Community 42|Community 42]]
+- [[_COMMUNITY_Community 43|Community 43]]
+- [[_COMMUNITY_Community 44|Community 44]]
+- [[_COMMUNITY_Community 45|Community 45]]
+- [[_COMMUNITY_Community 46|Community 46]]
+- [[_COMMUNITY_Community 58|Community 58]]
+- [[_COMMUNITY_Community 59|Community 59]]
+- [[_COMMUNITY_Community 60|Community 60]]
+- [[_COMMUNITY_Community 61|Community 61]]
+- [[_COMMUNITY_Community 62|Community 62]]
+- [[_COMMUNITY_Community 63|Community 63]]
+- [[_COMMUNITY_Community 64|Community 64]]
+- [[_COMMUNITY_Community 85|Community 85]]
+- [[_COMMUNITY_Community 86|Community 86]]
+- [[_COMMUNITY_Community 90|Community 90]]
+- [[_COMMUNITY_Community 91|Community 91]]
+- [[_COMMUNITY_Community 92|Community 92]]
+- [[_COMMUNITY_Community 93|Community 93]]
+- [[_COMMUNITY_Community 94|Community 94]]
+- [[_COMMUNITY_Community 95|Community 95]]
+- [[_COMMUNITY_Community 96|Community 96]]
+- [[_COMMUNITY_Community 97|Community 97]]
+- [[_COMMUNITY_Community 98|Community 98]]
+- [[_COMMUNITY_Community 99|Community 99]]
+- [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
+- [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
+- [[_COMMUNITY_Community 105|Community 105]]
+- [[_COMMUNITY_Community 106|Community 106]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `serverEnv()` - 18 edges
 2. `publicEnv()` - 16 edges
-3. `httpFetch()` - 14 edges
+3. `httpFetch()` - 15 edges
 4. `Cities Table` - 13 edges
 5. `main()` - 12 edges
 6. `processAnalyticsBatch()` - 12 edges
 7. `fetchFreshPlaces()` - 12 edges
-8. `runTest()` - 10 edges
-9. `main()` - 10 edges
-10. `getStorageItem()` - 10 edges
+8. `setStorageItem()` - 11 edges
+9. `getTopPlaces()` - 11 edges
+10. `runTest()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `ExperiencesWrapper()` --calls--> `getTopPlaces()`  [INFERRED]
-  src/app/cities/[id]/page.tsx → src/lib/places.ts
 - `shouldTrack()` --calls--> `publicEnv()`  [INFERRED]
   src/components/analytics/AnalyticsProvider.tsx → src/lib/env.ts
+- `ExperiencesWrapper()` --calls--> `getTopPlaces()`  [INFERRED]
+  src/app/cities/[id]/page.tsx → src/lib/places.ts
 - `Google Places API Smoke Test` --conceptually_related_to--> `City Places Cache Service Role Policies`  [INFERRED]
   test-google-places.ts → supabase/20260311_places_cache_cost_optimization.sql
 - `Supabase City Search Smoke Test` --references--> `Cities Table`  [EXTRACTED]
@@ -137,183 +138,183 @@
 - **hyperedge:glow-rendering** — group:glowing-crystal, filter:glow, primitive:glow-blur, primitive:glow-composite [INFERRED]
 - **hyperedge:color-depth-system** — linearGradient:crystalGradient, shape:central-diamond, shape:highlight-facet, shape:shadow-facet [INFERRED]
 
-## Communities (106 total, 29 thin omitted)
+## Communities (107 total, 30 thin omitted)
 
-### Community 0 - "Components Analytics Effects"
+### Community 0 - "Community 0"
 Cohesion: 0.04
 Nodes (54): adaptive city discovery, privacy-first analytics, browser geolocation API, browser localStorage/sessionStorage, Supabase Postgres/RPC, src/components/analytics/AnalyticsProvider.tsx, src/components/analytics/GeoConsentBanner.tsx, src/components/analytics/PageTracker.tsx (+46 more)
 
-### Community 1 - "Metrics Weather Providers"
+### Community 1 - "Community 1"
 Cohesion: 0.08
-Nodes (32): AIBriefingSection(), CityVitalsFallback(), CoreMetricsCard(), ExperiencesWrapper(), classifyAge(), isCacheFresh(), minutes(), getCityInsight() (+24 more)
+Nodes (35): generateSessionId(), getGeoConsent(), getOrCreateSession(), isNewVisitor(), setGeoConsentStorage(), shouldTrack(), handleAccept(), handleDecline() (+27 more)
 
-### Community 2 - "Analytics Storage Components"
+### Community 2 - "Community 2"
+Cohesion: 0.07
+Nodes (31): AIBriefingSection(), CityVitalsFallback(), CoreMetricsCard(), ExperiencesWrapper(), classifyAge(), isCacheFresh(), minutes(), getCityById() (+23 more)
+
+### Community 3 - "Community 3"
+Cohesion: 0.05
+Nodes (44): AIBriefingClient, AIBriefingSection, AIBriefingSkeleton, ExperienceCardSkeleton, ExperiencesSkeleton, Home, HomeSearchShowcase, AI briefing tabbed planning UI (+36 more)
+
+### Community 4 - "Community 4"
 Cohesion: 0.08
-Nodes (33): generateSessionId(), getGeoConsent(), getOrCreateSession(), isNewVisitor(), setGeoConsentStorage(), shouldTrack(), handleAccept(), handleDecline() (+25 more)
+Nodes (35): haversineKm(), getDistanceKm(), isWithinMaxPriceTier(), mapPriceLevel(), matchesQuery(), sortPlaces(), buildPlaceImagePublicUrl(), buildPlacesRequestKey() (+27 more)
 
-### Community 3 - "Places Place Ranking"
-Cohesion: 0.09
-Nodes (33): haversineKm(), getDistanceKm(), isWithinMaxPriceTier(), mapPriceLevel(), matchesQuery(), sortPlaces(), buildPlaceImagePublicUrl(), buildPlacesRequestKey() (+25 more)
-
-### Community 4 - "Supabase Analytics Search"
+### Community 5 - "Community 5"
 Cohesion: 0.07
 Nodes (44): Atomic Analytics Upsert RPCs, Cache First TTL Strategy, Cache Hit Stats Table, Record Cache Event RPC, Cache Schema Version Columns, AI Prompt Version Columns, City AI Insights Cache Table, City AI Insights Public Write Policy (+36 more)
 
-### Community 5 - "Get Api Places"
+### Community 6 - "Community 6"
 Cohesion: 0.06
 Nodes (34): Adaptive media loading, City guide composition, Client-side saved places and notes, HTTP cache and ETag strategy, Thin route handlers validate and delegate, AIBriefingSection, CityVitals, getCityById() (+26 more)
 
-### Community 6 - "Env Supabase Layout"
+### Community 7 - "Community 7"
 Cohesion: 0.09
-Nodes (16): GET(), ThemeProvider(), publicEnv(), requirePublicEnv(), requireServerEnv(), serverEnv(), warnOnce(), getHealth() (+8 more)
+Nodes (18): GET(), HealthTimeoutError, withTimeout(), ThemeProvider(), publicEnv(), requirePublicEnv(), requireServerEnv(), serverEnv() (+10 more)
 
-### Community 7 - "Analytics Scripts Report"
-Cohesion: 0.06
-Nodes (32): AIBriefingClient, AIBriefingSection, AIBriefingSkeleton, AnalyticsProvider/PageTracker/GeoConsentBanner, Home, HomeSearchShowcase, RootLayout, TopCitiesPage (+24 more)
+### Community 8 - "Community 8"
+Cohesion: 0.14
+Nodes (25): backoffMs(), breakerKey(), CircuitOpenError, getBreaker(), HttpError, httpFetch(), httpJson(), isAbortError() (+17 more)
 
-### Community 8 - "Scripts Warm Trending"
-Cohesion: 0.08
-Nodes (30): ExperienceCardSkeleton, ExperiencesSkeleton, curated 2026 travel source list, saved places and sanitized notes, CITY_ALIASES, TRENDING_2026, scripts/analytics-report.ts, scripts/trending-destinations.ts (+22 more)
-
-### Community 9 - "Scripts Warm Insights"
-Cohesion: 0.07
-Nodes (30): city places cache deletion helper, place image diagnostics, scripts/clear-places-cache.ts, scripts/diagnose-images.ts, fetchExistingInsights(), fetchTopCities(), run(), worker() (+22 more)
-
-### Community 10 - "Providers Places Fallback"
+### Community 9 - "Community 9"
 Cohesion: 0.11
 Nodes (31): Budget coverage fallback for restaurants and hotels, Cache-first stale-while-revalidate, Layered monolith service layer, Lazy env and client initialization, Places image enrichment aligned to UI sort/filter views, Prompt and schema version invalidation, Pure provider wrappers, Structured logs and correlation IDs (+23 more)
 
-### Community 11 - "Http Places Google"
-Cohesion: 0.15
-Nodes (22): backoffMs(), breakerKey(), CircuitOpenError, getBreaker(), HttpError, httpFetch(), httpJson(), isCircuitOpen() (+14 more)
+### Community 10 - "Community 10"
+Cohesion: 0.08
+Nodes (26): city places cache deletion helper, place image diagnostics, scripts/analytics-report.ts, scripts/clear-places-cache.ts, scripts/diagnose-images.ts, checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus() (+18 more)
 
-### Community 12 - "Docs Design Award"
+### Community 11 - "Community 11"
 Cohesion: 0.09
 Nodes (26): abort timeout and analytics delivery risks, skip-link and scroll progress accessibility regressions, agentic personalized UI, AI city intelligence, award-winning travel website design 2026, biophilic and organic UI, city AI candidates dataset, Designing for Intent (+18 more)
 
-### Community 13 - "Use Analytics Tracker"
-Cohesion: 0.11
-Nodes (11): PageTracker(), useDeviceType(), useRecentSearches(), LruCache, findNearest(), findNearestCity(), getCityById(), normalizeQuery() (+3 more)
+### Community 12 - "Community 12"
+Cohesion: 0.12
+Nodes (10): PageTracker(), useDeviceType(), useRecentSearches(), LruCache, findNearest(), findNearestCity(), normalizeQuery(), queryCitiesInBox() (+2 more)
 
-### Community 14 - "Warm Scripts Check"
+### Community 13 - "Community 13"
+Cohesion: 0.09
+Nodes (22): AnalyticsProvider/PageTracker/GeoConsentBanner, RootLayout, TopCitiesPage, TopCitiesPageContent, analytics-enabled application shell, marketing analytics report, SEO metadata and structured data, Top 50 ItemList structured data (+14 more)
+
+### Community 14 - "Community 14"
 Cohesion: 0.18
 Nodes (20): checkInsightsCacheStatus(), checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus(), createSupabaseClient(), getAqiLabel(), getTopCitiesByPopulation(), getTopCitiesByTraffic() (+12 more)
 
-### Community 15 - "Components Sections Scroll"
+### Community 15 - "Community 15"
 Cohesion: 0.1
 Nodes (19): Motion respects reduced-motion preference, Source transparency and AI labeling, CitySearch, src/components/sections/FreeResourceCTA.tsx, src/components/sections/HomeSearchShowcase.tsx, src/components/ui/Hotspot.tsx, src/components/ui/InteractiveButton.tsx, src/components/ui/ScrollProgress.tsx (+11 more)
 
-### Community 16 - "Test Supabase Backend"
+### Community 16 - "Community 16"
 Cohesion: 0.28
 Nodes (13): main(), paint(), probe(), runTest(), shouldRunSuite(), skipTest(), suiteConsistency(), suitePerformance() (+5 more)
 
-### Community 17 - "Agents Readme Audit"
+### Community 17 - "Community 17"
 Cohesion: 0.14
 Nodes (15): backend performance audit report, Conventional Commits and PR checklist, Docker Compose web service, graphify repository rules, layered monolith architecture, Supabase migration conventions, multi-mode city search, Next.js 16 App Router stack (+7 more)
 
-### Community 18 - "Analytics Report Scripts"
+### Community 18 - "Community 18"
+Cohesion: 0.26
+Nodes (12): POST(), readJsonBodyWithLimit(), getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats() (+4 more)
+
+### Community 19 - "Community 19"
 Cohesion: 0.32
 Nodes (12): c(), formatNumber(), getCityViews(), getDailyTrend(), getDeviceStats(), getGeoStats(), getOverview(), getTrafficSources() (+4 more)
 
-### Community 19 - "Analytics Record Stats"
-Cohesion: 0.28
-Nodes (11): POST(), getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats(), recordDeviceStats() (+3 more)
-
-### Community 20 - "Crystal Svg Logo"
+### Community 20 - "Community 20"
 Cohesion: 0.22
 Nodes (13): Faceted crystal logo, SVG definitions, public/logo.svg, glow, Glowing crystal group, crystalGradient, Gaussian blur, Composite source over blur (+5 more)
 
-### Community 21 - "Places Test Google"
+### Community 21 - "Community 21"
 Cohesion: 0.31
 Nodes (10): extractErrorMessage(), extractPlaces(), formatSample(), isPlaceResult(), isValidDisplayName(), jsonType(), mapJsonLayout(), parseArgs() (+2 more)
 
-### Community 22 - "Constellation Background Components"
-Cohesion: 0.22
-Nodes (3): buildSpatialGrid(), generateConnections(), getNeighborStars()
-
-### Community 23 - "Image Quality Optimized"
+### Community 22 - "Community 22"
 Cohesion: 0.25
 Nodes (4): OptimizedImageInner(), useNetworkQuality(), generateSizes(), getQualityValue()
 
-### Community 24 - "Components Layout Nav"
+### Community 23 - "Community 23"
+Cohesion: 0.22
+Nodes (3): buildSpatialGrid(), generateConnections(), getNeighborStars()
+
+### Community 24 - "Community 24"
 Cohesion: 0.18
 Nodes (11): Responsive navigation shell, src/components/layout/MobileBottomNav.tsx, src/components/layout/SiteFooter.tsx, src/components/layout/SiteNav.tsx, src/components/layout/ThemeProvider.tsx, src/components/layout/ThemeToggle.tsx, MobileBottomNav(), SiteFooter() (+3 more)
 
-### Community 25 - "Canonical Http Place"
+### Community 25 - "Community 25"
 Cohesion: 0.24
 Nodes (10): canonical provider boundary, src/lib/http.ts, src/lib/mapping.ts, CanonicalCityVitals, CanonicalPlace, CanonicalWeather, HTTP circuit breaker state machine, googlePlaceToCanonical (+2 more)
 
-### Community 26 - "Text Line Svg"
+### Community 26 - "Community 26"
 Cohesion: 0.29
 Nodes (10): 16x16 SVG canvas, document body, folded top-right corner, gray fill #666, page outline, single compound path, file.svg, bottom text line (+2 more)
 
-### Community 27 - "Insights Backfill Mjs"
+### Community 27 - "Community 27"
 Cohesion: 0.39
 Nodes (8): callOpenRouter(), fetchExistingInsights(), fetchTopCities(), isFresh(), run(), sanitizeJson(), upsertInsight(), worker()
 
-### Community 29 - "Hero Skyline Blue"
+### Community 29 - "Community 29"
 Cohesion: 0.29
 Nodes (8): Blue sky negative space, public/hero.png, Golden cloudscape, Hero city skyline photograph, Hero layout usage, Manhattan skyline, Warm illuminated city lights, Waterfront reflections
 
-### Community 30 - "Globe Path Bands"
+### Community 30 - "Community 30"
 Cohesion: 0.32
 Nodes (8): clipPath a, global navigation or location scope, public/globe.svg, compound globe grid path, horizontal latitude bands, vertical longitude bands, outer circular globe silhouette, globe icon
 
-### Community 31 - "Window Circular Control"
+### Community 31 - "Community 31"
 Cohesion: 0.46
 Nodes (8): inner window panel, left circular control, middle circular control, outer window frame, right circular control, compound path, window.svg, top window bar
 
-### Community 32 - "Sphere Categories Get"
+### Community 32 - "Community 32"
 Cohesion: 0.48
 Nodes (4): fisherYatesShuffle(), getCitiesFromCategory(), getMixedCitiesFromCategories(), GET()
 
-### Community 33 - "Next Svg Public"
+### Community 33 - "Community 33"
 Cohesion: 0.43
 Nodes (7): public/next.svg, Next.js logo, N letter and .js suffix, NEXT wordmark letterforms, .js, SVG root element, NEXT
 
-### Community 35 - "Get Color Vitals"
+### Community 36 - "Community 36"
 Cohesion: 0.5
 Nodes (4): src/components/features/city/CityVitals.tsx, CityVitals, getAqiColor, getTempColor / getTempIconColor
 
-### Community 36 - "Top Content Components"
+### Community 37 - "Community 37"
 Cohesion: 0.5
 Nodes (4): src/components/pages/TopCitiesPageContent.tsx, CityCard, CityRow, TopCitiesPageContent
 
-### Community 37 - "Style Code Contributing"
+### Community 38 - "Community 38"
 Cohesion: 0.5
 Nodes (4): strict TypeScript style, frontend performance coding guidelines, React functional component conventions, Tailwind accessibility and security style
 
-### Community 41 - "About Content Transparent"
-Cohesion: 0.67
-Nodes (3): AboutPage, AboutPageContent, transparent methodology and ethical design
-
-### Community 44 - "Ranking Scripts Test"
+### Community 42 - "Community 42"
 Cohesion: 1.0
 Nodes (3): Bayesian plus viral ranking verification, scripts/test-ranking.ts, src/lib/ranking
 
-### Community 45 - "Vercel Logo Public"
+### Community 43 - "Community 43"
+Cohesion: 0.67
+Nodes (3): AboutPage, AboutPageContent, transparent methodology and ethical design
+
+### Community 46 - "Community 46"
 Cohesion: 1.0
 Nodes (3): Vercel logo, public/vercel.svg, Vercel triangle mark
 
 ## Knowledge Gaps
-- **83 isolated node(s):** `JSON Layout Mapper`, `Places Response Validator`, `Next.js Standalone Security Headers`, `Supabase Storage Image Remote Patterns`, `Security ESLint Rules` (+78 more)
+- **84 isolated node(s):** `HealthTimeoutError`, `JSON Layout Mapper`, `Places Response Validator`, `Next.js Standalone Security Headers`, `Supabase Storage Image Remote Patterns` (+79 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **29 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **30 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `publicEnv()` connect `Env Supabase Layout` to `Analytics Storage Components`, `Places Place Ranking`?**
-  _High betweenness centrality (0.023) - this node is a cross-community bridge._
-- **Why does `serverEnv()` connect `Env Supabase Layout` to `Http Places Google`, `Metrics Weather Providers`, `Places Place Ranking`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
+- **Why does `publicEnv()` connect `Community 7` to `Community 1`, `Community 4`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `serverEnv()` connect `Community 7` to `Community 8`, `Community 2`, `Community 4`?**
+  _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Are the 7 inferred relationships involving `serverEnv()` (e.g. with `currentLevel()` and `isStructured()`) actually correct?**
   _`serverEnv()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `publicEnv()` (e.g. with `shouldTrack()` and `resolvePlaceImage()`) actually correct?**
   _`publicEnv()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 3 inferred relationships involving `httpFetch()` (e.g. with `newCorrelationId()` and `runPlacesRequest()`) actually correct?**
   _`httpFetch()` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `JSON Layout Mapper`, `Places Response Validator`, `Next.js Standalone Security Headers` to the rest of the system?**
-  _83 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Components Analytics Effects` be split into smaller, more focused modules?**
+- **What connects `HealthTimeoutError`, `JSON Layout Mapper`, `Places Response Validator` to the rest of the system?**
+  _84 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.04 - nodes in this community are weakly interconnected._

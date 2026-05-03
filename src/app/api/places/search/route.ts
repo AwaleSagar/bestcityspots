@@ -4,7 +4,14 @@ import { searchPlaces } from "@/lib/places";
 
 const REQUEST_TIMEOUT_MS = 25_000;
 
+function isAbortError(error: unknown): boolean {
+  return error instanceof DOMException && error.name === "AbortError";
+}
+
 export async function GET(request: NextRequest) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
     const { searchParams } = new URL(request.url);
 
@@ -29,13 +36,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Bound the cold path so we surface 504 before serverless kills us with a generic error.
-    const data = await Promise.race([
-      searchPlaces(parsed.data),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), REQUEST_TIMEOUT_MS)
-      ),
-    ]);
+    const data = await searchPlaces({ ...parsed.data, signal: controller.signal });
+    const hasCoordinates = typeof parsed.data.lat === "number" && typeof parsed.data.lng === "number";
 
     return NextResponse.json(
       {
@@ -44,16 +46,20 @@ export async function GET(request: NextRequest) {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=1800",
+          "Cache-Control": hasCoordinates
+            ? "private, max-age=60"
+            : "public, s-maxage=300, stale-while-revalidate=1800",
         },
       }
     );
   } catch (error) {
-    if (error instanceof Error && error.message === "timeout") {
+    if (isAbortError(error)) {
       console.warn("[places/search] Request timed out");
       return NextResponse.json({ error: "Request timed out" }, { status: 504 });
     }
     console.error("[places/search] Request failed:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } finally {
+    clearTimeout(timeout);
   }
 }

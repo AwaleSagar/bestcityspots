@@ -75,28 +75,31 @@ export async function GET(req: Request) {
     // non-cryptographic fingerprint for cache validation — not for security.
     const etag = `"${createHash("sha1").update(JSON.stringify(body)).digest("hex").slice(0, 16)}"`;
     const ifNoneMatch = req.headers.get("if-none-match");
+    const cacheControl =
+      mode === "population"
+        ? "public, s-maxage=3600, stale-while-revalidate=86400"
+        : "public, s-maxage=86400, stale-while-revalidate=604800";
     if (ifNoneMatch === etag) {
       return new NextResponse(null, {
         status: 304,
         headers: {
           ETag: etag,
-          "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+          "Cache-Control": cacheControl,
         },
       });
     }
 
     return NextResponse.json(body, {
       headers: {
-        // Cache at the edge for a day; city list doesn't change frequently.
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "Cache-Control": cacheControl,
         ETag: etag,
       },
     });
   } catch (error) {
+    console.error("[cities/sphere] Route failed:", error);
     return NextResponse.json(
       {
         error: "sphere_route_failed",
-        detail: error instanceof Error ? error.message : "unknown",
       },
       { status: 500, headers: { "Cache-Control": "no-store" } }
     );

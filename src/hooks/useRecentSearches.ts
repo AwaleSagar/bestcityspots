@@ -16,9 +16,8 @@ export function useRecentSearches() {
 
   useEffect(() => {
     const saved = getJsonStorageItem<City[]>(STORAGE_KEY, []);
-    // Defer to a microtask so the synchronous setState during effect doesn't
-    // trigger a cascading render warning under the React Compiler. Cheaper
-    // than setTimeout and runs before paint.
+    // React Compiler flags synchronous state updates directly inside effects;
+    // defer the localStorage snapshot into the next microtask.
     queueMicrotask(() => {
       setRecentCities(saved);
       setIsLoaded(true);

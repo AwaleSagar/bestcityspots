@@ -3,12 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, BookOpen, Info } from "lucide-react";
+import { isActiveNavPath, primaryNavItems, type PrimaryNavItem } from "@/config/nav";
 
-const navItems = [
-  { href: "/", label: "Explore", icon: MapPin },
-  { href: "/resources/top-cities", label: "Top Cities", icon: BookOpen },
-  { href: "/about", label: "About", icon: Info },
-] as const;
+function getNavIcon(href: PrimaryNavItem["href"]) {
+  switch (href) {
+    case "/resources/top-cities":
+      return BookOpen;
+    case "/about":
+      return Info;
+    default:
+      return MapPin;
+  }
+}
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -20,15 +26,15 @@ export default function MobileBottomNav() {
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0)" }}
     >
       <ul className="flex items-stretch justify-around" role="list">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const isActive =
-            href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(href + "/");
+        {primaryNavItems.map(({ href, label }) => {
+          const Icon = getNavIcon(href);
+          const isActive = isActiveNavPath(pathname, href);
 
           return (
             <li key={href} className="flex-1">
               <Link
                 href={href}
-                className={`flex flex-col items-center justify-center gap-0.5 py-2 text-center transition-colors ${
+                className={`flex min-h-14 flex-col items-center justify-center gap-0.5 py-2 text-center transition-colors ${
                   isActive ? "text-accent-strong" : "text-muted"
                 }`}
                 aria-current={isActive ? "page" : undefined}

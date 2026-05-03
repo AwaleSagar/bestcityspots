@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useSpring, useReducedMotion } from "framer-motion";
+import { useState } from "react";
+import { motion, useMotionValueEvent, useScroll, useSpring, useReducedMotion } from "framer-motion";
 
 interface ScrollProgressProps {
   /** Show percentage text next to progress bar */
@@ -16,7 +17,12 @@ export default function ScrollProgress({
   gradientTo = "var(--color-brand-secondary)",
 }: ScrollProgressProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [progressValue, setProgressValue] = useState(0);
   const { scrollYProgress } = useScroll();
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setProgressValue(Math.round(latest * 100));
+  });
 
   // Smooth spring animation for the progress bar
   const scaleX = useSpring(scrollYProgress, {
@@ -30,7 +36,7 @@ export default function ScrollProgress({
       className="fixed top-0 right-0 left-0 z-50 h-1"
       role="progressbar"
       aria-label="Reading progress"
-      aria-valuenow={0}
+      aria-valuenow={progressValue}
       aria-valuemin={0}
       aria-valuemax={100}
     >
@@ -62,7 +68,7 @@ export default function ScrollProgress({
           className="bg-background/80 absolute top-3 right-4 rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm"
           style={{ opacity: scrollYProgress }}
         >
-          <motion.span>{/* This updates reactively based on scroll */}</motion.span>
+          <span>{progressValue}%</span>
         </motion.div>
       )}
     </div>

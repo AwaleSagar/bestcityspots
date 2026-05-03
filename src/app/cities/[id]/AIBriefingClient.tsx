@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, MapPin, CalendarRange, ThermometerSun, Compass, Eye } from "lucide-react";
 import type { CityInsight } from "@/lib/intelligence";
@@ -11,65 +11,68 @@ interface AIBriefingClientProps {
 
 type Tab = "overview" | "attractions" | "seasons";
 
+const TABS = [
+  { id: "overview" as Tab, label: "Overview", icon: Eye },
+  { id: "attractions" as Tab, label: "Top Spots", icon: Compass },
+  { id: "seasons" as Tab, label: "When to Visit", icon: CalendarRange },
+];
+
+function getSeasonColor(name: string) {
+  const n = name.toLowerCase();
+  if (n.includes("spring"))
+    return {
+      icon: "text-[color:var(--color-season-spring)]",
+      bg: "bg-[color:color-mix(in_oklab,var(--color-season-spring)_10%,transparent)]",
+      border: "border-l-[color:var(--color-season-spring)]",
+      pill: "text-[color:var(--color-season-spring)]",
+    };
+  if (n.includes("summer"))
+    return {
+      icon: "text-[color:var(--color-season-summer)]",
+      bg: "bg-[color:color-mix(in_oklab,var(--color-season-summer)_10%,transparent)]",
+      border: "border-l-[color:var(--color-season-summer)]",
+      pill: "text-[color:var(--color-season-summer)]",
+    };
+  if (n.includes("autumn") || n.includes("fall"))
+    return {
+      icon: "text-[color:var(--color-season-autumn)]",
+      bg: "bg-[color:color-mix(in_oklab,var(--color-season-autumn)_10%,transparent)]",
+      border: "border-l-[color:var(--color-season-autumn)]",
+      pill: "text-[color:var(--color-season-autumn)]",
+    };
+  if (n.includes("winter"))
+    return {
+      icon: "text-[color:var(--color-season-winter)]",
+      bg: "bg-[color:color-mix(in_oklab,var(--color-season-winter)_10%,transparent)]",
+      border: "border-l-[color:var(--color-season-winter)]",
+      pill: "text-[color:var(--color-season-winter)]",
+    };
+  return {
+    icon: "text-accent",
+    bg: "bg-accent-soft",
+    border: "border-l-accent",
+    pill: "text-accent",
+  };
+}
+
 export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const shouldReduceMotion = useReducedMotion();
 
-  const getSeasonColor = (name: string) => {
-    const n = name.toLowerCase();
-    if (n.includes("spring"))
-      return {
-        icon: "text-[color:var(--color-season-spring)]",
-        bg: "bg-[color:color-mix(in_oklab,var(--color-season-spring)_10%,transparent)]",
-        border: "border-l-[color:var(--color-season-spring)]",
-        pill: "text-[color:var(--color-season-spring)]",
-      };
-    if (n.includes("summer"))
-      return {
-        icon: "text-[color:var(--color-season-summer)]",
-        bg: "bg-[color:color-mix(in_oklab,var(--color-season-summer)_10%,transparent)]",
-        border: "border-l-[color:var(--color-season-summer)]",
-        pill: "text-[color:var(--color-season-summer)]",
-      };
-    if (n.includes("autumn") || n.includes("fall"))
-      return {
-        icon: "text-[color:var(--color-season-autumn)]",
-        bg: "bg-[color:color-mix(in_oklab,var(--color-season-autumn)_10%,transparent)]",
-        border: "border-l-[color:var(--color-season-autumn)]",
-        pill: "text-[color:var(--color-season-autumn)]",
-      };
-    if (n.includes("winter"))
-      return {
-        icon: "text-[color:var(--color-season-winter)]",
-        bg: "bg-[color:color-mix(in_oklab,var(--color-season-winter)_10%,transparent)]",
-        border: "border-l-[color:var(--color-season-winter)]",
-        pill: "text-[color:var(--color-season-winter)]",
-      };
-    return {
-      icon: "text-accent",
-      bg: "bg-accent-soft",
-      border: "border-l-accent",
-      pill: "text-accent",
-    };
-  };
-
-  // Merge seasons and weather data
-  const mergedSeasons = insight.seasons.map((season) => {
-    const weatherMatch = insight.weather.find(
-      (w) => w.season.toLowerCase() === season.name.toLowerCase()
-    );
-    return {
-      ...season,
-      tempC: weatherMatch?.tempC || "N/A",
-      weatherNotes: weatherMatch?.notes || "",
-    };
-  });
-
-  const tabs = [
-    { id: "overview" as Tab, label: "Overview", icon: Eye },
-    { id: "attractions" as Tab, label: "Top Spots", icon: Compass },
-    { id: "seasons" as Tab, label: "When to Visit", icon: CalendarRange },
-  ];
+  const mergedSeasons = useMemo(
+    () =>
+      insight.seasons.map((season) => {
+        const weatherMatch = insight.weather.find(
+          (w) => w.season.toLowerCase() === season.name.toLowerCase()
+        );
+        return {
+          ...season,
+          tempC: weatherMatch?.tempC || "N/A",
+          weatherNotes: weatherMatch?.notes || "",
+        };
+      }),
+    [insight]
+  );
 
   const tabCounts: Record<Tab, number> = {
     overview: 1,
@@ -94,7 +97,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
       {/* Tab Switcher — matches ExperiencesSection tab style */}
       <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
         <div className="border-line bg-background/55 flex w-max items-center gap-1.5 rounded-2xl border p-1.5 sm:w-fit md:rounded-[1.5rem]">
-          {tabs.map((tab) => {
+          {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             const count = tabCounts[tab.id];

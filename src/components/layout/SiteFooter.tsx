@@ -77,7 +77,7 @@ export default function SiteFooter() {
           <p>City intelligence for deliberate travel</p>
         </div>
 
-        <div className="h-4 md:hidden" aria-hidden />
+        <div className="h-16 md:hidden" aria-hidden />
       </div>
     </footer>
   );
