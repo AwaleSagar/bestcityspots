@@ -31,7 +31,10 @@ fi
 COMPOSE_SERVICE="${COMPOSE_SERVICE:-web}"
 COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-}"
 COMPOSE_ENV_FILE="${COMPOSE_ENV_FILE:-}"
-DOCKER_NETWORK="${DOCKER_NETWORK:-web}"
+# Optional external Docker network (e.g. for a shared reverse proxy).
+# Empty by default — set DOCKER_NETWORK=web (or pass --network web) only if a
+# reverse-proxy stack expects to reach this container on a shared bridge.
+DOCKER_NETWORK="${DOCKER_NETWORK:-}"
 DOCKER_IMAGE="${DOCKER_IMAGE:-bestcityspots:latest}"
 
 GIT_REMOTE="${GIT_REMOTE:-origin}"
