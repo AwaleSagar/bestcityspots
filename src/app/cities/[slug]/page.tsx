@@ -240,10 +240,19 @@ function buildCanonicalUrl(city: { slug?: string; id: number }) {
   return `${siteUrl}/cities/${segment}`;
 }
 
+// Meta description sizing: Google generally truncates around 160 chars on
+// desktop. We leave a small buffer and prefer cutting at word boundaries.
+const META_DESC_MIN_LENGTH = 60;
+const META_DESC_MAX_LENGTH = 158;
+const META_DESC_TRUNCATE_AT = 155;
+// Lower bound for the word-boundary backtrack — below this we'd produce a
+// suspiciously short description, so just hard-cut at the character limit.
+const META_DESC_WORD_BOUNDARY_FLOOR = 100;
+
 /**
  * Trim and clamp the AI-generated intro to a meta-description-friendly
- * length (~155 chars). Falls back to a templated string when the cached
- * insight is missing.
+ * length. Falls back to a templated string when the cached insight is
+ * missing or too short to be useful.
  */
 function deriveCityDescription(
   insight: { intro?: string } | null,
@@ -251,12 +260,13 @@ function deriveCityDescription(
   countryName: string
 ) {
   const raw = insight?.intro?.trim();
-  if (raw && raw.length >= 60) {
-    if (raw.length <= 158) return raw;
-    // Cut at the last space before 155 chars to avoid truncating mid-word.
-    const cut = raw.slice(0, 155);
+  if (raw && raw.length >= META_DESC_MIN_LENGTH) {
+    if (raw.length <= META_DESC_MAX_LENGTH) return raw;
+    const cut = raw.slice(0, META_DESC_TRUNCATE_AT);
     const lastSpace = cut.lastIndexOf(" ");
-    return `${(lastSpace > 100 ? cut.slice(0, lastSpace) : cut).replace(/[.,;:\s]+$/, "")}…`;
+    const trimmed =
+      lastSpace > META_DESC_WORD_BOUNDARY_FLOOR ? cut.slice(0, lastSpace) : cut;
+    return `${trimmed.replace(/[.,;:\s]+$/, "")}…`;
   }
   return `${cityName} travel guide with live weather, neighborhoods, AI-assisted briefings, and curated places in ${countryName}.`;
 }
@@ -432,10 +442,6 @@ export default async function CityPage({
                   Travel Guide
                 </span>
               </h1>
-              <p className="sr-only">
-                {city.city}, {city.country} travel guide with live weather, neighborhoods,
-                and AI-assisted briefings for {new Date().getFullYear()}.
-              </p>
               <div className="mt-3 flex items-center gap-6 md:mt-4">
                 <p className="text-muted-strong text-xl font-semibold tracking-[0.16em] uppercase md:text-2xl">
                   {city.country}

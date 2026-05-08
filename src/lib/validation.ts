@@ -31,7 +31,10 @@ export const citySlugSchema = z
   .trim()
   .min(1, "Slug is required")
   .max(120, "Slug is too long")
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid slug");
+  .regex(
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+    "Slug must contain only lowercase letters, numbers, and single dashes between segments"
+  );
 
 // Discriminator for the unified `[slug]` route param: a purely-numeric
 // segment is treated as a legacy city id (and 308-redirected to the

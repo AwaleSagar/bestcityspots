@@ -37,9 +37,13 @@ $$;
 
 -- 3) Backfill -------------------------------------------------------------
 -- Fill any NULL slug with the base form, then resolve collisions in two
--- passes: first appending iso2, then appending the row id. This produces a
--- stable, human-readable slug for the common case while guaranteeing
--- uniqueness across edge cases (e.g. multiple "Springfield, USA").
+-- passes:
+--   Pass 1: append `iso2` (or, if iso2 is NULL on this row, the row id) so
+--           the common case "same base in two different countries"
+--           produces a friendly slug like `springfield-us`.
+--   Pass 2: any slug still colliding (i.e. multiple rows share the same
+--           base AND the same iso2) gets the row id appended. Because id
+--           is unique, this terminates after at most two passes.
 UPDATE public.cities
 SET slug = public.slugify_city(city, country)
 WHERE slug IS NULL OR slug = '';

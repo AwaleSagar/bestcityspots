@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Compass, MapPinned } from "lucide-react";
-import { getTopCities, cityHref } from "@/lib/cities";
+import { type City, getTopCities, cityHref } from "@/lib/cities";
 
 // SEO Phase 1 (T9, audit 1.4): branded 404 page with a popular-cities
 // recovery surface. Internal links from this page recover link equity that
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
 const RECOVERY_CITY_COUNT = 12;
 
 export default async function NotFound() {
-  let recoveryCities: Awaited<ReturnType<typeof getTopCities>> = [];
+  let popularCities: City[] = [];
   try {
-    recoveryCities = await getTopCities(RECOVERY_CITY_COUNT);
+    popularCities = await getTopCities(RECOVERY_CITY_COUNT);
   } catch {
     // Database unavailable — render the static recovery layout without
     // a per-city list rather than crashing the 404 itself.
-    recoveryCities = [];
+    popularCities = [];
   }
 
   return (
@@ -64,7 +64,7 @@ export default async function NotFound() {
           </Link>
         </nav>
 
-        {recoveryCities.length > 0 ? (
+        {popularCities.length > 0 ? (
           <section aria-labelledby="popular-cities" className="mt-12">
             <h2
               id="popular-cities"
@@ -73,7 +73,7 @@ export default async function NotFound() {
               Popular destinations
             </h2>
             <ul className="mt-4 flex flex-wrap gap-2">
-              {recoveryCities.map((city) => (
+              {popularCities.map((city) => (
                 <li key={city.id}>
                   <Link
                     href={cityHref(city)}

@@ -58,7 +58,16 @@ function parseSameAs(raw: string | undefined): string[] | undefined {
   const list = raw
     .split(",")
     .map((s) => s.trim())
-    .filter((s) => /^https?:\/\//i.test(s));
+    .filter((s) => {
+      if (!s) return false;
+      try {
+        const parsed = new URL(s);
+        // Only http(s) URLs are appropriate for schema.org `sameAs`.
+        return parsed.protocol === "https:" || parsed.protocol === "http:";
+      } catch {
+        return false;
+      }
+    });
   return list.length > 0 ? list : undefined;
 }
 
