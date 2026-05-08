@@ -9,7 +9,7 @@ export default function SiteNav() {
       <div className="container-gutter mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="group flex min-h-11 min-w-0 items-center gap-2.5"
+          className="group flex min-h-11 min-w-0 flex-1 items-center gap-2.5"
           aria-label="Best City Spots home"
         >
           <div className="bg-accent text-accent-contrast flex h-11 w-11 shrink-0 items-center justify-center rounded-lg">
@@ -20,7 +20,7 @@ export default function SiteNav() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <DesktopNavLinks />
           <ThemeToggle />
         </div>

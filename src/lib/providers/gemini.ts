@@ -64,6 +64,57 @@ export async function generateText(prompt: string): Promise<GeminiResult> {
   }
 }
 
+export type GeminiStreamStart =
+  | { ok: true; correlationId: string; stream: AsyncIterable<string> }
+  | { ok: false; reason: "auth" | "rate_limit" | "error"; correlationId: string };
+
+/**
+ * Streaming variant of `generateText`. Yields incremental text chunks as
+ * Gemini emits them. Caller is responsible for accumulating the full text
+ * and validating it once the stream completes.
+ */
+export async function generateTextStream(prompt: string): Promise<GeminiStreamStart> {
+  const correlationId = newCorrelationId();
+  const client = getClient();
+  if (!client) {
+    return { ok: false, reason: "auth", correlationId };
+  }
+  try {
+    const model = client.getGenerativeModel({ model: MODEL });
+    const result = await model.generateContentStream(prompt, {
+      signal: AbortSignal.timeout(GENERATE_TIMEOUT_MS),
+    } as { signal: AbortSignal });
+
+    async function* iterate(): AsyncIterable<string> {
+      let totalLen = 0;
+      try {
+        for await (const chunk of result.stream) {
+          const piece = chunk.text();
+          if (piece) {
+            totalLen += piece.length;
+            yield piece;
+          }
+        }
+        log.debug("stream.ok", { correlationId, length: totalLen });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        log.warn("stream.exception", { correlationId, provider: PROVIDER, error: message });
+        throw err;
+      }
+    }
+
+    return { ok: true, correlationId, stream: iterate() };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    log.warn("exception", { correlationId, provider: PROVIDER, error: message });
+    const lower = message.toLowerCase();
+    if (lower.includes("429") || lower.includes("quota") || lower.includes("rate limit")) {
+      return { ok: false, reason: "rate_limit", correlationId };
+    }
+    return { ok: false, reason: "error", correlationId };
+  }
+}
+
 /**
  * Extract the first balanced JSON value (object or array) from a raw AI
  * response, stripping any markdown fencing or surrounding commentary.

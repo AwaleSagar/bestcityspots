@@ -11,6 +11,27 @@ import {
 import { isCacheFresh, CACHE_TIERS } from "./cache-config";
 import { createLogger } from "./logger";
 
+export { PROMPT_VERSIONS } from "./providers/gemini";
+
+/**
+ * Canonical prompt for a single-city AI briefing. Exported so the streaming
+ * route handler and the batch (non-streaming) helper share a single source
+ * of truth — bumping `PROMPT_VERSIONS.CITY_INSIGHT` together with this
+ * template invalidates cached rows automatically.
+ */
+export function buildCityInsightPrompt(city: Pick<City, "city" | "country">): string {
+  return `
+    You are a concise travel curator. Summarize ${city.city}, ${city.country}.
+    Return ONLY a JSON object with keys:
+    {
+      "intro": "\u2264500 characters, vivid city intro",
+      "attractions": [{ "name": "spot", "why": "1 short sentence" }],
+      "seasons": [{ "name": "Spring", "months": "Mar-May", "summary": "advice" }],
+      "weather": [{ "season": "Spring", "tempC": "range\u00b0C", "notes": "tip" }]
+    }
+  `;
+}
+
 const log = createLogger({ component: "intelligence" });
 
 // Module-scope schema reused across calls (no re-allocation per request).
@@ -43,6 +64,84 @@ const CityInsightSchema = z.object({
 
 export type CityInsight = z.infer<typeof CityInsightSchema>;
 
+export { CityInsightSchema };
+
+/**
+ * Result of a cache-only read. Used by the streaming pipeline to fast-path
+ * fresh hits and to surface a stale fallback for clients to render while a
+ * fresh response streams in.
+ */
+export interface CachedCityInsightRead {
+  insight: CityInsight | null;
+  fresh: boolean;
+  updatedAt: string | null;
+}
+
+/**
+ * Cache-only variant of `getCityInsight`. Never calls Gemini. Returned
+ * `fresh` is true only when the row exists, parses, has a matching
+ * `prompt_version`, and is within `CACHE_TIERS.INSIGHTS.freshMs`.
+ */
+export async function readCachedCityInsight(cityId: number): Promise<CachedCityInsightRead> {
+  try {
+    const { data: cached } = await supabase
+      .from("city_ai_insights")
+      .select("intro, attractions, seasons, weather, updated_at, prompt_version")
+      .eq("city_id", cityId)
+      .maybeSingle();
+
+    if (!cached) return { insight: null, fresh: false, updatedAt: null };
+
+    const candidate = {
+      intro: (cached.intro || "").slice(0, 600),
+      attractions: cached.attractions || [],
+      seasons: cached.seasons || [],
+      weather: cached.weather || [],
+    };
+    const parsed = CityInsightSchema.safeParse(candidate);
+    const insight = parsed.success ? parsed.data : null;
+    const cachedVersion =
+      typeof cached.prompt_version === "number" ? cached.prompt_version : null;
+    const versionMatches =
+      cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
+    const fresh =
+      !!insight && versionMatches && isCacheFresh(cached.updated_at, CACHE_TIERS.INSIGHTS.freshMs);
+    return { insight, fresh, updatedAt: cached.updated_at ?? null };
+  } catch (e) {
+    log.warn("cache_read_failed", {
+      cityId,
+      error: e instanceof Error ? e.message : String(e),
+    });
+    return { insight: null, fresh: false, updatedAt: null };
+  }
+}
+
+/**
+ * Fire-and-forget upsert of a freshly generated insight. Centralised so the
+ * streaming and batch paths share write semantics.
+ */
+export function upsertCityInsight(city: City, insight: CityInsight): void {
+  const clientToUse = supabaseServer || supabase;
+  clientToUse
+    .from("city_ai_insights")
+    .upsert(
+      {
+        city_id: city.id,
+        city_name: city.city,
+        country: city.country,
+        ...insight,
+        prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "city_id" }
+    )
+    .then(({ error }: { error: unknown }) => {
+      if (error) {
+        log.warn("cache_write_failed", { cityId: city.id, error: String(error) });
+      }
+    });
+}
+
 /**
  * Stale-While-Revalidate fetch for a city's AI-generated insight.
  *
@@ -56,54 +155,13 @@ export type CityInsight = z.infer<typeof CityInsightSchema>;
  *    more than freshness.
  */
 export async function getCityInsight(city: City): Promise<CityInsight | null> {
-  // 1) Always attempt to read cache first so we have a fallback available.
-  let cachedInsight: CityInsight | null = null;
-  let cachedVersion: number | null = null;
-  let cachedUpdatedAt: string | null = null;
-  try {
-    const { data: cached } = await supabase
-      .from("city_ai_insights")
-      .select("intro, attractions, seasons, weather, updated_at, prompt_version")
-      .eq("city_id", city.id)
-      .maybeSingle();
-
-    if (cached) {
-      cachedUpdatedAt = cached.updated_at ?? null;
-      cachedVersion = typeof cached.prompt_version === "number" ? cached.prompt_version : null;
-      const candidate = {
-        intro: (cached.intro || "").slice(0, 600),
-        attractions: cached.attractions || [],
-        seasons: cached.seasons || [],
-        weather: cached.weather || [],
-      };
-      const parsed = CityInsightSchema.safeParse(candidate);
-      cachedInsight = parsed.success ? parsed.data : null;
-
-      // Only treat a row as a hit if prompt_version matches the current one.
-      const versionMatches =
-        cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
-      if (cachedInsight && versionMatches && isCacheFresh(cachedUpdatedAt, CACHE_TIERS.INSIGHTS.freshMs)) {
-        return cachedInsight;
-      }
-    }
-  } catch (e) {
-    log.warn("cache_read_failed", {
-      cityId: city.id,
-      error: e instanceof Error ? e.message : String(e),
-    });
-  }
+  // 1) Cache-first read with stale fallback semantics.
+  const cacheRead = await readCachedCityInsight(city.id);
+  if (cacheRead.fresh && cacheRead.insight) return cacheRead.insight;
+  const cachedInsight = cacheRead.insight;
 
   // 2) Call the AI. Any failure path below falls through to the stale cache.
-  const prompt = `
-    You are a concise travel curator. Summarize ${city.city}, ${city.country}.
-    Return ONLY a JSON object with keys:
-    {
-      "intro": "≤500 characters, vivid city intro",
-      "attractions": [{ "name": "spot", "why": "1 short sentence" }],
-      "seasons": [{ "name": "Spring", "months": "Mar-May", "summary": "advice" }],
-      "weather": [{ "season": "Spring", "tempC": "range°C", "notes": "tip" }]
-    }
-  `;
+  const prompt = buildCityInsightPrompt(city);
   const aiResult = await generateText(prompt);
   if (!aiResult.ok) {
     log.warn("ai_unavailable", { cityId: city.id, reason: aiResult.reason });
@@ -124,25 +182,7 @@ export async function getCityInsight(city: City): Promise<CityInsight | null> {
   }
 
   // 3) Fire-and-forget cache write with the current prompt_version.
-  const clientToUse = supabaseServer || supabase;
-  clientToUse
-    .from("city_ai_insights")
-    .upsert(
-      {
-        city_id: city.id,
-        city_name: city.city,
-        country: city.country,
-        ...parsed,
-        prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "city_id" }
-    )
-    .then(({ error }: { error: unknown }) => {
-      if (error) {
-        log.warn("cache_write_failed", { cityId: city.id, error: String(error) });
-      }
-    });
+  upsertCityInsight(city, parsed);
 
   return parsed;
 }

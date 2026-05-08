@@ -11,6 +11,7 @@ try {
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
+    qualities: [75, 85],
     remotePatterns: [
       // Standard Supabase Storage URLs
       {

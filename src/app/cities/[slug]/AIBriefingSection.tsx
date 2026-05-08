@@ -1,24 +1,27 @@
-import { getCityInsight } from "@/lib/intelligence";
+import { readCachedCityInsight } from "@/lib/intelligence";
 import { City } from "@/lib/cities";
 import AIBriefingClient from "./AIBriefingClient";
+import AIBriefingStreamClient from "./AIBriefingStreamClient";
 
 interface AIBriefingSectionProps {
   city: City;
 }
 
+/**
+ * Renders the AI briefing card.
+ *
+ *  - Cache hit (fresh + version-matched): server-render the final insight
+ *    with `AIBriefingClient`. Zero client streaming overhead.
+ *  - Cache miss / stale: hand the cityId to the client streaming component
+ *    so the user sees tokens as Gemini emits them, instead of waiting for
+ *    the full payload to arrive.
+ */
 export default async function AIBriefingSection({ city }: AIBriefingSectionProps) {
-  const aiInsight = await getCityInsight(city);
+  const { insight, fresh } = await readCachedCityInsight(city.id);
 
-  if (!aiInsight) {
-    return (
-      <section className="atlas-panel rounded-[1.4rem] p-6 sm:rounded-[1.7rem] md:rounded-[2rem]">
-        <h2 className="labelled-rule">AI City Briefing</h2>
-        <p className="text-muted-strong mt-3 text-sm font-semibold tracking-wide">
-          AI briefing is unavailable for this city right now.
-        </p>
-      </section>
-    );
+  if (fresh && insight) {
+    return <AIBriefingClient insight={insight} />;
   }
 
-  return <AIBriefingClient insight={aiInsight} />;
+  return <AIBriefingStreamClient cityId={city.id} initialInsight={insight} />;
 }
