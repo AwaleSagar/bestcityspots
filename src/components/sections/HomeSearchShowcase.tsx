@@ -1,6 +1,6 @@
 "use client";
 
-import type { City } from "@/lib/cities";
+import { type City, cityHref } from "@/lib/cities";
 import CitySearch from "@/components/features/city/CitySearch";
 import { motion, useReducedMotion } from "framer-motion";
 import { CloudSun, Compass, MapPinned, Moon, Utensils } from "lucide-react";
@@ -108,7 +108,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
             {cityPreview.map((city, index) => (
               <Link
                 key={city.id}
-                href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                href={cityHref(city, { lat: city.lat, lng: city.lng })}
                 className="group border-line flex items-center justify-between gap-4 border-b py-3.5 last:border-b-0"
               >
                 <div className="flex items-baseline gap-3">

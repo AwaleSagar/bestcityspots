@@ -24,6 +24,20 @@ export const uuidSchema = z.string().uuid("Invalid ID format");
 // City ID validation (Integer)
 export const cityIdSchema = z.coerce.number().int().positive("City ID must be a positive integer");
 
+// City slug validation: lowercase, dashes, alphanumerics. Bounded length to
+// keep route params well-behaved on every CDN.
+export const citySlugSchema = z
+  .string()
+  .trim()
+  .min(1, "Slug is required")
+  .max(120, "Slug is too long")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Invalid slug");
+
+// Discriminator for the unified `[slug]` route param: a purely-numeric
+// segment is treated as a legacy city id (and 308-redirected to the
+// canonical slug URL), anything else is a slug.
+export const numericIdParam = /^\d+$/;
+
 // Coordinate validation
 export const coordinatesSchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),

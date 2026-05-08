@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Globe2, MapPinned, Users } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { formatPopulation } from "@/lib/format";
+import { cityHref } from "@/lib/cities";
 
 interface City {
   id: number;
@@ -14,6 +15,7 @@ interface City {
   iso3?: string;
   admin_name?: string;
   capital?: string;
+  slug?: string;
   lat: number;
   lng: number;
   population: number;
@@ -44,7 +46,7 @@ const bands = [
 function CityCard({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
-      href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+      href={cityHref(city, { lat: city.lat, lng: city.lng })}
       className="atlas-panel interactive-card flex h-full flex-col justify-between rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.8rem] md:p-6"
     >
       <div>
@@ -77,7 +79,7 @@ function CityCard({ city, rank }: { city: City; rank: number }) {
 function CityRow({ city, rank }: { city: City; rank: number }) {
   return (
     <Link
-      href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+      href={cityHref(city, { lat: city.lat, lng: city.lng })}
       className="group hover:border-line hover:bg-background/55 flex items-center gap-3 rounded-[1rem] border border-transparent px-3 py-2.5 transition-colors duration-300 sm:gap-4 sm:rounded-[1.2rem] sm:px-4 sm:py-3"
     >
       <span className="text-muted w-8 shrink-0 font-mono text-xs sm:w-10 sm:text-sm">

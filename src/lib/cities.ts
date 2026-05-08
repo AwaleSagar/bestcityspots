@@ -8,6 +8,14 @@ export interface City {
   id: number;
   city: string;
   city_ascii: string;
+  /**
+   * URL-safe canonical slug (e.g. `lisbon-portugal`). Populated by the DB
+   * trigger introduced in migration 202605080000_cities_slug_seo.sql. May be
+   * undefined for very old rows that pre-date the migration; callers that
+   * build URLs should fall back to the numeric `id`, which the slug-aware
+   * route handler 308-redirects to the canonical slug.
+   */
+  slug?: string;
   lat: number;
   lng: number;
   country: string;
@@ -16,6 +24,23 @@ export interface City {
   admin_name: string;
   capital: string;
   population: number;
+}
+
+/**
+ * Build the canonical, slug-based path to a city page. Falls back to the
+ * numeric id when slug is missing — the city route then 308-redirects to the
+ * canonical URL so search engines and shared links converge regardless.
+ */
+export function cityHref(
+  city: Pick<City, "id" | "slug">,
+  query?: { lat?: number; lng?: number }
+) {
+  const segment = city.slug && city.slug.length > 0 ? city.slug : String(city.id);
+  const search =
+    query && typeof query.lat === "number" && typeof query.lng === "number"
+      ? `?lat=${query.lat}&lng=${query.lng}`
+      : "";
+  return `/cities/${segment}${search}`;
 }
 
 export interface CitySearchResult extends City {
@@ -36,7 +61,7 @@ async function queryCitiesInBox(lat: number, lng: number, boxSize: number, limit
   try {
     const { data, error } = await supabase
       .from("cities")
-      .select("id, city, city_ascii, country, population, lat, lng, admin_name, capital")
+      .select("id, city, city_ascii, slug, country, population, lat, lng, admin_name, capital")
       .gte("lat", lat - boxSize)
       .lte("lat", lat + boxSize)
       .gte("lng", lng - boxSize)
@@ -139,7 +164,9 @@ export const getTopCities = reactCache(async (limit = 10) => {
     const safeLimit = Math.max(1, Math.min(200, limit));
     const { data, error } = await supabase
       .from("cities")
-      .select("id, city, city_ascii, country, iso3, admin_name, capital, population, lat, lng")
+      .select(
+        "id, city, city_ascii, slug, country, iso3, admin_name, capital, population, lat, lng"
+      )
       .order("population", { ascending: false, nullsFirst: false })
       .limit(safeLimit);
 
@@ -170,6 +197,31 @@ export async function getCityById(id: number) {
     return data as City;
   } catch (e) {
     console.error(`Error fetching city with id ${id}:`, e);
+    return null;
+  }
+}
+
+/**
+ * Fetches a single city by its canonical slug. Used by the slug-based route
+ * handler so that `/cities/lisbon-portugal` resolves without a numeric-id
+ * round trip.
+ */
+export async function getCityBySlug(slug: string) {
+  try {
+    const { data, error } = await supabase
+      .from("cities")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error) {
+      console.error(`Error fetching city with slug "${slug}":`, error);
+      return null;
+    }
+
+    return (data ?? null) as City | null;
+  } catch (e) {
+    console.error(`Error fetching city with slug "${slug}":`, e);
     return null;
   }
 }

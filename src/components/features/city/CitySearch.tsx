@@ -2,7 +2,7 @@
 
 import type { KeyboardEvent, ReactNode } from "react";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { searchCities, City, CitySearchResult, findNearestCity } from "@/lib/cities";
+import { searchCities, City, CitySearchResult, findNearestCity, cityHref } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -187,10 +187,10 @@ function CitySearch({ topCities }: CitySearchProps) {
       } else if (e.key === "Enter") {
         const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
         if (selectedCity) {
-          router.push(`/cities/${selectedCity.id}`);
+          router.push(cityHref(selectedCity));
         } else if (searchResults.length > 0) {
           const firstCity = searchResults.at(0);
-          if (firstCity) router.push(`/cities/${firstCity.id}`);
+          if (firstCity) router.push(cityHref(firstCity));
         }
       } else if (e.key === "Escape") {
         setSearchQuery("");
@@ -218,7 +218,7 @@ function CitySearch({ topCities }: CitySearchProps) {
             return;
           }
           addRecentCity(nearest);
-          router.push(`/cities/${nearest.id}?lat=${latitude}&lng=${longitude}`);
+          router.push(cityHref(nearest, { lat: latitude, lng: longitude }));
         } catch (error) {
           console.warn("Unable to resolve current location", error);
           setIsLocating(false); // Make sure to reset state on error
@@ -385,7 +385,7 @@ function CitySearch({ topCities }: CitySearchProps) {
                       }}
                     >
                       <Link
-                        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                        href={cityHref(city, { lat: city.lat, lng: city.lng })}
                         onClick={() => addRecentCity(city)}
                         className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
                       >
@@ -413,7 +413,7 @@ function CitySearch({ topCities }: CitySearchProps) {
                       }}
                     >
                       <Link
-                        href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                        href={cityHref(city, { lat: city.lat, lng: city.lng })}
                         onClick={() => addRecentCity(city)}
                         className="border-line bg-surface/80 text-muted hover:border-accent/18 hover:bg-accent-soft/70 hover:text-foreground inline-block rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95"
                       >
@@ -492,7 +492,7 @@ function CitySearch({ topCities }: CitySearchProps) {
                   }}
                 >
                   <Link
-                    href={`/cities/${city.id}?lat=${city.lat}&lng=${city.lng}`}
+                    href={cityHref(city, { lat: city.lat, lng: city.lng })}
                     onClick={() => addRecentCity(city)}
                     className="flex w-full items-center justify-between gap-4 px-5 py-4 md:px-8 md:py-5"
                   >
