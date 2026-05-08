@@ -15,6 +15,8 @@ import ExperiencesSection from "./ExperiencesSection";
 import ExperiencesSkeleton from "./ExperiencesSkeleton";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
+import CityFAQSection from "./CityFAQSection";
+import CityRelatedSection from "./CityRelatedSection";
 import CityVitals from "@/components/features/city/CityVitals";
 import {
   MapPin,
@@ -101,8 +103,10 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
       </div>
       <div className="text-muted mt-4 flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
         <Activity className="h-3.5 w-3.5" />
+        {/* SEO Phase 2.4 (audit 5.7): explicit "Last verified" wording so
+            E-E-A-T cues are unambiguous to both readers and crawlers. */}
         {metrics?.updated_at
-          ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}`
+          ? `Last verified ${new Date(metrics.updated_at).toLocaleDateString()}`
           : "Pending data"}
       </div>
     </>
@@ -183,8 +187,53 @@ async function ExperiencesWrapper({
     getTopPlaces(cityName, "hotels", { lat, lng }),
   ]);
 
+  // SEO Phase 2.2 (audit 5.5): emit `Place` + `AggregateRating` JSON-LD
+  // for the top landmarks, restaurants, and hotels actually displayed in
+  // the Experiences carousel. Sourced from the same Google Places data
+  // that powers the visible cards so the structured data matches what
+  // users see on the page (a Google requirement for rich results).
+  const placeJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [...landmarks, ...restaurants, ...hotels]
+      .filter(
+        (place) =>
+          typeof place.userRatingCount === "number" &&
+          place.userRatingCount > 0 &&
+          typeof place.rating === "number"
+      )
+      .slice(0, 15)
+      .map((place) => ({
+        "@type": "Place",
+        name: place.displayName?.text,
+        address: place.formattedAddress,
+        ...(place.googleMapsUri ? { url: place.googleMapsUri } : {}),
+        ...(place.location?.latitude && place.location?.longitude
+          ? {
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: place.location.latitude,
+                longitude: place.location.longitude,
+              },
+            }
+          : {}),
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: place.rating,
+          reviewCount: place.userRatingCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      })),
+  };
+
   return (
     <div className="space-y-10">
+      {placeJsonLd["@graph"].length > 0 ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(placeJsonLd) }}
+        />
+      ) : null}
       <div className="space-y-3">
         <h2 className="labelled-rule">Top Experiences</h2>
         <p className="text-muted max-w-lg text-sm tracking-wide">
@@ -518,7 +567,15 @@ export default async function CityPage({
                     icon: Users,
                     title: "Budget transparency",
                     color: "text-[color:var(--color-brand-accent)]",
-                    text: "Use Dining and Stays price filters to keep high-interest places grounded in realistic trip spending.",
+                    // SEO Phase 2.5 (audit 5.6): vary boilerplate per city
+                    // so identical sentences don't repeat across hundreds of
+                    // city pages. Capital flag and population band drive a
+                    // small but real surface-level differentiation.
+                    text: city.capital
+                      ? `${city.city} reads as a capital — pricing skews higher around official quarters; lean on the Dining and Stays price filters to keep your shortlist grounded.`
+                      : city.population >= 5_000_000
+                        ? `Major-metro pricing varies sharply between districts in ${city.city}. The Dining and Stays price filters above keep high-interest places aligned with realistic trip spending.`
+                        : `Use the Dining and Stays price filters above to keep ${city.city} options grounded in realistic trip spending — useful especially when balancing landmark proximity against value.`,
                   },
                   {
                     icon: Navigation,
@@ -564,6 +621,18 @@ export default async function CityPage({
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
+
+            {/* SEO Phase 2.3 (audit 5.4): related cities turn the city page
+                into a hub instead of a crawl dead end. Linked by country
+                (closest semantic relationship we can compute without an
+                editorial step). */}
+            <CityRelatedSection city={city} />
+
+            {/* SEO Phase 2.2 (audit 5.5): visible FAQ block paired with
+                FAQPage + SpeakableSpecification JSON-LD. Lives below the
+                experiences carousel where it answers the questions users
+                still have after scanning the briefing. */}
+            <CityFAQSection city={city} />
           </div>
 
           {/* Sidebar */}

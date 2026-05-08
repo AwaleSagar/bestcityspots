@@ -37,17 +37,19 @@ export const metadata: Metadata = {
 const structuredData = [
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Best City Spots",
-    url: siteUrl,
+    // SEO Phase 2.2 (audit 5.5): emit `AboutPage` here so search engines map
+    // /about to the right knowledge-graph type, distinct from the
+    // Organization/WebSite blocks in the root layout. Cross-references the
+    // `@id`s declared in `src/app/layout.tsx` so all three blocks compose
+    // into a single graph rather than three orphan nodes.
+    "@type": "AboutPage",
+    name: "About Best City Spots",
+    url: `${siteUrl}/about`,
     description:
-      "Best City Spots is a curated atlas of global cities blending live signals with urban intelligence.",
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Best City Spots",
-    url: siteUrl,
+      "Transparent overview of how Best City Spots works: data sources, methodology, and our commitment to ethical design.",
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    publisher: { "@id": `${siteUrl}/#organization` },
+    mainEntity: { "@id": `${siteUrl}/#organization` },
   },
 ];
 

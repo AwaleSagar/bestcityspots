@@ -100,6 +100,14 @@ export const metadata: Metadata = {
   category: "travel",
   alternates: {
     canonical: "/",
+    // SEO Phase 3.4 (audit 7.4): emit `hreflang` self-references on every
+    // page so when locale variants ship later we are not retrofitting from
+    // scratch. `x-default` doubles as the canonical for the en surface and
+    // makes the site eligible for hreflang-aware indexing today.
+    languages: {
+      "en-US": "/",
+      "x-default": "/",
+    },
   },
   robots: {
     index: true,

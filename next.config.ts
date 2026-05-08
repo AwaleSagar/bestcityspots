@@ -55,10 +55,37 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
           },
-          // CSP is often complex to get right initially without breaking Next.js hydration.
-          // Starting with a basic one or leaving it for a dedicated focus is safer.
-          // For now, we omit strict CSP in header config to avoid immediate breakage,
-          // but valid architecture controls (Shift Left) help mitigate XSS.
+          // SEO Phase 3.6 (audit 8.5): Content-Security-Policy in
+          // Report-Only mode. Emitting the header without enforcement lets
+          // us collect violation telemetry from real traffic before
+          // promoting the policy to enforced mode. The directive set is
+          // intentionally permissive (`'unsafe-inline'` for styles and
+          // scripts) because Next.js + Framer Motion + Tailwind v4 inject
+          // inline runtime CSS/JS — a stricter nonce-based policy needs
+          // its own focused rollout.
+          //
+          // `report-uri` is omitted by default; once a reporting endpoint
+          // is configured, append a `report-to` directive and a
+          // `Reporting-Endpoints` header to capture violations.
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value: [
+              "default-src 'self'",
+              "base-uri 'self'",
+              "frame-ancestors 'none'",
+              "object-src 'none'",
+              "form-action 'self'",
+              "img-src 'self' data: blob: https:",
+              "media-src 'self' blob:",
+              "font-src 'self' data:",
+              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "connect-src 'self' https: wss:",
+              "manifest-src 'self'",
+              "worker-src 'self' blob:",
+              "upgrade-insecure-requests",
+            ].join("; "),
+          },
         ],
       },
     ];
