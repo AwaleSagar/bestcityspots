@@ -4,7 +4,7 @@ import {
   sanitizeKey,
   sanitizeNotes,
   topK,
-} from "../src/app/cities/[id]/experience-helpers";
+} from "../src/app/cities/[slug]/experience-helpers";
 import { parseReferrer, parseUserAgent } from "../src/lib/analytics";
 import { CACHE_TIERS, classifyAge } from "../src/lib/cache-config";
 

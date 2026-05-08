@@ -20,6 +20,11 @@ const publicSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: z.string().optional(),
   NEXT_PUBLIC_ANALYTICS_DEV: z.string().optional(),
+  // SEO Phase 1 (audit T11/T12): comma-separated list of canonical social /
+  // brand URLs surfaced in Organization JSON-LD `sameAs`. Optional — when
+  // unset the field is simply omitted from the structured data block.
+  NEXT_PUBLIC_ORGANIZATION_SAME_AS: z.string().optional(),
+  NEXT_PUBLIC_CONTACT_EMAIL: z.string().email().optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 });
 
@@ -54,6 +59,8 @@ export function publicEnv(): PublicEnv {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
     NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
+    NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
+    NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
     NODE_ENV: process.env.NODE_ENV,
   });
   if (!parsed.success) {

@@ -1,13 +1,22 @@
-import { getCityById } from "@/lib/cities";
+import { getCityById, getCityBySlug, getTopCities } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
 import { getCityMetrics } from "@/lib/metrics";
 import { getCityWeather } from "@/lib/weather";
-import { cityIdSchema, coordinatesSchema } from "@/lib/validation";
+import { getCityInsight } from "@/lib/intelligence";
+import {
+  cityIdSchema,
+  citySlugSchema,
+  coordinatesSchema,
+  numericIdParam,
+} from "@/lib/validation";
+import { publicEnv } from "@/lib/env";
 import ExperiencesSection from "./ExperiencesSection";
 import ExperiencesSkeleton from "./ExperiencesSkeleton";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
+import CityFAQSection from "./CityFAQSection";
+import CityRelatedSection from "./CityRelatedSection";
 import CityVitals from "@/components/features/city/CityVitals";
 import {
   MapPin,
@@ -23,22 +32,45 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Suspense, cache } from "react";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import CityViewTracker from "@/components/analytics/CityViewTracker";
+import {
+  CityVitalsFallback,
+  getArrivalMood,
+  MetricCard,
+} from "./city-page-parts";
 
 // Enable ISR: regenerate pages at most once per hour. Cached responses still
 // stream fresh metrics/places via the in-route Supabase caches; this just
 // avoids re-running the full server component tree on every request.
 export const revalidate = 3600;
 
+// SEO Phase 1 (T2): pre-render the top cities at build time. Long-tail cities
+// still render via ISR thanks to the default `dynamicParams = true`.
+const STATIC_CITY_COUNT = 250;
+
+export async function generateStaticParams() {
+  try {
+    const top = await getTopCities(STATIC_CITY_COUNT);
+    return top
+      .map((c) => c.slug)
+      .filter((slug): slug is string => typeof slug === "string" && slug.length > 0)
+      .map((slug) => ({ slug }));
+  } catch (e) {
+    console.warn("[cities/[slug]] generateStaticParams failed:", e);
+    return [];
+  }
+}
+
 // Request-scoped cache so generateMetadata + page body share one DB query.
+const getCachedCityBySlug = cache(getCityBySlug);
 const getCachedCityById = cache(getCityById);
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import {
-  CityVitalsFallback,
-  getArrivalMood,
-  MetricCard,
-} from "./city-page-parts";
+const getCachedCityInsight = cache(getCityInsight);
+
+const siteUrl =
+  publicEnv().NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://bestcityspots.com";
 
 function CoreMetricsSkeleton() {
   return (
@@ -71,8 +103,10 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
       </div>
       <div className="text-muted mt-4 flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
         <Activity className="h-3.5 w-3.5" />
+        {/* SEO Phase 2.4 (audit 5.7): explicit "Last verified" wording so
+            E-E-A-T cues are unambiguous to both readers and crawlers. */}
         {metrics?.updated_at
-          ? `Updated ${new Date(metrics.updated_at).toLocaleDateString()}`
+          ? `Last verified ${new Date(metrics.updated_at).toLocaleDateString()}`
           : "Pending data"}
       </div>
     </>
@@ -153,8 +187,53 @@ async function ExperiencesWrapper({
     getTopPlaces(cityName, "hotels", { lat, lng }),
   ]);
 
+  // SEO Phase 2.2 (audit 5.5): emit `Place` + `AggregateRating` JSON-LD
+  // for the top landmarks, restaurants, and hotels actually displayed in
+  // the Experiences carousel. Sourced from the same Google Places data
+  // that powers the visible cards so the structured data matches what
+  // users see on the page (a Google requirement for rich results).
+  const placeJsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [...landmarks, ...restaurants, ...hotels]
+      .filter(
+        (place) =>
+          typeof place.userRatingCount === "number" &&
+          place.userRatingCount > 0 &&
+          typeof place.rating === "number"
+      )
+      .slice(0, 15)
+      .map((place) => ({
+        "@type": "Place",
+        name: place.displayName?.text,
+        address: place.formattedAddress,
+        ...(place.googleMapsUri ? { url: place.googleMapsUri } : {}),
+        ...(place.location?.latitude && place.location?.longitude
+          ? {
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: place.location.latitude,
+                longitude: place.location.longitude,
+              },
+            }
+          : {}),
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: place.rating,
+          reviewCount: place.userRatingCount,
+          bestRating: 5,
+          worstRating: 1,
+        },
+      })),
+  };
+
   return (
     <div className="space-y-10">
+      {placeJsonLd["@graph"].length > 0 ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(placeJsonLd) }}
+        />
+      ) : null}
       <div className="space-y-3">
         <h2 className="labelled-rule">Top Experiences</h2>
         <p className="text-muted max-w-lg text-sm tracking-wide">
@@ -171,25 +250,117 @@ async function ExperiencesWrapper({
   );
 }
 
+/**
+ * Resolve the unified `[slug]` route param.
+ *
+ * SEO Phase 1 (T1, T3): the route accepts both legacy numeric ids
+ * (`/cities/123`) and canonical slugs (`/cities/lisbon-portugal`). When the
+ * caller hits a numeric id we 308-redirect to the canonical slug URL so
+ * external links and the previously-published sitemap entries continue to
+ * resolve and consolidate into a single canonical URL.
+ *
+ * Returns the City row when the segment is a valid slug, or never returns
+ * (redirects / 404s) for legacy ids and unknown values.
+ */
+async function resolveCityFromSegment(
+  segment: string,
+  searchSuffix: string
+): Promise<Awaited<ReturnType<typeof getCityBySlug>>> {
+  if (numericIdParam.test(segment)) {
+    const idResult = cityIdSchema.safeParse(segment);
+    if (!idResult.success) notFound();
+    const legacyCity = await getCachedCityById(idResult.data);
+    if (!legacyCity) notFound();
+    if (legacyCity.slug && legacyCity.slug.length > 0) {
+      // 308 (permanent) so search engines transfer link equity.
+      redirect(`/cities/${legacyCity.slug}${searchSuffix}`);
+    }
+    // No slug yet on this row (pre-migration) — render at the legacy URL.
+    return legacyCity;
+  }
+
+  const slugResult = citySlugSchema.safeParse(segment);
+  if (!slugResult.success) notFound();
+  return getCachedCityBySlug(slugResult.data);
+}
+
+function buildCanonicalUrl(city: { slug?: string; id: number }) {
+  const segment = city.slug && city.slug.length > 0 ? city.slug : String(city.id);
+  return `${siteUrl}/cities/${segment}`;
+}
+
+// Meta description sizing: Google generally truncates around 160 chars on
+// desktop. We leave a small buffer and prefer cutting at word boundaries.
+const META_DESC_MIN_LENGTH = 60;
+const META_DESC_MAX_LENGTH = 158;
+const META_DESC_TRUNCATE_AT = 155;
+// Lower bound for the word-boundary backtrack — below this we'd produce a
+// suspiciously short description, so just hard-cut at the character limit.
+const META_DESC_WORD_BOUNDARY_FLOOR = 100;
+
+/**
+ * Trim and clamp the AI-generated intro to a meta-description-friendly
+ * length. Falls back to a templated string when the cached insight is
+ * missing or too short to be useful.
+ */
+function deriveCityDescription(
+  insight: { intro?: string } | null,
+  cityName: string,
+  countryName: string
+) {
+  const raw = insight?.intro?.trim();
+  if (raw && raw.length >= META_DESC_MIN_LENGTH) {
+    if (raw.length <= META_DESC_MAX_LENGTH) return raw;
+    const cut = raw.slice(0, META_DESC_TRUNCATE_AT);
+    const lastSpace = cut.lastIndexOf(" ");
+    const trimmed =
+      lastSpace > META_DESC_WORD_BOUNDARY_FLOOR ? cut.slice(0, lastSpace) : cut;
+    return `${trimmed.replace(/[.,;:\s]+$/, "")}…`;
+  }
+  return `${cityName} travel guide with live weather, neighborhoods, AI-assisted briefings, and curated places in ${countryName}.`;
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const result = cityIdSchema.safeParse(id);
-  if (!result.success) return { title: "City Not Found" };
+  const { slug } = await params;
 
-  const city = await getCachedCityById(result.data);
+  // For metadata we only need to *read* the slug variant — for legacy ids
+  // the page handler below performs the redirect. Returning a minimal
+  // metadata object here keeps the legacy crawl path cheap and signals
+  // noindex so search engines don't keep the numeric URL in the index.
+  if (numericIdParam.test(slug)) {
+    return { title: "Best City Spots", robots: { index: false, follow: true } };
+  }
+
+  const slugResult = citySlugSchema.safeParse(slug);
+  if (!slugResult.success) return { title: "City Not Found" };
+
+  const city = await getCachedCityBySlug(slugResult.data);
   if (!city) return { title: "City Not Found" };
 
+  const insight = await getCachedCityInsight(city).catch(() => null);
+  const description = deriveCityDescription(insight, city.city, city.country);
+  const year = new Date().getFullYear();
+  const title = `${city.city} Travel Guide: Live Weather, Neighborhoods & AI Insights (${year})`;
+  const canonical = buildCanonicalUrl(city);
+
   return {
-    title: `${city.city}, ${city.country} - Travel Guide & Urban Data`,
-    description: `Comprehensive data and AI-powered travel insights for ${city.city}, ${city.country}. Real-time weather, demographics, and top attractions at Best City Spots.`,
+    title,
+    description,
+    alternates: { canonical },
     openGraph: {
-      title: `${city.city} | Best City Spots`,
-      description: `Discover ${city.city} with AI insights and live urban data.`,
-      type: "website",
+      title: `${city.city} Travel Guide | Best City Spots`,
+      description,
+      type: "article",
+      url: canonical,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${city.city} Travel Guide | Best City Spots`,
+      description,
     },
   };
 }
@@ -198,36 +369,34 @@ export default async function CityPage({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
   searchParams: Promise<{ lat?: string; lng?: string }>;
 }) {
-  const { id } = await params;
-  const { lat, lng } = await searchParams;
+  const { slug } = await params;
+  const sp = await searchParams;
+  const { lat, lng } = sp;
 
-  const idResult = cityIdSchema.safeParse(id);
   const coordsResult = coordinatesSchema.safeParse({ lat, lng });
-
-  if (!idResult.success) {
-    notFound();
-  }
-
   if (!coordsResult.success) {
     console.warn("Invalid coordinates provided:", coordsResult.error);
   }
-
-  const cityId = idResult.data;
   const validCoords = coordsResult.success ? coordsResult.data : {};
 
-  const city = await getCachedCityById(cityId);
+  const searchSuffix =
+    typeof lat === "string" && typeof lng === "string"
+      ? `?lat=${encodeURIComponent(lat)}&lng=${encodeURIComponent(lng)}`
+      : "";
 
-  if (!city) {
-    notFound();
-  }
+  const city = await resolveCityFromSegment(slug, searchSuffix);
+  if (!city) notFound();
 
-  const jsonLd = {
+  const canonical = buildCanonicalUrl(city);
+
+  const touristJsonLd = {
     "@context": "https://schema.org",
     "@type": "TouristDestination",
     name: city.city,
+    url: canonical,
     description: `Detailed travel metrics and insights for ${city.city}, ${city.country}.`,
     geo: {
       "@type": "GeoCoordinates",
@@ -239,6 +408,32 @@ export default async function CityPage({
       addressLocality: city.city,
       addressCountry: city.country,
     },
+    containedInPlace: {
+      "@type": "Country",
+      name: city.country,
+    },
+  };
+
+  // SEO Phase 1 (5.5): mirror the visual breadcrumbs as JSON-LD so search
+  // engines can render rich breadcrumb chips on the SERP.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Cities",
+        item: `${siteUrl}/resources/top-cities`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${city.city}, ${city.country}`,
+        item: canonical,
+      },
+    ],
   };
 
   const finalLat = validCoords.lat ?? city.lat;
@@ -247,13 +442,23 @@ export default async function CityPage({
     <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(touristJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <CityViewTracker cityId={city.id} />
       <div
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
       >
-        <Breadcrumbs items={[{ label: "Cities", href: "/" }, { label: city.city }]} />
+        <Breadcrumbs
+          items={[
+            { label: "Cities", href: "/resources/top-cities" },
+            { label: city.city },
+          ]}
+        />
         <nav className="mb-10 md:mb-14" aria-label="City navigation">
           <Link
             href="/"
@@ -280,8 +485,11 @@ export default async function CityPage({
                   Public data
                 </span>
               </div>
-              <h1 className="text-foreground block text-[clamp(2.8rem,7vw,5.6rem)] leading-[0.95] break-words">
-                {city.city}
+              <h1 className="text-foreground block text-[clamp(2.4rem,6vw,4.6rem)] leading-[0.95] break-words">
+                {city.city}{" "}
+                <span className="text-muted-strong text-[0.42em] tracking-[0.18em] uppercase">
+                  Travel Guide
+                </span>
               </h1>
               <div className="mt-3 flex items-center gap-6 md:mt-4">
                 <p className="text-muted-strong text-xl font-semibold tracking-[0.16em] uppercase md:text-2xl">
@@ -359,7 +567,15 @@ export default async function CityPage({
                     icon: Users,
                     title: "Budget transparency",
                     color: "text-[color:var(--color-brand-accent)]",
-                    text: "Use Dining and Stays price filters to keep high-interest places grounded in realistic trip spending.",
+                    // SEO Phase 2.5 (audit 5.6): vary boilerplate per city
+                    // so identical sentences don't repeat across hundreds of
+                    // city pages. Capital flag and population band drive a
+                    // small but real surface-level differentiation.
+                    text: city.capital
+                      ? `${city.city} reads as a capital — pricing skews higher around official quarters; lean on the Dining and Stays price filters to keep your shortlist grounded.`
+                      : city.population >= 5_000_000
+                        ? `Major-metro pricing varies sharply between districts in ${city.city}. The Dining and Stays price filters above keep high-interest places aligned with realistic trip spending.`
+                        : `Use the Dining and Stays price filters above to keep ${city.city} options grounded in realistic trip spending — useful especially when balancing landmark proximity against value.`,
                   },
                   {
                     icon: Navigation,
@@ -405,6 +621,18 @@ export default async function CityPage({
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
+
+            {/* SEO Phase 2.3 (audit 5.4): related cities turn the city page
+                into a hub instead of a crawl dead end. Linked by country
+                (closest semantic relationship we can compute without an
+                editorial step). */}
+            <CityRelatedSection city={city} />
+
+            {/* SEO Phase 2.2 (audit 5.5): visible FAQ block paired with
+                FAQPage + SpeakableSpecification JSON-LD. Lives below the
+                experiences carousel where it answers the questions users
+                still have after scanning the briefing. */}
+            <CityFAQSection city={city} />
           </div>
 
           {/* Sidebar */}

@@ -6,9 +6,10 @@ import TrustIndicators from "@/components/sections/TrustIndicators";
 import { Suspense } from "react";
 
 export const metadata = {
-  title: "Best City Spots | City Intelligence for Deliberate Travel",
+  title: "Best City Spots: City Travel Guides with Live Weather & AI Insights",
   description:
-    "Discover cities through an editorial atlas of live signals, neighborhood texture, and AI-assisted travel briefings.",
+    "City travel guides with live weather, neighborhood texture, and AI-assisted briefings — discover the best cities to visit and plan smarter, deliberate trips.",
+  alternates: { canonical: "/" },
 };
 
 function HomeSearchShowcaseFallback() {

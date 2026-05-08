@@ -3,11 +3,17 @@ import { MapPinned } from "lucide-react";
 
 const exploreLinks = [
   { href: "/", label: "Explore cities" },
+  { href: "/cities", label: "All cities" },
+  { href: "/countries", label: "Browse by country" },
   { href: "/resources/top-cities", label: "Top cities" },
+  { href: "/best-cities-by-air-quality", label: "Cleanest air" },
+  { href: "/best-cities-for-digital-nomads", label: "For digital nomads" },
 ] as const;
 
 const companyLinks = [
   { href: "/about", label: "About the project" },
+  { href: "/methodology", label: "Methodology" },
+  { href: "/press", label: "Press kit" },
   { href: "/about#source-stack", label: "Data sources" },
 ] as const;
 
