@@ -101,7 +101,7 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
           source={metrics?.source?.climate as string | undefined}
         />
       </div>
-      <div className="text-muted mt-4 flex items-center gap-2 text-[10px] font-semibold tracking-[0.15em] uppercase">
+      <div className="text-muted mt-4 flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase">
         <Activity className="h-3.5 w-3.5" />
         {/* SEO Phase 2.4 (audit 5.7): explicit "Last verified" wording so
             E-E-A-T cues are unambiguous to both readers and crawlers. */}
@@ -139,7 +139,7 @@ async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof g
         },
       ].map(({ icon: ItemIcon, label, value }) => (
         <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
-          <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
+          <div className="text-muted flex items-center gap-2 text-[11px] font-semibold tracking-[0.16em] uppercase">
             <ItemIcon className="text-accent h-3.5 w-3.5" />
             {label}
           </div>
@@ -155,7 +155,7 @@ function WeatherSummaryFallback() {
     <>
       {["Arrival mood", "Best next step", "Live context"].map((label) => (
         <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
-          <div className="text-muted flex items-center gap-2 text-[10px] font-semibold tracking-[0.16em] uppercase">
+          <div className="text-muted flex items-center gap-2 text-[11px] font-semibold tracking-[0.16em] uppercase">
             <Activity className="text-accent h-3.5 w-3.5" />
             {label}
           </div>

@@ -137,14 +137,14 @@ export default function ExperiencesSkeleton() {
                     }`}
                   />
                   <span
-                    className={`text-[10px] font-black tracking-[0.1em] uppercase md:text-[11px] ${
+                    className={`text-[11px] font-black tracking-[0.1em] uppercase ${
                       isFirst ? "text-foreground" : "text-foreground/30"
                     }`}
                   >
                     {tab.label}
                   </span>
                   <span
-                    className={`rounded-full px-1.5 py-0.5 text-[8px] font-black md:text-[9px] ${
+                    className={`rounded-full px-1.5 py-0.5 text-[11px] font-black ${
                       isFirst ? "bg-accent/15 text-accent" : "bg-foreground/5 text-foreground/25"
                     }`}
                   >
@@ -179,7 +179,7 @@ export default function ExperiencesSkeleton() {
               />
             ))}
           </div>
-          <span className="text-foreground/40 text-[10px] font-black tracking-[0.2em] uppercase">
+          <span className="text-foreground/40 text-[11px] font-black tracking-[0.2em] uppercase">
             Discovering experiences...
           </span>
         </div>

@@ -83,7 +83,11 @@ export default function SiteFooter() {
           <p>City intelligence for deliberate travel</p>
         </div>
 
-        <div className="h-16 md:hidden" aria-hidden />
+        <div
+          className="md:hidden"
+          style={{ height: "var(--mobile-bottom-nav-height)" }}
+          aria-hidden
+        />
       </div>
     </footer>
   );

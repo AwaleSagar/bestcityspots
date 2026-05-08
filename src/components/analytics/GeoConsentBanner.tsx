@@ -7,6 +7,8 @@ import { useAnalytics } from "@/lib/useAnalytics";
 import { getStorageItem, setStorageItem } from "@/lib/storage";
 
 const GEO_ASKED_KEY = "bcs_geo_asked";
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /**
  * Non-blocking banner asking for geolocation consent.
@@ -59,6 +61,24 @@ export function GeoConsentBanner() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         handleDismiss();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panelRef.current) return;
+      const focusable = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR));
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (!active) return;
+
+      if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
@@ -91,6 +111,7 @@ export function GeoConsentBanner() {
 
             {/* Close button */}
             <button
+              type="button"
               ref={closeButtonRef}
               onClick={handleDismiss}
               className="text-muted hover:bg-background/60 hover:text-foreground absolute top-3 right-3 rounded-full p-1.5 transition-colors"
@@ -116,12 +137,14 @@ export function GeoConsentBanner() {
 
                 <div className="mt-4 flex gap-2">
                   <button
+                    type="button"
                     onClick={handleAccept}
                     className="bg-foreground text-background rounded-full px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all hover:shadow-lg"
                   >
                     Allow
                   </button>
                   <button
+                    type="button"
                     onClick={handleDecline}
                     className="border-line bg-background/45 text-muted hover:text-foreground rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-colors"
                   >

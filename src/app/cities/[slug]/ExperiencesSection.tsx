@@ -399,7 +399,7 @@ export default function ExperiencesSection({
                 {item.displayName.text}
               </h3>
               {addressContext?.primary && (
-                <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.12em] text-white/50 uppercase">
+                <div className="mt-2 flex items-center gap-1.5 text-[11px] font-semibold tracking-[0.12em] text-white/50 uppercase">
                   <MapPin className="h-3 w-3 flex-shrink-0" />
                   <span className="line-clamp-1">{addressContext.primary}</span>
                   {addressContext.secondary && (
@@ -431,12 +431,12 @@ export default function ExperiencesSection({
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span
-                      className={`rounded-full border ${catColor.badge} px-3 py-1 text-[10px] font-black tracking-[0.16em] uppercase`}
+                      className={`rounded-full border ${catColor.badge} px-3 py-1 text-[11px] font-black tracking-[0.16em] uppercase`}
                     >
                       {primaryPulse}
                     </span>
                     {getPriceLevel(item.priceLevel) && (
-                      <span className="border-foreground/10 bg-foreground/[0.03] text-foreground/55 rounded-full border px-3 py-1 text-[10px] font-black tracking-[0.16em] uppercase">
+                      <span className="border-foreground/10 bg-foreground/[0.03] text-foreground/55 rounded-full border px-3 py-1 text-[11px] font-black tracking-[0.16em] uppercase">
                         {getPriceLevel(item.priceLevel)}
                       </span>
                     )}
@@ -457,7 +457,7 @@ export default function ExperiencesSection({
 
           {/* Compact meta row — only shown when there's no image (image cards show this on the overlay) */}
           {!item.imageUrl && (
-            <div className="text-foreground/40 flex flex-wrap items-center gap-2 text-[10px] font-black tracking-[0.16em] uppercase">
+            <div className="text-foreground/40 flex flex-wrap items-center gap-2 text-[11px] font-black tracking-[0.16em] uppercase">
               {ratingLabel && (
                 <span className="border-foreground/8 bg-foreground/[0.03] inline-flex items-center gap-1.5 rounded-full border px-3 py-1">
                   <Star className={`h-3.5 w-3.5 ${catColor.star}`} />
@@ -480,15 +480,16 @@ export default function ExperiencesSection({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackAction("click_maps_link")}
-                className="border-foreground/8 bg-foreground/[0.03] text-foreground/50 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition-all hover:border-sky-500/25 hover:text-sky-300 active:scale-[0.97]"
+                className="border-foreground/8 bg-foreground/[0.03] text-foreground/50 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-all hover:border-sky-500/25 hover:text-sky-300 active:scale-[0.97]"
               >
                 <MapPin className="h-3 w-3" />
                 Maps
               </a>
             )}
             <button
+              type="button"
               onClick={() => toggleSave(item, activeTab)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition-all active:scale-[0.97] ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-all active:scale-[0.97] ${
                 savedIds.has(item.id)
                   ? catColor.save
                   : `border-foreground/8 bg-foreground/[0.03] text-foreground/50 hover:text-foreground/75 ${catColor.saveHover}`
@@ -503,8 +504,9 @@ export default function ExperiencesSection({
               {savedIds.has(item.id) ? "Saved" : "Save"}
             </button>
             <button
+              type="button"
               onClick={() => toggleExpand(item.id)}
-              className={`border-foreground/6 text-foreground/35 ml-auto inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[10px] font-bold tracking-[0.12em] uppercase transition-all ${catColor.moreHover} hover:text-foreground/60 active:scale-[0.97]`}
+              className={`border-foreground/6 text-foreground/35 ml-auto inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-[11px] font-bold tracking-[0.12em] uppercase transition-all ${catColor.moreHover} hover:text-foreground/60 active:scale-[0.97]`}
               aria-expanded={isExpanded}
             >
               <Compass className="h-3 w-3" />
@@ -539,7 +541,7 @@ export default function ExperiencesSection({
                 {savedNote && (
                   <div className={`rounded-xl border ${catColor.note} p-4 text-sm`}>
                     <div
-                      className={`mb-2 text-[10px] font-black tracking-[0.2em] uppercase ${catColor.noteLabel}`}
+                      className={`mb-2 text-[11px] font-black tracking-[0.2em] uppercase ${catColor.noteLabel}`}
                     >
                       Your note
                     </div>
@@ -547,14 +549,18 @@ export default function ExperiencesSection({
                   </div>
                 )}
                 <div className="space-y-2">
-                  <div className="text-foreground/40 flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase">
+                  <div className="text-foreground/40 flex items-center gap-2 text-[11px] font-black tracking-[0.2em] uppercase">
                     Add your insight
-                    <span className="bg-foreground/10 text-foreground/30 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-[0.2em] uppercase">
+                    <span className="bg-foreground/10 text-foreground/30 rounded-full px-2 py-0.5 text-[11px] font-bold tracking-[0.2em] uppercase">
                       Local only
                     </span>
                   </div>
+                  <label htmlFor={`${safePlaceId}-note`} className="sr-only">
+                    Note for {item.displayName.text}
+                  </label>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
                     <textarea
+                      id={`${safePlaceId}-note`}
                       value={noteValue}
                       onChange={(e) => {
                         const value = e.target.value.slice(0, 280);
@@ -569,6 +575,7 @@ export default function ExperiencesSection({
                     />
                     <div className="flex gap-2">
                       <button
+                        type="button"
                         onClick={() => saveNote(item.id, noteValue)}
                         className={`rounded-xl border px-4 py-2 text-[11px] font-black tracking-[0.15em] uppercase transition-colors duration-100 ${catColor.noteBtn}`}
                         disabled={!notesHydrated}
@@ -576,6 +583,7 @@ export default function ExperiencesSection({
                         Save note
                       </button>
                       <button
+                        type="button"
                         onClick={() => clearNote(item.id)}
                         className="border-foreground/10 bg-foreground/[0.02] text-foreground/50 hover:border-foreground/20 hover:text-foreground rounded-xl border px-4 py-2 text-[11px] font-black tracking-[0.15em] uppercase transition"
                         disabled={!notesHydrated}
@@ -595,7 +603,7 @@ export default function ExperiencesSection({
 
   return (
     <div className="space-y-8">
-      <div className="border-line bg-surface/70 terrain-lines rounded-[1.4rem] border p-5">
+      <div className="border-line bg-surface/70 rounded-[1.4rem] border p-5">
         <p className="source-chip">Itinerary lanes</p>
         <p className="text-muted mt-3 max-w-2xl text-sm leading-relaxed">
           Move between sights, tables, and sleep bases without losing your saved shortlist or local
@@ -614,11 +622,12 @@ export default function ExperiencesSection({
               return (
                 <button
                   key={tab.id}
+                  type="button"
                   onClick={() => {
                     setActiveTab(tab.id);
                     setSelectedPrice(null);
                   }}
-                  className={`relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black tracking-[0.1em] uppercase transition-all duration-200 md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 md:text-[11px] ${isActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/50"}`}
+                  className={`relative flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-[10px] font-black tracking-[0.08em] uppercase transition-all duration-200 sm:gap-2 sm:px-4 sm:text-[11px] sm:tracking-[0.1em] md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 ${isActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/50"}`}
                 >
                   {isActive && (
                     <motion.div
@@ -635,7 +644,7 @@ export default function ExperiencesSection({
                   />
                   <span className="relative z-10">{tab.label}</span>
                   <span
-                    className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] font-black tabular-nums transition-colors duration-200 md:text-[9px] ${isActive ? tab.activeCount : "bg-foreground/5 text-foreground/25"}`}
+                    className={`relative z-10 rounded-full px-1.5 py-0.5 text-[10px] font-black tabular-nums transition-colors duration-200 sm:text-[11px] ${isActive ? tab.activeCount : "bg-foreground/5 text-foreground/25"}`}
                   >
                     {count}
                   </span>
@@ -656,8 +665,9 @@ export default function ExperiencesSection({
               className="border-line bg-background/45 flex w-fit items-center gap-1.5 rounded-2xl border p-1.5"
             >
               <button
+                type="button"
                 onClick={() => setSelectedPrice(null)}
-                className={`rounded-xl px-3.5 py-1.5 text-[10px] font-black transition-all ${
+                className={`rounded-xl px-3.5 py-1.5 text-[11px] font-black transition-all ${
                   selectedPrice === null
                     ? "border-accent/20 bg-accent-soft text-accent border"
                     : "text-foreground/20 hover:text-foreground/40 border border-transparent"
@@ -668,8 +678,9 @@ export default function ExperiencesSection({
               {priceLevels.map((level) => (
                 <button
                   key={level.id}
+                  type="button"
                   onClick={() => setSelectedPrice(level.id)}
-                  className={`rounded-xl px-3.5 py-1.5 text-[10px] font-black transition-all ${
+                  className={`rounded-xl px-3.5 py-1.5 text-[11px] font-black transition-all ${
                     selectedPrice === level.id
                       ? "border-accent/20 bg-accent-soft text-accent border"
                       : "text-foreground/20 hover:text-foreground/40 border border-transparent"
@@ -685,7 +696,7 @@ export default function ExperiencesSection({
 
       {/* Saved Places */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="border-line bg-background/45 text-foreground/50 flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[10px] font-black tracking-[0.15em] uppercase">
+        <div className="border-line bg-background/45 text-foreground/50 flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[11px] font-black tracking-[0.15em] uppercase">
           <Bookmark className="text-accent h-3.5 w-3.5" />
           <span>
             {savedForCity.length} saved in {cityName}
@@ -693,22 +704,38 @@ export default function ExperiencesSection({
         </div>
         <AnimatePresence>
           {savedForCity.map((item) => (
-            <motion.a
-              key={item.id}
-              href={item.googleMapsUri || "#"}
-              target={item.googleMapsUri ? "_blank" : undefined}
-              rel={item.googleMapsUri ? "noopener noreferrer" : undefined}
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
-              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
-              exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
-              className="group border-line bg-background/45 text-foreground/70 hover:border-accent/30 hover:bg-accent-soft/70 hover:text-foreground flex items-center gap-2 rounded-xl border px-3 py-1.5 text-[11px] font-bold transition-all duration-200"
-            >
-              <BookmarkCheck className="text-accent h-3.5 w-3.5" />
-              <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
-              <span className="text-foreground/30 group-hover:text-accent text-[9px] tracking-[0.15em] uppercase">
-                {item.type}
-              </span>
-            </motion.a>
+            item.googleMapsUri ? (
+              <motion.a
+                key={item.id}
+                href={item.googleMapsUri}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+                className="group border-line bg-background/45 text-foreground/70 hover:border-accent/30 hover:bg-accent-soft/70 hover:text-foreground flex items-center gap-2 rounded-xl border px-3 py-1.5 text-[11px] font-bold transition-all duration-200"
+              >
+                <BookmarkCheck className="text-accent h-3.5 w-3.5" />
+                <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
+              <span className="text-foreground/30 group-hover:text-accent text-[11px] tracking-[0.15em] uppercase">
+                  {item.type}
+                </span>
+              </motion.a>
+            ) : (
+              <motion.span
+                key={item.id}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+                animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1 }}
+                exit={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.96 }}
+                className="border-line bg-background/45 text-foreground/60 flex items-center gap-2 rounded-xl border px-3 py-1.5 text-[11px] font-bold"
+              >
+                <BookmarkCheck className="text-accent h-3.5 w-3.5" />
+                <span className="line-clamp-1 max-w-[120px] sm:max-w-[180px]">{item.name}</span>
+                <span className="text-foreground/30 text-[11px] tracking-[0.15em] uppercase">
+                  {item.type}
+                </span>
+              </motion.span>
+            )
           ))}
         </AnimatePresence>
       </div>
@@ -733,7 +760,7 @@ export default function ExperiencesSection({
                 <div className="text-foreground/25 text-xs font-black tracking-[0.2em] uppercase">
                   No {getPriceLevel(selectedPrice!) || activeTab} spots discovered
                 </div>
-                <div className="text-foreground/15 mt-1 text-[10px] font-bold tracking-wide">
+                <div className="text-foreground/15 mt-1 text-[11px] font-bold tracking-wide">
                   Try another price tier or switch lanes to keep planning.
                 </div>
               </div>

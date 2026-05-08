@@ -130,7 +130,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
           </div>
         </div>
 
-        <div className="border-line terrain-lines rounded-[1.4rem] border p-5 sm:p-6">
+        <div className="border-line bg-surface/70 rounded-[1.4rem] border p-5 sm:p-6">
           <p className="text-muted text-xs font-medium tracking-wider uppercase">
             What makes this different
           </p>

@@ -105,7 +105,7 @@ export default async function CitiesIndexPage() {
                   className="border-line bg-surface/65 text-muted-strong hover:text-foreground rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {country.country}{" "}
-                  <span className="text-muted ml-1 text-[10px]">{country.cityCount}</span>
+                  <span className="text-muted ml-1 text-[11px]">{country.cityCount}</span>
                 </Link>
               ))}
               <Link

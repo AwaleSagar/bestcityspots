@@ -104,8 +104,9 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black tracking-[0.1em] uppercase transition-all duration-200 md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 md:text-[11px] ${
+                className={`relative flex items-center gap-1.5 rounded-xl px-3.5 py-2.5 text-[10px] font-black tracking-[0.08em] uppercase transition-all duration-200 sm:gap-2 sm:px-4 sm:text-[11px] sm:tracking-[0.1em] md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 ${
                   isActive ? "text-foreground" : "text-foreground/30 hover:text-foreground/50"
                 }`}
               >
@@ -127,7 +128,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                 <span className="relative z-10">{tab.label}</span>
                 {tab.id !== "overview" && (
                   <span
-                    className={`relative z-10 rounded-full px-1.5 py-0.5 text-[8px] font-black tabular-nums transition-colors duration-200 md:text-[9px] ${
+                    className={`relative z-10 rounded-full px-1.5 py-0.5 text-[10px] font-black tabular-nums transition-colors duration-200 sm:text-[11px] ${
                       isActive ? "bg-accent/15 text-accent" : "bg-foreground/5 text-foreground/25"
                     }`}
                   >
@@ -158,7 +159,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
               <div className="border-line mt-6 flex flex-wrap items-center gap-2 border-t pt-5">
                 <div className="bg-accent h-1.5 w-1.5 animate-pulse rounded-full" />
                 <span className="source-chip">AI synthesis</span>
-                <span className="text-muted text-[10px] font-semibold tracking-[0.16em] uppercase">
+                <span className="text-muted text-[11px] font-semibold tracking-[0.16em] uppercase">
                   Google Gemini / checked against public city context
                 </span>
               </div>
@@ -196,14 +197,14 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                       <h3 className="text-foreground/90 text-base leading-tight font-black tracking-tight">
                         {a.name}
                       </h3>
-                      <span className="badge-featured mt-1 inline-block rounded-md px-2 py-0.5 text-[9px]">
+                      <span className="badge-featured mt-1 inline-block rounded-md px-2 py-0.5 text-[11px]">
                         Must Visit
                       </span>
                     </div>
                   </div>
 
                   <div className="border-line bg-background/50 rounded-xl border p-3.5">
-                    <div className="text-accent mb-2 flex items-center gap-1.5 text-[9px] font-black tracking-[0.2em] uppercase">
+                    <div className="text-accent mb-2 flex items-center gap-1.5 text-[11px] font-black tracking-[0.2em] uppercase">
                       <Compass className="h-3 w-3" />
                       Why visit
                     </div>
@@ -251,14 +252,14 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                           <h3 className="text-foreground/90 text-base leading-tight font-black tracking-tight">
                             {s.name}
                           </h3>
-                          <span className="text-foreground/35 text-[10px] font-bold tracking-widest uppercase">
+                          <span className="text-foreground/35 text-[11px] font-bold tracking-widest uppercase">
                             {s.months}
                           </span>
                         </div>
                       </div>
                       <div className="border-line bg-background/65 flex items-center gap-1.5 rounded-full border px-3 py-1.5">
                         <ThermometerSun className={`h-3.5 w-3.5 ${sc.pill}`} />
-                        <span className={`text-[10px] font-black tracking-wider ${sc.pill}`}>
+                        <span className={`text-[11px] font-black tracking-wider ${sc.pill}`}>
                           {s.tempC}
                         </span>
                       </div>
@@ -270,7 +271,7 @@ export default function AIBriefingClient({ insight }: AIBriefingClientProps) {
                     {/* Weather Notes */}
                     {s.weatherNotes && (
                       <div className="border-line bg-background/45 rounded-xl border p-3.5">
-                        <div className="text-muted mb-1.5 flex items-center gap-1.5 text-[9px] font-black tracking-[0.2em] uppercase">
+                        <div className="text-muted mb-1.5 flex items-center gap-1.5 text-[11px] font-black tracking-[0.2em] uppercase">
                           <ThermometerSun className="h-3 w-3" />
                           Weather Note
                         </div>

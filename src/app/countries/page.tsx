@@ -80,7 +80,7 @@ export default async function CountriesIndexPage() {
                   className="border-line bg-surface/65 hover:bg-surface text-foreground flex items-center justify-between gap-4 rounded-[1rem] border px-4 py-3 transition-colors duration-200"
                 >
                   <span className="truncate text-sm font-semibold">{country.country}</span>
-                  <span className="text-muted text-[10px] font-semibold tracking-[0.18em] uppercase">
+                  <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
                     {country.cityCount} {country.cityCount === 1 ? "city" : "cities"}
                   </span>
                 </Link>

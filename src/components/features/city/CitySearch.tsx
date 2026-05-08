@@ -187,10 +187,14 @@ function CitySearch({ topCities }: CitySearchProps) {
       } else if (e.key === "Enter") {
         const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
         if (selectedCity) {
+          addRecentCity(selectedCity);
           router.push(cityHref(selectedCity));
         } else if (searchResults.length > 0) {
           const firstCity = searchResults.at(0);
-          if (firstCity) router.push(cityHref(firstCity));
+          if (firstCity) {
+            addRecentCity(firstCity);
+            router.push(cityHref(firstCity));
+          }
         }
       } else if (e.key === "Escape") {
         setSearchQuery("");
@@ -198,7 +202,7 @@ function CitySearch({ topCities }: CitySearchProps) {
         setActiveIndex(-1);
       }
     },
-    [activeIndex, router, searchResults]
+    [activeIndex, addRecentCity, router, searchResults]
   );
 
   const handleLocate = useCallback(() => {
@@ -248,7 +252,6 @@ function CitySearch({ topCities }: CitySearchProps) {
       </label>
 
       <motion.div
-        layout
         transition={{ duration: shouldReduceMotion ? 0 : 0.38, ease: transitionEase }}
         className="search-shell group relative"
       >
@@ -431,7 +434,6 @@ function CitySearch({ topCities }: CitySearchProps) {
         {shouldShowResults && (
           <motion.div
             key="results"
-            layout
             initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
             animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
@@ -441,7 +443,7 @@ function CitySearch({ topCities }: CitySearchProps) {
               maxHeight: isVirtualKeyboardOpen ? DROPDOWN_MAX_HEIGHT : "none",
             }}
           >
-            <motion.div layout className="flex gap-2 px-1 sm:px-2">
+            <motion.div className="flex gap-2 px-1 sm:px-2">
               {[
                 { id: "megacity", label: "Megacities" },
                 { id: "capital", label: "Capitals" },
@@ -449,7 +451,6 @@ function CitySearch({ topCities }: CitySearchProps) {
                 <motion.button
                   key={filter.id}
                   type="button"
-                  layout
                   onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
                   whileHover={shouldReduceMotion ? undefined : { y: -1.5 }}
                   whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
@@ -465,7 +466,6 @@ function CitySearch({ topCities }: CitySearchProps) {
               ))}
             </motion.div>
             <motion.ul
-              layout
               id={resultsListId}
               role="listbox"
               aria-label="City search results"

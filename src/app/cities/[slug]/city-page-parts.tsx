@@ -35,7 +35,7 @@ export function MetricCard({
         {typeof value === "number" ? value.toLocaleString() : value}
       </span>
       {unit && (
-        <span className="text-foreground/45 text-[10px] font-semibold tracking-[0.15em] uppercase">
+        <span className="text-foreground/45 text-[11px] font-semibold tracking-[0.15em] uppercase">
           {unit}
         </span>
       )}
@@ -51,7 +51,7 @@ export function MetricCard({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <div className="text-muted text-[10px] font-semibold tracking-[0.15em] uppercase">
+              <div className="text-muted text-[11px] font-semibold tracking-[0.15em] uppercase">
                 {label}
               </div>
             </div>
@@ -60,10 +60,10 @@ export function MetricCard({
         </div>
       </div>
       <div className="border-line flex items-center justify-between border-t pt-3">
-        <div className="text-muted text-[9px] font-semibold tracking-[0.15em] uppercase">
+        <div className="text-muted text-[11px] font-semibold tracking-[0.15em] uppercase">
           Data Source
         </div>
-        <div className="text-muted-strong max-w-[120px] text-right text-[9px] leading-relaxed font-semibold tracking-[0.1em] uppercase">
+        <div className="text-muted-strong max-w-[120px] text-right text-[11px] leading-relaxed font-semibold tracking-[0.1em] uppercase">
           {isEmpty ? "Pending Discovery" : source || "Live Satellite"}
         </div>
       </div>

@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
       try {
         for await (const piece of aiStart.stream) {
           accumulated += piece;
-          controller.enqueue(encoder.encode(sse({ type: "chunk", text: accumulated })));
+          controller.enqueue(encoder.encode(sse({ type: "chunk", text: piece })));
         }
       } catch (err) {
         log.warn("stream_aborted", {

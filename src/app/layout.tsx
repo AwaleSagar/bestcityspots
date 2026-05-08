@@ -143,57 +143,58 @@ export const metadata: Metadata = {
     : undefined,
 };
 
-const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": `${siteUrl}/#organization`,
-    name: "Best City Spots",
-    legalName: "Best City Spots",
-    url: siteUrl,
-    logo: {
-      "@type": "ImageObject",
-      url: `${siteUrl}/opengraph-image`,
-      width: 1200,
-      height: 630,
-    },
-    description:
-      "Best City Spots provides curated city experiences for modern explorers—discover hidden gems, plan smarter trips, and explore with confidence.",
-    ...(sameAs ? { sameAs } : {}),
-    ...(contactEmail
-      ? {
-          contactPoint: {
-            "@type": "ContactPoint",
-            contactType: "customer support",
-            email: contactEmail,
-            availableLanguage: ["English"],
-          },
-        }
-      : {}),
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": `${siteUrl}/#website`,
-    name: "Best City Spots",
-    url: siteUrl,
-    description:
-      "Discover hidden gems, plan smarter trips, and explore the world's most vibrant cities with curated guides and AI-powered insights.",
-    publisher: { "@id": `${siteUrl}/#organization` },
-    inLanguage: "en-US",
-    // SEO audit 5.5: SearchAction unlocks sitelinks-search-box eligibility
-    // on the SERP. The target URL points at the on-site search results page,
-    // wrapped in the EntryPoint schema Google requires.
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/?q={search_term_string}`,
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      name: "Best City Spots",
+      legalName: "Best City Spots",
+      url: siteUrl,
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/opengraph-image`,
+        width: 1200,
+        height: 630,
       },
-      "query-input": "required name=search_term_string",
+      description:
+        "Best City Spots provides curated city experiences for modern explorers—discover hidden gems, plan smarter trips, and explore with confidence.",
+      ...(sameAs ? { sameAs } : {}),
+      ...(contactEmail
+        ? {
+            contactPoint: {
+              "@type": "ContactPoint",
+              contactType: "customer support",
+              email: contactEmail,
+              availableLanguage: ["English"],
+            },
+          }
+        : {}),
     },
-  },
-];
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}/#website`,
+      name: "Best City Spots",
+      url: siteUrl,
+      description:
+        "Discover hidden gems, plan smarter trips, and explore the world's most vibrant cities with curated guides and AI-powered insights.",
+      publisher: { "@id": `${siteUrl}/#organization` },
+      inLanguage: "en-US",
+      // SEO audit 5.5: SearchAction unlocks sitelinks-search-box eligibility
+      // on the SERP. The target URL points at the on-site search results page,
+      // wrapped in the EntryPoint schema Google requires.
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${siteUrl}/?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
 
 export default function RootLayout({
   children,
@@ -201,18 +202,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={`${instrumentSans.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} min-h-screen antialiased`}
       >
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd[0]) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd[1]) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

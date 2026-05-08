@@ -39,7 +39,12 @@ export default function TopicalHubLayout({
         className="container-gutter mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20"
         style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
       >
-        <Breadcrumbs items={[{ label: breadcrumbLabel }]} />
+        <Breadcrumbs
+          items={[
+            { label: "Cities", href: "/cities" },
+            { label: breadcrumbLabel },
+          ]}
+        />
 
         <span className="eyebrow">
           {eyebrowIcon}

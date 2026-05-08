@@ -41,7 +41,7 @@ export default function CityVitals({ data }: CityVitalsProps) {
   return (
     <div className="atlas-panel rounded-[1.4rem] p-5 shadow-xl sm:rounded-[1.7rem] sm:p-6 md:rounded-[2rem]">
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-muted text-[10px] font-black tracking-[0.2em] uppercase">
+        <h3 className="text-muted text-[11px] font-black tracking-[0.2em] uppercase">
           Live City Vitals
         </h3>
         <span className="text-muted text-xs font-bold uppercase">
@@ -60,7 +60,7 @@ export default function CityVitals({ data }: CityVitalsProps) {
           <div className={`text-3xl font-black tracking-tighter ${getTempColor(data.temp)}`}>
             {Math.round(data.temp)}°<span className="text-muted text-lg">C</span>
           </div>
-          <p className="text-muted text-[10px] font-medium italic">
+          <p className="text-muted text-[11px] font-medium italic">
             Feels like {Math.round(data.feels_like)}°
           </p>
         </div>
@@ -72,11 +72,11 @@ export default function CityVitals({ data }: CityVitalsProps) {
             <span className="text-[11px] font-bold tracking-wider uppercase">Air Quality</span>
           </div>
           <div
-            className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase ${getAqiColor(data.aqi)}`}
+            className={`inline-flex rounded-full border px-3 py-1 text-[11px] font-black tracking-widest uppercase ${getAqiColor(data.aqi)}`}
           >
             {data.aqi_label}
           </div>
-          <p className="text-muted text-[10px] font-medium opacity-75">Index: {data.aqi}/5</p>
+          <p className="text-muted text-[11px] font-medium opacity-75">Index: {data.aqi}/5</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export default function CityVitals({ data }: CityVitalsProps) {
           <div>
             <span className="text-muted block text-[11px] font-black uppercase">Wind</span>
             <span className="text-xs font-bold">
-              {Math.round(data.wind_speed)} <span className="text-[10px] opacity-60">km/h</span>
+              {Math.round(data.wind_speed)} <span className="text-[11px] opacity-60">km/h</span>
             </span>
           </div>
         </div>

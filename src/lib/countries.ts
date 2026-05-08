@@ -16,7 +16,7 @@ import type { City } from "./cities";
 
 const COUNTRY_PAGE_LIMIT = 200;
 
-function slugifyCountry(country: string): string {
+export function slugifyCountry(country: string): string {
   return country
     .toLowerCase()
     .normalize("NFKD")

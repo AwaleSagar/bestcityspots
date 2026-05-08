@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { City } from "@/lib/cities";
 import { cityHref } from "@/lib/cities";
-import { getRelatedCities } from "@/lib/countries";
+import { getRelatedCities, slugifyCountry } from "@/lib/countries";
 import { formatPopulation } from "@/lib/format";
 
 interface CityRelatedSectionProps {
@@ -37,7 +37,7 @@ async function RelatedContent({ city }: { city: City }) {
                 </span>
               </span>
               <span className="flex shrink-0 items-center gap-2">
-                <span className="text-muted text-[10px] font-semibold tracking-[0.18em] uppercase">
+                <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
                   {formatPopulation(c.population)}
                 </span>
                 <ArrowUpRight
@@ -51,7 +51,7 @@ async function RelatedContent({ city }: { city: City }) {
       </ul>
       <p className="text-muted text-xs">
         <Link
-          href={`/countries/${city.country.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+          href={`/countries/${slugifyCountry(city.country)}`}
           className="text-accent hover:underline"
         >
           See all cities in {city.country} →

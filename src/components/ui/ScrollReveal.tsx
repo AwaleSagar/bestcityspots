@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useRef } from "react";
+import { Children, ReactNode, useRef } from "react";
 import { motion, useInView, useReducedMotion, Variants, HTMLMotionProps } from "framer-motion";
 
 type AnimationType =
@@ -149,13 +149,11 @@ export function StaggerContainer({
       className={className}
     >
       {/* Clone children and add variants */}
-      {Array.isArray(children)
-        ? children.map((child, index) => (
-            <motion.div key={index} variants={itemVariants}>
-              {child}
-            </motion.div>
-          ))
-        : children}
+      {Children.map(children, (child, index) => (
+        <motion.div key={index} variants={itemVariants}>
+          {child}
+        </motion.div>
+      ))}
     </motion.div>
   );
 }

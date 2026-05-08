@@ -84,7 +84,6 @@
   --space-fluid-panel: clamp(1.25rem, 2.5vw, 2.5rem);
   --radius-organic: 38% 62% 48% 52% / 56% 42% 58% 44%;
   --radius-organic-inverse: 62% 38% 54% 46% / 44% 58% 42% 56%;
-  --pattern-terrain: color-mix(in oklab, var(--foreground) 5%, transparent);
   --pattern-botanical: color-mix(in oklab, var(--color-leaf) 13%, transparent);
 }
 
@@ -132,7 +131,6 @@
   --shadow-glow: 0 8px 32px rgba(231, 150, 101, 0.15);
 
   --color-selection-text: oklch(0.97 0.015 78);
-  --pattern-terrain: color-mix(in oklab, var(--foreground) 7%, transparent);
   --pattern-botanical: color-mix(in oklab, var(--color-leaf) 16%, transparent);
 }
 
@@ -192,9 +190,9 @@ html {
     text-wrap: pretty;
   }
 
-  a:not([class*="button"]):not([class*="btn"]):not([class*="card"]):not([class*="link"]):not(
-      [class*="nav"]
-    ) {
+  .text-link,
+  article :where(a),
+  .prose :where(a) {
     color: var(--color-accent-strong);
     text-decoration: underline;
     text-decoration-thickness: 1px;
@@ -328,10 +326,9 @@ html {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 12% 18%, var(--color-leaf-soft), transparent 28%),
-    radial-gradient(circle at 92% 12%, var(--color-water-soft), transparent 30%),
-    repeating-linear-gradient(115deg, transparent 0 18px, var(--pattern-terrain) 18px 19px);
-  opacity: 0.46;
+    radial-gradient(circle at 14% 20%, var(--color-leaf-soft), transparent 34%),
+    radial-gradient(circle at 88% 16%, var(--color-water-soft), transparent 36%);
+  opacity: 0.22;
 }
 
 .organic-panel > *:not(.absolute) {
@@ -366,14 +363,7 @@ html {
   background: var(--color-surface);
   transition:
     border-color 0.22s var(--transition-organic),
-    transform 0.22s var(--transition-organic),
-    box-shadow 0.22s var(--transition-organic);
-}
-
-.intent-card:hover {
-  border-color: color-mix(in oklab, var(--color-accent) 18%, var(--color-line));
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+    transform 0.22s var(--transition-organic);
 }
 
 .source-chip {
@@ -390,13 +380,6 @@ html {
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-
-.terrain-lines {
-  background-image:
-    radial-gradient(ellipse at 20% 20%, var(--color-leaf-soft), transparent 36%),
-    radial-gradient(ellipse at 80% 70%, var(--color-water-soft), transparent 34%),
-    repeating-linear-gradient(135deg, transparent 0 16px, var(--pattern-terrain) 16px 17px);
 }
 
 @container (min-width: 28rem) {
@@ -530,7 +513,7 @@ html {
     background 0.2s ease,
     color 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.2s ease;
 }
 
 .btn-primary {
@@ -539,20 +522,10 @@ html {
   color: var(--color-accent-contrast);
 }
 
-.btn-primary:hover {
-  background: var(--color-accent-strong);
-  box-shadow: var(--shadow-md);
-}
-
 .btn-secondary {
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   color: var(--foreground);
-}
-
-.btn-secondary:hover {
-  border-color: color-mix(in oklab, var(--color-accent) 20%, var(--color-line));
-  background: var(--color-surface-strong);
 }
 
 /* ─── Navigation ─── */
@@ -584,13 +557,8 @@ html {
 
 .interactive-card {
   transition:
-    box-shadow 0.2s ease,
+    transform 0.2s ease,
     border-color 0.2s ease;
-}
-
-.interactive-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: color-mix(in oklab, var(--color-accent) 12%, var(--color-line));
 }
 
 .search-shell {
@@ -624,6 +592,12 @@ html {
   }
 }
 
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 5s ease-in-out infinite;
 }
@@ -636,7 +610,7 @@ html {
     scroll-behavior: auto;
   }
 
-  :where(*, *::before, *::after) {
+  body :where(*, *::before, *::after) {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
@@ -649,6 +623,30 @@ html {
 
   .intent-card:hover {
     transform: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .intent-card:hover {
+    border-color: color-mix(in oklab, var(--color-accent) 18%, var(--color-line));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-strong);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary:hover {
+    border-color: color-mix(in oklab, var(--color-accent) 20%, var(--color-line));
+    background: var(--color-surface-strong);
+  }
+
+  .interactive-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: color-mix(in oklab, var(--color-accent) 12%, var(--color-line));
   }
 }
 

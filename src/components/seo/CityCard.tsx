@@ -34,7 +34,7 @@ export default function CityCard({ city, context }: CityCardProps) {
         ) : null}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
-        <span className="text-muted text-[10px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
           {formatPopulation(city.population)}
         </span>
         <ArrowUpRight

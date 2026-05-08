@@ -110,6 +110,7 @@ function useInsightStream(cityId: number, initialInsight: CityInsight | null) {
         const reader = res.body.getReader();
         const decoder = new TextDecoder();
         let buffer = "";
+        let streamedText = "";
 
         while (!cancelled) {
           const { value, done } = await reader.read();
@@ -136,7 +137,8 @@ function useInsightStream(cityId: number, initialInsight: CityInsight | null) {
             if (evt.type === "stale") {
               setInsight(evt.insight);
             } else if (evt.type === "chunk") {
-              const partial = parsePartialJson<PartialInsight>(evt.text);
+              streamedText += evt.text;
+              const partial = parsePartialJson<PartialInsight>(streamedText);
               const coerced = coerceToInsight(partial);
               // Only commit a chunk update when it actually adds content,
               // otherwise we risk flickering an empty render in front of a
@@ -184,7 +186,7 @@ function StreamingHeaderBadge() {
     <motion.span
       initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
       animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1 }}
-      className="text-accent/80 inline-flex items-center gap-1.5 text-[10px] font-black tracking-[0.2em] uppercase"
+      className="text-accent/80 inline-flex items-center gap-1.5 text-[11px] font-black tracking-[0.2em] uppercase"
     >
       <span className="bg-accent h-1.5 w-1.5 animate-pulse rounded-full" aria-hidden />
       Live
@@ -220,12 +222,12 @@ export default function AIBriefingStreamClient({
   if (!insight) return <AIBriefingSkeleton />;
 
   return (
-    <div className="relative">
-      {streaming && (
-        <div className="pointer-events-none absolute -top-1 right-0 z-10">
+    <div>
+      {streaming ? (
+        <div className="mb-2 flex justify-end">
           <StreamingHeaderBadge />
         </div>
-      )}
+      ) : null}
       <AIBriefingClient insight={insight} />
     </div>
   );

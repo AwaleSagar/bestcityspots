@@ -21,6 +21,7 @@ export default function ScrollProgress({
   const { scrollYProgress } = useScroll();
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (!showPercentage) return;
     setProgressValue(Math.round(latest * 100));
   });
 

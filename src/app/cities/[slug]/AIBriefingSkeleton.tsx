@@ -8,7 +8,7 @@ export default function AIBriefingSkeleton() {
         <h2 className="labelled-rule">
           <Sparkles className="text-accent h-4 w-4 animate-pulse" />
           <span className="animate-pulse">AI City Briefing</span>
-          <span className="text-accent/70 animate-pulse text-[10px] font-black tracking-[0.2em] uppercase">
+          <span className="text-accent/70 animate-pulse text-[11px] font-black tracking-[0.2em] uppercase">
             Generating...
           </span>
         </h2>
@@ -26,7 +26,7 @@ export default function AIBriefingSkeleton() {
           return (
             <div
               key={idx}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[10px] font-black tracking-[0.1em] uppercase md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 md:text-[11px] ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-[11px] font-black tracking-[0.1em] uppercase md:gap-2.5 md:rounded-2xl md:px-5 md:py-3 ${
                 idx === 0
                   ? "border-accent/20 bg-accent-soft text-foreground border"
                   : "text-foreground/30"

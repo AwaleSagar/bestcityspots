@@ -25,7 +25,10 @@ export const toNoteMap = (notes: CityNotes) => {
   const map = new Map<string, string>();
   Object.entries(notes).forEach(([key, value]) => {
     if (typeof value === "string") {
-      map.set(sanitizeKey(key), value);
+      // Keys in `CityNotes` are already sanitized on write and when read back
+      // from storage. Re-sanitizing here causes destructive prefix stacking
+      // (e.g. `k_...` -> `k_k_...`) and will make notes appear to “reset”.
+      map.set(key, value);
     }
   });
   return map;

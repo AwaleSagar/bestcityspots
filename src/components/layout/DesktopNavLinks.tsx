@@ -8,7 +8,7 @@ export default function DesktopNavLinks() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden items-center gap-1 sm:flex" aria-label="Main navigation">
+    <nav className="hidden items-center gap-1 md:flex" aria-label="Main navigation">
       {primaryNavItems.map(({ href, label }) => {
         const isActive = isActiveNavPath(pathname, href);
 
