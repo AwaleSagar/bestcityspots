@@ -15,6 +15,23 @@ export default function robots(): MetadataRoute.Robots {
         // crawl budget so search engines focus on indexable HTML pages.
         disallow: ["/api/"],
       },
+      // Cost guard: block high-volume AI/data crawlers from indexing the site.
+      // Well-behaved bots honor robots.txt and this can materially reduce
+      // crawler-triggered SSR/database load.
+      { userAgent: "GPTBot", disallow: ["/"] },
+      { userAgent: "ChatGPT-User", disallow: ["/"] },
+      { userAgent: "CCBot", disallow: ["/"] },
+      { userAgent: "anthropic-ai", disallow: ["/"] },
+      { userAgent: "ClaudeBot", disallow: ["/"] },
+      { userAgent: "Bytespider", disallow: ["/"] },
+      { userAgent: "PerplexityBot", disallow: ["/"] },
+      { userAgent: "Amazonbot", disallow: ["/"] },
+      { userAgent: "Diffbot", disallow: ["/"] },
+      { userAgent: "PetalBot", disallow: ["/"] },
+      { userAgent: "SemrushBot", disallow: ["/"] },
+      { userAgent: "AhrefsBot", disallow: ["/"] },
+      { userAgent: "MJ12bot", disallow: ["/"] },
+      { userAgent: "DotBot", disallow: ["/"] },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
     host: siteUrl,

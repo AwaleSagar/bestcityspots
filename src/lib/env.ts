@@ -32,6 +32,10 @@ const serverSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
   GOOGLE_PLACES_API_KEY: z.string().min(10).optional(),
   GOOGLE_GEMINI_API_KEY: z.string().min(10).optional(),
+  GOOGLE_PLACES_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
+  GOOGLE_GEMINI_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
+  GOOGLE_PLACES_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
+  GOOGLE_GEMINI_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
   OPENWEATHERMAP_API_KEY: z.string().min(10).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).optional(),
@@ -82,6 +86,10 @@ export function serverEnv(): ServerEnv {
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
     GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
+    GOOGLE_PLACES_LIVE_FETCH_ENABLED: process.env.GOOGLE_PLACES_LIVE_FETCH_ENABLED,
+    GOOGLE_GEMINI_LIVE_FETCH_ENABLED: process.env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED,
+    GOOGLE_PLACES_DAILY_CALL_LIMIT: process.env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
+    GOOGLE_GEMINI_DAILY_CALL_LIMIT: process.env.GOOGLE_GEMINI_DAILY_CALL_LIMIT,
     OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
     NODE_ENV: process.env.NODE_ENV,
     LOG_LEVEL: process.env.LOG_LEVEL,
@@ -97,8 +105,63 @@ export function serverEnv(): ServerEnv {
   return serverCache;
 }
 
+function readPublicEnvValue(key: keyof PublicEnv): PublicEnv[keyof PublicEnv] {
+  const env = publicEnv();
+  switch (key) {
+    case "NEXT_PUBLIC_SUPABASE_URL":
+      return env.NEXT_PUBLIC_SUPABASE_URL;
+    case "NEXT_PUBLIC_SUPABASE_ANON_KEY":
+      return env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    case "NEXT_PUBLIC_SITE_URL":
+      return env.NEXT_PUBLIC_SITE_URL;
+    case "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION":
+      return env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+    case "NEXT_PUBLIC_ANALYTICS_DEV":
+      return env.NEXT_PUBLIC_ANALYTICS_DEV;
+    case "NEXT_PUBLIC_ORGANIZATION_SAME_AS":
+      return env.NEXT_PUBLIC_ORGANIZATION_SAME_AS;
+    case "NEXT_PUBLIC_CONTACT_EMAIL":
+      return env.NEXT_PUBLIC_CONTACT_EMAIL;
+    case "NODE_ENV":
+      return env.NODE_ENV;
+  }
+}
+
+function readServerEnvValue(key: keyof ServerEnv): ServerEnv[keyof ServerEnv] {
+  const env = serverEnv();
+  switch (key) {
+    case "SUPABASE_SERVICE_ROLE_KEY":
+      return env.SUPABASE_SERVICE_ROLE_KEY;
+    case "GOOGLE_PLACES_API_KEY":
+      return env.GOOGLE_PLACES_API_KEY;
+    case "GOOGLE_GEMINI_API_KEY":
+      return env.GOOGLE_GEMINI_API_KEY;
+    case "GOOGLE_PLACES_LIVE_FETCH_ENABLED":
+      return env.GOOGLE_PLACES_LIVE_FETCH_ENABLED;
+    case "GOOGLE_GEMINI_LIVE_FETCH_ENABLED":
+      return env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED;
+    case "GOOGLE_PLACES_DAILY_CALL_LIMIT":
+      return env.GOOGLE_PLACES_DAILY_CALL_LIMIT;
+    case "GOOGLE_GEMINI_DAILY_CALL_LIMIT":
+      return env.GOOGLE_GEMINI_DAILY_CALL_LIMIT;
+    case "OPENWEATHERMAP_API_KEY":
+      return env.OPENWEATHERMAP_API_KEY;
+    case "LOG_LEVEL":
+      return env.LOG_LEVEL;
+    case "NEXT_PUBLIC_SUPABASE_URL":
+    case "NEXT_PUBLIC_SUPABASE_ANON_KEY":
+    case "NEXT_PUBLIC_SITE_URL":
+    case "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION":
+    case "NEXT_PUBLIC_ANALYTICS_DEV":
+    case "NEXT_PUBLIC_ORGANIZATION_SAME_AS":
+    case "NEXT_PUBLIC_CONTACT_EMAIL":
+    case "NODE_ENV":
+      return readPublicEnvValue(key);
+  }
+}
+
 export function requirePublicEnv<K extends keyof PublicEnv>(key: K): NonNullable<PublicEnv[K]> {
-  const value = publicEnv()[key];
+  const value = readPublicEnvValue(key) as PublicEnv[K];
   if (value === undefined || value === null || value === "") {
     throw new Error(`[env] Missing required public env var: ${key}`);
   }
@@ -106,7 +169,7 @@ export function requirePublicEnv<K extends keyof PublicEnv>(key: K): NonNullable
 }
 
 export function requireServerEnv<K extends keyof ServerEnv>(key: K): NonNullable<ServerEnv[K]> {
-  const value = serverEnv()[key];
+  const value = readServerEnvValue(key) as ServerEnv[K];
   if (value === undefined || value === null || value === "") {
     throw new Error(`[env] Missing required server env var: ${key}`);
   }

@@ -11,6 +11,7 @@ import {
 import { generateTextStream, sanitizeJsonResponse } from "@/lib/providers/gemini";
 import { cityIdSchema } from "@/lib/validation";
 import { createLogger } from "@/lib/logger";
+import { isPaidProviderEnabled } from "@/lib/cost-guard";
 
 const log = createLogger({ component: "api/cities/insight" });
 
@@ -57,6 +58,27 @@ export async function GET(req: NextRequest) {
       start(controller) {
         const encoder = new TextEncoder();
         controller.enqueue(encoder.encode(sse({ type: "complete", insight: cacheRead.insight! })));
+        controller.close();
+      },
+    });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+      },
+    });
+  }
+
+  if (!isPaidProviderEnabled("gemini")) {
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        const encoder = new TextEncoder();
+        if (cacheRead.insight) {
+          controller.enqueue(encoder.encode(sse({ type: "complete", insight: cacheRead.insight })));
+        } else {
+          controller.enqueue(encoder.encode(sse({ type: "error", reason: "ai_disabled" })));
+        }
         controller.close();
       },
     });

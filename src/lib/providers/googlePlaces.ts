@@ -14,6 +14,7 @@
 import { httpFetch, CircuitOpenError } from "../http";
 import { createLogger, newCorrelationId } from "../logger";
 import { serverEnv } from "../env";
+import { tryClaimPaidProviderUse } from "../cost-guard";
 
 const log = createLogger({ component: "provider/googlePlaces" });
 const API_BASE = "https://places.googleapis.com/v1";
@@ -29,6 +30,17 @@ const FIELD_MASKS: Record<FieldMaskTier, string> = {
   enrichment:
     "places.id,places.displayName,places.formattedAddress,places.location,places.types,places.rating,places.userRatingCount,places.priceLevel,places.googleMapsUri,places.photos,places.websiteUri,places.editorialSummary",
 };
+
+function getFieldMask(tier: FieldMaskTier): string {
+  switch (tier) {
+    case "minimal":
+      return FIELD_MASKS.minimal;
+    case "standard":
+      return FIELD_MASKS.standard;
+    case "enrichment":
+      return FIELD_MASKS.enrichment;
+  }
+}
 
 export interface GooglePlacePhoto {
   name: string;
@@ -131,7 +143,14 @@ export async function searchText(params: SearchTextParams): Promise<PlacesResult
     };
   }
 
-  return runPlacesRequest(`${API_BASE}/places:searchText`, body, tier, apiKey, correlationId, params.signal);
+  return runPlacesRequest(
+    `${API_BASE}/places:searchText`,
+    body,
+    tier,
+    apiKey,
+    correlationId,
+    params.signal
+  );
 }
 
 export async function searchNearby(params: SearchNearbyParams): Promise<PlacesResult> {
@@ -156,7 +175,14 @@ export async function searchNearby(params: SearchNearbyParams): Promise<PlacesRe
   if (params.languageCode) body.languageCode = params.languageCode;
   if (params.regionCode) body.regionCode = params.regionCode;
 
-  return runPlacesRequest(`${API_BASE}/places:searchNearby`, body, tier, apiKey, correlationId, params.signal);
+  return runPlacesRequest(
+    `${API_BASE}/places:searchNearby`,
+    body,
+    tier,
+    apiKey,
+    correlationId,
+    params.signal
+  );
 }
 
 async function runPlacesRequest(
@@ -167,6 +193,15 @@ async function runPlacesRequest(
   correlationId: string,
   signal?: AbortSignal
 ): Promise<PlacesResult> {
+  if (
+    !tryClaimPaidProviderUse(
+      PROVIDER,
+      body.textQuery ? `search:${String(body.textQuery).slice(0, 80)}` : "search"
+    )
+  ) {
+    return { ok: false, reason: "quota" };
+  }
+
   try {
     const response = await httpFetch(url, {
       provider: PROVIDER,
@@ -178,7 +213,7 @@ async function runPlacesRequest(
       headers: {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": FIELD_MASKS[tier],
+        "X-Goog-FieldMask": getFieldMask(tier),
       },
       signal,
       body: JSON.stringify(body),
@@ -229,6 +264,7 @@ export async function fetchPhotoBytes(
 ): Promise<ArrayBuffer | null> {
   const apiKey = getApiKey();
   if (!apiKey) return null;
+  if (!tryClaimPaidProviderUse(PROVIDER, `photo:${photoName}`)) return null;
   const url = `${API_BASE}/${photoName}/media?maxWidthPx=${opts.maxWidth}&maxHeightPx=${opts.maxHeight}&key=${encodeURIComponent(apiKey)}`;
   try {
     const res = await httpFetch(url, {

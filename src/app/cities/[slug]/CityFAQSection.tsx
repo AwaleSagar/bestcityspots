@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { City } from "@/lib/cities";
-import { getCityInsight } from "@/lib/intelligence";
+import { readCachedCityInsight } from "@/lib/intelligence";
 import { getCityMetrics } from "@/lib/metrics";
 
 interface CityFAQSectionProps {
@@ -67,7 +67,9 @@ function buildFaqs(city: City, intro: string | null, comfort: string | null): FA
 
 async function FAQContent({ city }: { city: City }) {
   const [insight, metrics] = await Promise.all([
-    getCityInsight(city).catch(() => null),
+    readCachedCityInsight(city.id)
+      .then((read) => read.insight)
+      .catch(() => null),
     getCityMetrics(city).catch(() => null),
   ]);
 
@@ -110,15 +112,12 @@ async function FAQContent({ city }: { city: City }) {
           Travelers frequently ask
         </h2>
         <p id="city-faq-summary" className="text-muted-strong text-sm leading-relaxed">
-          Quick answers about visiting {city.city}, {city.country}, drawn from cached
-          briefings and live conditions.
+          Quick answers about visiting {city.city}, {city.country}, drawn from cached briefings and
+          live conditions.
         </p>
         <dl className="space-y-3">
           {faqs.map((f) => (
-            <div
-              key={f.q}
-              className="border-line bg-surface/65 rounded-[1.1rem] border p-4 sm:p-5"
-            >
+            <div key={f.q} className="border-line bg-surface/65 rounded-[1.1rem] border p-4 sm:p-5">
               <dt className="text-foreground text-sm font-semibold sm:text-base">{f.q}</dt>
               <dd className="text-muted mt-2 text-sm leading-relaxed">{f.a}</dd>
             </div>

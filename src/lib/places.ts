@@ -13,6 +13,7 @@ import {
   sortPlaces,
 } from "./place-search-utils";
 import { fetchPhotoBytes, searchText, type GooglePlaceNative } from "./providers/googlePlaces";
+import { isPaidProviderEnabled } from "./cost-guard";
 
 const API_KEY = serverEnv().GOOGLE_PLACES_API_KEY;
 if (!API_KEY) {
@@ -86,6 +87,7 @@ type TopPlacesOptions = {
   lng?: number;
   radiusKm?: number;
   signal?: AbortSignal;
+  allowProviderFetch?: boolean;
   _bypassCache?: boolean;
 };
 
@@ -553,7 +555,9 @@ async function resolvePlaceImage(
     // Check if image already exists in storage
     const headRes = await fetch(publicUrl, {
       method: "HEAD",
-      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(5_000)]) : AbortSignal.timeout(5_000),
+      signal: signal
+        ? AbortSignal.any([signal, AbortSignal.timeout(5_000)])
+        : AbortSignal.timeout(5_000),
     });
     if (headRes.ok) {
       // Image exists, but we may need to generate blurhash if not cached
@@ -562,7 +566,9 @@ async function resolvePlaceImage(
       }
       // Fetch image to generate blurhash for existing cached images
       const existingImageRes = await fetch(publicUrl, {
-        signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(10_000)]) : AbortSignal.timeout(10_000),
+        signal: signal
+          ? AbortSignal.any([signal, AbortSignal.timeout(10_000)])
+          : AbortSignal.timeout(10_000),
       });
       if (existingImageRes.ok) {
         const existingBuffer = await existingImageRes.arrayBuffer();
@@ -620,7 +626,7 @@ async function fetchFromGoogle(
         typeof opts.effectiveRadiusKm === "number"
           ? { lat: opts.lat, lng: opts.lng, radiusKm: opts.effectiveRadiusKm }
           : undefined,
-          signal: opts?.signal,
+      signal: opts?.signal,
     });
 
     if (!result.ok) {
@@ -647,6 +653,9 @@ async function refreshPlacesInBackground(
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<void> {
+  if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
+    return;
+  }
   try {
     await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
   } catch (e) {
@@ -683,20 +692,20 @@ export async function getTopPlaces(
       const updatedAt = new Date(cache.updated_at);
       const now = new Date();
       const daysSinceUpdate = (now.getTime() - updatedAt.getTime()) / (1000 * 60 * 60 * 24);
+      const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
+      const cachedPlacesRaw = (cache.places_data || []) as Landmark[];
+      const normalizedResults = supabaseUrl
+        ? cachedPlacesRaw.map((place) => normalizeCachedPlace(place, supabaseUrl))
+        : cachedPlacesRaw.map((place) => ({ place, changed: false }));
+      const cachedPlaces = normalizedResults.map((result) => result.place);
+      const normalizedChanged = normalizedResults.some((result) => result.changed);
+
+      if (normalizedChanged) {
+        void savePlacesCache(cityName, type, cachedPlaces, cache.updated_at);
+      }
 
       if (daysSinceUpdate < CACHE_TTL.PLACES_FRESH_DAYS) {
         recordPlacesCacheEvent(type, true);
-        const supabaseUrl = publicEnv().NEXT_PUBLIC_SUPABASE_URL;
-        const cachedPlacesRaw = (cache.places_data || []) as Landmark[];
-        const normalizedResults = supabaseUrl
-          ? cachedPlacesRaw.map((place) => normalizeCachedPlace(place, supabaseUrl))
-          : cachedPlacesRaw.map((place) => ({ place, changed: false }));
-        const cachedPlaces = normalizedResults.map((result) => result.place);
-        const normalizedChanged = normalizedResults.some((result) => result.changed);
-
-        if (normalizedChanged) {
-          void savePlacesCache(cityName, type, cachedPlaces, cache.updated_at);
-        }
 
         const shouldRefreshForAge = daysSinceUpdate >= CACHE_TTL.PLACES_SOFT_REFRESH_DAYS;
         const shouldRefreshForCoverage =
@@ -714,12 +723,25 @@ export async function getTopPlaces(
           shouldRefreshForImages = !displayedTop.some((place) => !!place.imageUrl);
         }
 
-        if (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages) {
+        if (
+          opts?.allowProviderFetch &&
+          (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages)
+        ) {
           refreshPlacesInBackground(cityName, type, opts).catch(() => {});
         }
 
         return cachedPlaces;
       }
+
+      if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
+        recordPlacesCacheEvent(type, true);
+        return cachedPlaces;
+      }
+    }
+
+    if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
+      recordPlacesCacheEvent(type, false);
+      return [];
     }
 
     return await fetchAndCachePlaces(cityName, type, opts);

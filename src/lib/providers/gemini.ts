@@ -9,6 +9,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createLogger, newCorrelationId } from "../logger";
 import { serverEnv } from "../env";
+import { tryClaimPaidProviderUse } from "../cost-guard";
 
 const log = createLogger({ component: "provider/gemini" });
 const PROVIDER = "gemini";
@@ -40,6 +41,9 @@ export async function generateText(prompt: string): Promise<GeminiResult> {
   const client = getClient();
   if (!client) {
     return { ok: false, reason: "auth", correlationId };
+  }
+  if (!tryClaimPaidProviderUse(PROVIDER, "generateText")) {
+    return { ok: false, reason: "rate_limit", correlationId };
   }
   try {
     const model = client.getGenerativeModel({ model: MODEL });
@@ -78,6 +82,9 @@ export async function generateTextStream(prompt: string): Promise<GeminiStreamSt
   const client = getClient();
   if (!client) {
     return { ok: false, reason: "auth", correlationId };
+  }
+  if (!tryClaimPaidProviderUse(PROVIDER, "generateTextStream")) {
+    return { ok: false, reason: "rate_limit", correlationId };
   }
   try {
     const model = client.getGenerativeModel({ model: MODEL });

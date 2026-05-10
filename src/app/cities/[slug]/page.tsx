@@ -3,7 +3,6 @@ import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
 import { getCityMetrics } from "@/lib/metrics";
 import { getCityWeather } from "@/lib/weather";
-import { getCityInsight } from "@/lib/intelligence";
 import {
   cityIdSchema,
   citySlugSchema,
@@ -42,10 +41,9 @@ import {
   MetricCard,
 } from "./city-page-parts";
 
-// Enable ISR: regenerate pages at most once per hour. Cached responses still
-// stream fresh metrics/places via the in-route Supabase caches; this just
-// avoids re-running the full server component tree on every request.
-export const revalidate = 3600;
+// Emergency cost guard: regenerate city pages at most once per day so crawler
+// bursts don't repeatedly execute the full server component tree.
+export const revalidate = 86400;
 
 // SEO Phase 1 (T2): pre-render the top cities at build time. Long-tail cities
 // still render via ISR thanks to the default `dynamicParams = true`.
@@ -67,7 +65,7 @@ export async function generateStaticParams() {
 // Request-scoped cache so generateMetadata + page body share one DB query.
 const getCachedCityBySlug = cache(getCityBySlug);
 const getCachedCityById = cache(getCityById);
-const getCachedCityInsight = cache(getCityInsight);
+const getCachedCityWeather = cache(getCityWeather);
 
 const siteUrl =
   publicEnv().NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://bestcityspots.com";
@@ -115,7 +113,7 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
 
 async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
   if (!city) return null;
-  const weather = await getCityWeather(city);
+  const weather = await getCachedCityWeather(city);
 
   return (
     <>
@@ -168,7 +166,7 @@ function WeatherSummaryFallback() {
 
 async function CityVitalsSection({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
   if (!city) return <CityVitalsFallback />;
-  const weather = await getCityWeather(city);
+  const weather = await getCachedCityWeather(city);
   return weather ? <CityVitals data={weather} /> : <CityVitalsFallback />;
 }
 
@@ -341,8 +339,8 @@ export async function generateMetadata({
   const city = await getCachedCityBySlug(slugResult.data);
   if (!city) return { title: "City Not Found" };
 
-  const insight = await getCachedCityInsight(city).catch(() => null);
-  const description = deriveCityDescription(insight, city.city, city.country);
+  // Keep metadata DB-only and deterministic under heavy crawl load.
+  const description = deriveCityDescription(null, city.city, city.country);
   const year = new Date().getFullYear();
   const title = `${city.city} Travel Guide: Live Weather, Neighborhoods & AI Insights (${year})`;
   const canonical = buildCanonicalUrl(city);
