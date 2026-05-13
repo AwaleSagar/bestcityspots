@@ -1,342 +1,156 @@
-# Code Style Quick Reference
+# Code Style — Quick Reference
 
-A quick reference guide for developers working on Best City Spots.
+A short cheat sheet. For the full project conventions and PR process, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## TypeScript
 
-### ✅ Do
-
 ```typescript
-// Explicit types for function signatures
-function getUserById(id: number): Promise<User | null> {
-  // ...
-}
+// ✅ Explicit signatures, no `any`
+function getCityById(id: number): Promise<City | null> { ... }
 
-// Use interfaces for object shapes
-interface City {
-  id: number;
-  name: string;
-  country: string;
-}
+// ✅ interface for shapes, type for unions / intersections
+interface City { id: number; name: string; country: string; }
+type CityResult = City & { matchScore: number };
 
-// Prefer const for immutable values
-const MAX_RESULTS = 50;
-```
-
-### ❌ Don't
-
-```typescript
-// Don't use 'any'
-function getData(id: any): Promise<any> {
-  // ...
-}
-
-// Don't use var
+// ❌ Don't
+function getData(id: any): Promise<any> { ... }
 var count = 0;
-
-// Don't omit return types
-function getUser(id: number) {
-  // ...
-}
 ```
 
-## React Components
+## React / Next.js
 
-### ✅ Do
+```tsx
+// ✅ Server Component by default; "use client" only when needed
+"use client";
+import { useCallback, useState } from "react";
 
-```typescript
-// Functional components with typed props
 interface ButtonProps {
   label: string;
   onClick: () => void;
 }
 
-export const Button: FC<ButtonProps> = ({ label, onClick }) => {
-  return <button onClick={onClick}>{label}</button>;
-};
-
-// Use useCallback for event handlers
-const handleClick = useCallback(() => {
-  // handler logic
-}, [dependencies]);
-```
-
-### ❌ Don't
-
-```typescript
-// Don't use inline functions in JSX (performance)
-<button onClick={() => doSomething()}>Click</button>
-
-// Don't call setState directly in useEffect
-useEffect(() => {
-  setMounted(true); // Bad
-}, []);
-
-// Don't forget dependencies
-useEffect(() => {
-  doSomething(value);
-}, []); // Missing 'value' in dependencies
-```
-
-## Naming Conventions
-
-| Type                | Convention       | Example                           |
-| ------------------- | ---------------- | --------------------------------- |
-| Components          | PascalCase       | `CityCard`, `SearchBar`           |
-| Functions/Variables | camelCase        | `getUserData`, `isLoading`        |
-| Constants           | UPPER_SNAKE_CASE | `MAX_RESULTS`, `API_URL`          |
-| Interfaces/Types    | PascalCase       | `UserProfile`, `CityData`         |
-| Files (utilities)   | kebab-case       | `api-client.ts`, `format-date.ts` |
-| Files (components)  | PascalCase       | `CityCard.tsx`, `Header.tsx`      |
-
-## CSS/Tailwind
-
-### ✅ Do
-
-```tsx
-// Use Tailwind utilities
-<div className="flex items-center gap-4 rounded-lg bg-white/5 p-4">
-  {/* content */}
-</div>
-
-// Group related utilities
-<div className="
-  flex items-center gap-4
-  rounded-lg bg-white/5 p-4
-  hover:bg-white/10 transition-colors
-">
-  {/* content */}
-</div>
-```
-
-### ❌ Don't
-
-```tsx
-// Don't use inline styles
-<div style={{ display: "flex", padding: "16px" }}>{/* content */}</div>
-```
-
-## Error Handling
-
-### ✅ Do
-
-```typescript
-// Always handle errors in async functions
-async function fetchData() {
-  try {
-    const response = await api.get("/data");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return null;
-  }
+export function Button({ label, onClick }: ButtonProps) {
+  const handle = useCallback(onClick, [onClick]);
+  return <button onClick={handle}>{label}</button>;
 }
 ```
 
-### ❌ Don't
+- Server-only modules: start the file with `import "server-only"`.
+- Hooks order: `useState` → `useEffect` → `useMemo` → `useCallback` → custom hooks.
+- Effects: include all deps; always clean up subscriptions / timers.
+
+## Environment, HTTP & data
 
 ```typescript
-// Don't ignore errors
-async function fetchData() {
-  const response = await api.get("/data"); // What if this fails?
-  return response.data;
-}
+// ✅ Read env via env.ts
+import { serverEnv, requireServerEnv } from "@/lib/env";
+const key = requireServerEnv("GOOGLE_GEMINI_API_KEY");
+
+// ✅ Outbound HTTP through providers + http.ts
+import { fetchGooglePlace } from "@/lib/providers/googlePlaces";
+const data = await fetchGooglePlace(id);
+
+// ❌ Don't read process.env directly in app code
+const key = process.env.GOOGLE_GEMINI_API_KEY;
+
+// ❌ Don't call fetch() to third parties directly
+const r = await fetch("https://maps.googleapis.com/...");
 ```
 
-## Imports
+Always validate inputs and AI/provider outputs with **Zod** schemas from `src/lib/validation.ts`.
 
-### ✅ Do
+## Naming
 
-```typescript
-// Group imports logically
-import { useState, useEffect } from "react";
-import type { FC } from "react";
+| Kind               | Convention       | Example                                    |
+| ------------------ | ---------------- | ------------------------------------------ |
+| Components         | PascalCase       | `CityCard`, `HeroHeader`                   |
+| Functions / vars   | camelCase        | `getCityById`, `isLoading`                 |
+| Constants          | UPPER_SNAKE_CASE | `MAX_RESULTS`, `CACHE_TIERS`               |
+| Interfaces / types | PascalCase       | `CityInsight`, `PlaceResult`               |
+| Utility files      | kebab-case       | `cache-config.ts`, `place-search-utils.ts` |
+| Component files    | PascalCase       | `CityCard.tsx`, `MobileBottomNav.tsx`      |
 
-import { City } from "@/types";
-import { searchCities } from "@/lib/cities";
+## Styling
 
-import { Button } from "@/components/Button";
+```tsx
+// ✅ Tailwind utilities + liquid-glass tokens
+<div className="flex items-center gap-4 rounded-lg bg-glass/60 p-4 backdrop-blur-md hover:bg-glass/80 transition-colors">
+  ...
+</div>
+
+// ❌ Inline styles, hardcoded colors
+<div style={{ display: "flex", padding: 16, background: "#1a1a1a" }}>...</div>
 ```
 
-### ❌ Don't
-
-```typescript
-// Don't mix import styles
-import { Button } from "@/components/Button";
-import type { FC } from "react";
-import { searchCities } from "@/lib/cities";
-import { useState, useEffect } from "react";
-```
-
-## Commit Messages
-
-### Format
-
-```
-<type>(<scope>): <subject>
-```
-
-### Examples
-
-```
-feat(search): add city search with debouncing
-fix(ui): correct button alignment on mobile
-docs(readme): update installation instructions
-refactor(api): simplify error handling
-style(format): apply prettier formatting
-```
-
-### Types
-
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation
-- `style` - Formatting
-- `refactor` - Code restructuring
-- `perf` - Performance
-- `test` - Tests
-- `chore` - Maintenance
-
-## Quick Commands
-
-```bash
-# Development
-npm run dev              # Start dev server
-
-# Code Quality
-npm run lint             # Check for issues
-npm run lint:fix         # Fix auto-fixable issues
-npm run format           # Format all files
-npm run format:check     # Check formatting
-npm run type-check       # Check TypeScript types
-
-# Production
-npm run build            # Build for production
-npm run start            # Start production server
-```
+- Tailwind 4 + custom properties from `src/app/globals.css` (`--color-glass`, `--liquid-glow-*`, `--shadow-3xl`, …). No hardcoded colors.
+- Support dark mode via `next-themes` / `dark:` variants.
 
 ## Accessibility
 
-### ✅ Do
-
 ```tsx
-// Always include ARIA labels
-<button aria-label="Close menu">
-  <X />
-</button>
+// ✅
+<button aria-label="Close menu"><X /></button>
+<nav><ul><li><a href="/">Home</a></li></ul></nav>
+<img src="/city.jpg" alt="Skyline at dusk" />
 
-// Use semantic HTML
-<nav>
-  <ul>
-    <li><a href="/">Home</a></li>
-  </ul>
-</nav>
-
-// Ensure keyboard navigation
-<input onKeyDown={handleKeyDown} />
-```
-
-### ❌ Don't
-
-```tsx
-// Don't use divs for interactive elements
+// ❌
 <div onClick={handleClick}>Click me</div>
-
-// Don't forget alt text
-<img src="city.jpg" />
+<img src="/city.jpg" />
 ```
 
-## Security
+Respect `prefers-reduced-motion` in any animation work.
 
-### ✅ Do
+## Error handling
 
 ```typescript
-// Sanitize user input
-const sanitized = userInput.replace(/[^a-zA-Z0-9\s-]/g, "");
-
-// Use environment variables for secrets
-const apiKey = process.env.API_KEY;
-
-// Validate input length
-if (query.length <= 100) {
-  setSearchQuery(query);
+// ✅ Explicit + graceful degradation on read paths
+try {
+  return await fetchSomething();
+} catch (error) {
+  log.warn("fetchSomething failed", { error });
+  return null;
 }
 ```
 
-### ❌ Don't
-
-```typescript
-// Don't commit secrets
-const apiKey = "sk-1234567890abcdef"; // Bad!
-
-// Don't trust user input
-const html = `<div>${userInput}</div>`; // XSS risk
-
-// Don't use string concatenation for queries
-const query = `SELECT * FROM users WHERE name = '${name}'`; // SQL injection
-```
+Use `createLogger({ component })` from `src/lib/logger.ts` rather than ad-hoc `console.log` in new modules.
 
 ## Performance
 
-### ✅ Do
+- Memoize expensive derivations with `useMemo`; stabilize handlers with `useCallback`.
+- Debounce search and high-frequency inputs.
+- Use Next.js `<Image>` or the project's `OptimizedImage` wrapper for images.
+
+## Security
 
 ```typescript
-// Memoize expensive computations
-const filtered = useMemo(() => {
-  return data.filter(item => item.active);
-}, [data]);
+// ✅ Validate, sanitize, parameterize
+const parsed = uuidSchema.parse(id);
+const sanitized = userInput.replace(/[^a-zA-Z0-9\s-]/g, "");
 
-// Debounce frequent operations
-useEffect(() => {
-  const timer = setTimeout(() => {
-    search(query);
-  }, 300);
-  return () => clearTimeout(timer);
-}, [query]);
-
-// Use Next.js Image component
-import Image from 'next/image';
-<Image src="/city.jpg" alt="City" width={400} height={300} />
+// ❌ Never
+const apiKey = "sk-1234..."; // committed secret
+const html = `<div>${userInput}</div>`; // XSS
 ```
 
-### ❌ Don't
+- Validate inputs with Zod (`src/lib/validation.ts`).
+- Supabase queries are parameterized — don't build SQL strings.
+- RLS is the primary boundary; never bypass it from the client.
 
-```typescript
-// Don't filter in render
-return data.filter(item => item.active).map(...); // Bad in render
+## Commit messages
 
-// Don't create new functions in render
-<button onClick={() => handleClick(id)}>Click</button>
+Conventional Commits: `feat(search): add alias fallback`, `fix(http): respect caller AbortSignal`, `docs(readme): refresh API surface`.
 
-// Don't use img tag for images
-<img src="/city.jpg" alt="City" />
+## Quick commands
+
+```bash
+npm run dev           # Dev server
+npm run lint          # ESLint + security plugin
+npm run lint:fix
+npm run format        # Prettier
+npm run type-check    # tsc --noEmit
+npm run build         # Production build
 ```
-
-## File Organization
-
-```
-src/
-├── app/                 # Next.js pages
-│   ├── layout.tsx      # Root layout
-│   ├── page.tsx        # Home page
-│   └── cities/         # City pages
-├── components/         # Reusable components
-│   ├── ui/            # UI primitives
-│   └── features/      # Feature components
-├── lib/               # Utilities
-│   ├── supabase.ts    # DB client
-│   └── cities.ts      # City utils
-├── types/             # Type definitions
-└── styles/            # Global styles
-```
-
-## Need More Help?
-
-- 📖 Read [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines
-- 🐛 Open an issue for bugs
-- 💬 Start a discussion for questions
-- 📧 Contact maintainers
 
 ---
 
-**Remember**: Write code for humans first, machines second. Clarity > Cleverness.
+**Write code for humans first, machines second. Clarity > cleverness.**

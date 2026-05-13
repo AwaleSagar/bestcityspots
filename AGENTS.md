@@ -8,8 +8,11 @@ Best City Spots is a single Next.js 16 application that combines the product UI 
 
 This project is primarily a public web application with a small REST-style surface:
 
-- `POST /api/analytics` for batched, privacy-conscious visitor analytics ingestion
-- `GET /api/cities/sphere` for cached city visualization data
+- `POST /api/analytics` — batched, privacy-conscious visitor analytics ingestion
+- `GET /api/cities/sphere` — cached city visualization data
+- `GET /api/cities/insight` — SSE-streamed AI city briefing (cache-first)
+- `GET /api/places/search` — filtered places search with cost-guard + circuit breaker
+- `GET /api/health` — lightweight dependency status (token-gated detail)
 
 There is no GraphQL layer, no separate microservice boundary, and no event-streaming platform in the repo today.
 
