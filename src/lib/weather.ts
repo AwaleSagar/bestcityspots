@@ -1,8 +1,7 @@
 import "server-only";
 import { City } from "./cities";
 import { z } from "zod";
-import { supabase, supabaseServer } from "./supabase";
-import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
+import { CACHE_TIERS, classifyAge } from "./cache-config";
 import { fetchCurrentWeather } from "./providers/openweather";
 import {
   fetchCurrent as fetchOpenMeteo,
@@ -11,6 +10,12 @@ import {
 } from "./providers/openMeteo";
 import { aqiLabelFromOwm, owmAqiFromPm25, aqiLabelFromPm25 } from "./mapping";
 import { createLogger } from "./logger";
+import { runCacheFirstSWR } from "@/platform/cache/swr";
+import {
+  readCityWeatherCache,
+  writeCityWeatherCache,
+  type CityWeatherCacheRow,
+} from "@/platform/data-access/weather-cache-repository";
 
 const log = createLogger({ component: "weather" });
 
@@ -37,8 +42,6 @@ function parseCachedWeather(cached: unknown): WeatherData | null {
 }
 
 async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
-  const db = supabaseServer ?? supabase;
-
   // Defensive validation — a corrupted City row with non-finite or out-of-range
   // coords would otherwise be passed straight to OpenWeather/Open-Meteo.
   if (
@@ -105,13 +108,23 @@ async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
     return null;
   }
 
-  db.from("city_weather_cache")
-    .upsert({ city_id: city.id, ...parsed.data }, { onConflict: "city_id" })
-    .then(({ error }: { error: unknown }) => {
-      if (error) log.error("cache_write_failed", { cityId: city.id, error: String(error) });
-    });
-
   return parsed.data;
+}
+
+function toWeatherCacheRow(weather: WeatherData): CityWeatherCacheRow {
+  return {
+    temp: weather.temp,
+    feels_like: weather.feels_like,
+    temp_min: weather.temp_min,
+    temp_max: weather.temp_max,
+    humidity: weather.humidity,
+    description: weather.description,
+    icon: weather.icon,
+    wind_speed: weather.wind_speed,
+    aqi: weather.aqi,
+    aqi_label: weather.aqi_label,
+    updated_at: weather.updated_at,
+  };
 }
 
 /**
@@ -123,46 +136,26 @@ async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
  *    Open-Meteo). If both fail but any stale row exists, return it.
  */
 export async function getCityWeather(city: City): Promise<WeatherData | null> {
-  const db = supabaseServer ?? supabase;
-  const ttlMs = minutes(CACHE_TTL.WEATHER_FRESH_MINUTES);
-
-  try {
-    // Explicit projection mirrors WeatherDataSchema; avoids over-fetching
-    // unused columns (raw provider blobs etc.) from the cache row.
-    const { data: cached } = await db
-      .from("city_weather_cache")
-      .select(
-        "temp, feels_like, temp_min, temp_max, humidity, description, icon, wind_speed, aqi, aqi_label, updated_at"
-      )
-      .eq("city_id", city.id)
-      .maybeSingle();
-
-    const validCached = cached ? parseCachedWeather(cached) : null;
-    if (validCached) {
-      if (cached && isCacheFresh(cached.updated_at, ttlMs)) {
-        return validCached;
+  return runCacheFirstSWR<WeatherData>({
+    readCache: async () => {
+      const row = await readCityWeatherCache(city.id);
+      return {
+        value: row ? parseCachedWeather(row) : null,
+        updatedAt: row?.updated_at ?? null,
+      };
+    },
+    classify: (updatedAt) => classifyAge(updatedAt, CACHE_TIERS.WEATHER),
+    fetchFresh: async () => fetchFreshWeather(city),
+    writeCache: async (value) => {
+      await writeCityWeatherCache(city.id, toWeatherCacheRow(value));
+    },
+    onError: (event, error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      if (event === "live_fetch_failed") {
+        log.error(event, { cityId: city.id, error: message });
+      } else {
+        log.warn(event, { cityId: city.id, error: message });
       }
-      // Stale-while-revalidate: serve stale, refresh in background.
-      fetchFreshWeather(city).catch((err) => {
-        log.warn("revalidate_failed", {
-          cityId: city.id,
-          error: err instanceof Error ? err.message : String(err),
-        });
-      });
-      return validCached;
-    }
-
-    // No usable cache — block on fresh fetch.
-    const fresh = await fetchFreshWeather(city);
-    if (fresh) return fresh;
-
-    // Last resort: return any stale data we can parse (already attempted above).
-    return null;
-  } catch (error) {
-    log.error("fetch_failed", {
-      cityId: city.id,
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
-  }
+    },
+  });
 }

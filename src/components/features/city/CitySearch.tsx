@@ -1,31 +1,23 @@
 "use client";
 
-import type { KeyboardEvent, ReactNode } from "react";
-import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { searchCities, City, CitySearchResult, findNearestCity, cityHref } from "@/lib/cities";
+import type { ReactNode } from "react";
+import { memo, useCallback, useId, useRef } from "react";
+import { cityHref, City, CitySearchResult } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useRecentSearches } from "@/hooks/useRecentSearches";
-import { useDeviceType } from "@/hooks/useDeviceType";
-import { useAnalytics } from "@/lib/useAnalytics";
+import { useCitySearchController } from "./useCitySearchController";
+import {
+  CITY_SEARCH_FILTERS,
+  DROPDOWN_MAX_HEIGHT,
+  PLACEHOLDER_HINTS,
+  sanitizeSearchInput,
+  transitionEase,
+} from "./city-search-config";
 
 interface CitySearchProps {
   topCities: City[];
 }
-
-const KEYBOARD_ANIMATION_DELAY = 300;
-const DROPDOWN_MAX_HEIGHT = "40vh";
-const transitionEase = [0.22, 1, 0.36, 1] as const;
-
-const PLACEHOLDER_HINTS = [
-  "Where do you want to explore?",
-  "Try 'NYC' or 'Bangkok'...",
-  "Search 'beaches' or 'gastronomy'...",
-  "Try 'Eiffel Tower' or 'Colosseum'...",
-  "Search by city, country, or attraction...",
-];
 
 // Module-scope so identity is stable across renders — no per-instance
 // useMemo allocation needed.
@@ -53,187 +45,35 @@ function highlightMatchFn(text: string, query: string): ReactNode {
 }
 
 function CitySearch({ topCities }: CitySearchProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [rawSearchResults, setRawSearchResults] = useState<CitySearchResult[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [placeholderIdx, setPlaceholderIdx] = useState(0);
-  const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastInteractionRef = useRef<"keyboard" | "pointer">("pointer");
   const resultsListId = useId();
-  const router = useRouter();
-  const { trackAction } = useAnalytics();
-  const hasTrackedSearch = useRef(false);
-
-  const { recentCities, addRecentCity } = useRecentSearches();
-  const { isMobile, isTablet, isVirtualKeyboardOpen } = useDeviceType();
-  const isTouchDevice = isMobile || isTablet;
   const shouldReduceMotion = useReducedMotion();
-  const timeOfDay = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 11) return "Morning planning";
-    if (hour < 17) return "Afternoon comparison";
-    if (hour < 21) return "Evening shortlist";
-    return "Late-night dreaming";
-  }, []);
-  const adaptiveHints = useMemo(
-    () => [
-      timeOfDay,
-      recentCities.length > 0 ? "Recent cities ready" : "No account needed",
-      isTouchDevice ? "Touch-friendly results" : "Keyboard-ready search",
-    ],
-    [isTouchDevice, recentCities.length, timeOfDay]
-  );
-
-  // Rotate placeholder hints
-  useEffect(() => {
-    if (searchQuery) return;
-    const interval = setInterval(() => {
-      setPlaceholderIdx((prev) => (prev + 1) % PLACEHOLDER_HINTS.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [searchQuery]);
+  const {
+    searchQuery,
+    setSearchQuery,
+    searchResults,
+    shouldShowResults,
+    isSearching,
+    isLocating,
+    activeIndex,
+    setActiveIndex,
+    activeFilter,
+    setActiveFilter,
+    placeholderIdx,
+    handleKeyDown,
+    handleLocate,
+    recentCities,
+    addRecentCity,
+    isVirtualKeyboardOpen,
+    adaptiveHints,
+    topFuzzyHint,
+  } = useCitySearchController({ containerRef });
 
   const matchTypeLabel = useCallback((r: CitySearchResult) => {
     if (r.match_type === "fuzzy") return "Similar match";
     if (r.match_type === "alias") return "Also known as";
     return null;
   }, []);
-
-  // Scroll search container into view when virtual keyboard opens on touch devices
-  useEffect(() => {
-    if (!isVirtualKeyboardOpen || !isTouchDevice) return;
-    const timeout = setTimeout(() => {
-      containerRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "nearest",
-      });
-    }, KEYBOARD_ANIMATION_DELAY);
-    return () => clearTimeout(timeout);
-  }, [isVirtualKeyboardOpen, isTouchDevice]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const timer = setTimeout(async () => {
-      if (searchQuery.length >= 2) {
-        setIsSearching(true);
-        const results = await searchCities(searchQuery, 15, controller.signal);
-
-        if (controller.signal.aborted) return;
-        setRawSearchResults(results);
-        setActiveIndex(-1);
-        setIsSearching(false);
-
-        if (!hasTrackedSearch.current && results.length > 0) {
-          trackAction("search");
-          hasTrackedSearch.current = true;
-        }
-      } else {
-        controller.abort();
-        setRawSearchResults([]);
-        setActiveIndex(-1);
-        setIsSearching(false);
-        hasTrackedSearch.current = false;
-      }
-    }, 200);
-
-    return () => {
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [searchQuery, trackAction]);
-
-  // Apply filter client-side over the already-fetched results so toggling
-  // a filter chip does not trigger a new network request.
-  const searchResults = useMemo(() => {
-    let filtered = rawSearchResults;
-    if (activeFilter === "megacity") {
-      filtered = filtered.filter((c) => c.population > 5000000);
-    } else if (activeFilter === "capital") {
-      filtered = filtered.filter((c) => c.capital === "primary");
-    }
-    return filtered.slice(0, 10);
-  }, [rawSearchResults, activeFilter]);
-
-  const shouldShowResults = searchQuery.trim().length >= 2;
-
-  const topFuzzyHint = useMemo(() => {
-    if (!shouldShowResults || searchResults.length === 0) return null;
-    const first = searchResults[0];
-    if (first.match_type === "fuzzy" || first.match_type === "alias") {
-      return first.city;
-    }
-    return null;
-  }, [shouldShowResults, searchResults]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      lastInteractionRef.current = "keyboard";
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActiveIndex((prev) => {
-          if (searchResults.length === 0) return -1;
-          return prev >= searchResults.length - 1 ? 0 : prev + 1;
-        });
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActiveIndex((prev) => {
-          if (searchResults.length === 0) return -1;
-          return prev <= 0 ? searchResults.length - 1 : prev - 1;
-        });
-      } else if (e.key === "Enter") {
-        const selectedCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
-        if (selectedCity) {
-          addRecentCity(selectedCity);
-          router.push(cityHref(selectedCity));
-        } else if (searchResults.length > 0) {
-          const firstCity = searchResults.at(0);
-          if (firstCity) {
-            addRecentCity(firstCity);
-            router.push(cityHref(firstCity));
-          }
-        }
-      } else if (e.key === "Escape") {
-        setSearchQuery("");
-        setRawSearchResults([]);
-        setActiveIndex(-1);
-      }
-    },
-    [activeIndex, addRecentCity, router, searchResults]
-  );
-
-  const handleLocate = useCallback(() => {
-    if (isLocating || typeof navigator === "undefined" || !navigator.geolocation) {
-      return;
-    }
-
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords;
-          const nearest = await findNearestCity(latitude, longitude);
-          if (!nearest) {
-            console.warn("Unable to find nearest city for current location");
-            setIsLocating(false);
-            return;
-          }
-          addRecentCity(nearest);
-          router.push(cityHref(nearest, { lat: latitude, lng: longitude }));
-        } catch (error) {
-          console.warn("Unable to resolve current location", error);
-          setIsLocating(false); // Make sure to reset state on error
-        }
-      },
-      (error) => {
-        console.warn("Geolocation permission denied or error", error);
-        setIsLocating(false);
-      }
-    );
-  }, [isLocating, addRecentCity, router]);
 
   const activeCity = activeIndex >= 0 ? searchResults.at(activeIndex) : undefined;
   const activeOptionId = activeCity ? `city-option-${activeCity.id}` : undefined;
@@ -271,12 +111,11 @@ function CitySearch({ topCities }: CitySearchProps) {
         <Search className="text-muted group-focus-within:text-accent absolute top-1/2 left-4 h-4.5 w-4.5 -translate-y-1/2 transition-all duration-300 md:left-6 md:h-5 md:w-5" />
         <input
           id="city-search"
-          ref={inputRef}
           type="text"
           autoComplete="off"
           value={searchQuery}
           onChange={(e) => {
-            const val = e.target.value.replace(/[<>{}|\\^`[\]]/g, "");
+            const val = sanitizeSearchInput(e.target.value);
             if (val.length <= 100) setSearchQuery(val);
           }}
           onKeyDown={handleKeyDown}
@@ -444,10 +283,7 @@ function CitySearch({ topCities }: CitySearchProps) {
             }}
           >
             <motion.div className="flex gap-2 px-1 sm:px-2">
-              {[
-                { id: "megacity", label: "Megacities" },
-                { id: "capital", label: "Capitals" },
-              ].map((filter) => (
+              {CITY_SEARCH_FILTERS.map((filter) => (
                 <motion.button
                   key={filter.id}
                   type="button"
@@ -487,7 +323,6 @@ function CitySearch({ topCities }: CitySearchProps) {
                   id={`city-option-${city.id}`}
                   onPointerMove={(event) => {
                     if (event.pointerType !== "mouse") return;
-                    lastInteractionRef.current = "pointer";
                     setActiveIndex(idx);
                   }}
                 >

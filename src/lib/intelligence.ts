@@ -10,6 +10,10 @@ import {
 } from "./providers/gemini";
 import { isCacheFresh, CACHE_TIERS } from "./cache-config";
 import { createLogger } from "./logger";
+import {
+  readCityInsightCache,
+  writeCityInsightCache,
+} from "@/platform/data-access/city-insights-repository";
 
 export { PROMPT_VERSIONS } from "./providers/gemini";
 
@@ -84,11 +88,7 @@ export interface CachedCityInsightRead {
  */
 export async function readCachedCityInsight(cityId: number): Promise<CachedCityInsightRead> {
   try {
-    const { data: cached } = await supabase
-      .from("city_ai_insights")
-      .select("intro, attractions, seasons, weather, updated_at, prompt_version")
-      .eq("city_id", cityId)
-      .maybeSingle();
+    const cached = await readCityInsightCache(cityId);
 
     if (!cached) return { insight: null, fresh: false, updatedAt: null };
 
@@ -121,25 +121,18 @@ export async function readCachedCityInsight(cityId: number): Promise<CachedCityI
  * streaming and batch paths share write semantics.
  */
 export function upsertCityInsight(city: City, insight: CityInsight): void {
-  const clientToUse = supabaseServer || supabase;
-  clientToUse
-    .from("city_ai_insights")
-    .upsert(
-      {
-        city_id: city.id,
-        city_name: city.city,
-        country: city.country,
-        ...insight,
-        prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "city_id" }
-    )
-    .then(({ error }: { error: unknown }) => {
-      if (error) {
-        log.warn("cache_write_failed", { cityId: city.id, error: String(error) });
-      }
+  void writeCityInsightCache(city.id, {
+    city_name: city.city,
+    country: city.country,
+    ...insight,
+    prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
+    updated_at: new Date().toISOString(),
+  }).catch((error) => {
+    log.warn("cache_write_failed", {
+      cityId: city.id,
+      error: error instanceof Error ? error.message : String(error),
     });
+  });
 }
 
 /**

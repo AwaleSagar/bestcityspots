@@ -16,6 +16,8 @@ import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
 import CityFAQSection from "./CityFAQSection";
 import CityRelatedSection from "./CityRelatedSection";
+import CityPlanningPanel from "./CityPlanningPanel";
+import CityTravelEssentialsSection from "./CityTravelEssentialsSection";
 import CityVitals from "@/components/features/city/CityVitals";
 import {
   MapPin,
@@ -549,72 +551,18 @@ export default async function CityPage({
               </Suspense>
             </section>
 
-            <section className="space-y-6">
-              <h2 className="labelled-rule">Travel Essentials</h2>
-              <div className="flow-grid">
-                {[
-                  {
-                    icon: MapPin,
-                    title: "Neighborhood texture",
-                    color: "text-[color:var(--color-cat-dining)]",
-                    text: city.admin_name
-                      ? `Use the ${city.admin_name} context as a starting layer, then let landmarks reveal the smaller local pockets.`
-                      : `Start with landmarks, then use saved notes to build a more personal read of ${city.city}.`,
-                  },
-                  {
-                    icon: Users,
-                    title: "Budget transparency",
-                    color: "text-[color:var(--color-brand-accent)]",
-                    // SEO Phase 2.5 (audit 5.6): vary boilerplate per city
-                    // so identical sentences don't repeat across hundreds of
-                    // city pages. Capital flag and population band drive a
-                    // small but real surface-level differentiation.
-                    text: city.capital
-                      ? `${city.city} reads as a capital — pricing skews higher around official quarters; lean on the Dining and Stays price filters to keep your shortlist grounded.`
-                      : city.population >= 5_000_000
-                        ? `Major-metro pricing varies sharply between districts in ${city.city}. The Dining and Stays price filters above keep high-interest places aligned with realistic trip spending.`
-                        : `Use the Dining and Stays price filters above to keep ${city.city} options grounded in realistic trip spending — useful especially when balancing landmark proximity against value.`,
-                  },
-                  {
-                    icon: Navigation,
-                    title: "On-trip handoff",
-                    color: "text-[color:var(--color-brand-secondary)]",
-                    text: `Open any listed spot in Maps for directions, then keep your personal ${city.city} shortlist in saved places.`,
-                  },
-                  {
-                    icon: Activity,
-                    title: "Source posture",
-                    color: "text-accent",
-                    text: "Google Places, public city data, weather providers, and AI-assisted summaries are labeled so the guide stays auditable.",
-                  },
-                ].map(({ icon: ItemIcon, title, text, color }) => (
-                  <div
-                    key={title}
-                    className="intent-card rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5"
-                  >
-                    <div className="text-muted mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase">
-                      <ItemIcon className={`h-4 w-4 ${color}`} />
-                      {title}
-                    </div>
-                    <p className="text-muted text-sm leading-relaxed">{text}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            <CityTravelEssentialsSection
+              cityName={city.city}
+              adminName={city.admin_name}
+              capital={city.capital}
+              population={city.population}
+            />
 
             {/* Mobile-only CTA - shown before experiences */}
-            <div className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden">
-              <h3 className="text-foreground text-xl leading-tight font-bold tracking-[-0.02em] sm:text-2xl">
-                Plan Your {city.city} Trip
-              </h3>
-              <p className="text-muted text-sm leading-relaxed">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local
-                experiences — all free, no sign-up required.
-              </p>
-              <Link href="/resources/top-cities" className="btn-primary w-full">
-                Browse Free City Guide
-              </Link>
-            </div>
+            <CityPlanningPanel
+              cityName={city.city}
+              className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden"
+            />
 
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
@@ -635,19 +583,10 @@ export default async function CityPage({
 
           {/* Sidebar */}
           <div className="hidden space-y-8 lg:sticky lg:top-20 lg:col-span-4 lg:block">
-            <div className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h3 className="text-foreground text-2xl leading-tight font-bold tracking-[-0.02em] md:text-3xl">
-                Plan Your <br /> {city.city} Trip
-              </h3>
-              <p className="text-muted text-sm leading-relaxed">
-                Explore AI-powered briefings, live weather data, budget filters, and curated local
-                experiences. Save your favorite spots to build a personal itinerary — all free, no
-                sign-up required.
-              </p>
-              <Link href="/resources/top-cities" className="btn-primary w-full">
-                Browse Free City Guide
-              </Link>
-            </div>
+            <CityPlanningPanel
+              cityName={city.city}
+              className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10"
+            />
 
             <div className="atlas-panel rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
               <h4 className="text-muted text-[11px] font-semibold tracking-[0.25em] uppercase">

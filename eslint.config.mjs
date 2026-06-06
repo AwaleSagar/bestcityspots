@@ -18,6 +18,24 @@ const eslintConfig = defineConfig([
       "security/detect-eval-with-expression": "error",
     },
   },
+  // Architecture guardrails (warning-only during migration).
+  {
+    files: ["src/app/**/*.{ts,tsx}", "src/components/**/*.{ts,tsx}", "src/hooks/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "warn",
+        {
+          patterns: [
+            {
+              group: ["@/lib/providers/*"],
+              message:
+                "Import provider-backed services from domain/lib modules instead of using providers directly in app/components/hooks.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

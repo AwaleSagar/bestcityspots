@@ -14,6 +14,11 @@ import {
 } from "./place-search-utils";
 import { fetchPhotoBytes, searchText, type GooglePlaceNative } from "./providers/googlePlaces";
 import { isPaidProviderEnabled } from "./cost-guard";
+import {
+  readPlacesCache,
+  writePlacesCache,
+  writePlacesCacheEvent,
+} from "@/platform/data-access/places-cache-repository";
 
 const API_KEY = serverEnv().GOOGLE_PLACES_API_KEY;
 if (!API_KEY) {
@@ -224,23 +229,22 @@ async function savePlacesCache(
   places: Landmark[],
   updatedAt = new Date().toISOString()
 ): Promise<void> {
-  const client = getPlacesWriteClient();
-  if (!client || places.length === 0) {
+  if (places.length === 0) {
     return;
   }
 
-  const { error } = await client.from("city_places_cache").upsert(
-    {
-      city_name: cityName,
-      place_type: type,
-      places_data: places,
-      updated_at: updatedAt,
-    },
-    { onConflict: "city_name,place_type" }
-  );
+  if (!supabaseServer) {
+    getPlacesWriteClient();
+    return;
+  }
 
-  if (error) {
-    console.warn(`[places] Failed to save cache for ${cityName}/${type}:`, error.message);
+  try {
+    await writePlacesCache(cityName, type, places, updatedAt);
+  } catch (error) {
+    console.warn(
+      `[places] Failed to save cache for ${cityName}/${type}:`,
+      error instanceof Error ? error.message : error
+    );
   }
 }
 
@@ -249,23 +253,19 @@ function recordPlacesCacheEvent(type: PlaceType, isHit: boolean): void {
   // an RPC per request just to record "hit: true" indistinguishably. 10% is
   // statistically sufficient for ratio tracking while cutting DB write load.
   if (Math.random() > 0.1) return;
-  const client = getPlacesWriteClient();
-  if (!client) {
+  if (!supabaseServer) {
+    getPlacesWriteClient();
     return;
   }
 
   void (async () => {
     try {
-      const { error } = await client.rpc("record_cache_event", {
-        p_cache_type: `places:${type}`,
-        p_is_hit: isHit,
-      });
-
-      if (error) {
-        console.warn(`[places] Failed to record cache event for ${type}:`, error.message);
-      }
+      await writePlacesCacheEvent(type, isHit);
     } catch (error) {
-      console.warn(`[places] Failed to record cache event for ${type}:`, error);
+      console.warn(
+        `[places] Failed to record cache event for ${type}:`,
+        error instanceof Error ? error.message : error
+      );
     }
   })();
 }
@@ -345,13 +345,8 @@ async function loadExistingBlurhashes(
 ): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   try {
-    const { data } = await supabase
-      .from("city_places_cache")
-      .select("places_data")
-      .eq("city_name", cityName)
-      .eq("place_type", type)
-      .maybeSingle();
-    const places = (data?.places_data ?? []) as Landmark[];
+    const cache = await readPlacesCache(cityName, type);
+    const places = cache?.places_data ?? [];
     for (const p of places) {
       if (p.id && typeof p.blurhash === "string" && p.blurhash.length > 0) {
         map.set(p.id, p.blurhash);
@@ -679,14 +674,7 @@ export async function getTopPlaces(
   try {
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
-    const { data: cache } = bypassCache
-      ? { data: null }
-      : await supabase
-          .from("city_places_cache")
-          .select("places_data, updated_at")
-          .eq("city_name", cityName)
-          .eq("place_type", type)
-          .maybeSingle();
+    const cache = bypassCache ? null : await readPlacesCache(cityName, type);
 
     if (cache) {
       const updatedAt = new Date(cache.updated_at);

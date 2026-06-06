@@ -1,5 +1,15 @@
 import { z } from "zod";
-import { supabaseServer } from "@/lib/supabase";
+import { createLogger } from "@/lib/logger";
+import {
+  upsertDailyVisitorStats,
+  upsertTrafficSource,
+  upsertDeviceStats,
+  upsertGeoStats,
+  upsertCityViews,
+  upsertUserAction,
+} from "@/platform/data-access/analytics-repository";
+
+const log = createLogger({ component: "analytics" });
 
 // =============================================================================
 // Types
@@ -136,8 +146,6 @@ export async function recordDailyVisitorStats(
   sessionDuration: number | null,
   pageCount: number | null
 ): Promise<void> {
-  if (!supabaseServer) return;
-
   const sessions = new Set<string>();
   let newVisitors = 0;
   let returningVisitors = 0;
@@ -154,17 +162,23 @@ export async function recordDailyVisitorStats(
   const uniqueVisitors = sessions.size;
   const isBounce = pageCount !== null && pageCount <= 1;
 
-  const { error } = await supabaseServer.rpc("upsert_daily_visitor_stats", {
-      p_date: date,
-      p_visits: totalVisits,
-      p_unique: uniqueVisitors,
-      p_pageviews: pageViews,
-      p_duration: sessionDuration || 0,
-      p_bounce: isBounce ? 1 : 0,
-      p_new: newVisitors,
-      p_returning: returningVisitors,
+  try {
+    await upsertDailyVisitorStats({
+      date,
+      visits: totalVisits,
+      unique: uniqueVisitors,
+      pageviews: pageViews,
+      duration: sessionDuration || 0,
+      bounce: isBounce ? 1 : 0,
+      newVisitors,
+      returningVisitors,
     });
-  if (error) console.error("[analytics] Failed to update daily visitor stats:", error);
+  } catch (error) {
+    log.error("daily_stats_write_failed", {
+      date,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 export async function recordTrafficSource(
@@ -173,16 +187,22 @@ export async function recordTrafficSource(
   sourceName: string,
   uniqueVisitors: number
 ): Promise<void> {
-  if (!supabaseServer) return;
-
-  const { error } = await supabaseServer.rpc("upsert_traffic_source", {
-      p_date: date,
-      p_source_type: sourceType,
-      p_source_name: sourceName,
-      p_visits: 1,
-      p_unique: uniqueVisitors,
+  try {
+    await upsertTrafficSource({
+      date,
+      sourceType,
+      sourceName,
+      visits: 1,
+      unique: uniqueVisitors,
     });
-  if (error) console.error("[analytics] Failed to update traffic sources:", error);
+  } catch (error) {
+    log.error("traffic_source_write_failed", {
+      date,
+      sourceType,
+      sourceName,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 export async function recordDeviceStats(
@@ -191,15 +211,20 @@ export async function recordDeviceStats(
   browser: string | null,
   os: string | null
 ): Promise<void> {
-  if (!supabaseServer) return;
-
-  const { error } = await supabaseServer.rpc("upsert_device_stats", {
-      p_date: date,
-      p_device: deviceType,
-      p_browser: browser,
-      p_os: os,
+  try {
+    await upsertDeviceStats({
+      date,
+      device: deviceType,
+      browser,
+      os,
     });
-  if (error) console.error("[analytics] Failed to update device stats:", error);
+  } catch (error) {
+    log.error("device_stats_write_failed", {
+      date,
+      deviceType,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 export async function recordGeoStats(
@@ -208,38 +233,53 @@ export async function recordGeoStats(
   countryName: string,
   city: string | null
 ): Promise<void> {
-  if (!supabaseServer) return;
-
-  const { error } = await supabaseServer.rpc("upsert_geo_stats", {
-      p_date: date,
-      p_country_code: countryCode,
-      p_country_name: countryName,
-      p_city: city,
+  try {
+    await upsertGeoStats({
+      date,
+      countryCode,
+      countryName,
+      city,
     });
-  if (error) console.error("[analytics] Failed to update geo stats:", error);
+  } catch (error) {
+    log.error("geo_stats_write_failed", {
+      date,
+      countryCode,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 export async function recordCityView(date: string, cityId: number): Promise<void> {
-  if (!supabaseServer) return;
-
-  const { error } = await supabaseServer.rpc("upsert_city_views", {
-      p_date: date,
-      p_city_id: cityId,
+  try {
+    await upsertCityViews({
+      date,
+      cityId,
     });
-  if (error) console.error("[analytics] Failed to update city views:", error);
+  } catch (error) {
+    log.error("city_view_write_failed", {
+      date,
+      cityId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 export async function recordUserAction(
   date: string,
   actionType: z.infer<typeof ActionType>
 ): Promise<void> {
-  if (!supabaseServer) return;
-
-  const { error } = await supabaseServer.rpc("upsert_user_action", {
-      p_date: date,
-      p_action: actionType,
+  try {
+    await upsertUserAction({
+      date,
+      action: actionType,
     });
-  if (error) console.error("[analytics] Failed to update user actions:", error);
+  } catch (error) {
+    log.error("user_action_write_failed", {
+      date,
+      actionType,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 // =============================================================================

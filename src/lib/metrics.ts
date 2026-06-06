@@ -1,9 +1,14 @@
 import "server-only";
-import { supabase, supabaseServer } from "./supabase";
 import type { City } from "./cities";
-import { CACHE_TTL, isCacheFresh, minutes } from "./cache-config";
+import { CACHE_TIERS, classifyAge } from "./cache-config";
 import { fetchCurrent as fetchOpenMeteo, fetchPm25 } from "./providers/openMeteo";
 import { createLogger } from "./logger";
+import { runCacheFirstSWR } from "@/platform/cache/swr";
+import {
+  readCityMetricsCache,
+  writeCityMetricsCache,
+  type CityMetricsCacheRow,
+} from "@/platform/data-access/metrics-cache-repository";
 
 const log = createLogger({ component: "metrics" });
 
@@ -36,7 +41,7 @@ function comfortFromTemp(temp: number | null): string | null {
   return "Cold";
 }
 
-function toMetrics(data: Record<string, unknown>): CityMetrics {
+function toMetrics(data: CityMetricsCacheRow | Record<string, unknown>): CityMetrics {
   return {
     cost_index: (data.cost_index as number) ?? null,
     connectivity_mbps: (data.connectivity_mbps as number) ?? null,
@@ -49,7 +54,7 @@ function toMetrics(data: Record<string, unknown>): CityMetrics {
   };
 }
 
-async function fetchAndCacheMetrics(city: City): Promise<CityMetrics> {
+async function fetchFreshMetrics(city: City): Promise<CityMetrics> {
   const [pm25, temp] = await Promise.all([
     getOpenMeteoAirQuality(city.lat, city.lng),
     getOpenMeteoWeather(city.lat, city.lng),
@@ -66,54 +71,43 @@ async function fetchAndCacheMetrics(city: City): Promise<CityMetrics> {
     source: { pollution: "open-meteo/air-quality", climate: "open-meteo/weather" },
   };
 
-  const db = supabaseServer ?? supabase;
-  db.from("city_metrics")
-    .upsert({ city_id: city.id, ...metrics }, { onConflict: "city_id" })
-    .then(({ error }: { error: unknown }) => {
-      if (error) log.error("cache_write_failed", { cityId: city.id, error: String(error) });
-    });
-
   return metrics;
 }
 
+function toCacheRow(metrics: CityMetrics): CityMetricsCacheRow {
+  return {
+    cost_index: metrics.cost_index,
+    connectivity_mbps: metrics.connectivity_mbps,
+    safety_score: metrics.safety_score,
+    pollution_pm25: metrics.pollution_pm25,
+    climate_comfort: metrics.climate_comfort,
+    health_access_per_100k: metrics.health_access_per_100k,
+    updated_at: metrics.updated_at,
+    source: metrics.source ?? null,
+  };
+}
+
 export async function getCityMetrics(city: City): Promise<CityMetrics | null> {
-  const ttlMs = minutes(CACHE_TTL.METRICS_FRESH_MINUTES);
-
-  try {
-    const { data, error } = await supabase
-      .from("city_metrics")
-      .select(
-        "cost_index, connectivity_mbps, safety_score, pollution_pm25, climate_comfort, health_access_per_100k, updated_at, source"
-      )
-      .eq("city_id", city.id)
-      .maybeSingle();
-
-    if (!error && data) {
-      const cached = toMetrics(data as Record<string, unknown>);
-
-      if (isCacheFresh(cached.updated_at, ttlMs)) {
-        return cached;
+  return runCacheFirstSWR<CityMetrics>({
+    readCache: async () => {
+      const row = await readCityMetricsCache(city.id);
+      return {
+        value: row ? toMetrics(row) : null,
+        updatedAt: row?.updated_at ?? null,
+      };
+    },
+    classify: (updatedAt) => classifyAge(updatedAt, CACHE_TIERS.METRICS),
+    fetchFresh: async () => fetchFreshMetrics(city),
+    writeCache: async (value) => {
+      await writeCityMetricsCache(city.id, toCacheRow(value));
+    },
+    onError: (event, error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      if (event === "live_fetch_failed") {
+        log.error(event, { cityId: city.id, error: message });
+      } else {
+        log.warn(event, { cityId: city.id, error: message });
       }
-
-      // Stale-while-revalidate: return stale data, refresh in background
-      fetchAndCacheMetrics(city).catch(() => {});
-      return cached;
-    }
-  } catch (e) {
-    log.warn("cache_read_failed", {
-      cityId: city.id,
-      error: e instanceof Error ? e.message : String(e),
-    });
-  }
-
-  // No cache at all -- fetch fresh (blocking)
-  try {
-    return await fetchAndCacheMetrics(city);
-  } catch (e) {
-    log.error("live_fetch_failed", {
-      cityId: city.id,
-      error: e instanceof Error ? e.message : String(e),
-    });
-    return null;
-  }
+    },
+  });
 }

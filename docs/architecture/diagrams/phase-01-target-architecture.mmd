@@ -1,0 +1,19 @@
+flowchart TD
+    A[src/app/api/* Thin Route Handlers] --> B[src/domains/* Domain Services]
+    B --> C[src/platform/cache SWR Orchestration]
+    B --> D[src/platform/data-access Repositories]
+    B --> E[src/platform/provider-gateway External Providers]
+    B --> F[src/platform/observability Logging and Metrics]
+
+    D --> G[(Supabase Postgres and RPC)]
+    E --> H[Google Places]
+    E --> I[Gemini]
+    E --> J[OpenWeather]
+    E --> K[Open-Meteo]
+
+    L[src/components/* UI and Features] --> A
+    L --> B
+
+    M[src/shared/* Schemas Types Utilities] --> A
+    M --> B
+    M --> L
