@@ -94,3 +94,7 @@ supabase/.temp/
 *.tgz
 .npm/
 
+# graphify generated caches (keep graph reports/json tracked)
+/graphify-out/cache/
+/src/graphify-out/cache/
+
