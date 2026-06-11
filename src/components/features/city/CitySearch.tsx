@@ -125,7 +125,7 @@ function CitySearch({ topCities }: CitySearchProps) {
           aria-expanded={shouldShowResults}
           aria-controls={resultsListId}
           aria-activedescendant={activeOptionId}
-          className="border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full rounded-[1.2rem] border py-4 pr-14 pl-12 text-sm font-semibold shadow-sm transition-all duration-300 outline-none sm:rounded-[1.4rem] md:rounded-[1.7rem] md:py-5 md:pr-18 md:pl-16 md:text-lg"
+          className="border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full rounded-xl border py-4 pr-14 pl-12 text-sm font-semibold shadow-sm transition-all duration-300 outline-none sm:rounded-2xl md:rounded-3xl md:py-5 md:pr-18 md:pl-16 md:text-lg"
         />
 
         {/* Principle 4: Contrast - Loading indicator */}
@@ -305,7 +305,7 @@ function CitySearch({ topCities }: CitySearchProps) {
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-[1.2rem] shadow-xl sm:rounded-[1.4rem] md:rounded-[1.8rem] ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
+              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-xl shadow-xl sm:rounded-2xl md:rounded-3xl ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li

@@ -137,6 +137,7 @@ function toWeatherCacheRow(weather: WeatherData): CityWeatherCacheRow {
  */
 export async function getCityWeather(city: City): Promise<WeatherData | null> {
   return runCacheFirstSWR<WeatherData>({
+    key: `weather:${city.id}`,
     readCache: async () => {
       const row = await readCityWeatherCache(city.id);
       return {

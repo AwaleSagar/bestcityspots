@@ -39,17 +39,17 @@ const outcomes = [
   },
 ];
 
-export default function TestimonialsSection() {
+// UI review item 12: renamed from TestimonialsSection — it presents design
+// principles, not social proof. If genuine testimonials/usage stats are added
+// later, reintroduce a dedicated section for them.
+export default function PrinciplesSection() {
   return (
     <section className="mx-auto max-w-7xl" aria-labelledby="highlights-heading">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
         <ScrollReveal animation="fade-up">
           <div className="lg:sticky lg:top-24">
             <p className="text-muted text-xs font-medium tracking-wider uppercase">Use The Atlas</p>
-            <h2
-              id="highlights-heading"
-              className="text-foreground mt-3 max-w-md text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
-            >
+            <h2 id="highlights-heading" className="text-foreground section-title mt-3 max-w-md">
               Designed for real trip decisions.
             </h2>
             <p className="text-muted mt-3 text-sm leading-relaxed md:text-base">

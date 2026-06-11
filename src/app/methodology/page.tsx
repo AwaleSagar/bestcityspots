@@ -137,7 +137,7 @@ export default function MethodologyPage() {
           <section aria-labelledby="sources-heading" className="mt-12">
             <h2
               id="sources-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               <Database className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
               Data sources
@@ -146,7 +146,7 @@ export default function MethodologyPage() {
               {sources.map((source) => (
                 <li
                   key={source.name}
-                  className="border-line bg-surface/60 rounded-[1.2rem] border p-5"
+                  className="border-line bg-surface/60 rounded-xl border p-5"
                 >
                   <h3 className="text-foreground text-base font-semibold">{source.name}</h3>
                   <p className="text-muted mt-2 text-sm leading-relaxed">{source.used_for}</p>
@@ -162,7 +162,7 @@ export default function MethodologyPage() {
           <section aria-labelledby="principles-heading" className="mt-12">
             <h2
               id="principles-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               <CheckCircle2 className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
               Principles
@@ -182,14 +182,14 @@ export default function MethodologyPage() {
           <nav className="mt-12 flex flex-wrap gap-3" aria-label="Methodology navigation">
             <Link
               href="/about"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
               Back to About
             </Link>
             <Link
               href="/resources/top-cities"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               Browse city guides
               <ArrowRight className="h-4 w-4" aria-hidden />

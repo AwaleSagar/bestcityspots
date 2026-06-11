@@ -117,7 +117,7 @@ async function FAQContent({ city }: { city: City }) {
         </p>
         <dl className="space-y-3">
           {faqs.map((f) => (
-            <div key={f.q} className="border-line bg-surface/65 rounded-[1.1rem] border p-4 sm:p-5">
+            <div key={f.q} className="border-line bg-surface/65 rounded-lg border p-4 sm:p-5">
               <dt className="text-foreground text-sm font-semibold sm:text-base">{f.q}</dt>
               <dd className="text-muted mt-2 text-sm leading-relaxed">{f.a}</dd>
             </div>
@@ -134,7 +134,7 @@ function FAQFallback() {
       <h2 id="city-faq-heading-fallback" className="labelled-rule">
         Travelers frequently ask
       </h2>
-      <div className="bg-muted/15 h-32 animate-pulse rounded-[1.1rem]" />
+      <div className="bg-muted/15 h-32 animate-pulse rounded-lg" />
     </section>
   );
 }

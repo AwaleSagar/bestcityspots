@@ -7,12 +7,23 @@ export interface CacheSnapshot<T> {
 }
 
 export interface SwrOrchestrationOptions<T> {
+  /**
+   * Stable identity for this cache entry (e.g. `weather:123`). When provided,
+   * concurrent calls for the same key share a single in-flight orchestration —
+   * stampede protection so a crawler burst hitting one cold page triggers at
+   * most one provider fetch per process (incident action P1).
+   */
+  key?: string;
   readCache: () => Promise<CacheSnapshot<T>>;
   classify: (updatedAt: string | null) => CacheFreshness;
   fetchFresh: () => Promise<T | null>;
   writeCache?: (value: T) => Promise<void>;
   onError?: (event: string, error: unknown) => void;
 }
+
+// Per-process single-flight registry. Bounded by the number of concurrently
+// cold keys; entries are removed as soon as their orchestration settles.
+const inFlight = new Map<string, Promise<unknown>>();
 
 async function safeWrite<T>(
   writeCache: ((value: T) => Promise<void>) | undefined,
@@ -28,6 +39,23 @@ async function safeWrite<T>(
 }
 
 export async function runCacheFirstSWR<T>(options: SwrOrchestrationOptions<T>): Promise<T | null> {
+  if (!options.key) {
+    return orchestrate(options);
+  }
+
+  const existing = inFlight.get(options.key);
+  if (existing) {
+    return existing as Promise<T | null>;
+  }
+
+  const run = orchestrate(options).finally(() => {
+    inFlight.delete(options.key as string);
+  });
+  inFlight.set(options.key, run);
+  return run;
+}
+
+async function orchestrate<T>(options: SwrOrchestrationOptions<T>): Promise<T | null> {
   let cached: CacheSnapshot<T> = { value: null, updatedAt: null };
 
   try {

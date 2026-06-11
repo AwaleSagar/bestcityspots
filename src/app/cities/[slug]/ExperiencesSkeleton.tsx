@@ -11,7 +11,7 @@ function Shimmer() {
 function ExperienceCardSkeleton({ isFeatured }: { isFeatured: boolean }) {
   return (
     <div
-      className={`liquid-glass overflow-hidden rounded-2xl md:rounded-[2rem] ${isFeatured ? "md:col-span-2" : ""}`}
+      className={`liquid-glass overflow-hidden rounded-2xl md:rounded-3xl ${isFeatured ? "md:col-span-2" : ""}`}
     >
       {/* Image skeleton with overlaid elements */}
       <div
@@ -103,7 +103,7 @@ export default function ExperiencesSkeleton() {
   ];
 
   return (
-    <div className="space-y-10">
+    <div role="status" aria-label="Loading city experiences" className="space-y-10">
       {/* Header skeleton */}
       <div className="space-y-3">
         <div className="flex items-center gap-4">
@@ -120,7 +120,7 @@ export default function ExperiencesSkeleton() {
       <div className="space-y-8">
         {/* Tab switcher skeleton */}
         <div className="flex flex-col gap-4">
-          <div className="border-line bg-background/55 flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border p-1.5 md:rounded-[1.5rem]">
+          <div className="border-line bg-background/55 flex w-fit flex-wrap items-center gap-1.5 rounded-2xl border p-1.5 md:rounded-2xl">
             {tabs.map((tab, index) => {
               const Icon = tab.icon;
               const isFirst = index === 0;
@@ -137,14 +137,14 @@ export default function ExperiencesSkeleton() {
                     }`}
                   />
                   <span
-                    className={`text-[11px] font-black tracking-[0.1em] uppercase ${
+                    className={`text-xs font-black tracking-[0.1em] uppercase ${
                       isFirst ? "text-foreground" : "text-foreground/30"
                     }`}
                   >
                     {tab.label}
                   </span>
                   <span
-                    className={`rounded-full px-1.5 py-0.5 text-[11px] font-black ${
+                    className={`rounded-full px-1.5 py-0.5 text-xs font-black ${
                       isFirst ? "bg-accent/15 text-accent" : "bg-foreground/5 text-foreground/25"
                     }`}
                   >
@@ -179,7 +179,7 @@ export default function ExperiencesSkeleton() {
               />
             ))}
           </div>
-          <span className="text-foreground/40 text-[11px] font-black tracking-[0.2em] uppercase">
+          <span className="text-foreground/40 text-xs font-black tracking-[0.2em] uppercase">
             Discovering experiences...
           </span>
         </div>

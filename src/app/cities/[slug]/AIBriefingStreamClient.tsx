@@ -186,7 +186,7 @@ function StreamingHeaderBadge() {
     <motion.span
       initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
       animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1 }}
-      className="text-accent/80 inline-flex items-center gap-1.5 text-[11px] font-black tracking-[0.2em] uppercase"
+      className="text-accent/80 inline-flex items-center gap-1.5 text-xs font-black tracking-[0.2em] uppercase"
     >
       <span className="bg-accent h-1.5 w-1.5 animate-pulse rounded-full" aria-hidden />
       Live
@@ -207,7 +207,7 @@ export default function AIBriefingStreamClient({
 
   if (!insight && errored) {
     return (
-      <section className="atlas-panel rounded-[1.4rem] p-6 sm:rounded-[1.7rem] md:rounded-[2rem]">
+      <section className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:rounded-3xl">
         <h2 className="labelled-rule">
           <Sparkles className="text-accent h-4 w-4" />
           AI City Briefing

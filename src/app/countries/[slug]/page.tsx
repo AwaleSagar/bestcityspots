@@ -150,7 +150,7 @@ export default async function CountryPage({
           <section aria-labelledby="cities-heading" className="mt-12">
             <h2
               id="cities-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               Cities in {country.country}
             </h2>
@@ -166,7 +166,7 @@ export default async function CountryPage({
           <nav className="mt-12 flex flex-wrap gap-3" aria-label="Country navigation">
             <Link
               href="/countries"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
               All countries

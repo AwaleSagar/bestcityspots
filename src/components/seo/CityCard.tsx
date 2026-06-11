@@ -19,7 +19,7 @@ export default function CityCard({ city, context }: CityCardProps) {
   return (
     <Link
       href={cityHref(city)}
-      className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-[1.1rem] border px-4 py-3 transition-colors duration-200"
+      className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
     >
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-base font-semibold tracking-tight">{city.city}</h3>
@@ -28,13 +28,13 @@ export default function CityCard({ city, context }: CityCardProps) {
           {city.admin_name ? `${city.admin_name}, ${city.country}` : city.country}
         </p>
         {context ? (
-          <p className="text-muted-strong mt-1 truncate text-[11px] tracking-wide uppercase">
+          <p className="text-muted-strong mt-1 truncate text-xs tracking-wide uppercase">
             {context}
           </p>
         ) : null}
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
-        <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
+        <span className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
           {formatPopulation(city.population)}
         </span>
         <ArrowUpRight

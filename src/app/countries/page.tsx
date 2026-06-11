@@ -77,10 +77,10 @@ export default async function CountriesIndexPage() {
               <li key={country.slug}>
                 <Link
                   href={`/countries/${country.slug}`}
-                  className="border-line bg-surface/65 hover:bg-surface text-foreground flex items-center justify-between gap-4 rounded-[1rem] border px-4 py-3 transition-colors duration-200"
+                  className="border-line bg-surface/65 hover:bg-surface text-foreground flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
                 >
                   <span className="truncate text-sm font-semibold">{country.country}</span>
-                  <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
+                  <span className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
                     {country.cityCount} {country.cityCount === 1 ? "city" : "cities"}
                   </span>
                 </Link>
@@ -91,14 +91,14 @@ export default async function CountriesIndexPage() {
           <nav className="mt-12 flex flex-wrap gap-3" aria-label="Countries navigation">
             <Link
               href="/"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
               Back to home
             </Link>
             <Link
               href="/cities"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               All cities A→Z
             </Link>

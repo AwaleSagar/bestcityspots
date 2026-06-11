@@ -93,7 +93,7 @@ export default async function CitiesIndexPage() {
           <section aria-labelledby="facets-heading" className="mt-10">
             <h2
               id="facets-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               Browse by country
             </h2>
@@ -105,7 +105,7 @@ export default async function CitiesIndexPage() {
                   className="border-line bg-surface/65 text-muted-strong hover:text-foreground rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 >
                   {country.country}{" "}
-                  <span className="text-muted ml-1 text-[11px]">{country.cityCount}</span>
+                  <span className="text-muted ml-1 text-xs">{country.cityCount}</span>
                 </Link>
               ))}
               <Link
@@ -120,7 +120,7 @@ export default async function CitiesIndexPage() {
           <section aria-labelledby="top-cities-heading" className="mt-12">
             <h2
               id="top-cities-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               Top {cities.length} cities by population
             </h2>
@@ -136,7 +136,7 @@ export default async function CitiesIndexPage() {
           <nav className="mt-12 flex flex-wrap gap-3" aria-label="Cities navigation">
             <Link
               href="/"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
               Back to home

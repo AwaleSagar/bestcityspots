@@ -98,3 +98,12 @@ supabase/.temp/
 /graphify-out/cache/
 /src/graphify-out/cache/
 
+
+# Internal UI/UX review reference (not tracked)
+bestcityspots.md
+
+# Internal backend incident reference (not tracked)
+bestcityspots-backend-incident-actions.md
+
+# Internal user-story planning artifact (not tracked)
+bestcityspots-user-stories.md

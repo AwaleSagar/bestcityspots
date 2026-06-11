@@ -41,7 +41,7 @@ const trendingSignals = [
   "Easy planning entry",
   "Live guide ready",
   "Urban scale signal",
-  "Good comparison anchor",
+  "Well-known reference",
 ];
 
 export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProps) {
@@ -85,7 +85,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
               whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}
               transition={{ duration: 0.42, delay: shouldReduceMotion ? 0 : index * 0.05, ease }}
-              className="intent-card rounded-[1.25rem] p-4 sm:p-5"
+              className="intent-card rounded-xl p-4 sm:p-5"
             >
               <Icon className="text-accent h-4 w-4" aria-hidden />
               <h3 className="text-foreground mt-4 text-base leading-tight">{label}</h3>
@@ -94,7 +94,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
           ))}
         </div>
 
-        <div className="organic-panel destination-story-card rounded-[1.6rem] p-5 sm:p-6">
+        <div className="organic-panel destination-story-card rounded-2xl p-5 sm:p-6">
           <div>
             <p className="source-chip">
               <MapPinned className="h-3.5 w-3.5" aria-hidden />
@@ -130,7 +130,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
           </div>
         </div>
 
-        <div className="border-line bg-surface/70 rounded-[1.4rem] border p-5 sm:p-6">
+        <div className="border-line bg-surface/70 rounded-2xl border p-5 sm:p-6">
           <p className="text-muted text-xs font-medium tracking-wider uppercase">
             What makes this different
           </p>
@@ -149,7 +149,7 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
                 text: "Saved places and notes live on your device without an account gate.",
               },
             ].map(({ title, text }) => (
-              <div key={title} className="border-line bg-surface/72 rounded-[1rem] border p-4">
+              <div key={title} className="border-line bg-surface/72 rounded-lg border p-4">
                 <h3 className="text-foreground text-sm font-medium">{title}</h3>
                 <p className="text-muted mt-0.5 text-sm leading-relaxed">{text}</p>
               </div>

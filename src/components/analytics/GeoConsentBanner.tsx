@@ -106,7 +106,7 @@ export function GeoConsentBanner() {
           aria-labelledby="geo-consent-title"
           aria-describedby="geo-consent-description"
         >
-          <div ref={panelRef} className="border-line bg-surface-strong/95 relative overflow-hidden rounded-[1.8rem] border p-5 shadow-2xl backdrop-blur-xl">
+          <div ref={panelRef} className="border-line bg-surface-strong/95 relative overflow-hidden rounded-3xl border p-5 shadow-2xl backdrop-blur-xl">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[color:var(--color-brand-secondary)] via-[color:var(--color-accent)] to-[color:var(--color-accent-strong)]" />
 
             {/* Close button */}

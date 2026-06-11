@@ -10,15 +10,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build needs Supabase (generateStaticParams reads the cities table) but must
+# NEVER see paid-provider API keys: the cost guard is cache-only when
+# NODE_ENV=production and no live-fetch flag is set, so builds make zero paid
+# calls — and keys passed as build args persist in image layers (incident
+# action P4). Provide GOOGLE_* keys at runtime only, via env_file.
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
-ARG GOOGLE_PLACES_API_KEY
-ARG GOOGLE_GEMINI_API_KEY
 
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
-ENV GOOGLE_PLACES_API_KEY=$GOOGLE_PLACES_API_KEY
-ENV GOOGLE_GEMINI_API_KEY=$GOOGLE_GEMINI_API_KEY
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build

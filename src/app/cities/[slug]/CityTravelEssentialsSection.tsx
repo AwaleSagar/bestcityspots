@@ -49,8 +49,8 @@ export default function CityTravelEssentialsSection({
             text: "Google Places, public city data, weather providers, and AI-assisted summaries are labeled so the guide stays auditable.",
           },
         ].map(({ icon: ItemIcon, title, text, color }) => (
-          <div key={title} className="intent-card rounded-[1.1rem] p-4 sm:rounded-[1.3rem] sm:p-5">
-            <div className="text-muted mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase">
+          <div key={title} className="intent-card rounded-lg p-4 sm:rounded-xl sm:p-5">
+            <div className="text-muted mb-3 flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase">
               <ItemIcon className={`h-4 w-4 ${color}`} />
               {title}
             </div>

@@ -2,6 +2,18 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Tailwind Theme (radius scale — keep utilities and tokens in sync) ─── */
+
+@theme {
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-4xl: 2.5rem;
+}
+
 /* ─── Design Tokens ─── */
 
 :root {
@@ -13,7 +25,8 @@
   --color-surface: oklch(0.98 0.006 80);
   --color-surface-strong: oklch(0.96 0.01 78);
   --color-elevated: oklch(1 0 0);
-  --color-muted: oklch(0.55 0.015 42);
+  /* 0.53 lightness keeps muted text ≥ 4.5:1 on --background (WCAG 2.2 AA) */
+  --color-muted: oklch(0.53 0.015 42);
   --color-muted-strong: oklch(0.4 0.02 42);
   --color-line: color-mix(in oklab, var(--foreground) 8%, transparent);
   --color-accent: oklch(0.55 0.18 38);
@@ -52,13 +65,9 @@
 
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-cormorant-garamond);
-  --font-mono: var(--font-ibm-plex-mono);
+  /* System mono stack: usage is too sparse to justify a webfont payload (LCP) */
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, monospace;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
   --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
@@ -70,7 +79,9 @@
   --touch-target-min: 44px;
   --mobile-bottom-nav-height: 56px;
 
-  --text-fluid-xs: clamp(0.72rem, 0.7rem + 0.1vw, 0.76rem);
+  /* 0.75rem (12px) is the legibility floor for all text, incl. micro-labels */
+  --text-micro: 0.75rem;
+  --text-fluid-xs: clamp(0.75rem, 0.73rem + 0.1vw, 0.78rem);
   --text-fluid-sm: clamp(0.8rem, 0.78rem + 0.12vw, 0.875rem);
   --text-fluid-base: clamp(0.95rem, 0.93rem + 0.14vw, 1.05rem);
   --text-fluid-lg: clamp(1.1rem, 1.02rem + 0.36vw, 1.25rem);
@@ -81,6 +92,7 @@
   --text-fluid-hero: clamp(2.8rem, 1.8rem + 4vw, 5.6rem);
 
   --space-fluid-section: clamp(4rem, 8vw, 8rem);
+  --space-fluid-gap: calc(clamp(4rem, 8vw, 8rem) / 2);
   --space-fluid-panel: clamp(1.25rem, 2.5vw, 2.5rem);
   --radius-organic: 38% 62% 48% 52% / 56% 42% 58% 44%;
   --radius-organic-inverse: 62% 38% 54% 46% / 44% 58% 42% 56%;
@@ -138,7 +150,9 @@
 
 html {
   text-size-adjust: 100%;
-  scroll-padding-top: env(safe-area-inset-top, 0);
+  /* Sticky header height + safe area so anchor/focus targets are never
+     hidden under the nav (WCAG 2.2 — 2.4.11 Focus Not Obscured) */
+  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -175,15 +189,25 @@ html {
     padding-right: env(safe-area-inset-right, 0);
   }
 
+  /* Display serif only at large sizes — Cormorant's light strokes read thin
+     below ~1.5rem, so h3–h6 stay on the sans for scanability. */
   h1,
-  h2,
+  h2 {
+    font-family: var(--font-display), ui-serif, serif;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
   h3,
   h4,
   h5,
   h6 {
-    font-family: var(--font-display), ui-serif, serif;
-    line-height: 1;
-    letter-spacing: -0.03em;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
 
   p {
@@ -297,11 +321,12 @@ html {
   width: min(34vw, 22rem);
   aspect-ratio: 1;
   border-radius: var(--radius-organic);
+  /* Soft stops instead of filter: blur() — avoids per-section GPU blur
+     layers that cause scroll jank / INP regressions on mid-range devices */
   background:
-    radial-gradient(circle at 35% 35%, var(--color-leaf-soft), transparent 56%),
-    radial-gradient(circle at 70% 70%, var(--color-earth-soft), transparent 58%);
-  filter: blur(10px);
-  opacity: 0.72;
+    radial-gradient(circle at 35% 35%, var(--color-leaf-soft), transparent 70%),
+    radial-gradient(circle at 70% 70%, var(--color-earth-soft), transparent 72%);
+  opacity: 0.6;
   pointer-events: none;
   z-index: -1;
 }
@@ -376,7 +401,7 @@ html {
   background: color-mix(in oklab, var(--color-surface) 82%, var(--color-earth-soft));
   padding: 0.32rem 0.65rem;
   color: var(--color-muted-strong);
-  font-size: 0.68rem;
+  font-size: var(--text-micro);
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -437,7 +462,7 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.72rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -448,7 +473,7 @@ html {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.72rem;
+  font-size: var(--text-micro);
   font-weight: 500;
   color: var(--color-muted);
 }
@@ -456,6 +481,21 @@ html {
 .page-title {
   font-size: var(--text-fluid-hero);
   line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+/* Single source of truth for section-level headings (was inlined as
+   text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05] across components). */
+.section-title {
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  line-height: 1.1;
+}
+
+/* Vertical rhythm between page sections — one fluid scale, no breakpoint steps */
+.section-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-fluid-gap);
 }
 
 .lede {
@@ -468,7 +508,7 @@ html {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.72rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -487,7 +527,7 @@ html {
 .badge-featured {
   border-radius: 9999px;
   padding: 0.2rem 0.55rem;
-  font-size: 0.62rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   letter-spacing: 0.02em;
   background: var(--color-accent-soft);
@@ -573,10 +613,29 @@ html {
   background: radial-gradient(
     circle at 50% 50%,
     color-mix(in oklab, var(--color-accent) 6%, transparent),
-    transparent 70%
+    transparent 85%
   );
-  filter: blur(12px);
   z-index: -1;
+}
+
+/* CSS-only entrance for above-the-fold content (replaces framer-motion in
+   the hero — keeps the first viewport free of animation-library JS for INP).
+   Stagger via --fade-up-delay; globally disabled by the reduced-motion rule. */
+@keyframes fade-up-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up-in 0.5s var(--transition-fluid) both;
+  animation-delay: var(--fade-up-delay, 0s);
 }
 
 @keyframes pulse-glow {
@@ -602,6 +661,59 @@ html {
   animation: pulse-glow 5s ease-in-out infinite;
 }
 
+/* ─── Map (US-05/US-06) ─── */
+
+.bcs-map .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface-strong);
+  font-family: inherit;
+}
+
+.bcs-map .leaflet-control-attribution {
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  color: var(--color-muted);
+  font-size: 0.625rem;
+}
+
+.bcs-map .leaflet-control-attribution a {
+  color: var(--color-muted-strong);
+}
+
+/* Dark tiles via the established CSS-filter approach — no second tile set. */
+.dark .bcs-map .leaflet-tile {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+.bcs-marker {
+  background: transparent;
+  border: none;
+}
+
+.bcs-marker-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  border: 2px solid var(--color-accent-contrast);
+  box-shadow: var(--shadow-sm);
+}
+
+.bcs-marker--saved .bcs-marker-dot {
+  background: var(--color-leaf);
+}
+
+.bcs-marker--active .bcs-marker-dot {
+  background: var(--color-accent-strong);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 30%, transparent);
+}
+
+.bcs-marker:focus-visible .bcs-marker-dot {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 /* ─── Reduced Motion ─── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -612,6 +724,7 @@ html {
 
   body :where(*, *::before, *::after) {
     animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;

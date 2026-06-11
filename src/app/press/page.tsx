@@ -72,12 +72,12 @@ export default function PressPage() {
           <section aria-labelledby="assets-heading" className="mt-12">
             <h2
               id="assets-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               Brand assets
             </h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-              <li className="border-line bg-surface/60 rounded-[1.1rem] border p-4">
+              <li className="border-line bg-surface/60 rounded-lg border p-4">
                 <a
                   href="/logo.svg"
                   download
@@ -87,7 +87,7 @@ export default function PressPage() {
                 </a>
                 <p className="text-muted mt-2 text-xs">Vector mark, transparent background.</p>
               </li>
-              <li className="border-line bg-surface/60 rounded-[1.1rem] border p-4">
+              <li className="border-line bg-surface/60 rounded-lg border p-4">
                 <a
                   href="/opengraph-image"
                   className="text-foreground inline-flex items-center gap-3 text-sm font-semibold"
@@ -102,7 +102,7 @@ export default function PressPage() {
           <section aria-labelledby="facts-heading" className="mt-12">
             <h2
               id="facts-heading"
-              className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
             >
               Quick facts
             </h2>
@@ -134,7 +134,7 @@ export default function PressPage() {
             <section aria-labelledby="contact-heading" className="mt-12">
               <h2
                 id="contact-heading"
-                className="text-muted text-[11px] font-semibold tracking-[0.22em] uppercase"
+                className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
               >
                 <Mail className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
                 Contact
@@ -153,14 +153,14 @@ export default function PressPage() {
           <nav className="mt-12 flex flex-wrap gap-3" aria-label="Press navigation">
             <Link
               href="/"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
               Back to home
             </Link>
             <Link
               href="/methodology"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
             >
               Methodology
               <ArrowRight className="h-4 w-4" aria-hidden />

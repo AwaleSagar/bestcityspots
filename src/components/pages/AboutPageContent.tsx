@@ -63,7 +63,7 @@ export default function AboutPageContent() {
             <nav className="mb-10" aria-label="Breadcrumb">
               <Link
                 href="/"
-                className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+                className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden />
                 Back to explorer
@@ -71,7 +71,7 @@ export default function AboutPageContent() {
             </nav>
           </ScrollReveal>
 
-          <header className="atlas-frame rounded-[1.6rem] p-5 sm:rounded-[2rem] md:rounded-[2.4rem] md:p-8 lg:p-10">
+          <header className="atlas-frame rounded-2xl p-5 sm:rounded-3xl md:rounded-4xl md:p-8 lg:p-10">
             <ScrollReveal animation="fade-up">
               <span className="eyebrow">
                 <Sparkles className="text-accent h-3.5 w-3.5" aria-hidden />
@@ -112,8 +112,8 @@ export default function AboutPageContent() {
                   staggerIndex={index}
                   staggerDelay={0.1}
                 >
-                  <article className="atlas-panel interactive-card rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.8rem] md:p-6">
-                    <p className="text-muted font-mono text-[0.68rem] tracking-[0.24em] uppercase">
+                  <article className="atlas-panel interactive-card rounded-xl p-4 sm:rounded-2xl sm:p-5 md:rounded-3xl md:p-6">
+                    <p className="text-muted font-mono text-xs tracking-[0.24em] uppercase">
                       Principle 0{index + 1}
                     </p>
                     <h3 className="text-foreground mt-3 text-[2rem] leading-none">{item.title}</h3>
@@ -127,8 +127,8 @@ export default function AboutPageContent() {
           <section className="mt-16 grid gap-6 lg:grid-cols-3">
             {stack.map(({ icon: Icon, title, text }, index) => (
               <ScrollReveal key={title} animation="fade-up" staggerIndex={index} staggerDelay={0.1}>
-                <article className="atlas-frame rounded-[1.2rem] p-4 sm:rounded-[1.5rem] sm:p-5 md:rounded-[1.9rem] md:p-6">
-                  <div className="border-line bg-background/60 flex h-12 w-12 items-center justify-center rounded-[1rem] border">
+                <article className="atlas-frame rounded-xl p-4 sm:rounded-2xl sm:p-5 md:rounded-3xl md:p-6">
+                  <div className="border-line bg-background/60 flex h-12 w-12 items-center justify-center rounded-lg border">
                     <Icon className="text-accent h-5 w-5" aria-hidden />
                   </div>
                   <h3 className="text-foreground mt-5 text-[2rem] leading-none">{title}</h3>
@@ -142,14 +142,14 @@ export default function AboutPageContent() {
             <ScrollReveal animation="fade-up">
               <div
                 id="source-stack"
-                className="atlas-panel-strong rounded-[1.4rem] p-5 sm:rounded-[1.7rem] md:rounded-[2rem] md:p-7"
+                className="atlas-panel-strong rounded-2xl p-5 sm:rounded-3xl md:rounded-3xl md:p-7"
               >
                 <div className="labelled-rule">Source Stack</div>
                 <ul className="text-muted-strong mt-5 space-y-4 text-sm leading-7">
                   {sources.map((item) => (
                     <li
                       key={item}
-                      className="border-line bg-background/45 rounded-[1.15rem] border px-4 py-3"
+                      className="border-line bg-background/45 rounded-lg border px-4 py-3"
                     >
                       {item}
                     </li>
@@ -159,7 +159,7 @@ export default function AboutPageContent() {
             </ScrollReveal>
 
             <ScrollReveal animation="fade-up" delay={0.1}>
-              <div className="atlas-frame rounded-[1.4rem] p-5 sm:rounded-[1.7rem] md:rounded-[2rem] md:p-7">
+              <div className="atlas-frame rounded-2xl p-5 sm:rounded-3xl md:rounded-3xl md:p-7">
                 <div className="labelled-rule">How to read the product</div>
                 <div className="text-muted mt-5 space-y-4 text-sm leading-7">
                   <p>
@@ -181,7 +181,7 @@ export default function AboutPageContent() {
           </section>
 
           <ScrollReveal animation="fade-up">
-            <section className="atlas-panel-strong mt-16 rounded-[1.4rem] p-5 sm:rounded-[1.8rem] md:rounded-[2.2rem] md:p-8">
+            <section className="atlas-panel-strong mt-16 rounded-2xl p-5 sm:rounded-3xl md:rounded-3xl md:p-8">
               <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <div>
                   <div className="labelled-rule">Next step</div>

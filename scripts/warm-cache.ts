@@ -474,6 +474,54 @@ async function checkInsightsCacheStatus(
 // Cache Warming Functions
 // ============================================================================
 
+// ── Warmer budget envelope (incident action P2) ─────────────────────────────
+// The warmer claims every paid call from the SAME durable daily counter as the
+// web app (public.claim_provider_use), so total provider spend per day is
+// bounded regardless of who initiates the call. The warmer's envelope is
+// configurable; once exhausted, remaining cities are skipped gracefully.
+const WARM_BUDGETS = {
+  "google-places": parseWarmBudget(process.env.WARM_CACHE_PLACES_BUDGET, 300),
+  gemini: parseWarmBudget(process.env.WARM_CACHE_GEMINI_BUDGET, 100),
+} as const;
+
+function parseWarmBudget(value: string | undefined, fallback: number): number {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
+const exhaustedBudgets = new Set<keyof typeof WARM_BUDGETS>();
+
+/**
+ * Atomic claim against the shared provider budget. Fails closed: any RPC
+ * error stops further paid calls for that provider in this run — a warmer
+ * must never be the thing that runs up an unbounded bill.
+ */
+async function claimProviderBudget(
+  supabase: SupabaseClient,
+  provider: keyof typeof WARM_BUDGETS
+): Promise<boolean> {
+  if (exhaustedBudgets.has(provider)) return false;
+
+  const { data, error } = await supabase.rpc("claim_provider_use", {
+    p_provider: provider,
+    p_day: new Date().toISOString().slice(0, 10),
+    p_limit: WARM_BUDGETS[provider],
+  });
+
+  if (error) {
+    console.error(`    [budget] claim failed for ${provider}: ${error.message} — failing closed`);
+    exhaustedBudgets.add(provider);
+    return false;
+  }
+  if (data !== true) {
+    console.warn(`    [budget] daily ${provider} budget exhausted — skipping remaining calls`);
+    exhaustedBudgets.add(provider);
+    return false;
+  }
+  return true;
+}
+
 async function warmPlacesCache(
   supabase: SupabaseClient,
   city: City,
@@ -494,6 +542,10 @@ async function warmPlacesCache(
   if (!apiKey) {
     console.error("    Error: GOOGLE_PLACES_API_KEY not set");
     return { warmed: false, cached: false, error: true };
+  }
+
+  if (!(await claimProviderBudget(supabase, "google-places"))) {
+    return { warmed: false, cached: false, error: false };
   }
 
   try {
@@ -575,6 +627,10 @@ async function warmInsightsCache(
   if (!apiKey) {
     console.error("    Error: GOOGLE_GEMINI_API_KEY not set");
     return { warmed: false, cached: false, error: true };
+  }
+
+  if (!(await claimProviderBudget(supabase, "gemini"))) {
+    return { warmed: false, cached: false, error: false };
   }
 
   try {

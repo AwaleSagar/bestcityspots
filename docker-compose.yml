@@ -4,13 +4,18 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        # Paid-provider keys intentionally NOT passed at build time (incident
+        # action P4): builds are cache-only, and build args leak into layers.
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
-        GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY}
-        GOOGLE_GEMINI_API_KEY: ${GOOGLE_GEMINI_API_KEY}
     image: bestcityspots:latest
     ports:
       - "127.0.0.1:3000:3000"
+    # Bounded resources: a crawler burst degrades gracefully (slow responses,
+    # 429s at nginx) instead of OOM-cycling the container — restart loops
+    # previously reset the in-memory cost guard (incident root cause 3).
+    mem_limit: 768m
+    cpus: 1.0
     environment:
       - HOSTNAME=0.0.0.0
       - PORT=3000

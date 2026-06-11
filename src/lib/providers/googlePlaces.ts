@@ -194,10 +194,10 @@ async function runPlacesRequest(
   signal?: AbortSignal
 ): Promise<PlacesResult> {
   if (
-    !tryClaimPaidProviderUse(
+    !(await tryClaimPaidProviderUse(
       PROVIDER,
       body.textQuery ? `search:${String(body.textQuery).slice(0, 80)}` : "search"
-    )
+    ))
   ) {
     return { ok: false, reason: "quota" };
   }
@@ -264,7 +264,7 @@ export async function fetchPhotoBytes(
 ): Promise<ArrayBuffer | null> {
   const apiKey = getApiKey();
   if (!apiKey) return null;
-  if (!tryClaimPaidProviderUse(PROVIDER, `photo:${photoName}`)) return null;
+  if (!(await tryClaimPaidProviderUse(PROVIDER, `photo:${photoName}`))) return null;
   const url = `${API_BASE}/${photoName}/media?maxWidthPx=${opts.maxWidth}&maxHeightPx=${opts.maxHeight}&key=${encodeURIComponent(apiKey)}`;
   try {
     const res = await httpFetch(url, {

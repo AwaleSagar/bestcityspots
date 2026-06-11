@@ -17,10 +17,11 @@ interface AIBriefingSectionProps {
  *    the full payload to arrive.
  */
 export default async function AIBriefingSection({ city }: AIBriefingSectionProps) {
-  const { insight, fresh } = await readCachedCityInsight(city.id);
+  const { insight, fresh, updatedAt } = await readCachedCityInsight(city.id);
 
   if (fresh && insight) {
-    return <AIBriefingClient insight={insight} />;
+    // US-11: surface the generation date next to the existing AI label.
+    return <AIBriefingClient insight={insight} generatedAt={updatedAt} />;
   }
 
   return <AIBriefingStreamClient cityId={city.id} initialInsight={insight} />;

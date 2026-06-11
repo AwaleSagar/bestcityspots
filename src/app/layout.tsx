@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import { Cormorant_Garamond, Instrument_Sans } from "next/font/google";
 import { AnalyticsProvider, PageTracker } from "@/components/analytics";
 import LazyGeoConsentBanner from "@/components/analytics/LazyGeoConsentBanner";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
@@ -35,12 +35,8 @@ const cormorantGaramond = Cormorant_Garamond({
   display: "swap",
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
-  subsets: ["latin"],
-  weight: ["400"],
-  display: "swap",
-});
+// IBM Plex Mono removed: --font-mono now uses the system mono stack
+// (globals.css) — its usage was too sparse to justify webfont weight on LCP.
 
 const publicConfig = publicEnv();
 const siteUrl = (publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
@@ -204,12 +200,15 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
-        className={`${instrumentSans.variable} ${cormorantGaramond.variable} ${ibmPlexMono.variable} min-h-screen antialiased`}
+        className={`${instrumentSans.variable} ${cormorantGaramond.variable} min-h-screen antialiased`}
       >
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >

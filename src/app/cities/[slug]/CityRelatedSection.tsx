@@ -28,7 +28,7 @@ async function RelatedContent({ city }: { city: City }) {
           <li key={c.id}>
             <Link
               href={cityHref(c)}
-              className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-[1.1rem] border px-4 py-3 transition-colors"
+              className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors"
             >
               <span className="min-w-0">
                 <span className="block truncate text-sm font-semibold">{c.city}</span>
@@ -37,7 +37,7 @@ async function RelatedContent({ city }: { city: City }) {
                 </span>
               </span>
               <span className="flex shrink-0 items-center gap-2">
-                <span className="text-muted text-[11px] font-semibold tracking-[0.18em] uppercase">
+                <span className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
                   {formatPopulation(c.population)}
                 </span>
                 <ArrowUpRight

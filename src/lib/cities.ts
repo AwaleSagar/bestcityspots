@@ -31,10 +31,7 @@ export interface City {
  * numeric id when slug is missing — the city route then 308-redirects to the
  * canonical URL so search engines and shared links converge regardless.
  */
-export function cityHref(
-  city: Pick<City, "id" | "slug">,
-  query?: { lat?: number; lng?: number }
-) {
+export function cityHref(city: Pick<City, "id" | "slug">, query?: { lat?: number; lng?: number }) {
   const segment = city.slug && city.slug.length > 0 ? city.slug : String(city.id);
   const search =
     query && typeof query.lat === "number" && typeof query.lng === "number"
@@ -160,8 +157,10 @@ export async function searchCities(
 export const getTopCities = reactCache(async (limit = 10) => {
   try {
     // Allow larger batches for UI/background visualizations (e.g. tag spheres),
-    // while still enforcing a reasonable upper bound.
-    const safeLimit = Math.max(1, Math.min(200, limit));
+    // while still enforcing a reasonable upper bound. 250 matches the warmed/
+    // pre-rendered/sitemap city set (US-02) — keep in sync with
+    // STATIC_CITY_COUNT and SITEMAP_CITY_COUNT.
+    const safeLimit = Math.max(1, Math.min(250, limit));
     const { data, error } = await supabase
       .from("cities")
       .select(
@@ -201,12 +200,25 @@ export async function getCityById(id: number) {
   }
 }
 
+// Negative cache for slug lookups (incident action P1): crawlers fuzzing
+// /cities/<garbage> previously caused a DB query per request; a confirmed
+// miss is now remembered for 24h so slug-enumeration never amplifies into
+// repeated lookups (and the page 404s without touching any provider path).
+// Only *confirmed* misses are cached — transient DB errors are not, so an
+// outage can't poison real cities.
+const negativeSlugCache = new LruCache<string, true>(2_000);
+const NEGATIVE_SLUG_TTL_MS = minutes(24 * 60);
+
 /**
  * Fetches a single city by its canonical slug. Used by the slug-based route
  * handler so that `/cities/lisbon-portugal` resolves without a numeric-id
  * round trip.
  */
 export async function getCityBySlug(slug: string) {
+  if (negativeSlugCache.peek(slug)) {
+    return null;
+  }
+
   try {
     const { data, error } = await supabase
       .from("cities")
@@ -219,7 +231,12 @@ export async function getCityBySlug(slug: string) {
       return null;
     }
 
-    return (data ?? null) as City | null;
+    if (!data) {
+      negativeSlugCache.set(slug, true, NEGATIVE_SLUG_TTL_MS);
+      return null;
+    }
+
+    return data as City;
   } catch (e) {
     console.error(`Error fetching city with slug "${slug}":`, e);
     return null;

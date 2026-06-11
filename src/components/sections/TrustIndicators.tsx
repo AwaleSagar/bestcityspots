@@ -30,7 +30,7 @@ const pillars = [
 export default function TrustIndicators() {
   return (
     <section
-      className="organic-panel mx-auto max-w-7xl rounded-[1.8rem] p-5 sm:rounded-[2.2rem] sm:p-7 md:p-10"
+      className="organic-panel mx-auto max-w-7xl rounded-3xl p-5 sm:rounded-3xl sm:p-7 md:p-10"
       aria-labelledby="trust-heading"
     >
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
@@ -39,7 +39,7 @@ export default function TrustIndicators() {
             <p className="source-chip">Trust signals</p>
             <h2
               id="trust-heading"
-              className="text-foreground mt-3 max-w-md text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05]"
+              className="text-foreground mt-3 max-w-md section-title"
             >
               Credibility shows up in the reading experience.
             </h2>
@@ -54,7 +54,7 @@ export default function TrustIndicators() {
           <ScrollReveal animation="fade-up">
             <div className="space-y-4">
               {pillars.map(({ icon: Icon, title, detail, iconColor }) => (
-                <article key={title} className="intent-card rounded-[1.25rem] p-5">
+                <article key={title} className="intent-card rounded-xl p-5">
                   <div className="flex items-start gap-3">
                     <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} aria-hidden />
                     <div>
@@ -68,7 +68,7 @@ export default function TrustIndicators() {
           </ScrollReveal>
 
           <ScrollReveal animation="fade-up" delay={0.2}>
-            <div className="border-line bg-surface/72 rounded-[1.25rem] border p-5">
+            <div className="border-line bg-surface/72 rounded-xl border p-5">
               <p className="text-muted text-xs font-medium tracking-wider uppercase">
                 Verification
               </p>

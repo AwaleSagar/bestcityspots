@@ -5,19 +5,25 @@ import { getCountrySummaries } from "@/lib/countries";
 import { listMonthSlugs } from "@/lib/topical-hubs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 export const revalidate = 86400;
 
 /**
- * Number of cities surfaced both in the sitemap and on `/resources/top-cities`.
- * Keeping the two in lock-step satisfies SEO audit T4 (sitemap/listing parity)
- * — every URL we submit is reachable via on-site navigation, eliminating
- * orphaned URLs and crawl waste.
+ * Number of cities surfaced in the sitemap.
+ *
+ * US-02 (product audit AF-3): this is pinned to the cache-warmed set — the
+ * same `STATIC_CITY_COUNT = 250` pre-rendered in `cities/[slug]/page.tsx`
+ * and warmed nightly by `scripts/warm-cache.ts --top-cities=250`. Submitting
+ * only pages with real cached content follows Google's thin-content guidance
+ * ("fewer, stronger pages"): long-tail cities remain reachable and render
+ * the reduced template, but are never advertised to crawlers. If the warm
+ * envelope changes, change BOTH constants together.
  */
-export const SITEMAP_CITY_COUNT = 50;
+export const SITEMAP_CITY_COUNT = 250;
 
 const homeImage = `${siteUrl}/opengraph-image`;
 
@@ -53,6 +59,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.3,
+      images: [homeImage],
+    },
+    // UI review item 4: accessibility statement (EAA expectation).
+    {
+      url: `${siteUrl}/accessibility`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      priority: 0.2,
       images: [homeImage],
     },
     // SEO Phase 2.3: IA hubs.

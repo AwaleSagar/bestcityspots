@@ -66,7 +66,7 @@ export default function ScrollProgress({
       {/* Percentage indicator */}
       {showPercentage && (
         <motion.div
-          className="bg-background/80 absolute top-3 right-4 rounded-full px-2 py-0.5 text-[10px] font-bold backdrop-blur-sm"
+          className="bg-background/80 absolute top-3 right-4 rounded-full px-2 py-0.5 text-xs font-bold backdrop-blur-sm"
           style={{ opacity: scrollYProgress }}
         >
           <span>{progressValue}%</span>

@@ -20,14 +20,18 @@
     "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run",
     "analytics": "tsx scripts/analytics-report.ts",
     "analytics:30d": "tsx scripts/analytics-report.ts --days 30",
-    "analytics:json": "tsx scripts/analytics-report.ts --json"
+    "analytics:json": "tsx scripts/analytics-report.ts --json",
+    "test:metrics": "tsx scripts/test-metrics-display.ts",
+    "import:cost": "tsx scripts/import-cost-index.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.90.1",
+    "@types/leaflet": "^1.9.21",
     "blurhash": "^2.0.5",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.25.0",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
     "next": "16.1.1",
     "next-themes": "^0.4.6",

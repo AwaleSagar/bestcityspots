@@ -15,6 +15,7 @@ const companyLinks = [
   { href: "/methodology", label: "Methodology" },
   { href: "/press", label: "Press kit" },
   { href: "/about#source-stack", label: "Data sources" },
+  { href: "/accessibility", label: "Accessibility" },
 ] as const;
 
 export default function SiteFooter() {

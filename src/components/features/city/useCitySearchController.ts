@@ -36,7 +36,7 @@ export function useCitySearchController({ containerRef }: UseCitySearchControlle
   const timeOfDay = useMemo(() => {
     const hour = new Date().getHours();
     if (hour < 11) return "Morning planning";
-    if (hour < 17) return "Afternoon comparison";
+    if (hour < 17) return "Afternoon research";
     if (hour < 21) return "Evening shortlist";
     return "Late-night dreaming";
   }, []);

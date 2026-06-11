@@ -13,8 +13,7 @@ export default function CityPlanningPanel({ cityName, className }: CityPlanningP
       </h3>
       <p className="text-muted text-sm leading-relaxed">
         Explore AI-powered briefings, live weather data, budget filters, and curated local
-        experiences. Save your favorite spots to build a personal itinerary - all free, no sign-up
-        required.
+        experiences. Save your favorite spots and add private notes — all free, no sign-up required.
       </p>
       <Link href="/resources/top-cities" className="btn-primary w-full">
         Browse Free City Guide

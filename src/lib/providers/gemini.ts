@@ -42,7 +42,7 @@ export async function generateText(prompt: string): Promise<GeminiResult> {
   if (!client) {
     return { ok: false, reason: "auth", correlationId };
   }
-  if (!tryClaimPaidProviderUse(PROVIDER, "generateText")) {
+  if (!(await tryClaimPaidProviderUse(PROVIDER, "generateText"))) {
     return { ok: false, reason: "rate_limit", correlationId };
   }
   try {
@@ -83,7 +83,7 @@ export async function generateTextStream(prompt: string): Promise<GeminiStreamSt
   if (!client) {
     return { ok: false, reason: "auth", correlationId };
   }
-  if (!tryClaimPaidProviderUse(PROVIDER, "generateTextStream")) {
+  if (!(await tryClaimPaidProviderUse(PROVIDER, "generateTextStream"))) {
     return { ok: false, reason: "rate_limit", correlationId };
   }
   try {

@@ -1,14 +1,12 @@
-import { getCityById, getCityBySlug, getTopCities } from "@/lib/cities";
+import { getCityById, getCityBySlug, getTopCities, cityHref, type City } from "@/lib/cities";
+import { haversineKm } from "@/lib/geo";
+import { readCachedCityInsight } from "@/lib/intelligence";
+import { readPlacesCache } from "@/platform/data-access/places-cache-repository";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
 import { getCityMetrics } from "@/lib/metrics";
 import { getCityWeather } from "@/lib/weather";
-import {
-  cityIdSchema,
-  citySlugSchema,
-  coordinatesSchema,
-  numericIdParam,
-} from "@/lib/validation";
+import { cityIdSchema, citySlugSchema, coordinatesSchema, numericIdParam } from "@/lib/validation";
 import { publicEnv } from "@/lib/env";
 import ExperiencesSection from "./ExperiencesSection";
 import ExperiencesSkeleton from "./ExperiencesSkeleton";
@@ -19,6 +17,7 @@ import CityRelatedSection from "./CityRelatedSection";
 import CityPlanningPanel from "./CityPlanningPanel";
 import CityTravelEssentialsSection from "./CityTravelEssentialsSection";
 import CityVitals from "@/components/features/city/CityVitals";
+import CityMap from "@/components/features/city/CityMap";
 import {
   MapPin,
   Users,
@@ -37,11 +36,9 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense, cache } from "react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CityViewTracker from "@/components/analytics/CityViewTracker";
-import {
-  CityVitalsFallback,
-  getArrivalMood,
-  MetricCard,
-} from "./city-page-parts";
+import { CityVitalsFallback, getArrivalMood, MetricCard } from "./city-page-parts";
+import { selectAvailableMetrics, shouldRenderMetricsPanel } from "@/lib/metrics-display";
+import type { ComponentType } from "react";
 
 // Emergency cost guard: regenerate city pages at most once per day so crawler
 // bursts don't repeatedly execute the full server component tree.
@@ -69,51 +66,88 @@ const getCachedCityBySlug = cache(getCityBySlug);
 const getCachedCityById = cache(getCityById);
 const getCachedCityWeather = cache(getCityWeather);
 
-const siteUrl =
-  publicEnv().NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://bestcityspots.com";
+// US-01 (audit AF-3): a city is "warm" when at least one substantive cached
+// layer exists (AI insight or places). Cache-only reads — this check can
+// never trigger a paid provider call. Request-scoped so generateMetadata and
+// the page body share one lookup.
+const isCityWarm = cache(async (city: City): Promise<boolean> => {
+  const [insight, places] = await Promise.all([
+    readCachedCityInsight(city.id)
+      .then((read) => read.insight)
+      .catch(() => null),
+    readPlacesCache(city.city, "landmarks").catch(() => null),
+  ]);
+  return Boolean(insight || places);
+});
+
+const siteUrl = publicEnv().NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://bestcityspots.com";
 
 function CoreMetricsSkeleton() {
   return (
-    <div className="grid animate-pulse grid-cols-1 gap-4">
-      <div className="atlas-panel h-[120px] rounded-[1.1rem] sm:rounded-[1.3rem]" />
-      <div className="atlas-panel h-[120px] rounded-[1.1rem] sm:rounded-[1.3rem]" />
+    <div
+      role="status"
+      aria-label="Loading city metrics"
+      className="grid animate-pulse grid-cols-1 gap-4"
+    >
+      <div className="atlas-panel h-[120px] rounded-lg sm:rounded-xl" />
+      <div className="atlas-panel h-[120px] rounded-lg sm:rounded-xl" />
     </div>
   );
 }
 
+// US-03 (audit AF-2): icons per metric key; the selection of which metrics
+// render lives in src/lib/metrics-display.ts and is value-driven.
+const METRIC_ICONS: Record<string, ComponentType<{ className?: string }>> = {
+  pollution_pm25: CloudIcon,
+  climate_comfort: ThermometerSun,
+  cost_index: Users,
+  safety_score: ShieldCheck,
+  connectivity_mbps: Activity,
+  health_access_per_100k: Activity,
+};
+
 async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
   if (!city) return null;
   const metrics = await getCityMetrics(city);
+  const rows = selectAvailableMetrics(metrics);
+
+  // Fewer than two real metrics: the panel doesn't earn its space — the
+  // live weather/AQI vitals section alone tells the story (US-03).
+  if (!shouldRenderMetricsPanel(rows)) return null;
+
   return (
     <>
       <div className="grid grid-cols-1 gap-4">
-        <MetricCard
-          icon={CloudIcon}
-          label="Pollution (PM2.5)"
-          value={metrics?.pollution_pm25}
-          unit="µg/m³"
-          source={metrics?.source?.pollution as string | undefined}
-        />
-        <MetricCard
-          icon={ThermometerSun}
-          label="Climate Comfort"
-          value={metrics?.climate_comfort}
-          source={metrics?.source?.climate as string | undefined}
-        />
+        {rows.map((row) => (
+          <MetricCard
+            key={row.key}
+            icon={METRIC_ICONS[row.key] ?? Activity}
+            label={row.label}
+            value={row.value}
+            unit={row.unit}
+            source={row.source}
+          />
+        ))}
       </div>
-      <div className="text-muted mt-4 flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase">
-        <Activity className="h-3.5 w-3.5" />
-        {/* SEO Phase 2.4 (audit 5.7): explicit "Last verified" wording so
-            E-E-A-T cues are unambiguous to both readers and crawlers. */}
-        {metrics?.updated_at
-          ? `Last verified ${new Date(metrics.updated_at).toLocaleDateString()}`
-          : "Pending data"}
-      </div>
+      {metrics?.updated_at ? (
+        <div className="text-muted mt-4 flex items-center gap-2 text-xs font-semibold tracking-[0.15em] uppercase">
+          <Activity className="h-3.5 w-3.5" />
+          {/* SEO Phase 2.4 (audit 5.7): explicit "Last verified" wording so
+              E-E-A-T cues are unambiguous to both readers and crawlers. */}
+          {`Last verified ${new Date(metrics.updated_at).toLocaleDateString()}`}
+        </div>
+      ) : null}
     </>
   );
 }
 
-async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
+async function WeatherSummaryCards({
+  city,
+  reduced = false,
+}: {
+  city: Awaited<ReturnType<typeof getCityById>>;
+  reduced?: boolean;
+}) {
   if (!city) return null;
   const weather = await getCachedCityWeather(city);
 
@@ -128,7 +162,11 @@ async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof g
         {
           icon: Clock3,
           label: "Best next step",
-          value: "Scan the AI briefing, then save places into a personal route.",
+          // US-01/US-04: the reduced profile has no AI briefing — don't
+          // point at one.
+          value: reduced
+            ? "Check live conditions below, then jump to the nearest full guide."
+            : "Scan the AI briefing, then save places into a personal route.",
         },
         {
           icon: Activity,
@@ -138,8 +176,8 @@ async function WeatherSummaryCards({ city }: { city: Awaited<ReturnType<typeof g
             : "Weather and air quality are checked when available.",
         },
       ].map(({ icon: ItemIcon, label, value }) => (
-        <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
-          <div className="text-muted flex items-center gap-2 text-[11px] font-semibold tracking-[0.16em] uppercase">
+        <div key={label} className="border-line bg-surface/72 rounded-lg border p-4">
+          <div className="text-muted flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase">
             <ItemIcon className="text-accent h-3.5 w-3.5" />
             {label}
           </div>
@@ -154,12 +192,12 @@ function WeatherSummaryFallback() {
   return (
     <>
       {["Arrival mood", "Best next step", "Live context"].map((label) => (
-        <div key={label} className="border-line bg-surface/72 rounded-[1rem] border p-4">
-          <div className="text-muted flex items-center gap-2 text-[11px] font-semibold tracking-[0.16em] uppercase">
+        <div key={label} className="border-line bg-surface/72 rounded-lg border p-4">
+          <div className="text-muted flex items-center gap-2 text-xs font-semibold tracking-[0.16em] uppercase">
             <Activity className="text-accent h-3.5 w-3.5" />
             {label}
           </div>
-          <div className="bg-muted/15 mt-3 h-10 animate-pulse rounded-[0.8rem]" />
+          <div className="bg-muted/15 mt-3 h-10 animate-pulse rounded-md" />
         </div>
       ))}
     </>
@@ -245,6 +283,8 @@ async function ExperiencesWrapper({
         landmarks={landmarks}
         restaurants={restaurants}
         hotels={hotels}
+        centerLat={lat}
+        centerLng={lng}
       />
     </div>
   );
@@ -313,8 +353,7 @@ function deriveCityDescription(
     if (raw.length <= META_DESC_MAX_LENGTH) return raw;
     const cut = raw.slice(0, META_DESC_TRUNCATE_AT);
     const lastSpace = cut.lastIndexOf(" ");
-    const trimmed =
-      lastSpace > META_DESC_WORD_BOUNDARY_FLOOR ? cut.slice(0, lastSpace) : cut;
+    const trimmed = lastSpace > META_DESC_WORD_BOUNDARY_FLOOR ? cut.slice(0, lastSpace) : cut;
     return `${trimmed.replace(/[.,;:\s]+$/, "")}…`;
   }
   return `${cityName} travel guide with live weather, neighborhoods, AI-assisted briefings, and curated places in ${countryName}.`;
@@ -347,10 +386,17 @@ export async function generateMetadata({
   const title = `${city.city} Travel Guide: Live Weather, Neighborhoods & AI Insights (${year})`;
   const canonical = buildCanonicalUrl(city);
 
+  // US-01/US-02 (audit AF-3): un-warmed cities render the reduced template
+  // and are kept out of the index ("fewer, stronger pages" — Google's
+  // thin-content guidance). `follow` keeps link equity flowing to the
+  // nearest covered city and country hubs.
+  const warm = await isCityWarm(city);
+
   return {
     title,
     description,
     alternates: { canonical },
+    ...(warm ? {} : { robots: { index: false, follow: true } }),
     openGraph: {
       title: `${city.city} Travel Guide | Best City Spots`,
       description,
@@ -363,6 +409,199 @@ export async function generateMetadata({
       description,
     },
   };
+}
+
+// US-01 (audit AF-3): point visitors of lightweight pages at the nearest city
+// with a full guide. Computed against the warmed top-250 set with the
+// existing haversine helper — one request-memoized DB read, no providers.
+async function NearestCoveredCity({ city }: { city: City }) {
+  const top = await getTopCities(250);
+  let best: { candidate: City; km: number } | null = null;
+  for (const candidate of top) {
+    if (candidate.id === city.id) continue;
+    if (typeof candidate.lat !== "number" || typeof candidate.lng !== "number") continue;
+    const km = haversineKm(city.lat, city.lng, candidate.lat, candidate.lng);
+    if (!best || km < best.km) best = { candidate, km };
+  }
+  if (!best) return null;
+
+  return (
+    <section aria-labelledby="nearest-covered-heading" className="space-y-6">
+      <h2 id="nearest-covered-heading" className="labelled-rule">
+        Nearest full guide
+      </h2>
+      <Link
+        href={cityHref(best.candidate)}
+        className="atlas-panel-strong interactive-card flex items-center justify-between gap-4 rounded-2xl p-6 md:p-8"
+      >
+        <div>
+          <p className="text-foreground text-2xl font-bold tracking-tight">
+            {best.candidate.city}, {best.candidate.country}
+          </p>
+          <p className="text-muted mt-2 text-sm leading-relaxed">
+            About {Math.round(best.km).toLocaleString()} km away — full guide with AI briefing,
+            curated places, and live city signals.
+          </p>
+        </div>
+        <Navigation className="text-accent h-6 w-6 shrink-0" aria-hidden />
+      </Link>
+    </section>
+  );
+}
+
+/**
+ * US-01 (audit AF-3): honest reduced layout for cities without cached
+ * substance. Shows only what is real — geo facts, live weather/AQI from the
+ * free providers, the nearest fully covered city, and same-country links.
+ * No AI briefing shell, no empty experiences, no "Generating…" stubs, and no
+ * paid provider call can be triggered from this render path.
+ */
+function ReducedCityPage({
+  city,
+  touristJsonLd,
+  breadcrumbJsonLd,
+}: {
+  city: City;
+  touristJsonLd: object;
+  breadcrumbJsonLd: object;
+}) {
+  return (
+    <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(touristJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <CityViewTracker cityId={city.id} />
+      <div
+        className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
+        style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
+      >
+        <Breadcrumbs
+          items={[{ label: "Cities", href: "/resources/top-cities" }, { label: city.city }]}
+        />
+        <nav
+          className="mb-10 flex flex-wrap items-center gap-3 md:mb-14"
+          aria-label="City navigation"
+        >
+          <Link
+            href="/"
+            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Return to explorer
+          </Link>
+          {/* US-07: comparison entry point on the city page header. */}
+          <Link
+            href={city.slug ? `/compare?cities=${city.slug}` : "/compare"}
+            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+          >
+            Compare this city
+          </Link>
+        </nav>
+
+        <div className="mx-auto max-w-3xl space-y-14">
+          <header className="organic-panel relative overflow-visible rounded-2xl p-5 sm:rounded-3xl md:rounded-4xl md:p-8">
+            <div className="mb-3 flex flex-wrap items-center gap-3 md:mb-4">
+              <span className="eyebrow">
+                <Navigation className="text-accent h-3.5 w-3.5" />
+                {city.iso3 || "CITY"}
+              </span>
+              <span className="atlas-chip">{city.capital || "Urban center"}</span>
+              <span className="source-chip">
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Lightweight profile
+              </span>
+            </div>
+            <h1 className="text-foreground block text-[clamp(2.4rem,6vw,4.6rem)] leading-[0.95] break-words">
+              {city.city}{" "}
+              <span className="text-muted-strong text-[0.42em] tracking-[0.18em] uppercase">
+                City Profile
+              </span>
+            </h1>
+            <div className="mt-3 flex items-center gap-6 md:mt-4">
+              <p className="text-muted-strong text-xl font-semibold tracking-[0.16em] uppercase md:text-2xl">
+                {city.country}
+              </p>
+              <div className="from-line h-px flex-1 bg-gradient-to-r to-transparent" />
+            </div>
+            <p className="text-muted mt-5 max-w-2xl text-sm leading-relaxed">
+              This is a lightweight data profile: verified facts and live conditions, without the
+              full editorial guide. Our complete guides currently cover the most-visited cities.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3 md:mt-7">
+              <Suspense fallback={<WeatherSummaryFallback />}>
+                <WeatherSummaryCards city={city} reduced />
+              </Suspense>
+            </div>
+          </header>
+
+          <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
+            <div className="atlas-panel rounded-xl p-6 sm:rounded-2xl md:p-8">
+              <div className="text-muted mb-6 flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[color:var(--color-cat-stays-soft)]">
+                  <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
+                </div>
+                <span className="text-xs font-semibold tracking-[0.2em] uppercase">
+                  Census Data
+                </span>
+              </div>
+              <div className="text-foreground mb-2 text-4xl font-bold tracking-[-0.02em] md:text-5xl">
+                {formatPopulation(city.population)}
+              </div>
+              <div className="text-muted text-xs font-medium tracking-[0.15em] uppercase">
+                Global Residents
+              </div>
+            </div>
+
+            <div className="atlas-panel rounded-xl p-6 sm:rounded-2xl md:p-8">
+              <div className="text-muted mb-4 flex items-center gap-4 sm:mb-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)]">
+                  <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
+                </div>
+                <span className="text-xs font-semibold tracking-[0.2em] uppercase">Territory</span>
+              </div>
+              <div className="text-foreground mb-2 text-2xl leading-tight font-bold tracking-tight md:text-3xl">
+                {city.admin_name || "Autonomous"}
+              </div>
+              <div className="text-muted text-xs font-medium tracking-[0.15em] uppercase">
+                {typeof city.lat === "number" && typeof city.lng === "number"
+                  ? `${city.lat.toFixed(2)}°, ${city.lng.toFixed(2)}°`
+                  : "Regional Hub"}
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-10">
+            <h2 className="labelled-rule">Live Conditions</h2>
+            <Suspense fallback={<CityVitalsFallback />}>
+              <CityVitalsSection city={city} />
+            </Suspense>
+          </section>
+
+          {/* US-05: geography is the reduced profile's main content. */}
+          <section className="space-y-6" aria-labelledby="reduced-map-heading">
+            <h2 id="reduced-map-heading" className="labelled-rule">
+              City Map
+            </h2>
+            <CityMap
+              centerLat={city.lat}
+              centerLng={city.lng}
+              label={`Map of ${city.city}`}
+              zoom={11}
+            />
+          </section>
+
+          <NearestCoveredCity city={city} />
+
+          <CityRelatedSection city={city} />
+        </div>
+      </div>
+    </main>
+  );
 }
 
 export default async function CityPage({
@@ -436,6 +675,20 @@ export default async function CityPage({
     ],
   };
 
+  // US-01 (audit AF-3): cold caches ⇒ honest reduced layout instead of a
+  // full template of empty section shells. Cache-only check, shared with
+  // generateMetadata (which adds noindex for the same condition).
+  const warm = await isCityWarm(city);
+  if (!warm) {
+    return (
+      <ReducedCityPage
+        city={city}
+        touristJsonLd={touristJsonLd}
+        breadcrumbJsonLd={breadcrumbJsonLd}
+      />
+    );
+  }
+
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
   return (
@@ -454,25 +707,32 @@ export default async function CityPage({
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
       >
         <Breadcrumbs
-          items={[
-            { label: "Cities", href: "/resources/top-cities" },
-            { label: city.city },
-          ]}
+          items={[{ label: "Cities", href: "/resources/top-cities" }, { label: city.city }]}
         />
-        <nav className="mb-10 md:mb-14" aria-label="City navigation">
+        <nav
+          className="mb-10 flex flex-wrap items-center gap-3 md:mb-14"
+          aria-label="City navigation"
+        >
           <Link
             href="/"
-            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-[0.72rem] font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
           >
             <ArrowLeft className="h-4 w-4" />
             Return to explorer
+          </Link>
+          {/* US-07: comparison entry point on the city page header. */}
+          <Link
+            href={city.slug ? `/compare?cities=${city.slug}` : "/compare"}
+            className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
+          >
+            Compare this city
           </Link>
         </nav>
 
         <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
-            <header className="organic-panel relative overflow-visible rounded-[1.6rem] p-5 sm:rounded-[2rem] md:rounded-[2.4rem] md:p-8">
+            <header className="organic-panel relative overflow-visible rounded-2xl p-5 sm:rounded-3xl md:rounded-4xl md:p-8">
               <div className="animate-pulse-glow pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px]" />
               <div className="mb-3 flex flex-wrap items-center gap-3 md:mb-4">
                 <span className="eyebrow">
@@ -509,36 +769,36 @@ export default async function CityPage({
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
+              <div className="atlas-panel interactive-card rounded-xl p-6 active:scale-[0.98] sm:rounded-2xl md:rounded-3xl md:p-8 lg:p-10">
                 <div className="text-muted mb-6 flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[color:var(--color-cat-stays-soft)] transition-colors duration-300">
                     <Users className="h-5 w-5 text-[color:var(--color-cat-stays)]" />
                   </div>
-                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
+                  <span className="text-xs font-semibold tracking-[0.2em] uppercase">
                     Census Data
                   </span>
                 </div>
                 <div className="text-foreground mb-2 text-4xl font-bold tracking-[-0.02em] md:text-5xl">
                   {formatPopulation(city.population)}
                 </div>
-                <div className="text-muted text-[11px] font-medium tracking-[0.15em] uppercase">
+                <div className="text-muted text-xs font-medium tracking-[0.15em] uppercase">
                   Global Residents
                 </div>
               </div>
 
-              <div className="atlas-panel interactive-card rounded-[1.2rem] p-6 active:scale-[0.98] sm:rounded-[1.5rem] md:rounded-[1.8rem] md:p-8 lg:p-10">
+              <div className="atlas-panel interactive-card rounded-xl p-6 active:scale-[0.98] sm:rounded-2xl md:rounded-3xl md:p-8 lg:p-10">
                 <div className="text-muted mb-4 flex items-center gap-4 sm:mb-6">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[0.9rem] bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[color:color-mix(in_oklab,var(--color-brand-accent)_14%,transparent)] transition-colors">
                     <MapPin className="h-5 w-5 text-[color:var(--color-brand-accent)]" />
                   </div>
-                  <span className="text-[11px] font-semibold tracking-[0.2em] uppercase">
+                  <span className="text-xs font-semibold tracking-[0.2em] uppercase">
                     Territory
                   </span>
                 </div>
                 <div className="text-foreground mb-2 text-2xl leading-tight font-bold tracking-tight md:text-3xl">
                   {city.admin_name || "Autonomous"}
                 </div>
-                <div className="text-muted text-[11px] font-medium tracking-[0.15em] uppercase">
+                <div className="text-muted text-xs font-medium tracking-[0.15em] uppercase">
                   Regional Hub
                 </div>
               </div>
@@ -561,7 +821,7 @@ export default async function CityPage({
             {/* Mobile-only CTA - shown before experiences */}
             <CityPlanningPanel
               cityName={city.city}
-              className="atlas-panel-strong relative space-y-6 rounded-[1.4rem] p-6 sm:rounded-[1.6rem] lg:hidden"
+              className="atlas-panel-strong relative space-y-6 rounded-2xl p-6 sm:rounded-2xl lg:hidden"
             />
 
             <Suspense fallback={<ExperiencesSkeleton />}>
@@ -585,11 +845,11 @@ export default async function CityPage({
           <div className="hidden space-y-8 lg:sticky lg:top-20 lg:col-span-4 lg:block">
             <CityPlanningPanel
               cityName={city.city}
-              className="atlas-panel-strong relative space-y-8 rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10"
+              className="atlas-panel-strong relative space-y-8 rounded-2xl p-6 sm:rounded-3xl md:p-10"
             />
 
-            <div className="atlas-panel rounded-[1.6rem] p-6 sm:rounded-[2rem] md:p-10">
-              <h4 className="text-muted text-[11px] font-semibold tracking-[0.25em] uppercase">
+            <div className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:p-10">
+              <h4 className="text-muted text-xs font-semibold tracking-[0.25em] uppercase">
                 Core Metrics
               </h4>
               <Suspense fallback={<CoreMetricsSkeleton />}>
