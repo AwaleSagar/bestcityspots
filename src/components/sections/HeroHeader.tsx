@@ -60,10 +60,11 @@ export default function HeroHeader() {
               <p className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">
                 Intent map
               </p>
-              {/* US-04: list only shipped capabilities. Re-add "comparison" /
-                  "planning" when US-07 / US-10 ship. */}
+              {/* US-04 honesty rule: all four are now shipped capabilities —
+                  comparison via /compare (US-07), planning via the
+                  day-by-day plan (US-10). */}
               <h2 className="text-foreground mt-2 text-2xl leading-none sm:text-3xl">
-                Discovery, live signals, local context.
+                Discovery, comparison, planning, arrival.
               </h2>
             </div>
           </div>

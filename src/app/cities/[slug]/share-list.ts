@@ -14,13 +14,17 @@
 export const SHARE_PARAM = "shared";
 export const MAX_SHARED_PLACES = 50;
 
-const VERSION = "1";
+// v1: ids only. v2 (US-10): each entry may carry a day suffix `@<n>`.
+const VERSION_V1 = "1";
+const VERSION_V2 = "2";
 const GOOGLE_PREFIX = "ChIJ";
 const PREFIX_MARKER = "~";
 
 export interface SharedList {
   city: string;
   ids: string[];
+  /** US-10: itinerary day per place id (1-based); absent = unassigned. */
+  days: Record<string, number>;
 }
 
 function toBase64Url(value: string): string {
@@ -49,9 +53,19 @@ function expandId(id: string): string {
   return id.startsWith(PREFIX_MARKER) ? GOOGLE_PREFIX + id.slice(PREFIX_MARKER.length) : id;
 }
 
-export function encodeSharedList(city: string, ids: readonly string[]): string {
+export function encodeSharedList(
+  city: string,
+  ids: readonly string[],
+  days: Record<string, number> = {}
+): string {
   const unique = [...new Set(ids)].slice(0, MAX_SHARED_PLACES);
-  const payload = `${VERSION}|${city.replace(/\|/g, " ")}|${unique.map(compressId).join(",")}`;
+  const entries = unique.map((id) => {
+    const day = days[id];
+    const suffix = typeof day === "number" && day > 0 ? `@${day}` : "";
+    return compressId(id) + suffix;
+  });
+  const version = entries.some((entry) => entry.includes("@")) ? VERSION_V2 : VERSION_V1;
+  const payload = `${version}|${city.replace(/\|/g, " ")}|${entries.join(",")}`;
   return toBase64Url(payload);
 }
 
@@ -61,14 +75,24 @@ export function decodeSharedList(token: string): SharedList | null {
   if (!payload) return null;
 
   const [version, city, idsRaw] = payload.split("|");
-  if (version !== VERSION || !city || idsRaw === undefined) return null;
+  if ((version !== VERSION_V1 && version !== VERSION_V2) || !city || idsRaw === undefined) {
+    return null;
+  }
 
-  const ids = idsRaw
-    .split(",")
-    .map((id) => expandId(id.trim()))
-    .filter((id) => /^[A-Za-z0-9_-]{4,128}$/.test(id))
-    .slice(0, MAX_SHARED_PLACES);
+  const ids: string[] = [];
+  const days: Record<string, number> = {};
+  for (const rawEntry of idsRaw.split(",")) {
+    const [rawId, rawDay] = rawEntry.trim().split("@");
+    const id = expandId(rawId);
+    if (!/^[A-Za-z0-9_-]{4,128}$/.test(id)) continue;
+    ids.push(id);
+    if (version === VERSION_V2 && rawDay) {
+      const day = Number.parseInt(rawDay, 10);
+      if (Number.isInteger(day) && day > 0 && day <= 99) days[id] = day;
+    }
+  }
 
-  if (ids.length === 0) return null;
-  return { city, ids: [...new Set(ids)] };
+  const unique = [...new Set(ids)].slice(0, MAX_SHARED_PLACES);
+  if (unique.length === 0) return null;
+  return { city, ids: unique, days };
 }

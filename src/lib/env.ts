@@ -25,6 +25,8 @@ const publicSchema = z.object({
   // unset the field is simply omitted from the structured data block.
   NEXT_PUBLIC_ORGANIZATION_SAME_AS: z.string().optional(),
   NEXT_PUBLIC_CONTACT_EMAIL: z.string().email().optional(),
+  // US-13: Booking.com partner id — affiliate links render only when set.
+  NEXT_PUBLIC_BOOKING_AFFILIATE_ID: z.string().min(3).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 });
 
@@ -65,6 +67,7 @@ export function publicEnv(): PublicEnv {
     NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
     NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
     NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+    NEXT_PUBLIC_BOOKING_AFFILIATE_ID: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID,
     NODE_ENV: process.env.NODE_ENV,
   });
   if (!parsed.success) {
@@ -122,6 +125,8 @@ function readPublicEnvValue(key: keyof PublicEnv): PublicEnv[keyof PublicEnv] {
       return env.NEXT_PUBLIC_ORGANIZATION_SAME_AS;
     case "NEXT_PUBLIC_CONTACT_EMAIL":
       return env.NEXT_PUBLIC_CONTACT_EMAIL;
+    case "NEXT_PUBLIC_BOOKING_AFFILIATE_ID":
+      return env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID;
     case "NODE_ENV":
       return env.NODE_ENV;
   }
@@ -155,6 +160,7 @@ function readServerEnvValue(key: keyof ServerEnv): ServerEnv[keyof ServerEnv] {
     case "NEXT_PUBLIC_ANALYTICS_DEV":
     case "NEXT_PUBLIC_ORGANIZATION_SAME_AS":
     case "NEXT_PUBLIC_CONTACT_EMAIL":
+    case "NEXT_PUBLIC_BOOKING_AFFILIATE_ID":
     case "NODE_ENV":
       return readPublicEnvValue(key);
   }

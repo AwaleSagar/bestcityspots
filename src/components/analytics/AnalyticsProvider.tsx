@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { publicEnv } from "@/lib/env";
 import {
   getSessionStorageItem,
@@ -23,7 +31,8 @@ export type ActionType =
   | "view_city"
   | "click_maps_link"
   | "share"
-  | "download_itinerary";
+  | "download_itinerary"
+  | "click_affiliate";
 
 interface AnalyticsEvent {
   type: "pageview" | "action" | "session_end";
@@ -254,10 +263,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
           ],
           { type: "application/json" }
         );
-        navigator.sendBeacon(
-          "/api/analytics",
-          payload
-        );
+        navigator.sendBeacon("/api/analytics", payload);
       } else {
         // Fallback to fetch with keepalive
         sendEvents(events);

@@ -1,19 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  Database,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Database, Sparkles } from "lucide-react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 // SEO Phase 2.4 (audit 7.3): explicit, structured methodology page that
 // surfaces sources, refresh cadence, and AI-vs-human attribution. Linked
@@ -26,16 +20,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/methodology" },
   openGraph: {
     title: "Methodology | Best City Spots",
-    description:
-      "Sources, refresh cadence, and AI-vs-human attribution behind every city guide.",
+    description: "Sources, refresh cadence, and AI-vs-human attribution behind every city guide.",
     url: "/methodology",
     type: "article",
   },
   twitter: {
     card: "summary",
     title: "Methodology | Best City Spots",
-    description:
-      "Sources, refresh cadence, and AI-vs-human attribution behind every city guide.",
+    description: "Sources, refresh cadence, and AI-vs-human attribution behind every city guide.",
   },
 };
 
@@ -129,9 +121,9 @@ export default function MethodologyPage() {
             Methodology &mdash; sources, refresh cadence, and AI attribution.
           </h1>
           <p className="lede mt-5 max-w-xl">
-            We treat travel data like a public record: every metric on a city page traces
-            back to a named provider, a refresh window, and a clear note about whether
-            humans or AI assembled it.
+            We treat travel data like a public record: every metric on a city page traces back to a
+            named provider, a refresh window, and a clear note about whether humans or AI assembled
+            it.
           </p>
 
           <section aria-labelledby="sources-heading" className="mt-12">
@@ -144,10 +136,7 @@ export default function MethodologyPage() {
             </h2>
             <ul className="mt-4 space-y-4">
               {sources.map((source) => (
-                <li
-                  key={source.name}
-                  className="border-line bg-surface/60 rounded-xl border p-5"
-                >
+                <li key={source.name} className="border-line bg-surface/60 rounded-xl border p-5">
                   <h3 className="text-foreground text-base font-semibold">{source.name}</h3>
                   <p className="text-muted mt-2 text-sm leading-relaxed">{source.used_for}</p>
                   <p className="text-muted-strong mt-2 flex items-center gap-2 text-xs">
@@ -157,6 +146,31 @@ export default function MethodologyPage() {
                 </li>
               ))}
             </ul>
+          </section>
+
+          {/* US-12 + US-13: transparency for counters and partner links. */}
+          <section aria-labelledby="transparency-heading" className="mt-12">
+            <h2
+              id="transparency-heading"
+              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
+            >
+              <CheckCircle2 className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
+              Counters &amp; partner links
+            </h2>
+            <div className="text-muted-strong mt-4 space-y-3 text-sm leading-relaxed">
+              <p>
+                &ldquo;Saved&rdquo; counters on place cards are fully anonymous aggregates: we store
+                only a per-place daily tally, never who saved what. No user identifiers, sessions,
+                or IP addresses are recorded, and counts are shown only once a place has been saved
+                at least five times.
+              </p>
+              <p>
+                Some stay listings include a clearly labeled <em>Partner</em> link to a booking
+                site. If you book through one, we may earn a commission at no extra cost to you.
+                Partner links never influence rankings — ordering comes from the same public rating
+                data as everything else — and we count only an anonymous total of clicks.
+              </p>
+            </div>
           </section>
 
           <section aria-labelledby="principles-heading" className="mt-12">

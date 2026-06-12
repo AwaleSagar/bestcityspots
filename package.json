@@ -22,7 +22,9 @@
     "analytics:30d": "tsx scripts/analytics-report.ts --days 30",
     "analytics:json": "tsx scripts/analytics-report.ts --json",
     "test:metrics": "tsx scripts/test-metrics-display.ts",
-    "import:cost": "tsx scripts/import-cost-index.ts"
+    "import:cost": "tsx scripts/import-cost-index.ts",
+    "test:share": "tsx scripts/test-share-list.ts",
+    "test": "npm run test:metrics && npm run test:share"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

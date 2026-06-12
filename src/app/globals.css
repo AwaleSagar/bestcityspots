@@ -714,6 +714,28 @@ html {
   outline-offset: 2px;
 }
 
+/* ─── Print (US-10): isolate the itinerary plan ─── */
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-itinerary,
+  .print-itinerary * {
+    visibility: visible;
+  }
+
+  .print-itinerary {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: none;
+    background: #fff;
+    color: #000;
+  }
+}
+
 /* ─── Reduced Motion ─── */
 
 @media (prefers-reduced-motion: reduce) {

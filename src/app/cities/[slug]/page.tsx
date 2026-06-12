@@ -38,6 +38,7 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CityViewTracker from "@/components/analytics/CityViewTracker";
 import { CityVitalsFallback, getArrivalMood, MetricCard } from "./city-page-parts";
 import { selectAvailableMetrics, shouldRenderMetricsPanel } from "@/lib/metrics-display";
+import { getPlaceSaveTotals } from "@/lib/place-saves";
 import type { ComponentType } from "react";
 
 // Emergency cost guard: regenerate city pages at most once per day so crawler
@@ -225,6 +226,11 @@ async function ExperiencesWrapper({
     getTopPlaces(cityName, "hotels", { lat, lng }),
   ]);
 
+  // US-12: anonymous aggregate save counts for the displayed places.
+  const saveCounts = await getPlaceSaveTotals(
+    [...landmarks, ...restaurants, ...hotels].map((place) => place.id)
+  );
+
   // SEO Phase 2.2 (audit 5.5): emit `Place` + `AggregateRating` JSON-LD
   // for the top landmarks, restaurants, and hotels actually displayed in
   // the Experiences carousel. Sourced from the same Google Places data
@@ -285,6 +291,7 @@ async function ExperiencesWrapper({
         hotels={hotels}
         centerLat={lat}
         centerLng={lng}
+        saveCounts={saveCounts}
       />
     </div>
   );

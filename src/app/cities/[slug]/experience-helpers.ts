@@ -12,7 +12,43 @@ export type SavedPlace = {
   googleMapsUri?: string;
   priceLevel?: string;
   rating?: number;
+  /**
+   * US-10: itinerary day bucket (1-based). Absent/0 = unassigned. Optional
+   * by design — pre-itinerary localStorage payloads parse unchanged, which
+   * is the versioned migration from the flat list.
+   */
+  day?: number;
 };
+
+/** US-10: highest assignable day (UI offers existing days + one new). */
+export const MAX_ITINERARY_DAYS = 14;
+
+/**
+ * US-10: multi-stop Google Maps directions URL for one itinerary day.
+ * Built per the Maps URLs spec (api=1; origin/destination + pipe-separated
+ * waypoints). Mobile Maps honors at most ~9 waypoints, so stops are capped
+ * at 11 total (origin + 9 + destination).
+ */
+export function buildDayDirectionsUrl(places: readonly SavedPlace[]): string | null {
+  const stops = places
+    .map((place) => `${place.name}, ${place.address || place.city}`)
+    .slice(0, 11)
+    .map(encodeURIComponent);
+
+  if (stops.length === 0) return null;
+  if (stops.length === 1) {
+    return `https://www.google.com/maps/search/?api=1&query=${stops[0]}`;
+  }
+
+  const origin = stops[0];
+  const destination = stops[stops.length - 1];
+  const waypoints = stops.slice(1, -1).join("%7C");
+  return (
+    `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}` +
+    (waypoints ? `&waypoints=${waypoints}` : "") +
+    "&travelmode=walking"
+  );
+}
 
 export type CityNotes = Record<string, string>;
 

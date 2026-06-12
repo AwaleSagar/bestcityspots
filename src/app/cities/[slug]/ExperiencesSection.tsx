@@ -19,6 +19,8 @@ import {
   SAVED_PLACES_STORAGE_KEY,
   toNoteMap,
   topK,
+  buildDayDirectionsUrl,
+  MAX_ITINERARY_DAYS,
   type CityNotes,
   type SavedPlace,
 } from "./experience-helpers";
@@ -38,9 +40,12 @@ import {
   MapPin,
   Share2,
   Import,
+  CalendarDays,
+  Printer,
 } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { useAnalytics } from "@/lib/useAnalytics";
+import { publicEnv } from "@/lib/env";
 
 interface ExperiencesSectionProps {
   cityName: string;
@@ -50,6 +55,8 @@ interface ExperiencesSectionProps {
   /** City center for the experiences map (US-05/US-06). */
   centerLat?: number;
   centerLng?: number;
+  /** US-12: anonymous aggregate save totals keyed by place id. */
+  saveCounts?: Record<string, number>;
 }
 
 export default function ExperiencesSection({
@@ -59,8 +66,11 @@ export default function ExperiencesSection({
   hotels,
   centerLat,
   centerLng,
+  saveCounts = {},
 }: ExperiencesSectionProps) {
   const [activeTab, setActiveTab] = useState<ExperienceTabId>("landmarks");
+  // US-13: affiliate links render only when the partner id is configured.
+  const bookingAffiliateId = publicEnv().NEXT_PUBLIC_BOOKING_AFFILIATE_ID;
   // US-06: list ↔ map selection sync.
   const [activeMarkerId, setActiveMarkerId] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<string | null>(null);
@@ -277,10 +287,37 @@ export default function ExperiencesSection({
   );
   const sharedUnresolvedCount = sharedList ? sharedList.ids.length - sharedResolved.length : 0;
 
+  // ── US-10: itinerary-lite — group saved places into days ────────────────
+  const assignDay = useCallback((placeId: string, day: number) => {
+    setSavedPlaces((previous) =>
+      previous.map((place) =>
+        place.id === placeId ? { ...place, day: day > 0 ? day : undefined } : place
+      )
+    );
+  }, []);
+
+  const dayGroups = useMemo(() => {
+    const groups = new Map<number, SavedPlace[]>();
+    for (const place of savedForCity) {
+      const day = place.day && place.day > 0 ? place.day : 0;
+      groups.set(day, [...(groups.get(day) ?? []), place]);
+    }
+    return [...groups.entries()].sort((a, b) => a[0] - b[0]);
+  }, [savedForCity]);
+
+  const assignableDays = useMemo(() => {
+    const maxAssigned = Math.max(0, ...savedForCity.map((place) => place.day ?? 0));
+    return Math.min(maxAssigned + 1, MAX_ITINERARY_DAYS);
+  }, [savedForCity]);
+
   const handleShareList = useCallback(async () => {
+    const dayByPlaceId = Object.fromEntries(
+      savedForCity.filter((place) => place.day && place.day > 0).map((p) => [p.id, p.day as number])
+    );
     const token = encodeSharedList(
       cityName,
-      savedForCity.map((place) => place.id)
+      savedForCity.map((place) => place.id),
+      dayByPlaceId
     );
     const url = `${window.location.origin}${window.location.pathname}?${SHARE_PARAM}=${token}`;
     trackAction("share"); // counts the action only — never the list contents
@@ -312,11 +349,13 @@ export default function ExperiencesSection({
           googleMapsUri: place.googleMapsUri,
           priceLevel: place.priceLevel,
           rating: place.rating,
+          // US-10: shared day grouping travels with the list (v2 tokens).
+          day: sharedList?.days[place.id],
         }));
       return [...previous, ...additions];
     });
     setImportDone(true);
-  }, [sharedResolved, cityName]);
+  }, [sharedResolved, cityName, sharedList]);
 
   const draftNotesMap = useMemo(() => toNoteMap(draftNotes), [draftNotes]);
   const placeNotesMap = toNoteMap(placeNotes);
@@ -332,6 +371,14 @@ export default function ExperiencesSection({
       }
 
       trackAction("save_place");
+      // US-12: bump the anonymous aggregate counter. Fire-and-forget; the
+      // payload is the place id only — never the user's list or identity.
+      void fetch("/api/places/save-event", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ placeId: place.id }),
+        keepalive: true,
+      }).catch(() => {});
       const nextPlace: SavedPlace = {
         id: place.id,
         city: cityName,
@@ -367,6 +414,9 @@ export default function ExperiencesSection({
     const addressContext = getAddressContext(item.formattedAddress);
     const primaryPulse = pulseTags[0] || formatType(item.types);
     const ratingLabel = item.rating ? item.rating.toFixed(1) : null;
+    // US-12: only show social proof once it's meaningful (≥5 saves).
+    const saveCount = saveCounts[item.id] ?? 0;
+    const savedLabel = saveCount >= 5 ? `Saved ${formatPopulation(saveCount)}×` : null;
     const reviewLabel =
       item.userRatingCount != null && item.userRatingCount > 0
         ? `${formatPopulation(item.userRatingCount)} reviews`
@@ -405,14 +455,24 @@ export default function ExperiencesSection({
               aria-hidden="true"
             />
             {/* Top-right: rating only */}
-            {ratingLabel && (
-              <div className="absolute top-4 right-4 z-30 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/50 px-2.5 py-1 text-xs font-black tracking-[0.06em] text-white backdrop-blur-md md:top-5 md:right-5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                {/* US-11: rating + compact review count, e.g. "4.6 · 12k" */}
-                <span>
-                  {ratingLabel}
-                  {item.userRatingCount ? ` · ${formatPopulation(item.userRatingCount)}` : ""}
-                </span>
+            {(ratingLabel || savedLabel) && (
+              <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 md:top-5 md:right-5">
+                {ratingLabel && (
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/50 px-2.5 py-1 text-xs font-black tracking-[0.06em] text-white backdrop-blur-md">
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    {/* US-11: rating + compact review count, e.g. "4.6 · 12k" */}
+                    <span>
+                      {ratingLabel}
+                      {item.userRatingCount ? ` · ${formatPopulation(item.userRatingCount)}` : ""}
+                    </span>
+                  </div>
+                )}
+                {savedLabel && (
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-black/50 px-2.5 py-1 text-xs font-black tracking-[0.06em] text-white backdrop-blur-md">
+                    <Bookmark className="h-3 w-3 fill-current" />
+                    <span>{savedLabel}</span>
+                  </div>
+                )}
               </div>
             )}
             {/* Bottom: name + address */}
@@ -493,6 +553,12 @@ export default function ExperiencesSection({
                   {reviewLabel}
                 </span>
               )}
+              {savedLabel && (
+                <span className="border-foreground/8 bg-foreground/[0.03] inline-flex items-center gap-1.5 rounded-full border px-3 py-1">
+                  <Bookmark className="text-accent h-3.5 w-3.5" />
+                  {savedLabel}
+                </span>
+              )}
             </div>
           )}
 
@@ -508,6 +574,23 @@ export default function ExperiencesSection({
               >
                 <MapPin className="h-3 w-3" />
                 Maps
+              </a>
+            )}
+            {/* US-13 (ADR-002): clearly-labeled partner link, stays only.
+                Plain anchor — zero JS/widget weight; aggregate click count
+                only. rel=sponsored per Google's paid-link guidance. */}
+            {activeTab === "hotels" && bookingAffiliateId && (
+              <a
+                href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
+                  `${item.displayName.text}, ${cityName}`
+                )}&aid=${encodeURIComponent(bookingAffiliateId)}`}
+                target="_blank"
+                rel="sponsored nofollow noopener noreferrer"
+                onClick={() => trackAction("click_affiliate")}
+                className="border-foreground/8 bg-foreground/[0.03] text-foreground/50 hover:border-accent/25 hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-bold tracking-[0.12em] uppercase transition-all active:scale-[0.97]"
+                title="Partner link — booking may earn us a commission at no cost to you."
+              >
+                Check availability · Partner
               </a>
             )}
             <button
@@ -820,6 +903,95 @@ export default function ExperiencesSection({
           )}
         </AnimatePresence>
       </div>
+
+      {/* US-10: itinerary-lite — organize the shortlist into days. */}
+      {savedForCity.length > 0 && (
+        <div
+          className="print-itinerary border-line bg-surface/70 rounded-2xl border p-5 md:p-6"
+          role="region"
+          aria-label="Itinerary days"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="source-chip">
+              <CalendarDays className="h-3.5 w-3.5" />
+              Day-by-day plan
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                trackAction("download_itinerary");
+                window.print();
+              }}
+              className="border-line bg-background/45 text-foreground/70 hover:text-foreground flex items-center gap-2 rounded-xl border px-3.5 py-2 text-xs font-black tracking-[0.15em] uppercase transition-colors"
+            >
+              <Printer className="text-accent h-3.5 w-3.5" />
+              Print plan
+            </button>
+          </div>
+
+          <div className="mt-5 space-y-6">
+            {dayGroups.map(([day, places]) => {
+              const directionsUrl = day > 0 ? buildDayDirectionsUrl(places) : null;
+              return (
+                <div key={day}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h4 className="text-muted text-xs font-black tracking-[0.18em] uppercase">
+                      {day === 0 ? "Unassigned" : `Day ${day}`}
+                      <span className="text-foreground/30 ml-2">{places.length}</span>
+                    </h4>
+                    {directionsUrl && (
+                      <a
+                        href={directionsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => trackAction("click_maps_link")}
+                        className="text-link text-xs font-semibold print:hidden"
+                      >
+                        Open Day {day} in Google Maps
+                      </a>
+                    )}
+                  </div>
+                  <ul className="mt-2 space-y-2">
+                    {places.map((place) => (
+                      <li
+                        key={place.id}
+                        className="border-line flex flex-wrap items-center justify-between gap-3 border-b pb-2"
+                      >
+                        <span className="text-foreground/80 text-sm font-semibold">
+                          {place.name}
+                          <span className="text-foreground/30 ml-2 text-xs tracking-[0.15em] uppercase">
+                            {place.type}
+                          </span>
+                        </span>
+                        <label className="flex items-center gap-2 text-xs print:hidden">
+                          <span className="sr-only">Move {place.name} to day</span>
+                          <select
+                            value={place.day ?? 0}
+                            onChange={(event) =>
+                              assignDay(place.id, Number.parseInt(event.target.value, 10))
+                            }
+                            className="border-line bg-background text-foreground rounded-md border px-2 py-1.5 text-xs"
+                          >
+                            <option value={0}>Unassigned</option>
+                            {Array.from({ length: assignableDays }, (_, index) => (
+                              <option key={index + 1} value={index + 1}>
+                                Day {index + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-muted mt-4 text-xs print:hidden">
+            Day groups are saved on this device and travel with your share link. Notes stay private.
+          </p>
+        </div>
+      )}
 
       {/* US-05/US-06: experiences map — markers track the visible tab+filter. */}
       {typeof centerLat === "number" && typeof centerLng === "number" && (

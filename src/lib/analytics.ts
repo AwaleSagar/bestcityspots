@@ -37,6 +37,7 @@ export const ActionType = z.enum([
   "click_maps_link",
   "share",
   "download_itinerary",
+  "click_affiliate",
 ]);
 
 export const AnalyticsEventSchema = z.object({

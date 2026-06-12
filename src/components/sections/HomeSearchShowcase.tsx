@@ -155,6 +155,10 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
               </div>
             ))}
           </div>
+          {/* US-07: comparison entry point alongside search results. */}
+          <Link href="/compare" className="text-link mt-4 inline-block text-sm font-semibold">
+            Compare cities side-by-side &rarr;
+          </Link>
         </div>
       </div>
     </motion.section>
