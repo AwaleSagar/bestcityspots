@@ -97,6 +97,8 @@ supabase/.temp/
 # graphify generated caches (keep graph reports/json tracked)
 /graphify-out/cache/
 /src/graphify-out/cache/
+# graphify intermediate working files (chunks, transcripts, semantic cache)
+/graphify-out/.graphify_*
 
 
 # Internal UI/UX review reference (not tracked)
@@ -107,3 +109,13 @@ bestcityspots-backend-incident-actions.md
 
 # Internal user-story planning artifact (not tracked)
 bestcityspots-user-stories.md
+
+# Internal color audit / brainstorm (not tracked)
+bestcityspots-color-audit.md
+
+# Internal visual-asset generation prompts / creative production reference (not tracked)
+bestcityspots-visual-asset-prompts.md
+
+# Ansible: never commit real inventory or decrypted secrets (examples are fine)
+deploy/ansible/inventory.ini
+deploy/ansible/group_vars/vault.yml

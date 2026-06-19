@@ -112,6 +112,12 @@ CREATE TRIGGER trg_cities_set_slug
 -- Replaces public.search_cities_elastic so callers can navigate directly to
 -- the canonical /cities/{slug} URL. Body is the same as the canonical
 -- definition in supabase/elastic_search.sql, with `slug` threaded through.
+--
+-- The prior definition in elastic_search.sql returns a different row type
+-- (no `slug` column), so CREATE OR REPLACE cannot change it in place. Drop
+-- the existing function first; idempotent because of IF EXISTS.
+DROP FUNCTION IF EXISTS public.search_cities_elastic(text, int);
+
 CREATE OR REPLACE FUNCTION public.search_cities_elastic(
   query text,
   result_limit int DEFAULT 10

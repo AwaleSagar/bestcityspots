@@ -19,7 +19,7 @@ export default function CityCard({ city, context }: CityCardProps) {
   return (
     <Link
       href={cityHref(city)}
-      className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
+      className="border-line bg-surface/65 hover:bg-surface text-foreground group flex h-full items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
     >
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-base font-semibold tracking-tight">{city.city}</h3>

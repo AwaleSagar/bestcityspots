@@ -27,16 +27,6 @@ function HomeSearchShowcaseFallback() {
       </div>
 
       <div className="space-y-5">
-        <div className="flow-grid">
-          {Array.from({ length: 4 }, (_, index) => (
-            <div key={index} className="intent-card rounded-xl p-4 sm:p-5">
-              <div className="bg-muted/20 h-4 w-4 rounded-full" />
-              <div className="bg-muted/20 mt-4 h-5 w-28 rounded-full" />
-              <div className="bg-muted/15 mt-3 h-10 rounded-md" />
-            </div>
-          ))}
-        </div>
-
         <div className="organic-panel rounded-2xl p-5 sm:p-6">
           <div className="bg-muted/20 h-7 w-36 rounded-full" />
           <div className="bg-muted/20 mt-4 h-16 max-w-md rounded-lg" />

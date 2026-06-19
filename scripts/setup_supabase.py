@@ -69,6 +69,7 @@ SQL_FILES_IN_ORDER = [
     "migrations/202604241700_cache_schema_versions.sql",
     "migrations/202605080000_cities_slug_seo.sql",
     "migrations/202606111000_provider_budget_and_cache_idempotency.sql",
+    "migrations/202606141200_fix_search_cities_elastic_coord_types.sql",
 ]
 
 # Base tables that exist in production but have no CREATE TABLE in the repo
@@ -394,16 +395,56 @@ def step_seed_cities(conn, csv_path: Path) -> None:
                     count += 1
                 buf.seek(0)
                 cur.copy_expert(f"{copy_sql} with (format csv, null '\\N')", buf)
+            # Resolve slugs in the temp table BEFORE inserting, mirroring the
+            # collision-resolution backfill in
+            # migrations/202605080000_cities_slug_seo.sql. Required because the
+            # slug trigger only sets the *base* slug and leaves duplicate base
+            # slugs (e.g. the two distinct "Suzhou, China") to trip the unique
+            # index. The bulk INSERT below is a single statement, so a per-row
+            # trigger can't see its siblings — slugs must be pre-computed here.
+            cur.execute("update tmp_cities set slug = public.slugify_city(city, country)")
+            # Pass 1: same base slug across rows -> append iso2 (or id if blank).
+            cur.execute(
+                """
+                with ranked as (
+                  select id, row_number() over (
+                    partition by slug order by population desc nulls last, id
+                  ) as rn
+                  from tmp_cities
+                )
+                update tmp_cities t
+                set slug = t.slug || '-' || lower(coalesce(nullif(t.iso2, ''), t.id::text))
+                from ranked r
+                where r.id = t.id and r.rn > 1
+                """
+            )
+            # Pass 2: anything still colliding -> append the unique id. Because
+            # id is unique this terminates after at most these two passes.
+            cur.execute(
+                """
+                with ranked as (
+                  select id, row_number() over (
+                    partition by slug order by population desc nulls last, id
+                  ) as rn
+                  from tmp_cities
+                )
+                update tmp_cities t
+                set slug = t.slug || '-' || t.id::text
+                from ranked r
+                where r.id = t.id and r.rn > 1
+                """
+            )
             cur.execute(
                 f"""
-                insert into public.cities ({columns})
-                select {columns} from tmp_cities
+                insert into public.cities ({columns}, slug)
+                select {columns}, slug from tmp_cities
                 on conflict (id) do update set
                   city = excluded.city, city_ascii = excluded.city_ascii,
                   lat = excluded.lat, lng = excluded.lng,
                   country = excluded.country, iso2 = excluded.iso2,
                   iso3 = excluded.iso3, admin_name = excluded.admin_name,
-                  capital = excluded.capital, population = excluded.population
+                  capital = excluded.capital, population = excluded.population,
+                  slug = excluded.slug
                 """
             )
         conn.commit()

@@ -46,8 +46,8 @@ export default function FreeResourceCTA() {
                   Explicit aspect ratio + sizes keep CLS at zero. */}
               <div className="relative aspect-[16/9]">
                 <Image
-                  src="/hero.png"
-                  alt="City skyline at golden hour with waterfront reflections"
+                  src="/images/hero/global50-cover.webp"
+                  alt="The Global 50 — a curated index of the world's most-searched cities"
                   fill
                   sizes="(min-width: 1024px) 36rem, 100vw"
                   className="object-cover"

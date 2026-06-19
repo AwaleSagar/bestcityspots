@@ -1,0 +1,451 @@
+---
+# =============================================================================
+# bestcityspots — production deploy playbook (Layers 1–3 of the cost-defense
+# model; Layer 4 is Google Cloud console-only, see deploy/README.md).
+#
+# What it does, idempotently, on a fresh Ubuntu host:
+#   • Host hardening: non-root deploy user, UFW firewall, fail2ban,
+#     unattended-upgrades.
+#   • Docker Engine + compose plugin.
+#   • App: pin-checked git checkout, secret env_file (0600), `docker compose
+#     build && up -d` with previous-image retained for rollback.
+#   • Edge: nginx reverse proxy with the repo's rate-limit/bot-block config
+#     (validated with `nginx -t` before every reload) + optional certbot TLS.
+#   • Origin closed: firewall denies 3000/tcp; container binds 127.0.0.1 only.
+#   • Nightly cache-warm cron (the only intended paid-spend path).
+#
+# Guardrails (fail BEFORE touching the server):
+#   • Refuses to deploy a moving ref (main/HEAD) unless -e allow_unpinned=true.
+#   • Refuses to enable live paid fetch unless -e allow_live_fetch=true.
+#   • Requires an explicit confirmation token.
+#   • Requires all secrets to be present (no half-configured deploy).
+#   • Post-deploy health gate with automatic rollback to the previous image.
+#
+# Usage:
+#   ansible-playbook -i inventory.ini deploy/ansible/playbook.yml \
+#     --ask-vault-pass \
+#     -e app_version=v1.4.2 \
+#     -e confirm=bestcityspots-prod
+#
+# Dry run first:  add  --check --diff
+# =============================================================================
+
+- name: Deploy bestcityspots (production)
+  hosts: bestcityspots_prod
+  become: true
+  serial: 1                 # one host at a time — never break the whole fleet
+  any_errors_fatal: true    # stop immediately on the first failure
+
+  vars:
+    # ---- overridable defaults (real values live in group_vars/all.yml) ----
+    app_user: "deploy"
+    app_dir: "/opt/bestcityspots"
+    app_repo: ""                       # e.g. git@github.com:you/bestcityspots.git
+    app_version: ""                    # MUST be a pinned tag/SHA (guardrail)
+    compose_project: "bestcityspots"
+
+    # Cost guardrails — these are the production-safe defaults. Do NOT change
+    # here; flip only via -e and only with allow_live_fetch=true.
+    places_live_fetch: "false"
+    gemini_live_fetch: "false"
+    places_daily_limit: "100"
+    gemini_daily_limit: "25"
+    warm_places_budget: "300"
+    warm_gemini_budget: "100"
+
+    enable_tls: false                  # set true once DNS points at the host
+    letsencrypt_email: ""
+    warm_cache_cron: true
+
+  # ---------------------------------------------------------------------------
+  # PRE-FLIGHT GUARDRAILS — these run before any change is made to the host.
+  # ---------------------------------------------------------------------------
+  pre_tasks:
+    - name: "Guardrail · require explicit production confirmation"
+      ansible.builtin.assert:
+        that: "confirm | default('') == 'bestcityspots-prod'"
+        fail_msg: >-
+          Refusing to run. Re-invoke with  -e confirm=bestcityspots-prod
+          to acknowledge this targets PRODUCTION.
+        success_msg: "Production deploy confirmed."
+
+    - name: "Guardrail · app_version must be a pinned ref (not a moving branch)"
+      ansible.builtin.assert:
+        that:
+          - "app_version | length > 0"
+          - "(app_version not in ['main', 'master', 'HEAD']) or (allow_unpinned | default(false) | bool)"
+        fail_msg: >-
+          app_version is empty or points at a moving branch. Pin a tag or SHA
+          (e.g. -e app_version=v1.4.2), or override with -e allow_unpinned=true.
+
+    - name: "Guardrail · live paid-API fetch stays OFF unless explicitly allowed"
+      ansible.builtin.assert:
+        that:
+          - "(places_live_fetch == 'false' and gemini_live_fetch == 'false') or (allow_live_fetch | default(false) | bool)"
+        fail_msg: >-
+          Live paid-provider fetch is being enabled in production. This is the
+          incident class that caused the billing spike. If truly intended,
+          re-run with -e allow_live_fetch=true (and make sure GCP quota caps +
+          budget kill from deploy/README.md Layer 4 are in place).
+
+    - name: "Guardrail · all required secrets are present"
+      ansible.builtin.assert:
+        that:
+          - "vault_supabase_url | default('') | length > 0"
+          - "vault_supabase_anon_key | default('') | length > 0"
+          - "vault_supabase_service_role_key | default('') | length > 0"
+          - "vault_site_url | default('') | length > 0"
+        fail_msg: >-
+          Missing required secrets. Populate group_vars/vault.yml (see
+          vault.example.yml) and encrypt it with ansible-vault.
+        no_log: true
+
+    - name: "Guardrail · deploy user must not be root"
+      ansible.builtin.assert:
+        that: "app_user != 'root'"
+        fail_msg: "app_user must be an unprivileged account, not root."
+
+  # ---------------------------------------------------------------------------
+  tasks:
+    # ===================== Host hardening =====================
+    - name: Create unprivileged deploy user
+      ansible.builtin.user:
+        name: "{{ app_user }}"
+        shell: /bin/bash
+        create_home: true
+      tags: [hardening]
+
+    - name: Install baseline packages
+      ansible.builtin.apt:
+        name: [ufw, fail2ban, unattended-upgrades, ca-certificates, curl, gnupg, git]
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      tags: [hardening]
+
+    - name: Enable unattended security upgrades
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+        mode: "0644"
+      tags: [hardening]
+
+    - name: UFW default deny incoming / allow outgoing
+      community.general.ufw:
+        direction: "{{ item.dir }}"
+        policy: "{{ item.policy }}"
+      loop:
+        - { dir: incoming, policy: deny }
+        - { dir: outgoing, policy: allow }
+      tags: [hardening, firewall]
+
+    - name: UFW allow SSH, HTTP, HTTPS
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: ["22", "80", "443"]
+      tags: [hardening, firewall]
+
+    # GUARDRAIL: the origin must never be reachable directly. The container
+    # binds 127.0.0.1:3000, and we also deny 3000/tcp at the firewall as
+    # defense in depth (incident: an exposed origin bypasses nginx limits).
+    - name: UFW explicitly deny direct origin port (3000)
+      community.general.ufw:
+        rule: deny
+        port: "3000"
+        proto: tcp
+      tags: [hardening, firewall]
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+      tags: [hardening, firewall]
+
+    # ===================== Docker =====================
+    - name: Add Docker apt key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+      tags: [docker]
+
+    - name: Add Docker apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [arch={{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}
+          signed-by=/etc/apt/keyrings/docker.asc]
+          https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        filename: docker
+        state: present
+      tags: [docker]
+
+    - name: Install Docker Engine + compose plugin
+      ansible.builtin.apt:
+        name: [docker-ce, docker-ce-cli, containerd.io, docker-buildx-plugin, docker-compose-plugin]
+        state: present
+        update_cache: true
+      tags: [docker]
+
+    - name: Ensure docker service is running and enabled
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+      tags: [docker]
+
+    - name: Add deploy user to docker group
+      ansible.builtin.user:
+        name: "{{ app_user }}"
+        groups: docker
+        append: true
+      tags: [docker]
+
+    # ===================== App deploy (with rollback) =====================
+    - name: Ensure app directory exists
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0750"
+      tags: [app]
+
+    - name: Checkout pinned application revision
+      become_user: "{{ app_user }}"
+      ansible.builtin.git:
+        repo: "{{ app_repo }}"
+        dest: "{{ app_dir }}"
+        version: "{{ app_version }}"
+        accept_hostkey: true
+        force: true
+      register: app_checkout
+      tags: [app]
+
+    - name: Render runtime secret env file (.env.production)
+      become_user: "{{ app_user }}"
+      ansible.builtin.template:
+        src: env.production.j2
+        dest: "{{ app_dir }}/.env.production"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0600"
+      no_log: true            # never echo secrets to the Ansible log
+      tags: [app]
+
+    - name: Tag current image as :previous (rollback point)
+      ansible.builtin.command:
+        cmd: docker image tag bestcityspots:latest bestcityspots:previous
+      register: tag_prev
+      changed_when: tag_prev.rc == 0
+      failed_when: false      # first-ever deploy has no :latest yet — fine
+      tags: [app]
+
+    # The whole build/up/health sequence is guarded: any failure triggers the
+    # rescue block, which restores the previous image and fails loudly.
+    - name: Deploy with health gate
+      tags: [app]
+      block:
+        - name: Build image from pinned source
+          become_user: "{{ app_user }}"
+          ansible.builtin.command:
+            cmd: docker compose --env-file .env.production -p {{ compose_project }} build
+            chdir: "{{ app_dir }}"
+          register: compose_build
+          changed_when: "'Building' in compose_build.stderr or 'naming to' in compose_build.stderr"
+
+        - name: Start/refresh containers
+          become_user: "{{ app_user }}"
+          ansible.builtin.command:
+            cmd: docker compose --env-file .env.production -p {{ compose_project }} up -d --remove-orphans
+            chdir: "{{ app_dir }}"
+          register: compose_up
+          changed_when: "'Started' in compose_up.stderr or 'Recreated' in compose_up.stderr or 'Created' in compose_up.stderr"
+
+        - name: "Health gate · wait for /api/health to return 200"
+          ansible.builtin.uri:
+            url: "http://127.0.0.1:3000/api/health"
+            status_code: 200
+            timeout: 5
+          register: health
+          until: "health.status == 200"
+          retries: 12          # ~2 min total
+          delay: 10
+          check_mode: false
+
+      rescue:
+        - name: "Rollback · previous image exists?"
+          ansible.builtin.command: docker image inspect bestcityspots:previous
+          register: prev_img
+          failed_when: false
+          changed_when: false
+
+        - name: "Rollback · restore previous image and restart"
+          become_user: "{{ app_user }}"
+          ansible.builtin.shell: |
+            docker image tag bestcityspots:previous bestcityspots:latest
+            docker compose --env-file .env.production -p {{ compose_project }} up -d --remove-orphans
+          args:
+            chdir: "{{ app_dir }}"
+          when: prev_img.rc == 0
+          changed_when: true
+
+        - name: "Rollback · fail the play so the deploy is not marked successful"
+          ansible.builtin.fail:
+            msg: >-
+              Deploy failed the health gate and was rolled back to the previous
+              image ({{ 'restored' if prev_img.rc == 0 else 'NO previous image — site may be down, investigate' }}).
+              Check `docker compose -p {{ compose_project }} logs --tail=100 web`.
+
+    - name: Prune dangling images (keep :previous and :latest)
+      become_user: "{{ app_user }}"
+      ansible.builtin.command: docker image prune -f
+      changed_when: false
+      tags: [app]
+
+    # ===================== Edge: nginx =====================
+    - name: Install nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+      tags: [nginx]
+
+    - name: Install proxy snippet
+      ansible.builtin.template:
+        src: bestcityspots-proxy.conf.j2
+        dest: /etc/nginx/snippets/bestcityspots-proxy.conf
+        mode: "0644"
+      notify: reload nginx
+      tags: [nginx]
+
+    - name: Install site config (rate limits + bot blocks from repo)
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../nginx/bestcityspots.conf"
+        dest: /etc/nginx/sites-available/bestcityspots.conf
+        mode: "0644"
+      notify: reload nginx
+      tags: [nginx]
+
+    - name: Enable site
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/bestcityspots.conf
+        dest: /etc/nginx/sites-enabled/bestcityspots.conf
+        state: link
+      notify: reload nginx
+      tags: [nginx]
+
+    - name: Remove default nginx site
+      ansible.builtin.file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify: reload nginx
+      tags: [nginx]
+
+    # ===================== TLS (optional) =====================
+    - name: Install certbot (only if TLS enabled)
+      ansible.builtin.apt:
+        name: [certbot, python3-certbot-nginx]
+        state: present
+      when: enable_tls | bool
+      tags: [tls]
+
+    - name: Obtain/renew certificate
+      ansible.builtin.command:
+        cmd: >-
+          certbot --nginx --non-interactive --agree-tos
+          -m {{ letsencrypt_email }}
+          -d {{ vault_site_url | regex_replace('^https?://', '') | regex_replace('/$', '') }}
+        creates: "/etc/letsencrypt/live/{{ vault_site_url | regex_replace('^https?://', '') | regex_replace('/$', '') }}/fullchain.pem"
+      when: enable_tls | bool and letsencrypt_email | length > 0
+      tags: [tls]
+
+    # ===================== Nightly cache warm (intended spend path) =====================
+    # The warmer is a tsx script (scripts/warm-cache.ts). The standalone Docker
+    # runtime image does NOT contain scripts/ or devDeps (and .dockerignore
+    # excludes scripts), so it must run on the host from the git checkout —
+    # exactly as deploy/README.md documents. We install Node + deps for that.
+    - name: Install Node.js for the host warmer
+      when: warm_cache_cron | bool
+      tags: [cron]
+      block:
+        - name: Add NodeSource apt key
+          ansible.builtin.get_url:
+            url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
+            dest: /etc/apt/keyrings/nodesource.asc
+            mode: "0644"
+
+        - name: Add NodeSource repo (Node 20.x)
+          ansible.builtin.apt_repository:
+            repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_20.x nodistro main"
+            filename: nodesource
+            state: present
+
+        - name: Install nodejs
+          ansible.builtin.apt:
+            name: nodejs
+            state: present
+            update_cache: true
+
+    - name: Install npm dependencies for the warmer (only when source changed)
+      become_user: "{{ app_user }}"
+      ansible.builtin.command:
+        cmd: npm ci
+        chdir: "{{ app_dir }}"
+      when: warm_cache_cron | bool and (app_checkout is changed)
+      changed_when: true
+      tags: [cron]
+
+    - name: Ensure warm log exists and is writable by the deploy user
+      ansible.builtin.file:
+        path: /var/log/bcs-warm.log
+        state: touch
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0644"
+      when: warm_cache_cron | bool
+      changed_when: false
+      tags: [cron]
+
+    - name: Nightly cache-warm cron (host Node, cache-only, budget-bounded)
+      ansible.builtin.cron:
+        name: "bestcityspots cache warm"
+        user: "{{ app_user }}"
+        minute: "30"
+        hour: "2"
+        job: >-
+          cd {{ app_dir }} && set -a && . ./.env.production && set +a &&
+          npm run warm-cache -- --traffic --top-cities=250
+          >> /var/log/bcs-warm.log 2>&1
+      when: warm_cache_cron | bool
+      tags: [cron]
+
+  # ---------------------------------------------------------------------------
+  post_tasks:
+    - name: "Verify · origin port 3000 is NOT reachable externally"
+      ansible.builtin.command: "ufw status"
+      register: ufw_status
+      changed_when: false
+      check_mode: false
+      tags: [verify]
+
+    - name: "Verify · assert 3000 is denied at the firewall"
+      ansible.builtin.assert:
+        that: "'3000' in ufw_status.stdout and 'DENY' in ufw_status.stdout"
+        fail_msg: "Port 3000 is not denied by UFW — origin may be exposed."
+        success_msg: "Origin port 3000 is firewalled. Edge-only access confirmed."
+      tags: [verify]
+
+  handlers:
+    - name: reload nginx
+      # validate ensures a broken config can NEVER be loaded into production.
+      ansible.builtin.command: nginx -t
+      register: nginx_test
+      changed_when: false
+      notify: do reload nginx
+
+    - name: do reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded

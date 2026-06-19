@@ -23,9 +23,14 @@ export default function FreshnessStamp({ iso, prefix = "Updated" }: FreshnessSta
     setRelative(formatRelativeTime(iso));
   }, [iso]);
 
+  // The absolute-date fallback must be locale- AND timezone-deterministic, or
+  // SSR (Node, defaults to en-US/UTC) and the first client render (browser
+  // locale/timezone) produce different strings and hydration mismatches. Pin
+  // both so the two renders are byte-identical; the effect above then swaps in
+  // the accurate relative label after mount.
   return (
     <time dateTime={iso}>
-      {prefix} {relative ?? new Date(iso).toLocaleDateString()}
+      {prefix} {relative ?? new Date(iso).toLocaleDateString("en-US", { timeZone: "UTC" })}
     </time>
   );
 }

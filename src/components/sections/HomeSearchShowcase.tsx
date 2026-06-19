@@ -3,7 +3,8 @@
 import { type City, cityHref } from "@/lib/cities";
 import CitySearch from "@/components/features/city/CitySearch";
 import { motion, useReducedMotion } from "framer-motion";
-import { CloudSun, Compass, MapPinned, Moon, Utensils } from "lucide-react";
+import { MapPinned } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface HomeSearchShowcaseProps {
@@ -11,29 +12,6 @@ interface HomeSearchShowcaseProps {
 }
 
 const ease = [0.16, 1, 0.3, 1] as const;
-
-const intentModes = [
-  {
-    icon: Compass,
-    label: "Find a city",
-    detail: "Start with a name, region, or travel mood.",
-  },
-  {
-    icon: CloudSun,
-    label: "Compare climates",
-    detail: "Use weather and comfort signals before you commit.",
-  },
-  {
-    icon: Moon,
-    label: "Plan the timing",
-    detail: "Read seasonal notes and live conditions together.",
-  },
-  {
-    icon: Utensils,
-    label: "Follow local texture",
-    detail: "Move from landmarks into dining, stays, and saved notes.",
-  },
-];
 
 const trendingSignals = [
   "Strong first shortlist",
@@ -77,25 +55,17 @@ export default function HomeSearchShowcase({ topCities }: HomeSearchShowcaseProp
       </div>
 
       <div className="space-y-5">
-        <div className="flow-grid">
-          {intentModes.map(({ icon: Icon, label, detail }, index) => (
-            <motion.article
-              key={label}
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-              whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.35 }}
-              transition={{ duration: 0.42, delay: shouldReduceMotion ? 0 : index * 0.05, ease }}
-              className="intent-card rounded-xl p-4 sm:p-5"
-            >
-              <Icon className="text-accent h-4 w-4" aria-hidden />
-              <h3 className="text-foreground mt-4 text-base leading-tight">{label}</h3>
-              <p className="text-muted mt-2 text-sm leading-relaxed">{detail}</p>
-            </motion.article>
-          ))}
-        </div>
-
-        <div className="organic-panel destination-story-card rounded-2xl p-5 sm:p-6">
-          <div>
+        <div className="organic-panel destination-story-card relative isolate overflow-hidden rounded-2xl p-5 sm:p-6">
+          {/* Faint cartographic contour backdrop behind the ranked list */}
+          <Image
+            src="/images/textures/trending-contours.webp"
+            alt=""
+            fill
+            aria-hidden
+            sizes="(min-width: 1024px) 30rem, 100vw"
+            className="pointer-events-none absolute inset-0 -z-10 object-cover opacity-[0.06] select-none"
+          />
+          <div className="relative">
             <p className="source-chip">
               <MapPinned className="h-3.5 w-3.5" aria-hidden />
               Trending guides

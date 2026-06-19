@@ -1,0 +1,29 @@
+---
+# Non-secret configuration. Secrets live in vault.yml (ansible-vault encrypted).
+
+app_user: "deploy"
+app_dir: "/opt/bestcityspots"
+compose_project: "bestcityspots"
+
+# CHANGE ME: your git remote (SSH preferred; add a deploy key to the host).
+app_repo: "git@github.com:YOUR_ORG/bestcityspots.git"
+
+# app_version is intentionally NOT set here — pass a pinned tag/SHA on the CLI:
+#   -e app_version=v1.4.2
+# (the playbook refuses moving refs like 'main' unless -e allow_unpinned=true)
+
+# ── Cost guardrails: production-safe defaults (cache-only) ────────────────
+places_live_fetch: "false"
+gemini_live_fetch: "false"
+places_daily_limit: "100"
+gemini_daily_limit: "25"
+warm_places_budget: "300"
+warm_gemini_budget: "100"
+ai_provider: "openai"
+log_level: "info"
+
+# ── TLS ───────────────────────────────────────────────────────────────────
+enable_tls: false            # flip to true once DNS A/AAAA records resolve
+letsencrypt_email: ""
+
+warm_cache_cron: true

@@ -48,7 +48,75 @@ type Row = {
   admin_name: string;
   capital: string;
   population: number | null;
+  /**
+   * Computed client-side with full-dataset collision resolution. On a blank
+   * project the unique index `cities_slug_key` + naive slug trigger exist
+   * BEFORE seeding (unlike production, which seeded first and backfilled),
+   * so relying on the trigger aborts the batch on the first duplicate
+   * city+country slug. Providing an explicit, pre-deduplicated slug makes
+   * seeding order-independent; the trigger leaves non-empty slugs alone.
+   */
+  slug: string;
 };
+
+// Mirrors public.slugify_city(): unaccent + lowercase + non-alnum runs → '-'.
+// NFD strip covers combining accents; the map covers common non-decomposable
+// letters so client slugs stay close to the SQL function's output.
+const CHAR_MAP: Record<string, string> = {
+  ø: "o",
+  Ø: "o",
+  æ: "ae",
+  Æ: "ae",
+  œ: "oe",
+  Œ: "oe",
+  ß: "ss",
+  đ: "d",
+  Đ: "d",
+  ð: "d",
+  Ð: "d",
+  þ: "th",
+  Þ: "th",
+  ł: "l",
+  Ł: "l",
+};
+
+function slugifyCity(city: string, country: string): string {
+  const raw = `${city ?? ""}-${country ?? ""}`
+    .replace(/[øØæÆœŒßđĐðÐþÞłŁ]/g, (ch) => CHAR_MAP[ch] ?? ch)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+  return raw.replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Assign unique slugs using the same rules as the migration backfill
+ * (202605080000): within a colliding group, the highest-population row keeps
+ * the base slug; others get `-iso2`; anything still colliding gets `-id`
+ * (ids are unique, so this terminates).
+ */
+function assignUniqueSlugs(rows: Row[]): void {
+  const groups = new Map<string, Row[]>();
+  for (const row of rows) {
+    row.slug = slugifyCity(row.city, row.country) || `city-${row.id}`;
+    const list = groups.get(row.slug);
+    if (list) list.push(row);
+    else groups.set(row.slug, [row]);
+  }
+
+  const taken = new Set(groups.keys());
+  for (const [base, list] of groups) {
+    if (list.length === 1) continue;
+    list.sort((a, b) => (b.population ?? -1) - (a.population ?? -1) || a.id - b.id);
+    for (const row of list.slice(1)) {
+      const withIso = row.iso2 ? `${base}-${row.iso2.toLowerCase()}` : "";
+      const candidate = withIso && !taken.has(withIso) ? withIso : `${base}-${row.id}`;
+      row.slug = candidate;
+      taken.add(candidate);
+    }
+  }
+}
 
 // Minimal CSV parser that handles quoted fields with commas.
 function parseCsvLine(line: string): string[] {
@@ -80,23 +148,12 @@ async function main() {
   const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
 
   let header: string[] | null = null;
-  const batch: Row[] = [];
+  const rows: Row[] = [];
   const BATCH_SIZE = 500;
-  let inserted = 0;
   let skipped = 0;
 
-  const flush = async () => {
-    if (batch.length === 0) return;
-    const { error } = await admin.from("cities").upsert(batch, { onConflict: "id" });
-    if (error) {
-      console.error("Batch upsert failed:", error.message);
-      process.exit(1);
-    }
-    inserted += batch.length;
-    process.stdout.write(`\rinserted: ${inserted}  skipped: ${skipped}`);
-    batch.length = 0;
-  };
-
+  // Pass 1: parse the whole CSV (so slug collisions can be resolved with
+  // full knowledge of the dataset, exactly like the migration backfill).
   for await (const rawLine of rl) {
     const line = rawLine.trim();
     if (!line) continue;
@@ -118,7 +175,7 @@ async function main() {
       continue;
     }
 
-    const row: Row = {
+    rows.push({
       id,
       city: get("city"),
       city_ascii: get("city_ascii"),
@@ -130,12 +187,26 @@ async function main() {
       admin_name: get("admin_name"),
       capital: get("capital"),
       population: Number.parseInt(get("population"), 10) || null,
-    };
-
-    batch.push(row);
-    if (batch.length >= BATCH_SIZE) await flush();
+      slug: "",
+    });
   }
-  await flush();
+
+  // Pass 2: collision-free slugs across the entire dataset.
+  assignUniqueSlugs(rows);
+  console.log(`parsed ${rows.length} rows (${skipped} skipped); slugs deduplicated`);
+
+  // Pass 3: batched upsert.
+  let inserted = 0;
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const batch = rows.slice(i, i + BATCH_SIZE);
+    const { error } = await admin.from("cities").upsert(batch, { onConflict: "id" });
+    if (error) {
+      console.error(`\nBatch upsert failed (rows ${i}-${i + batch.length}):`, error.message);
+      process.exit(1);
+    }
+    inserted += batch.length;
+    process.stdout.write(`\rinserted: ${inserted}/${rows.length}`);
+  }
 
   console.log(`\nDone. Inserted/upserted: ${inserted}, skipped: ${skipped}`);
   console.log(

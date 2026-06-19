@@ -1,6 +1,7 @@
 "use client";
 
 import { Globe2, Radar, ShieldCheck, Waypoints } from "lucide-react";
+import Image from "next/image";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 
 const pillars = [
@@ -30,17 +31,23 @@ const pillars = [
 export default function TrustIndicators() {
   return (
     <section
-      className="organic-panel mx-auto max-w-7xl rounded-3xl p-5 sm:rounded-3xl sm:p-7 md:p-10"
+      className="organic-panel relative isolate mx-auto max-w-7xl overflow-hidden rounded-3xl p-5 sm:rounded-3xl sm:p-7 md:p-10"
       aria-labelledby="trust-heading"
     >
+      {/* Subtle Sea-Glass/Azure field behind the trust pillars */}
+      <Image
+        src="/images/textures/trust-field.webp"
+        alt=""
+        fill
+        aria-hidden
+        sizes="(min-width: 1280px) 80rem, 100vw"
+        className="pointer-events-none absolute inset-0 -z-10 object-cover opacity-[0.05] select-none"
+      />
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <ScrollReveal animation="fade-up">
           <div className="lg:sticky lg:top-24">
             <p className="source-chip">Trust signals</p>
-            <h2
-              id="trust-heading"
-              className="text-foreground mt-3 max-w-md section-title"
-            >
+            <h2 id="trust-heading" className="text-foreground section-title mt-3 max-w-md">
               Credibility shows up in the reading experience.
             </h2>
             <p className="text-muted mt-3 max-w-md text-sm leading-relaxed md:text-base">
@@ -58,7 +65,9 @@ export default function TrustIndicators() {
                   <div className="flex items-start gap-3">
                     <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${iconColor}`} aria-hidden />
                     <div>
-                      <h3 className="text-foreground text-base leading-snug font-medium">{title}</h3>
+                      <h3 className="text-foreground text-base leading-snug font-medium">
+                        {title}
+                      </h3>
                       <p className="text-muted mt-1 text-sm leading-relaxed">{detail}</p>
                     </div>
                   </div>

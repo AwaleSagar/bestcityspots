@@ -7,9 +7,10 @@ import { getTopCities } from "@/lib/cities";
 import { getCountrySummaries } from "@/lib/countries";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 // SEO Phase 2.3 (audit 7.2): the `/cities` hub becomes the true crawl-
 // friendly index. The home page stays brand-led; this surface ranks for
@@ -21,8 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cities" },
   openGraph: {
     title: "All Cities | Best City Spots",
-    description:
-      "Browse all cities in Best City Spots — searchable by country.",
+    description: "Browse all cities in Best City Spots — searchable by country.",
     url: "/cities",
     type: "website",
   },
@@ -86,8 +86,8 @@ export default async function CitiesIndexPage() {
             All cities &mdash; the full Best City Spots index.
           </h1>
           <p className="lede mt-5 max-w-2xl">
-            Browse the most-visited cities indexed by Best City Spots, or jump straight to
-            a country to see its full city list.
+            Browse the most-visited cities indexed by Best City Spots, or jump straight to a country
+            to see its full city list.
           </p>
 
           <section aria-labelledby="facets-heading" className="mt-10">
@@ -124,7 +124,7 @@ export default async function CitiesIndexPage() {
             >
               Top {cities.length} cities by population
             </h2>
-            <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="card-grid mt-4">
               {cities.map((city) => (
                 <li key={city.id}>
                   <CityCard city={city} />

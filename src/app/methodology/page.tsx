@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Database, Sparkles } from "lucide-react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
@@ -125,6 +126,17 @@ export default function MethodologyPage() {
             named provider, a refresh window, and a clear note about whether humans or AI assembled
             it.
           </p>
+
+          <figure className="border-line bg-surface/60 mt-10 overflow-hidden rounded-2xl border">
+            <Image
+              src="/illustrations/methodology-pipeline.webp"
+              alt="Data pipeline: weather, places, public datasets, and AI flow through a scoring step into a ranked city list"
+              width={1400}
+              height={1120}
+              sizes="(min-width: 768px) 48rem, 100vw"
+              className="h-auto w-full"
+            />
+          </figure>
 
           <section aria-labelledby="sources-heading" className="mt-12">
             <h2

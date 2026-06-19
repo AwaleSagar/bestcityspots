@@ -1,0 +1,24 @@
+---
+# SECRETS TEMPLATE.
+#   1. cp vault.example.yml vault.yml
+#   2. fill in real values
+#   3. encrypt:  ansible-vault encrypt deploy/ansible/group_vars/vault.yml
+#   4. NEVER commit the decrypted vault.yml (it's gitignored).
+#
+# Run the playbook with --ask-vault-pass (or --vault-password-file).
+
+# ── Required ──
+vault_supabase_url: "https://YOUR-REF.supabase.co"
+vault_supabase_anon_key: "REPLACE_ME"
+vault_supabase_service_role_key: "REPLACE_ME"
+vault_site_url: "https://bestcityspots.com"
+
+# ── Paid providers (optional — only needed if/when live fetch is enabled) ──
+vault_google_places_api_key: "REPLACE_ME"
+vault_google_gemini_api_key: ""
+vault_openai_api_key: "REPLACE_ME"
+vault_openweathermap_api_key: "REPLACE_ME"
+
+# ── Optional ──
+vault_health_check_token: "REPLACE_ME_RANDOM"
+vault_contact_email: ""

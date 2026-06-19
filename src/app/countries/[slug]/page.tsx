@@ -4,17 +4,14 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2 } from "lucide-react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CityCard from "@/components/seo/CityCard";
-import {
-  getCitiesByCountry,
-  getCountryBySlug,
-  getCountrySummaries,
-} from "@/lib/countries";
+import { getCitiesByCountry, getCountryBySlug, getCountrySummaries } from "@/lib/countries";
 import { publicEnv } from "@/lib/env";
 import { citySlugSchema } from "@/lib/validation";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 type RouteParams = { slug: string };
 
@@ -61,11 +58,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function CountryPage({
-  params,
-}: {
-  params: Promise<RouteParams>;
-}) {
+export default async function CountryPage({ params }: { params: Promise<RouteParams> }) {
   const { slug } = await params;
   const parsed = citySlugSchema.safeParse(slug);
   if (!parsed.success) notFound();
@@ -128,10 +121,7 @@ export default async function CountryPage({
           style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
         >
           <Breadcrumbs
-            items={[
-              { label: "Countries", href: "/countries" },
-              { label: country.country },
-            ]}
+            items={[{ label: "Countries", href: "/countries" }, { label: country.country }]}
           />
 
           <span className="eyebrow">
@@ -142,9 +132,9 @@ export default async function CountryPage({
             {country.country} travel guide.
           </h1>
           <p className="lede mt-5 max-w-2xl">
-            {cities.length} cities indexed in {country.country}. Each links to a city page
-            with live weather, air-quality, neighborhood texture, and AI-assisted briefings
-            sourced from public providers.
+            {cities.length} cities indexed in {country.country}. Each links to a city page with live
+            weather, air-quality, neighborhood texture, and AI-assisted briefings sourced from
+            public providers.
           </p>
 
           <section aria-labelledby="cities-heading" className="mt-12">
@@ -154,7 +144,7 @@ export default async function CountryPage({
             >
               Cities in {country.country}
             </h2>
-            <ul className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ul className="card-grid mt-4">
               {cities.map((city) => (
                 <li key={city.id}>
                   <CityCard city={city} />

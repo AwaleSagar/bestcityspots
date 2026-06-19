@@ -39,12 +39,7 @@ export default function TopicalHubLayout({
         className="container-gutter mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-20"
         style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
       >
-        <Breadcrumbs
-          items={[
-            { label: "Cities", href: "/cities" },
-            { label: breadcrumbLabel },
-          ]}
-        />
+        <Breadcrumbs items={[{ label: "Cities", href: "/cities" }, { label: breadcrumbLabel }]} />
 
         <span className="eyebrow">
           {eyebrowIcon}
@@ -70,11 +65,10 @@ export default function TopicalHubLayout({
           </h2>
           {cities.length === 0 ? (
             <p className="text-muted-strong mt-4 text-sm">
-              {emptyState ??
-                "Ranking will populate as more cities are indexed. Check back soon."}
+              {emptyState ?? "Ranking will populate as more cities are indexed. Check back soon."}
             </p>
           ) : (
-            <ol className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ol className="card-grid mt-4">
               {cities.map((city, index) => (
                 <li key={city.id} className="flex items-start gap-3">
                   <span className="text-muted mt-3 w-6 shrink-0 text-right text-xs font-semibold tabular-nums">

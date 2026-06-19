@@ -7,7 +7,7 @@ import {
   sanitizeJsonResponse,
   sanitizeJsonArrayResponse,
   PROMPT_VERSIONS,
-} from "./providers/gemini";
+} from "./providers/ai";
 import { isCacheFresh, CACHE_TIERS } from "./cache-config";
 import { createLogger } from "./logger";
 import {
@@ -15,7 +15,7 @@ import {
   writeCityInsightCache,
 } from "@/platform/data-access/city-insights-repository";
 
-export { PROMPT_VERSIONS } from "./providers/gemini";
+export { PROMPT_VERSIONS } from "./providers/ai";
 
 /**
  * Canonical prompt for a single-city AI briefing. Exported so the streaming
@@ -100,10 +100,8 @@ export async function readCachedCityInsight(cityId: number): Promise<CachedCityI
     };
     const parsed = CityInsightSchema.safeParse(candidate);
     const insight = parsed.success ? parsed.data : null;
-    const cachedVersion =
-      typeof cached.prompt_version === "number" ? cached.prompt_version : null;
-    const versionMatches =
-      cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
+    const cachedVersion = typeof cached.prompt_version === "number" ? cached.prompt_version : null;
+    const versionMatches = cachedVersion === null || cachedVersion === PROMPT_VERSIONS.CITY_INSIGHT;
     const fresh =
       !!insight && versionMatches && isCacheFresh(cached.updated_at, CACHE_TIERS.INSIGHTS.freshMs);
     return { insight, fresh, updatedAt: cached.updated_at ?? null };
@@ -201,7 +199,11 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
       cachedVersion = typeof cache.prompt_version === "number" ? cache.prompt_version : null;
       const versionMatches =
         cachedVersion === null || cachedVersion === PROMPT_VERSIONS.TRENDING_CITIES;
-      if (versionMatches && isCacheFresh(cachedUpdatedAt, CACHE_TIERS.TRENDING.freshMs) && cachedNames.length > 0) {
+      if (
+        versionMatches &&
+        isCacheFresh(cachedUpdatedAt, CACHE_TIERS.TRENDING.freshMs) &&
+        cachedNames.length > 0
+      ) {
         return await matchCitiesInDb(cachedNames);
       }
     }
@@ -290,9 +292,7 @@ async function matchCitiesInDb(cityNames: string[]): Promise<City[]> {
       const candidates = rows.filter((r) => r.city === pair.city);
       if (candidates.length === 0) continue;
       const exact = pair.country
-        ? candidates.find(
-            (r) => r.country.toLowerCase() === (pair.country as string).toLowerCase()
-          )
+        ? candidates.find((r) => r.country.toLowerCase() === (pair.country as string).toLowerCase())
         : null;
       const pick = exact ?? candidates[0];
       if (!seen.has(pick.id)) {

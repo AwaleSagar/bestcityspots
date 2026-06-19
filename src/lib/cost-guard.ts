@@ -3,7 +3,7 @@ import "server-only";
 import { serverEnv } from "./env";
 import { getServerClient } from "./supabase";
 
-type PaidProvider = "gemini" | "google-places";
+type PaidProvider = "gemini" | "google-places" | "openai";
 
 // In-memory mirror of the durable counter. Used as (a) a fast-path reject so
 // an exhausted budget doesn't keep hitting the database, and (b) a fallback
@@ -35,7 +35,9 @@ export function isPaidProviderEnabled(provider: PaidProvider): boolean {
   const flag =
     provider === "gemini"
       ? env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED
-      : env.GOOGLE_PLACES_LIVE_FETCH_ENABLED;
+      : provider === "openai"
+        ? env.OPENAI_LIVE_FETCH_ENABLED
+        : env.GOOGLE_PLACES_LIVE_FETCH_ENABLED;
 
   if (flag === "true") return true;
   if (flag === "false") return false;
@@ -47,9 +49,16 @@ export function isPaidProviderEnabled(provider: PaidProvider): boolean {
 
 function dailyLimit(provider: PaidProvider): number {
   const env = serverEnv();
-  return provider === "gemini"
-    ? parseLimit(env.GOOGLE_GEMINI_DAILY_CALL_LIMIT, env.NODE_ENV === "production" ? 25 : 500)
-    : parseLimit(env.GOOGLE_PLACES_DAILY_CALL_LIMIT, env.NODE_ENV === "production" ? 100 : 1_000);
+  if (provider === "gemini") {
+    return parseLimit(env.GOOGLE_GEMINI_DAILY_CALL_LIMIT, env.NODE_ENV === "production" ? 25 : 500);
+  }
+  if (provider === "openai") {
+    return parseLimit(env.OPENAI_DAILY_CALL_LIMIT, env.NODE_ENV === "production" ? 25 : 500);
+  }
+  return parseLimit(
+    env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
+    env.NODE_ENV === "production" ? 100 : 1_000
+  );
 }
 
 function localState(provider: PaidProvider, day: string): { day: string; count: number } {

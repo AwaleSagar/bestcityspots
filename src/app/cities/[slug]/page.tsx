@@ -4,6 +4,7 @@ import { readCachedCityInsight } from "@/lib/intelligence";
 import { readPlacesCache } from "@/platform/data-access/places-cache-repository";
 import { formatPopulation } from "@/lib/format";
 import { getTopPlaces } from "@/lib/places";
+import { isPaidProviderEnabled } from "@/lib/cost-guard";
 import { getCityMetrics } from "@/lib/metrics";
 import { getCityWeather } from "@/lib/weather";
 import { cityIdSchema, citySlugSchema, coordinatesSchema, numericIdParam } from "@/lib/validation";
@@ -78,7 +79,11 @@ const isCityWarm = cache(async (city: City): Promise<boolean> => {
       .catch(() => null),
     readPlacesCache(city.city, "landmarks").catch(() => null),
   ]);
-  return Boolean(insight || places);
+  const warm = Boolean(insight || places);
+  console.info(
+    `[city-page] isCityWarm(${city.city}#${city.id}): insight=${Boolean(insight)} placesCache=${Boolean(places)} -> warm=${warm}`
+  );
+  return warm;
 });
 
 const siteUrl = publicEnv().NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://bestcityspots.com";
@@ -220,11 +225,20 @@ async function ExperiencesWrapper({
   lat: number;
   lng: number;
 }) {
+  // Opt into a live provider fetch on a cold/stale cache. This is only an
+  // *opt-in*: the actual call is still gated by isPaidProviderEnabled()
+  // (the GOOGLE_PLACES_LIVE_FETCH_ENABLED kill switch + daily budget), so
+  // production with the flag off stays cache-only and spends nothing. On a
+  // hit, the cache is served and a stale entry refreshes in the background.
+  const fetchOpts = { lat, lng, allowProviderFetch: true } as const;
   const [landmarks, restaurants, hotels] = await Promise.all([
-    getTopPlaces(cityName, "landmarks", { lat, lng }),
-    getTopPlaces(cityName, "restaurants", { lat, lng }),
-    getTopPlaces(cityName, "hotels", { lat, lng }),
+    getTopPlaces(cityName, "landmarks", fetchOpts),
+    getTopPlaces(cityName, "restaurants", fetchOpts),
+    getTopPlaces(cityName, "hotels", fetchOpts),
   ]);
+  console.info(
+    `[city-page] ExperiencesWrapper(${cityName}): landmarks=${landmarks.length} restaurants=${restaurants.length} hotels=${hotels.length}`
+  );
 
   // US-12: anonymous aggregate save counts for the displayed places.
   const saveCounts = await getPlaceSaveTotals(
@@ -685,8 +699,22 @@ export default async function CityPage({
   // US-01 (audit AF-3): cold caches ⇒ honest reduced layout instead of a
   // full template of empty section shells. Cache-only check, shared with
   // generateMetadata (which adds noindex for the same condition).
+  //
+  // BOOTSTRAP FIX: a cold city would otherwise be stuck forever on the reduced
+  // profile — the reduced page has no ExperiencesWrapper, and ExperiencesWrapper
+  // is the only thing that fetches+caches places. So a cold cache could never
+  // warm itself through a page view (chicken-and-egg). When live Places fetch
+  // is enabled (dev, or prod with the kill switch on), render the full guide
+  // even on a cold cache so the first view fetches and warms it. In prod with
+  // live fetch off, behavior is unchanged: cold ⇒ reduced.
   const warm = await isCityWarm(city);
-  if (!warm) {
+  const canFetchLive = isPaidProviderEnabled("google-places");
+  console.info(
+    `[city-page] render ${city.city}#${city.id}: warm=${warm} canFetchLive=${canFetchLive} -> ${
+      warm || canFetchLive ? "FULL guide" : "REDUCED profile"
+    }`
+  );
+  if (!warm && !canFetchLive) {
     return (
       <ReducedCityPage
         city={city}

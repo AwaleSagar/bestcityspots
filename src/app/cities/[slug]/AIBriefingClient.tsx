@@ -1,6 +1,7 @@
 "use client";
 
 import FreshnessStamp from "@/components/ui/FreshnessStamp";
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, MapPin, CalendarRange, ThermometerSun, Compass, Eye } from "lucide-react";
@@ -86,21 +87,34 @@ export default function AIBriefingClient({ insight, generatedAt }: AIBriefingCli
   return (
     <section className="space-y-8">
       {/* Section Heading — matches "Structural Profile" / "Top Experiences" style */}
-      <div className="space-y-3">
-        <h2 className="labelled-rule">
-          <Sparkles className="text-accent h-4 w-4" />
-          AI City Briefing
-        </h2>
-        <p className="text-muted max-w-xl text-sm font-semibold tracking-wide">
-          A labeled synthesis of attractions, seasons, and practical weather context. Use it as a
-          planning companion, not a hidden authority.
-        </p>
-        {generatedAt ? (
-          <p className="text-muted text-xs font-semibold tracking-[0.15em] uppercase">
-            {/* US-11: generation date alongside the existing AI labeling. */}
-            <FreshnessStamp iso={generatedAt} prefix="Generated" />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className="space-y-3">
+          <h2 className="labelled-rule">
+            <Sparkles className="text-accent h-4 w-4" />
+            AI City Briefing
+          </h2>
+          <p className="text-muted max-w-xl text-sm font-semibold tracking-wide">
+            A labeled synthesis of attractions, seasons, and practical weather context. Use it as a
+            planning companion, not a hidden authority.
           </p>
-        ) : null}
+          {generatedAt ? (
+            <p className="text-muted text-xs font-semibold tracking-[0.15em] uppercase">
+              {/* US-11: generation date alongside the existing AI labeling. */}
+              <FreshnessStamp iso={generatedAt} prefix="Generated" />
+            </p>
+          ) : null}
+        </div>
+
+        {/* AI-assisted seal: decorative accent kept out of the text flow to avoid overlap */}
+        <div className="hidden pt-1 lg:block">
+          <Image
+            src="/illustrations/ai-briefing-seal.webp"
+            alt="AI-assisted briefing seal"
+            width={512}
+            height={512}
+            className="pointer-events-none h-16 w-16 opacity-90 xl:h-20 xl:w-20"
+          />
+        </div>
       </div>
 
       {/* Tab Switcher — matches ExperiencesSection tab style */}

@@ -7,17 +7,25 @@ scales here instead.
 
 ## Color
 
+**Azure Atlas palette (refreshed 2026-06-13).** Identity accent is Coral
+Spark `#E8543F`; links/buttons use Clay Press `#C2402E` with the new
+`--color-accent-deep` (Kiln) as the pressed step; the cool half of the wheel
+is Deep Azure `#15608A` (`brand-secondary`/`water`) and Sea Glass `#2E8C77`
+(`leaf`/dining). Dark mode sits on a cool-neutral charcoal (hue 250). All
+tokens are verified inside the sRGB gamut — do not raise chroma without
+re-checking gamut and contrast.
+
 Defined in `oklch` with a parallel `.dark` palette. Semantic roles, not raw hues:
 
-| Token                                                                                       | Role                                                                                                         |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `--background` / `--foreground`                                                             | Page canvas and primary text                                                                                 |
-| `--color-surface`, `--color-surface-strong`, `--color-elevated`                             | Card/panel layers                                                                                            |
-| `--color-muted`, `--color-muted-strong`                                                     | Secondary text. `--color-muted` is tuned to stay ≥ 4.5:1 on `--background` (WCAG 2.2 AA) — do not lighten it |
-| `--color-accent`, `--color-accent-strong`, `--color-accent-soft`, `--color-accent-contrast` | Brand action color; `accent-contrast` is the only approved text color on accent fills                        |
-| `--color-earth` / `--color-leaf` / `--color-water` (+ `-soft`)                              | Organic/biophilic tints for decorative surfaces                                                              |
-| `--color-cat-*`, `--color-season-*`                                                         | Category and season encodings                                                                                |
-| `--color-glass*`                                                                            | Glass surfaces (backdrop-blur disabled on mobile)                                                            |
+| Token                                                                                       | Role                                                                                                   |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `--background` / `--foreground`                                                             | Page canvas and primary text                                                                           |
+| `--color-surface`, `--color-surface-strong`, `--color-elevated`                             | Card/panel layers                                                                                      |
+| `--color-muted`, `--color-muted-strong`                                                     | Secondary text. `--color-muted` (Mist) holds 5.2:1 on `--background` (WCAG 2.2 AA) — do not lighten it |
+| `--color-accent`, `--color-accent-strong`, `--color-accent-soft`, `--color-accent-contrast` | Brand action color; `accent-contrast` is the only approved text color on accent fills                  |
+| `--color-earth` / `--color-leaf` / `--color-water` (+ `-soft`)                              | Organic/biophilic tints for decorative surfaces                                                        |
+| `--color-cat-*`, `--color-season-*`                                                         | Category and season encodings                                                                          |
+| `--color-glass*`                                                                            | Glass surfaces (backdrop-blur disabled on mobile)                                                      |
 
 Contrast rules: body and secondary text ≥ 4.5:1; large display text ≥ 3:1.
 Verify with a checker whenever a text/background token changes.

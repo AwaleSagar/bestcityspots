@@ -5,9 +5,10 @@ import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { getCountrySummaries } from "@/lib/countries";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 // SEO Phase 2.3 (audit 7.2): the `/countries` hub is the parent index for
 // the country pages. It exists primarily as a crawl-friendly entry point
@@ -19,8 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/countries" },
   openGraph: {
     title: "City Guides by Country | Best City Spots",
-    description:
-      "Browse Best City Spots travel guides organized by country.",
+    description: "Browse Best City Spots travel guides organized by country.",
     url: "/countries",
     type: "website",
   },
@@ -63,21 +63,18 @@ export default async function CountriesIndexPage() {
             <Globe2 className="text-accent h-3.5 w-3.5" aria-hidden />
             Browse by country
           </span>
-          <h1 className="page-title text-foreground mt-6 max-w-3xl">
-            City guides by country.
-          </h1>
+          <h1 className="page-title text-foreground mt-6 max-w-3xl">City guides by country.</h1>
           <p className="lede mt-5 max-w-2xl">
-            {countries.length} countries indexed. Each country page lists its most-visited
-            cities with population, region context, and a direct link into the full city
-            guide.
+            {countries.length} countries indexed. Each country page lists its most-visited cities
+            with population, region context, and a direct link into the full city guide.
           </p>
 
-          <ul className="mt-10 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="card-grid mt-10">
             {countries.map((country) => (
               <li key={country.slug}>
                 <Link
                   href={`/countries/${country.slug}`}
-                  className="border-line bg-surface/65 hover:bg-surface text-foreground flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
+                  className="border-line bg-surface/65 hover:bg-surface text-foreground flex h-full items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
                 >
                   <span className="truncate text-sm font-semibold">{country.country}</span>
                   <span className="text-muted text-xs font-semibold tracking-[0.18em] uppercase">

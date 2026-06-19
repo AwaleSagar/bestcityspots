@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Database, Globe2, Radar, Shield, Sparkles } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
@@ -91,6 +92,17 @@ export default function AboutPageContent() {
                 We combine public data, live city conditions, and AI-assisted summaries so travelers
                 can compare places without fighting a noisy interface.
               </p>
+            </ScrollReveal>
+
+            <ScrollReveal animation="fade-up" delay={0.3}>
+              <Image
+                src="/illustrations/about-transparent-atlas.webp"
+                alt="Translucent map layers — weather, places, and AI synthesis — stacking into one calm atlas"
+                width={1280}
+                height={720}
+                sizes="(min-width: 1024px) 56rem, 100vw"
+                className="mt-8 h-auto w-full rounded-2xl"
+              />
             </ScrollReveal>
           </header>
 

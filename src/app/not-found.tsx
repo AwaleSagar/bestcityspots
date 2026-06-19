@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Compass, MapPinned } from "lucide-react";
 import { type City, getTopCities, cityHref } from "@/lib/cities";
@@ -27,14 +28,20 @@ export default async function NotFound() {
   }
 
   return (
-    <main
-      id="main-content"
-      className="text-foreground min-h-screen bg-transparent font-sans"
-    >
+    <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <div
         className="container-gutter mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20"
         style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
       >
+        <Image
+          src="/illustrations/404-off-the-map.webp"
+          alt="A map pin drifting off the edge of a folded paper map"
+          width={720}
+          height={540}
+          priority
+          className="mb-8 w-full max-w-sm"
+        />
+
         <span className="eyebrow">
           <Compass className="text-accent h-3.5 w-3.5" aria-hidden />
           404 / Off the map
@@ -43,8 +50,8 @@ export default async function NotFound() {
           We couldn&rsquo;t find that page.
         </h1>
         <p className="lede mt-5 max-w-xl">
-          The link may have moved or the city slug changed. Try returning to the
-          explorer, or jump straight into one of the most-loved guides below.
+          The link may have moved or the city slug changed. Try returning to the explorer, or jump
+          straight into one of the most-loved guides below.
         </p>
 
         <nav aria-label="Recover navigation" className="mt-10 flex flex-wrap gap-3">

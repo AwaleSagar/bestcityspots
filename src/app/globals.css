@@ -17,51 +17,59 @@
 /* ─── Design Tokens ─── */
 
 :root {
-  --background: oklch(0.97 0.008 80);
-  --foreground: oklch(0.18 0.02 42);
+  /* ── Azure Atlas palette (color audit 2026-06-13, Direction A) ──
+     All chroma values verified inside the sRGB gamut; all text pairs ≥4.5:1,
+     UI pairs ≥3:1 (see audit §5-6). Coral Spark is the identity accent;
+     Clay Press carries links/buttons (light text passes AA); Kiln is the
+     pressed/hover step. */
+  --background: oklch(0.977 0.007 81); /* Paper #FAF7F2 */
+  --foreground: oklch(0.229 0.015 58); /* Ink #221B16 */
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-surface: oklch(0.98 0.006 80);
-  --color-surface-strong: oklch(0.96 0.01 78);
+  --color-surface: oklch(0.985 0.005 80);
+  --color-surface-strong: oklch(0.962 0.009 78);
   --color-elevated: oklch(1 0 0);
-  /* 0.53 lightness keeps muted text ≥ 4.5:1 on --background (WCAG 2.2 AA) */
-  --color-muted: oklch(0.53 0.015 42);
-  --color-muted-strong: oklch(0.4 0.02 42);
+  /* Mist — 5.24:1 on Paper (WCAG 2.2 AA with margin) */
+  --color-muted: oklch(0.517 0.014 51);
+  --color-muted-strong: oklch(0.4 0.018 55);
   --color-line: color-mix(in oklab, var(--foreground) 8%, transparent);
-  --color-accent: oklch(0.55 0.18 38);
-  --color-accent-strong: oklch(0.46 0.19 36);
+  --color-accent: oklch(0.642 0.187 31); /* Coral Spark #E8543F — icons/identity (3.4:1 UI) */
+  --color-accent-strong: oklch(
+    0.555 0.169 31
+  ); /* Clay Press #C2402E — links 4.8:1, btn fill 4.9:1 */
+  --color-accent-deep: oklch(0.5 0.16 31); /* Kiln — pressed/hover state */
   --color-accent-soft: color-mix(in oklab, var(--color-accent) 10%, transparent);
-  --color-accent-contrast: oklch(0.98 0.01 78);
+  --color-accent-contrast: oklch(0.98 0.005 80);
   --color-brand-primary: var(--color-accent);
-  --color-brand-secondary: oklch(0.42 0.06 210);
-  --color-brand-accent: oklch(0.68 0.08 86);
-  --color-earth: oklch(0.53 0.08 64);
+  --color-brand-secondary: oklch(0.466 0.097 240); /* Deep Azure #15608A — 6.4:1 */
+  --color-brand-accent: oklch(0.631 0.113 76); /* Dune Gold #B07F2E — 3.3:1 UI */
+  --color-earth: oklch(0.6 0.07 75); /* warm sand (decorative tints only) */
   --color-earth-soft: color-mix(in oklab, var(--color-earth) 12%, transparent);
-  --color-leaf: oklch(0.43 0.09 142);
+  --color-leaf: oklch(0.58 0.093 175); /* Sea Glass #2E8C77 — 3.8:1 UI */
   --color-leaf-soft: color-mix(in oklab, var(--color-leaf) 10%, transparent);
-  --color-water: oklch(0.46 0.06 214);
+  --color-water: oklch(0.466 0.097 240); /* Deep Azure — real blue presence */
   --color-water-soft: color-mix(in oklab, var(--color-water) 10%, transparent);
   --color-glass: color-mix(in oklab, var(--background) 80%, white);
   --color-glass-heavy: color-mix(in oklab, var(--background) 90%, white);
   --color-glass-border: color-mix(in oklab, var(--foreground) 6%, transparent);
 
-  --color-cat-dining: oklch(0.42 0.11 155);
+  --color-cat-dining: oklch(0.49 0.09 173); /* deep Sea Glass */
   --color-cat-dining-soft: color-mix(in oklab, var(--color-cat-dining) 10%, transparent);
-  --color-cat-stays: oklch(0.42 0.09 245);
+  --color-cat-stays: oklch(0.45 0.1 245); /* Azure family */
   --color-cat-stays-soft: color-mix(in oklab, var(--color-cat-stays) 10%, transparent);
 
-  --color-season-spring: oklch(0.45 0.12 150);
-  --color-season-summer: oklch(0.52 0.13 80);
-  --color-season-autumn: oklch(0.5 0.14 48);
-  --color-season-winter: oklch(0.45 0.09 240);
+  --color-season-spring: oklch(0.5 0.1 165);
+  --color-season-summer: oklch(0.58 0.12 80);
+  --color-season-autumn: oklch(0.55 0.15 35);
+  --color-season-winter: oklch(0.47 0.09 235);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
   --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.1);
   --shadow-3xl: 0 24px 56px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 8px 32px rgba(179, 79, 42, 0.12);
+  --shadow-glow: 0 8px 32px rgba(232, 84, 63, 0.12); /* Coral Spark */
 
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-cormorant-garamond);
@@ -94,55 +102,62 @@
   --space-fluid-section: clamp(4rem, 8vw, 8rem);
   --space-fluid-gap: calc(clamp(4rem, 8vw, 8rem) / 2);
   --space-fluid-panel: clamp(1.25rem, 2.5vw, 2.5rem);
+  /* Uniform gap between cards in a card grid. Single source of truth so
+     every card list (cities, countries, hubs, top-cities) breathes the same
+     — replaces the ad-hoc gap-2/gap-4 values that drifted per page. */
+  --card-gap: clamp(0.75rem, 1.4vw, 1rem);
   --radius-organic: 38% 62% 48% 52% / 56% 42% 58% 44%;
   --radius-organic-inverse: 62% 38% 54% 46% / 44% 58% 42% 56%;
   --pattern-botanical: color-mix(in oklab, var(--color-leaf) 13%, transparent);
 }
 
 .dark {
-  --background: oklch(0.13 0.015 34);
-  --foreground: oklch(0.93 0.01 82);
+  /* Azure Atlas dark: cool-neutral charcoal (audit fix #7) so the coral
+     accent pops by temperature contrast instead of stewing in sepia. */
+  --background: oklch(0.14 0.008 250);
+  --foreground: oklch(0.93 0.005 250);
 
-  --color-surface: oklch(0.16 0.018 36);
-  --color-surface-strong: oklch(0.19 0.02 38);
-  --color-elevated: oklch(0.22 0.022 40);
-  --color-muted: oklch(0.62 0.015 78);
-  --color-muted-strong: oklch(0.78 0.012 80);
+  --color-surface: oklch(0.17 0.009 250);
+  --color-surface-strong: oklch(0.2 0.01 250);
+  --color-elevated: oklch(0.23 0.012 250);
+  --color-muted: oklch(0.64 0.01 250); /* 5.9:1 on dark bg */
+  --color-muted-strong: oklch(0.78 0.008 250);
   --color-line: color-mix(in oklab, var(--foreground) 10%, transparent);
-  --color-accent: oklch(0.7 0.14 48);
-  --color-accent-strong: oklch(0.78 0.13 56);
+  --color-accent: oklch(0.72 0.13 33); /* light coral — 7.6:1 on bg */
+  --color-accent-strong: oklch(0.78 0.12 35); /* btn fill — dark text 8:1+ */
+  --color-accent-deep: oklch(0.83 0.09 35); /* pressed/hover (brightens in dark) */
   --color-accent-soft: color-mix(in oklab, var(--color-accent) 14%, transparent);
-  --color-accent-contrast: oklch(0.14 0.02 34);
-  --color-brand-secondary: oklch(0.72 0.05 210);
-  --color-brand-accent: oklch(0.76 0.07 86);
-  --color-earth: oklch(0.71 0.07 66);
+  --color-accent-contrast: oklch(0.15 0.01 250);
+  --color-brand-secondary: oklch(0.72 0.09 230);
+  --color-brand-accent: oklch(0.8 0.08 85);
+  --color-earth: oklch(0.74 0.06 78);
   --color-earth-soft: color-mix(in oklab, var(--color-earth) 14%, transparent);
-  --color-leaf: oklch(0.68 0.08 142);
+  --color-leaf: oklch(0.74 0.09 170);
   --color-leaf-soft: color-mix(in oklab, var(--color-leaf) 12%, transparent);
-  --color-water: oklch(0.72 0.06 214);
+  --color-water: oklch(0.72 0.09 230);
   --color-water-soft: color-mix(in oklab, var(--color-water) 12%, transparent);
-  --color-glass: oklch(0.15 0.016 36);
-  --color-glass-heavy: oklch(0.17 0.018 38);
+  --color-glass: oklch(0.16 0.009 250);
+  --color-glass-heavy: oklch(0.19 0.01 250);
   --color-glass-border: color-mix(in oklab, var(--foreground) 8%, transparent);
 
-  --color-cat-dining: oklch(0.68 0.12 155);
+  --color-cat-dining: oklch(0.7 0.1 172);
   --color-cat-dining-soft: color-mix(in oklab, var(--color-cat-dining) 10%, transparent);
-  --color-cat-stays: oklch(0.66 0.1 245);
+  --color-cat-stays: oklch(0.68 0.09 240);
   --color-cat-stays-soft: color-mix(in oklab, var(--color-cat-stays) 10%, transparent);
 
-  --color-season-spring: oklch(0.68 0.12 150);
-  --color-season-summer: oklch(0.72 0.12 80);
-  --color-season-autumn: oklch(0.66 0.13 48);
-  --color-season-winter: oklch(0.64 0.09 240);
+  --color-season-spring: oklch(0.7 0.1 165);
+  --color-season-summer: oklch(0.74 0.1 82);
+  --color-season-autumn: oklch(0.7 0.12 35);
+  --color-season-winter: oklch(0.66 0.09 235);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.4);
   --shadow-3xl: 0 24px 56px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 8px 32px rgba(231, 150, 101, 0.15);
+  --shadow-glow: 0 8px 32px rgba(234, 132, 110, 0.15); /* light coral */
 
-  --color-selection-text: oklch(0.97 0.015 78);
+  --color-selection-text: oklch(0.97 0.005 250);
   --pattern-botanical: color-mix(in oklab, var(--color-leaf) 16%, transparent);
 }
 
@@ -323,9 +338,11 @@ html {
   border-radius: var(--radius-organic);
   /* Soft stops instead of filter: blur() — avoids per-section GPU blur
      layers that cause scroll jank / INP regressions on mid-range devices */
+  /* Audit fix #5: the cool half of the wheel enters at hero level —
+     azure replaces the second earth-tone stop. */
   background:
     radial-gradient(circle at 35% 35%, var(--color-leaf-soft), transparent 70%),
-    radial-gradient(circle at 70% 70%, var(--color-earth-soft), transparent 72%);
+    radial-gradient(circle at 70% 70%, var(--color-water-soft), transparent 72%);
   opacity: 0.6;
   pointer-events: none;
   z-index: -1;
@@ -374,6 +391,19 @@ html {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+/* Shared card-list grid: one consistent gap (--card-gap) and a responsive,
+   auto-filling column track so every list of cards (CityCard on the cities /
+   countries / hub / top-cities surfaces) reflows identically — 1 column on
+   mobile, more as width allows — instead of each page hard-coding its own
+   grid-cols + gap. `align-items: stretch` (the grid default) guarantees equal
+   card heights within a row even with variable-length content. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--card-gap);
+  align-items: stretch;
 }
 
 .intent-card,
@@ -558,7 +588,9 @@ html {
 
 .btn-primary {
   border: 1px solid transparent;
-  background: var(--color-accent);
+  /* Clay Press, not Coral Spark: the lighter coral fails 4.5:1 with light
+     text (audit fix #8); Clay passes at 4.9:1. */
+  background: var(--color-accent-strong);
   color: var(--color-accent-contrast);
 }
 
@@ -769,7 +801,7 @@ html {
   }
 
   .btn-primary:hover {
-    background: var(--color-accent-strong);
+    background: var(--color-accent-deep);
     box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }

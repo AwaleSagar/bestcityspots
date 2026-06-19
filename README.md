@@ -122,14 +122,22 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 # Providers (server-only)
 GOOGLE_PLACES_API_KEY=your_google_places_key
-GOOGLE_GEMINI_API_KEY=your_gemini_key
 OPENWEATHERMAP_API_KEY=your_openweathermap_key
+
+# AI briefings — Gemini ⇄ OpenAI with automatic fallback.
+# AI_PROVIDER picks the preferred engine (default gemini); the other is
+# used when the preferred one is unconfigured, disabled, or over budget.
+AI_PROVIDER=gemini
+GOOGLE_GEMINI_API_KEY=your_gemini_key
+OPENAI_API_KEY=your_openai_key
 
 # Cost guard (server-only) — gate paid provider calls
 GOOGLE_PLACES_LIVE_FETCH_ENABLED=false
 GOOGLE_GEMINI_LIVE_FETCH_ENABLED=false
+OPENAI_LIVE_FETCH_ENABLED=false
 GOOGLE_PLACES_DAILY_CALL_LIMIT=100
 GOOGLE_GEMINI_DAILY_CALL_LIMIT=25
+OPENAI_DAILY_CALL_LIMIT=25
 
 # Observability (server-only, optional)
 LOG_LEVEL=info

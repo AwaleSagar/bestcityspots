@@ -38,6 +38,12 @@ const serverSchema = z.object({
   GOOGLE_GEMINI_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
   GOOGLE_PLACES_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
   GOOGLE_GEMINI_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
+  // OpenAI fallback provider (see src/lib/providers/ai.ts)
+  OPENAI_API_KEY: z.string().min(10).optional(),
+  OPENAI_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
+  OPENAI_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
+  /** Preferred AI engine; the other becomes the fallback. Default: gemini. */
+  AI_PROVIDER: z.enum(["gemini", "openai"]).optional(),
   OPENWEATHERMAP_API_KEY: z.string().min(10).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).optional(),
@@ -57,19 +63,44 @@ function warnOnce(key: string, issue: string) {
   console.warn(`[env] ${key}: ${issue}`);
 }
 
+/**
+ * Treat empty-string env vars (e.g. a bare `FOO=` line in a .env file) as
+ * *unset* so they resolve to `undefined` rather than `""`.
+ *
+ * Zod's `.optional()` only admits `undefined`, not `""`, so an empty optional
+ * like `NEXT_PUBLIC_CONTACT_EMAIL=` would otherwise fail `.email()`/`.min()`.
+ * Because a single failed field makes the whole `safeParse` return `{}`, one
+ * empty optional would silently discard *every* other value (including a
+ * valid Supabase URL/key). Stripping empties first keeps optionals optional.
+ */
+function compact<T extends Record<string, unknown>>(raw: T): Partial<T> {
+  const out: Partial<T> = {};
+  for (const key in raw) {
+    // Keys are fixed literals from the call sites below, not user input.
+    // eslint-disable-next-line security/detect-object-injection
+    const value = raw[key];
+    if (typeof value === "string" && value.trim() === "") continue;
+    // eslint-disable-next-line security/detect-object-injection
+    out[key] = value;
+  }
+  return out;
+}
+
 export function publicEnv(): PublicEnv {
   if (publicCache) return publicCache;
-  const parsed = publicSchema.safeParse({
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-    NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-    NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
-    NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
-    NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
-    NEXT_PUBLIC_BOOKING_AFFILIATE_ID: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID,
-    NODE_ENV: process.env.NODE_ENV,
-  });
+  const parsed = publicSchema.safeParse(
+    compact({
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+      NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
+      NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
+      NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+      NEXT_PUBLIC_BOOKING_AFFILIATE_ID: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID,
+      NODE_ENV: process.env.NODE_ENV,
+    })
+  );
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
       warnOnce(String(issue.path[0]), issue.message);
@@ -85,18 +116,24 @@ export function serverEnv(): ServerEnv {
     throw new Error("[env] serverEnv() cannot be called from a client bundle");
   }
   if (serverCache) return serverCache;
-  const parsed = serverSchema.safeParse({
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
-    GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
-    GOOGLE_PLACES_LIVE_FETCH_ENABLED: process.env.GOOGLE_PLACES_LIVE_FETCH_ENABLED,
-    GOOGLE_GEMINI_LIVE_FETCH_ENABLED: process.env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED,
-    GOOGLE_PLACES_DAILY_CALL_LIMIT: process.env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
-    GOOGLE_GEMINI_DAILY_CALL_LIMIT: process.env.GOOGLE_GEMINI_DAILY_CALL_LIMIT,
-    OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
-    NODE_ENV: process.env.NODE_ENV,
-    LOG_LEVEL: process.env.LOG_LEVEL,
-  });
+  const parsed = serverSchema.safeParse(
+    compact({
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
+      GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
+      GOOGLE_PLACES_LIVE_FETCH_ENABLED: process.env.GOOGLE_PLACES_LIVE_FETCH_ENABLED,
+      GOOGLE_GEMINI_LIVE_FETCH_ENABLED: process.env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED,
+      GOOGLE_PLACES_DAILY_CALL_LIMIT: process.env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
+      GOOGLE_GEMINI_DAILY_CALL_LIMIT: process.env.GOOGLE_GEMINI_DAILY_CALL_LIMIT,
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+      OPENAI_LIVE_FETCH_ENABLED: process.env.OPENAI_LIVE_FETCH_ENABLED,
+      OPENAI_DAILY_CALL_LIMIT: process.env.OPENAI_DAILY_CALL_LIMIT,
+      AI_PROVIDER: process.env.AI_PROVIDER,
+      OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
+      NODE_ENV: process.env.NODE_ENV,
+      LOG_LEVEL: process.env.LOG_LEVEL,
+    })
+  );
   const pub = publicEnv();
   if (!parsed.success) {
     for (const issue of parsed.error.issues) {
@@ -149,6 +186,14 @@ function readServerEnvValue(key: keyof ServerEnv): ServerEnv[keyof ServerEnv] {
       return env.GOOGLE_PLACES_DAILY_CALL_LIMIT;
     case "GOOGLE_GEMINI_DAILY_CALL_LIMIT":
       return env.GOOGLE_GEMINI_DAILY_CALL_LIMIT;
+    case "OPENAI_API_KEY":
+      return env.OPENAI_API_KEY;
+    case "OPENAI_LIVE_FETCH_ENABLED":
+      return env.OPENAI_LIVE_FETCH_ENABLED;
+    case "OPENAI_DAILY_CALL_LIMIT":
+      return env.OPENAI_DAILY_CALL_LIMIT;
+    case "AI_PROVIDER":
+      return env.AI_PROVIDER;
     case "OPENWEATHERMAP_API_KEY":
       return env.OPENWEATHERMAP_API_KEY;
     case "LOG_LEVEL":

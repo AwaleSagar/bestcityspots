@@ -4,6 +4,26 @@ import { LruCache } from "./cache";
 import { minutes } from "./cache-config";
 import { cache as reactCache } from "react";
 
+/**
+ * Supabase/PostgREST errors are plain objects whose useful fields
+ * (`message`/`code`/`details`/`hint`) often render as `{}` when passed
+ * straight to `console.error`. This normalizes them into a flat, loggable
+ * shape so failures (e.g. a missing RPC, RLS denial, or network error)
+ * are actually diagnosable in the console.
+ */
+function describeSupabaseError(error: unknown): Record<string, unknown> {
+  if (error && typeof error === "object") {
+    const e = error as { message?: string; code?: string; details?: string; hint?: string };
+    return {
+      message: e.message ?? String(error),
+      code: e.code || undefined,
+      details: e.details || undefined,
+      hint: e.hint || undefined,
+    };
+  }
+  return { message: String(error) };
+}
+
 export interface City {
   id: number;
   city: string;
@@ -67,7 +87,7 @@ async function queryCitiesInBox(lat: number, lng: number, boxSize: number, limit
       .limit(limit);
 
     if (error) {
-      console.warn("Error fetching nearby cities:", error);
+      console.warn("Error fetching nearby cities:", describeSupabaseError(error));
       return [];
     }
     return (data ?? []) as City[];
@@ -131,7 +151,7 @@ export async function searchCities(
 
     if (signal?.aborted) return [];
     if (error) {
-      console.error("Error searching cities:", error);
+      console.error("Error searching cities:", describeSupabaseError(error));
       return [];
     }
 
@@ -142,7 +162,7 @@ export async function searchCities(
     return results;
   } catch (e) {
     if (signal?.aborted) return [];
-    console.error("Error searching cities:", e);
+    console.error("Error searching cities:", describeSupabaseError(e));
     return [];
   }
 }
@@ -170,7 +190,7 @@ export const getTopCities = reactCache(async (limit = 10) => {
       .limit(safeLimit);
 
     if (error) {
-      console.error("Error fetching top cities:", error);
+      console.error("Error fetching top cities:", describeSupabaseError(error));
       return [];
     }
 
@@ -189,7 +209,7 @@ export async function getCityById(id: number) {
     const { data, error } = await supabase.from("cities").select("*").eq("id", id).single();
 
     if (error) {
-      console.error(`Error fetching city with id ${id}:`, error);
+      console.error(`Error fetching city with id ${id}:`, describeSupabaseError(error));
       return null;
     }
 
@@ -227,7 +247,7 @@ export async function getCityBySlug(slug: string) {
       .maybeSingle();
 
     if (error) {
-      console.error(`Error fetching city with slug "${slug}":`, error);
+      console.error(`Error fetching city with slug "${slug}":`, describeSupabaseError(error));
       return null;
     }
 

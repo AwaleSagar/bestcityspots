@@ -20,15 +20,15 @@ async function RelatedContent({ city }: { city: City }) {
         More cities in {city.country}
       </h2>
       <p className="text-muted-strong text-sm">
-        Explore other guides nearby — same-country recommendations linked through to live
-        weather, AQI, and AI-assisted briefings.
+        Explore other guides nearby — same-country recommendations linked through to live weather,
+        AQI, and AI-assisted briefings.
       </p>
-      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <ul className="card-grid">
         {related.map((c) => (
           <li key={c.id}>
             <Link
               href={cityHref(c)}
-              className="border-line bg-surface/65 hover:bg-surface text-foreground group flex items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors"
+              className="border-line bg-surface/65 hover:bg-surface text-foreground group flex h-full items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors"
             >
               <span className="min-w-0">
                 <span className="block truncate text-sm font-semibold">{c.city}</span>

@@ -671,10 +671,17 @@ export async function getTopPlaces(
     return [];
   }
 
+  console.info(
+    `[places-debug] getTopPlaces(${cityName}/${type}): allowProviderFetch=${Boolean(
+      opts?.allowProviderFetch
+    )} liveEnabled=${isPaidProviderEnabled("google-places")}`
+  );
+
   try {
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
     const cache = bypassCache ? null : await readPlacesCache(cityName, type);
+    console.info(`[places-debug] ${cityName}/${type}: cacheHit=${Boolean(cache)}`);
 
     if (cache) {
       const updatedAt = new Date(cache.updated_at);
@@ -728,11 +735,21 @@ export async function getTopPlaces(
     }
 
     if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
+      console.warn(
+        `[places-debug] ${cityName}/${type}: BLOCKED live fetch (allowProviderFetch=${Boolean(
+          opts?.allowProviderFetch
+        )} liveEnabled=${isPaidProviderEnabled("google-places")}) -> returning []`
+      );
       recordPlacesCacheEvent(type, false);
       return [];
     }
 
-    return await fetchAndCachePlaces(cityName, type, opts);
+    console.info(`[places-debug] ${cityName}/${type}: fetching live from Google Places…`);
+    const fetched = await fetchAndCachePlaces(cityName, type, opts);
+    console.info(
+      `[places-debug] ${cityName}/${type}: live fetch returned ${fetched.length} place(s)`
+    );
+    return fetched;
   } catch (e) {
     if (isAbortError(e)) {
       throw e;

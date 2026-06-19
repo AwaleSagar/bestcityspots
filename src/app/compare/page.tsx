@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Scale, Users, MapPin, X, Sparkles } from "lucide-react";
 import { getCityBySlug, type City } from "@/lib/cities";
@@ -101,17 +102,26 @@ export default async function ComparePage({
         </div>
 
         {columns.length === 0 ? (
-          <div className="organic-panel mt-12 rounded-3xl p-8 md:p-12">
-            <h2 className="text-foreground text-2xl font-bold tracking-tight">
-              Start with any city
-            </h2>
-            <p className="text-muted mt-3 max-w-lg text-sm leading-relaxed">
-              Search above, or jump in from{" "}
-              <Link href="/resources/top-cities" className="text-link">
-                The Global 50
-              </Link>{" "}
-              — every city page has a Compare shortcut.
-            </p>
+          <div className="organic-panel mt-12 flex flex-col items-center gap-6 rounded-3xl p-8 text-center md:flex-row md:gap-10 md:p-12 md:text-left">
+            <Image
+              src="/illustrations/compare-empty.webp"
+              alt="Two empty comparison cards waiting to be filled"
+              width={600}
+              height={480}
+              className="w-full max-w-[16rem] shrink-0"
+            />
+            <div>
+              <h2 className="text-foreground text-2xl font-bold tracking-tight">
+                Start with any city
+              </h2>
+              <p className="text-muted mt-3 max-w-lg text-sm leading-relaxed">
+                Search above, or jump in from{" "}
+                <Link href="/resources/top-cities" className="text-link">
+                  The Global 50
+                </Link>{" "}
+                — every city page has a Compare shortcut.
+              </p>
+            </div>
           </div>
         ) : (
           <div

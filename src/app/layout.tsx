@@ -16,9 +16,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
+  // Azure Atlas palette (color audit): Paper / cool charcoal.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f5f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#1a1614" },
+    { media: "(prefers-color-scheme: light)", color: "#faf7f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#07090c" },
   ],
 };
 

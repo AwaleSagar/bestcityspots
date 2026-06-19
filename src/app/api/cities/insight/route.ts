@@ -8,10 +8,9 @@ import {
   upsertCityInsight,
   type CityInsight,
 } from "@/lib/intelligence";
-import { generateTextStream, sanitizeJsonResponse } from "@/lib/providers/gemini";
+import { generateTextStream, sanitizeJsonResponse, isAIEnabled } from "@/lib/providers/ai";
 import { cityIdSchema } from "@/lib/validation";
 import { createLogger } from "@/lib/logger";
-import { isPaidProviderEnabled } from "@/lib/cost-guard";
 
 const log = createLogger({ component: "api/cities/insight" });
 
@@ -70,7 +69,8 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  if (!isPaidProviderEnabled("gemini")) {
+  // Either engine being enabled is enough — the facade handles fallback.
+  if (!isAIEnabled()) {
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
         const encoder = new TextEncoder();
