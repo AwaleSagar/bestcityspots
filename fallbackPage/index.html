@@ -1,402 +1,260 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Best City Spots — Under Maintenance</title>
-  <meta name="description" content="Best City Spots is currently undergoing scheduled maintenance. We'll be back shortly." />
-  <meta name="robots" content="noindex, nofollow" />
-  <style>
-    *,
-    *::before,
-    *::after {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg-primary: #0a0e1a;
-      --bg-secondary: #111827;
-      --glass-bg: rgba(255, 255, 255, 0.04);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-highlight: rgba(255, 255, 255, 0.12);
-      --text-primary: #f1f5f9;
-      --text-secondary: #94a3b8;
-      --accent-1: #6366f1;
-      --accent-2: #8b5cf6;
-      --accent-3: #a78bfa;
-      --glow-1: rgba(99, 102, 241, 0.3);
-      --glow-2: rgba(139, 92, 246, 0.2);
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Animated background orbs */
-    .bg-orb {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.5;
-      animation: float 12s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    .bg-orb--1 {
-      width: 400px;
-      height: 400px;
-      background: var(--glow-1);
-      top: -10%;
-      left: -5%;
-      animation-delay: 0s;
-    }
-
-    .bg-orb--2 {
-      width: 350px;
-      height: 350px;
-      background: var(--glow-2);
-      bottom: -10%;
-      right: -5%;
-      animation-delay: -4s;
-    }
-
-    .bg-orb--3 {
-      width: 250px;
-      height: 250px;
-      background: rgba(167, 139, 250, 0.15);
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation-delay: -8s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      33% { transform: translateY(-30px) scale(1.05); }
-      66% { transform: translateY(20px) scale(0.95); }
-    }
-
-    /* Glass card */
-    .card {
-      position: relative;
-      z-index: 1;
-      max-width: 520px;
-      width: 90%;
-      padding: 48px 40px;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 24px;
-      backdrop-filter: blur(24px) saturate(1.4);
-      -webkit-backdrop-filter: blur(24px) saturate(1.4);
-      box-shadow:
-        0 0 0 1px var(--glass-highlight) inset,
-        0 24px 48px rgba(0, 0, 0, 0.4),
-        0 0 80px var(--glow-1);
-      text-align: center;
-      animation: cardEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    }
-
-    @keyframes cardEntry {
-      from {
-        opacity: 0;
-        transform: translateY(30px) scale(0.96);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Best City Spots — We'll be right back</title>
+    <meta
+      name="description"
+      content="Best City Spots is undergoing brief scheduled maintenance. We'll be back shortly."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#14181f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbf7f2" media="(prefers-color-scheme: light)" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
+
+      :root {
+        /* Spacing scale (4px base) */
+        --s-1: 4px;
+        --s-2: 8px;
+        --s-3: 12px;
+        --s-4: 16px;
+        --s-6: 24px;
+        --s-8: 32px;
+        --s-10: 40px;
+        --s-16: 64px;
+
+        /* Azure Atlas — dark canvas (cool charcoal, hue ~250) */
+        --bg: #14181f;
+        --bg-wash: #1b212b;
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #eef1f5;
+        --text-muted: #9aa4b2;
+        --accent: #e8543f; /* Coral Spark */
+        --accent-soft: rgba(232, 84, 63, 0.13);
+        --accent-ring: rgba(232, 84, 63, 0.3);
+        --focus: #4a9fcf; /* Deep Azure, lightened for dark */
       }
-    }
 
-    /* Animated icon */
-    .icon-wrap {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 28px;
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: pulse 3s ease-in-out infinite;
-      box-shadow: 0 8px 32px var(--glow-1);
-    }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #fbf7f2;
+          --bg-wash: #f3ece2;
+          --border: rgba(20, 24, 31, 0.09);
+          --text: #1c2128;
+          --text-muted: #5c6675;
+          --accent: #c2402e; /* Clay Press — stronger for light contrast */
+          --accent-soft: rgba(194, 64, 46, 0.09);
+          --accent-ring: rgba(194, 64, 46, 0.22);
+          --focus: #15608a; /* Deep Azure */
+        }
+      }
 
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 8px 32px var(--glow-1); }
-      50% { box-shadow: 0 8px 48px var(--glow-1), 0 0 60px var(--glow-2); }
-    }
+      @media (prefers-contrast: more) {
+        :root {
+          --border: currentColor;
+          --text-muted: var(--text);
+        }
+      }
 
-    .icon-wrap svg {
-      width: 40px;
-      height: 40px;
-      stroke: white;
-      stroke-width: 1.5;
-      fill: none;
-    }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
 
-    h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-      background: linear-gradient(135deg, var(--text-primary), var(--accent-3));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+      body {
+        /* System-first: honest, instant, zero font bytes */
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          "Helvetica Neue",
+          Arial,
+          sans-serif;
+        background-color: var(--bg);
+        /* Static, GPU-cheap gradient wash — no blurred decorative layers */
+        background-image:
+          radial-gradient(120% 90% at 15% 0%, var(--bg-wash) 0%, transparent 55%),
+          radial-gradient(100% 80% at 100% 100%, var(--accent-soft) 0%, transparent 60%);
+        color: var(--text);
+        min-height: 100vh;
+        min-height: 100svh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(var(--s-6), 6vw, var(--s-10));
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
 
-    .subtitle {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
+      main {
+        width: 100%;
+        max-width: 30rem;
+        text-align: center;
+        animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
 
-    /* Progress bar */
-    .progress-track {
-      width: 100%;
-      height: 4px;
-      background: var(--glass-border);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 28px;
-    }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-    .progress-bar {
-      height: 100%;
-      width: 30%;
-      border-radius: 4px;
-      background: linear-gradient(90deg, var(--accent-1), var(--accent-2), var(--accent-3));
-      animation: progress 2.5s ease-in-out infinite;
-    }
+      /* The single accent moment: the brand mark */
+      .mark {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto var(--s-8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        color: var(--accent);
+        background: var(--accent-soft);
+        box-shadow: 0 0 0 1px var(--accent-ring) inset;
+      }
 
-    @keyframes progress {
-      0% { width: 10%; margin-left: 0; }
-      50% { width: 40%; margin-left: 30%; }
-      100% { width: 10%; margin-left: 90%; }
-    }
+      .mark svg {
+        width: 28px;
+        height: 28px;
+        stroke: currentColor;
+        stroke-width: 1.6;
+        fill: none;
+      }
 
-    /* Countdown */
-    .countdown {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .countdown__block {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 60px;
-    }
-
-    .countdown__value {
-      font-size: 2rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: var(--text-primary);
-      line-height: 1;
-    }
-
-    .countdown__label {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-secondary);
-      margin-top: 6px;
-    }
-
-    .countdown__sep {
-      font-size: 2rem;
-      font-weight: 300;
-      color: var(--text-secondary);
-      line-height: 1;
-      opacity: 0.4;
-    }
-
-    /* Status badge */
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 999px;
-      font-size: 0.8rem;
-      color: var(--accent-3);
-      letter-spacing: 0.02em;
-    }
-
-    .status__dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-2);
-      animation: blink 1.5s ease-in-out infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    /* Footer text */
-    .footer {
-      margin-top: 24px;
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      opacity: 0.6;
-    }
-
-    .footer a {
-      color: var(--accent-3);
-      text-decoration: none;
-    }
-
-    .footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .card {
-        padding: 36px 24px;
+      .eyebrow {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--text-muted);
+        margin-bottom: var(--s-3);
       }
 
       h1 {
-        font-size: 1.4rem;
+        font-size: clamp(2rem, 6vw, 2.75rem);
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        color: var(--text);
+        text-wrap: balance;
       }
 
-      .countdown__value {
-        font-size: 1.5rem;
+      .lede {
+        margin: var(--s-4) auto 0;
+        max-width: 36rem;
+        font-size: 1.0625rem;
+        color: var(--text-muted);
+        text-wrap: pretty;
       }
 
-      .countdown__block {
-        min-width: 48px;
+      /* Quiet status — a label, not a badge */
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--s-2);
+        margin-top: var(--s-8);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-muted);
       }
-    }
-  </style>
-</head>
-<body>
 
-  <!-- Background orbs -->
-  <div class="bg-orb bg-orb--1"></div>
-  <div class="bg-orb bg-orb--2"></div>
-  <div class="bg-orb bg-orb--3"></div>
+      .status__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
 
-  <!-- Main card -->
-  <div class="card">
-    <div class="icon-wrap">
-      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-      </svg>
-    </div>
-
-    <h1>We&rsquo;ll Be Right Back</h1>
-    <p class="subtitle">
-      Best City Spots is undergoing scheduled maintenance to bring you an even better experience. Hang tight!
-    </p>
-
-    <div class="progress-track">
-      <div class="progress-bar"></div>
-    </div>
-
-    <div class="countdown" id="countdown">
-      <div class="countdown__block">
-        <span class="countdown__value" id="cd-hours">00</span>
-        <span class="countdown__label">Hours</span>
-      </div>
-      <span class="countdown__sep">:</span>
-      <div class="countdown__block">
-        <span class="countdown__value" id="cd-minutes">00</span>
-        <span class="countdown__label">Minutes</span>
-      </div>
-      <span class="countdown__sep">:</span>
-      <div class="countdown__block">
-        <span class="countdown__value" id="cd-seconds">00</span>
-        <span class="countdown__label">Seconds</span>
-      </div>
-    </div>
-
-    <div class="status">
-      <span class="status__dot"></span>
-      Maintenance in progress
-    </div>
-
-    <p class="footer">
-      &copy; <span id="year"></span> Best City Spots &mdash;
-      <a href="mailto:support@bestcityspots.com">Contact Support</a>
-    </p>
-  </div>
-
-  <script>
-    (function () {
-      // Set current year
-      document.getElementById('year').textContent = new Date().getFullYear();
-
-      // Countdown: default 2 hours from now (adjust as needed)
-      var MAINTENANCE_DURATION_MS = 2 * 60 * 60 * 1000;
-      var storageKey = 'bcs_maintenance_end';
-      var endTime;
-
-      try {
-        var stored = localStorage.getItem(storageKey);
-        if (stored && Number(stored) > Date.now()) {
-          endTime = Number(stored);
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
         }
-      } catch (e) {
-        // localStorage unavailable
-      }
-
-      if (!endTime) {
-        endTime = Date.now() + MAINTENANCE_DURATION_MS;
-        try {
-          localStorage.setItem(storageKey, String(endTime));
-        } catch (e) {
-          // ignore
+        50% {
+          opacity: 0.55;
         }
       }
 
-      var hoursEl = document.getElementById('cd-hours');
-      var minutesEl = document.getElementById('cd-minutes');
-      var secondsEl = document.getElementById('cd-seconds');
-
-      function pad(n) {
-        return n < 10 ? '0' + n : String(n);
+      footer {
+        margin-top: var(--s-10);
+        padding-top: var(--s-6);
+        border-top: 1px solid var(--border);
+        font-size: 0.8125rem;
+        color: var(--text-muted);
       }
 
-      function tick() {
-        var remaining = Math.max(0, endTime - Date.now());
-        var totalSeconds = Math.floor(remaining / 1000);
-        var h = Math.floor(totalSeconds / 3600);
-        var m = Math.floor((totalSeconds % 3600) / 60);
-        var s = totalSeconds % 60;
+      footer a {
+        display: inline-block;
+        padding: 10px var(--s-2); /* ≥44px tap target height */
+        margin: -10px calc(-1 * var(--s-2));
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 6px;
+      }
 
-        hoursEl.textContent = pad(h);
-        minutesEl.textContent = pad(m);
-        secondsEl.textContent = pad(s);
+      footer a:hover {
+        text-decoration: underline;
+      }
 
-        if (remaining <= 0) {
-          try { localStorage.removeItem(storageKey); } catch (e) {}
-          window.location.reload();
+      a:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
         }
       }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 21s-7-4.35-7-10a7 7 0 0 1 14 0c0 5.65-7 10-7 10z" />
+          <circle cx="12" cy="11" r="2.5" />
+        </svg>
+      </div>
 
-      tick();
-      setInterval(tick, 1000);
-    })();
-  </script>
-</body>
+      <p class="eyebrow">Best City Spots</p>
+      <h1>We&rsquo;ll be right back</h1>
+      <p class="lede">
+        We&rsquo;re making a few quick improvements. The site will be back online shortly &mdash;
+        thanks for your patience.
+      </p>
+
+      <p class="status" role="status" aria-live="polite">
+        <span class="status__dot" aria-hidden="true"></span>
+        Scheduled maintenance in progress
+      </p>
+
+      <footer>
+        &copy; 2026 Best City Spots &middot;
+        <a href="mailto:support@bestcityspots.com">Contact support</a>
+      </footer>
+    </main>
+  </body>
 </html>

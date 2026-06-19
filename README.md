@@ -7,70 +7,56 @@
 
 # 🌆 Best City Spots
 
-### Premium urban-intelligence for deliberate travelers
+### A calm, credible atlas for deliberate travel.
 
-Search, compare, and explore the world's most vibrant cities with **AI-assisted briefings**, **live weather & air quality**, **curated places**, and **city-level metrics** — wrapped in a refined *liquid-glass* UI.
+Search, compare, and explore the world's cities with **live weather & air quality**, **AI-assisted briefings**, **curated places**, and **transparent city metrics** — in a refined, accessible, _liquid-glass_ interface.
 
 <br />
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg?style=flat-square)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind 4](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Supabase](https://img.shields.io/badge/Supabase-Postgres-3ECF8E?style=flat-square&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Code style: Prettier](https://img.shields.io/badge/code_style-prettier-F7B93E?style=flat-square&logo=prettier&logoColor=black)](https://prettier.io/)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-6366f1?style=flat-square)](#-contributing)
 
 <br />
 
-[Overview](#-overview) ·
-[Features](#-feature-highlights) ·
-[Tech Stack](#-tech-stack) ·
-[Architecture](#-architecture) ·
-[Getting Started](#-getting-started) ·
-[Scripts](#-scripts) ·
-[Deployment](#-deployment) ·
-[License](#-license)
+[**Overview**](#-overview) ·
+[**Features**](#-feature-highlights) ·
+[**Tech Stack**](#-tech-stack) ·
+[**Architecture**](#-architecture) ·
+[**Getting Started**](#-getting-started) ·
+[**Configuration**](#-environment--service-configuration) ·
+[**Scripts**](#-scripts) ·
+[**Deployment**](#-deployment) ·
+[**Contributing**](#-contributing)
 
 </div>
 
 ---
 
-## 📑 Table of Contents
+## 📖 Overview
 
-- [Overview](#-overview)
-- [Feature Highlights](#-feature-highlights)
-- [Tech Stack](#-tech-stack)
-- [Architecture](#-architecture)
-- [API Surface](#-api-surface)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Project Structure](#-project-structure)
-- [Scripts](#-scripts)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
+**Best City Spots** turns the noisy work of destination research into something that feels _edited_. Instead of a dozen tabs, you get one place that fuses **live conditions** (weather, air quality), **real place data** (landmarks, dining, stays from Google Places), **clearly-labeled AI synthesis**, and **practical planning cues** into a single, trustworthy reading experience.
 
----
+It is built around two convictions:
 
-## 🧭 Overview
+- **Honesty over hype** — sources stay visible, the AI layer is framed as _assistance, not authority_, and there are no paywalls or dark patterns.
+- **Sustainable by design** — every paid API call is bounded by a durable, multi-layer cost guard, so the project can run in production without surprise bills.
 
-**Best City Spots** is a single Next.js 16 application that blends a polished product UI with a
-cost-aware, cache-first backend. It pulls together AI insight, live environmental data, curated
-points of interest, and quantitative city metrics into one fast, beautiful experience.
+> **Who it's for**
+>
+> - **Travelers** shaping a trip who want signal, not spam — search by name, mood, climate, or season, then compare and plan.
+> - **Engineers** looking for a production-grade reference: a Next.js 16 / React 19 app with strict typing, a cache-first data layer, Postgres full-text + fuzzy search, image pipelines, and real cost controls.
 
-**Who it's for**
+<div align="center">
 
-- 🧳 **Deliberate travelers** who want a curated, data-backed read on a city before they go.
-- 🌍 **Digital nomads** comparing cities on cost, connectivity, air quality, and climate comfort.
-- 📊 **The curious** who enjoy exploring the world through an interactive, metric-rich lens.
-
-> [!NOTE]
-> This repository is published as a **personal / portfolio project** for reference. It is shared
-> under the MIT license — feel free to read, learn from, and adapt it.
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
+|   🔎 Search & discover    |     🌤️ Live conditions      | 🧠 Labeled AI briefings  |      📊 Compare & plan       |
+| :-----------------------: | :-------------------------: | :----------------------: | :--------------------------: |
+| FTS + trigram + alias RPC | OpenWeatherMap + Open-Meteo | Gemini ⇄ OpenAI fallback | Up to 3 cities, side-by-side |
 
 </div>
 
@@ -78,113 +64,69 @@ points of interest, and quantitative city metrics into one fast, beautiful exper
 
 ## ✨ Feature Highlights
 
-| | Feature | What it does |
-| :---: | :--- | :--- |
-| 🤖 | **AI city briefings** | Google Gemini (`gemini-3-flash-preview`) generates intros, attractions, seasonal guidance, and weather prep — streamed over **SSE** and Zod-validated. Falls back to OpenAI automatically. |
-| 📍 | **Curated places** | Top experiences, restaurants, and hotels from the **Google Places API (New)**, ranked with a Bayesian engine, with BlurHash placeholders and a Supabase Storage image cache. |
-| 🌦️ | **Live conditions** | Real-time weather and AQI via **OpenWeatherMap**, with pollution & climate-comfort signals from **Open-Meteo**, refreshed every 60 minutes. |
-| 📈 | **City metrics** | Cost-of-living, safety, connectivity, pollution, and health-access aggregates per city. |
-| 🔎 | **Multi-mode search** | Postgres full-text + trigram fuzzy + alias RPC (`search_cities_elastic`), recent-search memory, and GPS-based nearest-city lookup. |
-| 🪩 | **Sphere visualization** | An interactive 3D city sphere with category, population, and per-category modes. |
-| 🗂️ | **SEO topical hubs** | Curated landing routes for air quality, digital nomads, and 12 month-by-month destination guides. |
-| ⚡ | **Layered caching** | Tiered TTLs in Supabase with `schemaVersion` / `prompt_version` invalidation and stale-while-revalidate refreshes. |
-| 🛡️ | **Hardened HTTP** | Per-provider circuit breakers, timeouts, retry + jitter, and a daily call-limit **cost guard** for paid APIs. |
-| 🔒 | **Privacy-first analytics** | Aggregate-only daily tables, GDPR geo-consent banner, and no per-user profiling. |
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
+- 🔎 **Elastic city search** — PostgreSQL full-text search + trigram fuzzy matching + an alias table, exposed through the `search_cities_elastic` RPC. Typo-tolerant, ranked by relevance and population, with recent-search memory and GPS nearest-city lookup.
+- 🌤️ **Live weather & air quality** — current conditions and AQI per city via **OpenWeatherMap**, with **Open-Meteo** as a keyless fallback so the guide never goes stale.
+- 🗺️ **Curated "Top Experiences"** — landmarks, dining, and stays from the **Google Places API (New)**, ranked and de-duplicated, with photos cached to **Supabase Storage** and **BlurHash** placeholders for instant, layout-stable loading.
+- 🧠 **AI city briefings** — synthesized overviews, attractions, and seasonal notes via **Google Gemini** with automatic **OpenAI** fallback. Always labeled as machine-assisted, never presented as hidden authority.
+- ⚖️ **Side-by-side compare** — put up to three cities head-to-head on live weather, air quality, population, and verified metrics. The URL _is_ the comparison — share it as-is.
+- 📈 **Transparent metrics & methodology** — population, region context, and city metrics with a dedicated `/methodology` page explaining every source, refresh cadence, and AI-vs-human attribution.
+- 🧭 **Topical SEO hubs** — programmatic, crawl-friendly indexes: _cleanest air_, _best for digital nomads_, _best cities to visit by month_, plus per-country and all-cities indexes.
+- 🧳 **Personal planning** — save places and notes on-device (no account wall) and assemble a day-by-day plan.
+- 🛡️ **Cost-guarded by default** — a layered defense (edge rate-limits, app kill-switches, a durable atomic daily budget, and cloud quota caps) makes runaway paid-API spend structurally impossible. See [Architecture](#-architecture).
+- 🎨 **Refined, accessible UI** — a token-driven _liquid-glass_ design system, dark mode (`next-themes`), Framer Motion micro-interactions, an interactive Leaflet map, and a dedicated accessibility statement.
 
 ---
 
-## 🛠️ Tech Stack
+## 🧰 Tech Stack
 
-| Category | Technologies |
-| :--- | :--- |
-| **Framework** | Next.js 16 (App Router) · React 19 · TypeScript 5 (strict) |
-| **Styling** | Tailwind CSS 4 · liquid-glass CSS custom properties · `next-themes` |
-| **Database / Storage** | Supabase — Postgres, RLS, Storage (`place_images` bucket) |
-| **AI** | Google Generative AI — Gemini (`gemini-3-flash-preview`) with OpenAI fallback |
-| **External APIs** | Google Places (New) · OpenWeatherMap · Open-Meteo |
-| **Validation** | Zod — inputs, AI/provider outputs, and typed env vars |
-| **UI / Motion** | Framer Motion · Lucide icons · Leaflet maps |
-| **Imaging** | Sharp (server-side) · BlurHash placeholders |
-| **Tooling** | ESLint 9 + `eslint-plugin-security` · Prettier · `tsx` |
-| **Build / Deploy** | Standalone Next build · Dockerfile · `docker-compose.yml` |
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
+| Layer                  | Technology                                                                                                                                                                                                                  |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Framework**          | [Next.js 16](https://nextjs.org/) (App Router, standalone output) on **Node 20**                                                                                                                                            |
+| **Language**           | [TypeScript 5](https://www.typescriptlang.org/) (strict)                                                                                                                                                                    |
+| **UI**                 | [React 19](https://react.dev/), [Tailwind CSS 4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/), [lucide-react](https://lucide.dev/), [next-themes](https://github.com/pacocoursey/next-themes) |
+| **Maps & media**       | [Leaflet](https://leafletjs.com/), [sharp](https://sharp.pixelplumbing.com/), [BlurHash](https://blurha.sh/)                                                                                                                |
+| **Data & storage**     | [Supabase](https://supabase.com/) — Postgres (FTS + `pg_trgm`), Storage, Row-Level Security                                                                                                                                 |
+| **Validation**         | [Zod](https://zod.dev/) (centralized, runtime-validated env + inputs)                                                                                                                                                       |
+| **External providers** | Google Gemini · OpenAI · Google Places (New) · OpenWeatherMap · Open-Meteo                                                                                                                                                  |
+| **Tooling**            | ESLint 9 (+ `eslint-plugin-security`), Prettier, `tsx`, Tailwind PostCSS                                                                                                                                                    |
+| **Deploy**             | Docker (multi-stage standalone) + Docker Compose · Ansible · nginx edge                                                                                                                                                     |
 
 ---
 
 ## 🏗️ Architecture
 
-A layered monolith: route handlers and server actions stay thin, while all business logic, provider
-calls, and database access live in the `src/lib/` service layer. Reads are **cache-first** with
-stale-while-revalidate refreshes to keep latency low and third-party API cost bounded.
+The app is **cache-first**: user requests are served from Supabase caches and never trigger a paid API call on their own. Fresh data enters out-of-band through the cache warmer, and a four-layer guard keeps spend bounded even if a layer fails.
 
-```mermaid
-flowchart LR
-    A[Server Component /<br/>Route Handler /<br/>Server Action] --> B[src/lib/* service]
-    B --> C{Supabase<br/>cache hit?}
-    C -- Fresh --> D[Return cached data]
-    C -- Miss / Stale --> E[providers/* via http.ts<br/>timeouts · retry · circuit breaker]
-    E --> F[Upsert cache<br/>often in background]
-    F --> D
-    D --> G[Zod-validated, typed props]
+```
+                ┌──────────────────────────────────────────────┐
+   Visitor ──▶  │  nginx (Layer 1)  rate-limits · bot blocks    │
+                └───────────────┬──────────────────────────────┘
+                                │  127.0.0.1:3000 (origin closed)
+                ┌───────────────▼──────────────────────────────┐
+                │  Next.js 16 SSR · React 19                    │
+                │   • cache-first reads (Supabase)              │
+                │   • cost-guard kill switches (Layer 2)        │
+                └───────────────┬──────────────────────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────────────┐
+        ▼                       ▼                                ▼
+┌───────────────┐   ┌────────────────────────┐   ┌──────────────────────────┐
+│  Supabase     │   │  Durable budget (L3)   │   │  Paid providers          │
+│  Postgres ·   │   │  claim_provider_use()  │   │  Places · Gemini/OpenAI  │
+│  Storage · RLS│   │  atomic daily counter  │   │  · OpenWeatherMap        │
+└───────────────┘   └────────────────────────┘   └──────────────────────────┘
+                                │
+                    GCP quota caps + budget kill (Layer 4, console)
 ```
 
-**Cache tiers** (see [`src/lib/cache-config.ts`](src/lib/cache-config.ts)):
+| Layer                   | Mechanism                                                  | Where                              |
+| ----------------------- | ---------------------------------------------------------- | ---------------------------------- |
+| **1 · Edge**            | nginx per-IP rate limits + bot blocks                      | `deploy/nginx/bestcityspots.conf`  |
+| **2 · App kill switch** | `GOOGLE_*_LIVE_FETCH_ENABLED` (default **false** in prod)  | env / compose                      |
+| **3 · Durable budget**  | `claim_provider_use()` atomic per-day counter, fail-closed | Supabase + `src/lib/cost-guard.ts` |
+| **4 · Platform caps**   | GCP quota caps + API-key restriction + budget kill         | Google Cloud Console               |
 
-| Cache table | Fresh | Soft refresh | Purpose |
-| :--- | :--- | :--- | :--- |
-| `city_ai_insights` | 365 d | 30 d | Gemini city briefings |
-| `city_places_cache` · `place_details_cache` | 30 d | 7 d | Google Places landmarks & details |
-| `city_weather_cache` | 60 m | 30 m | Weather + AQI snapshots |
-| `city_metrics` | 60 m | 30 m | Cost, safety, connectivity, pollution, health |
-| `ai_trending_cache` | 24 h | 12 h | AI trending destinations |
-
-> Invalidate by bumping `CACHE_TIERS[*].schemaVersion` in `src/lib/cache-config.ts`, or
-> `PROMPT_VERSIONS` in `src/lib/providers/gemini.ts` for AI output. Mismatches are treated as a
-> cache miss — no data migration required.
-
-**Security highlights**
-
-- Public-read app; privileged writes are restricted to `service_role` (server-only).
-- Supabase RLS is the primary boundary — review it on every table / policy change.
-- All inputs and AI/provider outputs are validated with Zod.
-- Hardened response headers (HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`)
-  are configured in [`next.config.ts`](next.config.ts).
-- `SUPABASE_SERVICE_ROLE_KEY` and provider keys are never exposed to the client.
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
-
----
-
-## 🔌 API Surface
-
-| Endpoint | Method | Description |
-| :--- | :---: | :--- |
-| `/api/analytics` | `POST` | Batched, size-limited, privacy-conscious analytics ingestion. |
-| `/api/cities/sphere` | `GET` | Sphere visualization data (`mode=categories \| population \| category`). |
-| `/api/cities/insight` | `GET` | SSE-streamed AI city briefing (`stale` → `chunk` → `complete`). |
-| `/api/places/search` | `GET` | Filtered places search (type, rating, price tier, sort, paging, geo). |
-| `/api/health` | `GET` | Dependency health — token-gated detail via `HEALTH_CHECK_TOKEN`. |
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
+📄 Full operational detail lives in [`deploy/README.md`](deploy/README.md), and a structural map of the codebase in [`PROJECT.md`](PROJECT.md).
 
 ---
 
@@ -192,307 +134,236 @@ flowchart LR
 
 ### Prerequisites
 
-- **Node.js** 20.x+ and **npm** 10.x+
-- A **Supabase** project (for the database, RLS, and storage)
-- Optional API keys for live data: Google Gemini, Google Places, OpenWeatherMap *(the app degrades
-  gracefully when these are absent)*
+- **Node.js 20+** and npm
+- A **Supabase** project (free tier is fine)
+- **Python 3.9+** (only for the one-shot Supabase setup script)
+- API keys as needed: Google Places (New), Google Gemini and/or OpenAI, OpenWeatherMap
 
-### 1. Clone & install
+### 1 · Clone & install
 
 ```bash
-git clone https://github.com/AwaleSagar/bestcityspots.git
+git clone https://github.com/<your-org>/bestcityspots.git
 cd bestcityspots
 npm install
 ```
 
-### 2. Configure environment
-
-Create a `.env.local` in the repo root. All keys are optional at build time — placeholder values are
-enough for `lint`, `type-check`, and `build`. See [Environment Variables](#-environment-variables)
-for the full reference and [`docs/external-services-setup.md`](docs/external-services-setup.md) for a
-provider-by-provider setup walkthrough.
-
-```env
-# Supabase (public)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-
-# Supabase (server-only — required for cache writes / admin paths)
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# Providers (server-only)
-GOOGLE_PLACES_API_KEY=your_google_places_key
-OPENWEATHERMAP_API_KEY=your_openweathermap_key
-GOOGLE_GEMINI_API_KEY=your_gemini_key
-```
-
-### 3. Set up the database
-
-SQL lives under [`supabase/`](supabase/). Baseline files sit at the directory root; incremental
-changes go in `supabase/migrations/<YYYYMMDDHHMM>_<short_description>.sql` (idempotent, one concern
-per file — see [`supabase/migrations/README.md`](supabase/migrations/README.md)).
+### 2 · Configure environment
 
 ```bash
-# Apply migrations in order
-for f in supabase/migrations/*.sql; do
-  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-done
+cp .env.example .env.local
+# then fill in the values — see "Environment & service configuration" below
 ```
 
-### 4. Run the dev server
+### 3 · Provision the database
+
+The idempotent setup script applies all schema, RLS, functions, and seeds ~42k cities:
 
 ```bash
-npm run dev   # → http://localhost:3000
+pip install "psycopg[binary]"
+python scripts/setup_supabase.py        # add --skip-seed to re-run schema only
 ```
 
-> [!IMPORTANT]
-> **Cost & safety.** Paid providers (Gemini, Google Places, OpenAI) are gated by per-day limits in
-> [`src/lib/cost-guard.ts`](src/lib/cost-guard.ts) and the `*_LIVE_FETCH_ENABLED` flags — which
-> default to `false`. Keep them off in development to avoid unexpected API spend; flip them on only
-> when you intend to make live calls.
+Prefer SQL? Paste `supabase/setup_all_blank_project.sql` into the Supabase SQL editor, then seed with `npx tsx scripts/seed-cities.ts data/worldcities.csv`.
 
-<div align="right">
+### 4 · Verify & run
 
-[↑ Back to top](#-best-city-spots)
+```bash
+python scripts/test-keys.py   # checks DB / Places / Weather / AI credentials
+npm run test:supabase         # exercises tables, RLS, and the search RPC
+npm run dev                   # http://localhost:3000
+```
 
-</div>
+> **💡 Cost note:** In development, set `GOOGLE_PLACES_LIVE_FETCH_ENABLED=true` to let city pages fetch & cache real places on first view. In production this stays `false` — fresh data is loaded by the warmer (`npm run warm-cache`).
 
 ---
 
-## 🔑 Environment Variables
+## 🔐 Environment & Service Configuration
 
-Read env through `publicEnv()` / `serverEnv()` from [`src/lib/env.ts`](src/lib/env.ts) — never
-`process.env` directly. Use `requireServerEnv(key)` when a value is mandatory at the call site. Only
-`NEXT_PUBLIC_*` variables are reachable from the client; everything else is server-only.
+Copy `.env.example` → `.env.local`. All keys are validated at runtime by Zod (`src/lib/env.ts`); the app degrades gracefully when optional ones are absent.
 
 <details>
-<summary><strong>Public variables</strong> (<code>NEXT_PUBLIC_*</code>, client-accessible)</summary>
+<summary><strong>Supabase</strong> — required for all data</summary>
 
-<br />
-
-| Variable | Description |
-| :--- | :--- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key. |
-| `NEXT_PUBLIC_SITE_URL` | Canonical app URL (SSR, analytics, metadata). |
-| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Google Search Console verification token. |
-| `NEXT_PUBLIC_ANALYTICS_DEV` | Enable dev analytics logging. |
-| `NEXT_PUBLIC_ORGANIZATION_SAME_AS` | Comma-separated social/brand URLs (JSON-LD `sameAs`). |
-| `NEXT_PUBLIC_CONTACT_EMAIL` | Contact email for schema markup. |
-| `NEXT_PUBLIC_BOOKING_AFFILIATE_ID` | Booking.com affiliate ID for affiliate links. |
+| Variable                        | Description                                          |
+| ------------------------------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Project URL (`https://<ref>.supabase.co`)            |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key (read paths, RLS-protected)          |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server-only: cache writes, image uploads, cost-guard |
+| `SUPABASE_DB_URL`               | Postgres URL — only for `scripts/setup_supabase.py`  |
 
 </details>
 
 <details>
-<summary><strong>Server-only variables</strong> (never exposed to the client)</summary>
+<summary><strong>AI briefings</strong> — Gemini ⇄ OpenAI with automatic fallback</summary>
 
-<br />
-
-| Variable | Description | Default |
-| :--- | :--- | :--- |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (admin writes). | — |
-| `GOOGLE_PLACES_API_KEY` | Google Places API key. | — |
-| `GOOGLE_GEMINI_API_KEY` | Google Gemini API key. | — |
-| `OPENAI_API_KEY` | OpenAI fallback API key. | — |
-| `OPENWEATHERMAP_API_KEY` | OpenWeatherMap API key (free tier). | — |
-| `AI_PROVIDER` | Preferred AI engine (`gemini` \| `openai`); the other is fallback. | `gemini` |
-| `GOOGLE_PLACES_LIVE_FETCH_ENABLED` | Gate live Google Places calls. | `false` |
-| `GOOGLE_GEMINI_LIVE_FETCH_ENABLED` | Gate live Gemini calls. | `false` |
-| `OPENAI_LIVE_FETCH_ENABLED` | Gate live OpenAI calls. | `false` |
-| `GOOGLE_PLACES_DAILY_CALL_LIMIT` | Daily call cap for Places. | `100` |
-| `GOOGLE_GEMINI_DAILY_CALL_LIMIT` | Daily call cap for Gemini. | `25` |
-| `OPENAI_DAILY_CALL_LIMIT` | Daily call cap for OpenAI. | `25` |
-| `LOG_LEVEL` | Logger verbosity (`debug` \| `info` \| `warn` \| `error`). | `info` |
-| `HEALTH_CHECK_TOKEN` | Bearer token gating `/api/health` detail. | — |
+| Variable                           | Default  | Description                                  |
+| ---------------------------------- | -------- | -------------------------------------------- |
+| `AI_PROVIDER`                      | `gemini` | Preferred engine; the other becomes fallback |
+| `GOOGLE_GEMINI_API_KEY`            | —        | Gemini key                                   |
+| `OPENAI_API_KEY`                   | —        | OpenAI key                                   |
+| `GOOGLE_GEMINI_LIVE_FETCH_ENABLED` | `false`  | Kill switch (prod default: cache-only)       |
+| `OPENAI_LIVE_FETCH_ENABLED`        | `false`  | Kill switch                                  |
+| `GOOGLE_GEMINI_DAILY_CALL_LIMIT`   | `25`     | Durable daily budget                         |
+| `OPENAI_DAILY_CALL_LIMIT`          | `25`     | Durable daily budget                         |
 
 </details>
 
-<div align="right">
+<details>
+<summary><strong>Google Places</strong> (New) — landmarks, dining, stays</summary>
 
-[↑ Back to top](#-best-city-spots)
+| Variable                           | Default | Description                            |
+| ---------------------------------- | ------- | -------------------------------------- |
+| `GOOGLE_PLACES_API_KEY`            | —       | Places API (New) key                   |
+| `GOOGLE_PLACES_LIVE_FETCH_ENABLED` | `false` | Kill switch (prod default: cache-only) |
+| `GOOGLE_PLACES_DAILY_CALL_LIMIT`   | `100`   | Durable daily budget                   |
 
-</div>
+</details>
+
+<details>
+<summary><strong>Weather & optional/site settings</strong></summary>
+
+| Variable                           | Description                                           |
+| ---------------------------------- | ----------------------------------------------------- |
+| `OPENWEATHERMAP_API_KEY`           | Live weather + AQI (Open-Meteo fallback needs no key) |
+| `NEXT_PUBLIC_SITE_URL`             | Canonical site URL (SEO, sitemaps, OG)                |
+| `LOG_LEVEL`                        | `debug` \| `info` \| `warn` \| `error`                |
+| `HEALTH_CHECK_TOKEN`               | Bearer token for the detailed `/api/health` payload   |
+| `NEXT_PUBLIC_CONTACT_EMAIL`        | Surfaced in structured data / contact                 |
+| `NEXT_PUBLIC_BOOKING_AFFILIATE_ID` | Affiliate links render only when set (ADR-002)        |
+
+</details>
+
+> 🔒 **Never commit secrets.** `.env*` is gitignored. In production, paid-provider keys are provided **at runtime only** (never baked into Docker layers) and the Places key should be IP-restricted to your server.
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 
-<details open>
-<summary><strong>Top-level layout</strong></summary>
+<details>
+<summary>Click to expand the directory tree</summary>
 
-<br />
-
-```text
+```
 .
 ├── src/
-│   ├── app/            # Next.js App Router — routes, layouts, server actions, api/*
-│   ├── components/     # UI: analytics, effects, features, layout, pages, sections, seo, ui
-│   ├── hooks/          # useDeviceType, useNetworkQuality, useRecentSearches
-│   ├── config/         # Static config (nav)
-│   └── lib/            # Service layer — DB access, providers, AI, caching, validation
-├── supabase/           # SQL: schema, RLS, RPCs + timestamped migrations/
-├── scripts/            # Operational TS/shell tools (cache warm, analytics, seeds, tests)
-├── data/               # Local seed data
-├── public/             # Static assets (images, videos, illustrations)
-├── docs/               # ADRs, external-services setup, design tokens
-├── deploy/             # nginx + ansible deployment artifacts
-├── Dockerfile          # Multi-stage standalone build
-├── docker-compose.yml
-├── next.config.ts      # Hardened response headers
-└── package.json
+│   ├── app/                  # App Router: routes, layouts, server actions
+│   │   ├── api/              # REST: analytics, cities/{sphere,insight}, places/{search,save-event}, health
+│   │   ├── cities/           # /cities index + /cities/[slug] detail (full guide / reduced profile)
+│   │   ├── countries/        # /countries hub + /countries/[slug]
+│   │   ├── best-cities-*/     # Topical SEO hubs (air quality, nomads, by month)
+│   │   ├── compare/          # Side-by-side city comparison
+│   │   ├── actions.ts        # Server actions
+│   │   └── globals.css       # Liquid-glass design tokens (single source of truth)
+│   ├── components/           # analytics, features, layout, pages, sections, seo, ui
+│   ├── hooks/                # useDeviceType, useNetworkQuality, useRecentSearches …
+│   ├── config/               # nav.ts
+│   ├── platform/             # data-access repositories, caching
+│   └── lib/                  # Service layer (mostly server-only)
+│       ├── providers/        # gemini, openai, ai (router), googlePlaces, openweather, openMeteo
+│       ├── cost-guard.ts     # durable daily budget + kill switches
+│       ├── cities.ts         # search (RPC), lookups
+│       ├── places.ts         # Places fetch, ranking, image pipeline
+│       ├── intelligence.ts   # AI briefing cache + synthesis
+│       ├── weather.ts, metrics.ts, env.ts (Zod), supabase.ts …
+├── supabase/                 # SQL baseline files + ordered migrations/
+├── scripts/                  # Ops: setup, seeding, cache warming, analytics, key checks
+├── deploy/                   # nginx config, Ansible playbook, deploy runbook
+├── public/                   # Static assets: images/{hero,textures}, illustrations, videos
+├── data/                     # Local seed data (gitignored worldcities.csv)
+├── Dockerfile, docker-compose.yml
+└── next.config.ts            # Next config + hardened response headers (CSP, HSTS …)
 ```
 
 </details>
-
-<details>
-<summary><strong>Service layer</strong> (<code>src/lib/</code>) — where all logic lives</summary>
-
-<br />
-
-| File | Role |
-| :--- | :--- |
-| `supabase.ts` | Lazy Supabase clients (anon + service-role). |
-| `env.ts` | Typed env access: `publicEnv()`, `serverEnv()`, `requireServerEnv`. |
-| `http.ts` | Outbound HTTP: timeouts, retry + jitter, per-provider circuit breaker. |
-| `providers/{gemini,openai,googlePlaces,openweather,openMeteo}.ts` | Provider wrappers (all route through `http.ts`). |
-| `intelligence.ts` | Gemini AI insights — cache-first via `city_ai_insights`. |
-| `places.ts`, `place-search-utils.ts` | Google Places fetch + search filters. |
-| `weather.ts` | Weather + AQI with cache. |
-| `metrics.ts` | City metrics aggregation. |
-| `cities.ts` | City lookup + search (RPC `search_cities_elastic`). |
-| `ranking.ts` | Bayesian ranking for places. |
-| `cache.ts`, `cache-config.ts` | Cache TTL tiers + `schemaVersion` invalidation. |
-| `validation.ts` | Shared Zod schemas (inputs + AI/provider outputs). |
-| `cost-guard.ts` | Daily call-limit guard for paid providers. |
-| `analytics.ts`, `useAnalytics.ts` | Privacy-conscious visitor analytics. |
-| `countries.ts`, `topical-hubs.ts`, `sphere-categories.ts` | SEO hub helpers + curated category sets. |
-| `logger.ts`, `health.ts`, `geo.ts`, `format.ts`, `image-transforms.ts`, `storage.ts` | Utilities. |
-
-</details>
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
 
 ---
 
 ## 📜 Scripts
 
 <details open>
-<summary><strong>Development & build</strong></summary>
+<summary><strong>Development & quality</strong></summary>
 
-<br />
-
-| Command | Description |
-| :--- | :--- |
-| `npm run dev` | Start the dev server on port 3000. |
-| `npm run build` | Production build (standalone Next output). |
-| `npm run start` | Start the production server. |
-| `npm run type-check` | Type-check with `tsc --noEmit`. |
-| `npm run lint` | ESLint (includes `eslint-plugin-security`). |
-| `npm run lint:fix` | ESLint with auto-fix. |
-| `npm run format` | Prettier write across the codebase. |
-| `npm run format:check` | Prettier check (no writes). |
+| Command                           | What it does                     |
+| --------------------------------- | -------------------------------- |
+| `npm run dev`                     | Start the dev server (Turbopack) |
+| `npm run build` / `npm run start` | Production build / serve         |
+| `npm run type-check`              | `tsc --noEmit` (strict)          |
+| `npm run lint` · `lint:fix`       | ESLint (with security plugin)    |
+| `npm run format` · `format:check` | Prettier                         |
 
 </details>
 
 <details>
-<summary><strong>Operations & verification</strong></summary>
+<summary><strong>Database, providers & ops</strong></summary>
 
-<br />
-
-| Command | Description |
-| :--- | :--- |
-| `npm run warm-cache` | Warm AI / trending / places caches. |
-| `npm run warm-cache:trending` | Warm trending destinations only. |
-| `npm run warm-cache:dry-run` | Plan cache warming with no writes. |
-| `npm run analytics` | Visitor analytics report (7-day default). |
-| `npm run analytics:30d` | Analytics report over a 30-day window. |
-| `npm run analytics:json` | Analytics report as JSON. |
-| `npm run import:cost` | Import the cost-of-living index. |
-| `npm run test` | Run metrics + share-list checks. |
-| `npm run test:refactor` | Cross-cutting refactor verification. |
-| `npm run test:google-places` | Google Places integration smoke test. |
-| `npm run test:supabase` | Supabase backend smoke tests (`:json` variant available). |
-| `npm run test:metrics` · `npm run test:share` | Targeted metrics / share-list checks. |
+| Command                                    | What it does                                        |
+| ------------------------------------------ | --------------------------------------------------- |
+| `python scripts/setup_supabase.py`         | One-shot, idempotent DB setup + city seed           |
+| `python scripts/test-keys.py`              | Health-check DB / Places / Weather / AI keys        |
+| `npm run test:supabase`                    | Backend test harness (tables, RLS, RPCs)            |
+| `npm run warm-cache`                       | Populate caches (the only intended paid-spend path) |
+| `npm run warm-cache:trending` · `:dry-run` | Warm trending only · no-spend preview               |
+| `npm run analytics` · `analytics:30d`      | Usage/traffic reports                               |
+| `npm run import:cost`                      | Import the cost-of-living index                     |
+| `npm run test`                             | Lightweight metric/share unit checks                |
 
 </details>
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
 
 ---
 
 ## 🐳 Deployment
 
-The app builds to a **standalone** Next.js output and ships with a multi-stage `Dockerfile` and
-`docker-compose.yml` (Node 20 Alpine). Production deployment artifacts (nginx reverse proxy,
-optional Ansible provisioning) live under [`deploy/`](deploy/).
+The repo ships a multi-stage **Dockerfile** (standalone Next output) and a **docker-compose.yml** that binds the origin to `127.0.0.1:3000`, sets memory/CPU limits, and injects paid-provider keys at runtime only.
 
 ```bash
-# Build the image — public NEXT_PUBLIC_* vars are baked in at build time
-docker build -t bestcityspots \
-  --build-arg NEXT_PUBLIC_SUPABASE_URL=... \
-  --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=... \
-  .
-
-# Run — runtime secrets flow through the env file
-docker run -p 3000:3000 --env-file .env.local bestcityspots
+docker compose --env-file .env.production up -d --build
 ```
 
-Or with Compose:
+For full server provisioning there's an **Ansible playbook** in [`deploy/ansible/`](deploy/ansible/) that hardens the host, installs Docker + nginx, deploys with a **health-gated rollback**, closes the origin port at the firewall, and schedules the nightly cache warmer — with guardrails that refuse unpinned refs, block accidental live-fetch in prod, and require an explicit confirmation token.
 
 ```bash
-docker compose up --build
+cd deploy/ansible
+ansible-playbook playbook.yml --ask-vault-pass \
+  -e app_version=v1.0.0 -e confirm=bestcityspots-prod --check --diff
 ```
-
-The app is stateless at the Next.js layer, so it scales horizontally behind a load balancer. Keep
-the hardened response headers in [`next.config.ts`](next.config.ts) intact.
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
 
 ---
 
 ## 🤝 Contributing
 
-This is a personal project, but thoughtful issues and pull requests are welcome. Before submitting,
-please review the project conventions:
+Contributions are welcome! To keep the history clean and the project healthy:
 
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — workflow and expectations
-- [`CODE_STYLE.md`](CODE_STYLE.md) — coding standards
-- [`AGENTS.md`](AGENTS.md) · [`PROJECT.md`](PROJECT.md) — architecture and deeper context
+1. **Fork** the repo and create a branch: `git checkout -b feat/your-feature`
+2. **Install & develop:** `npm install` → `npm run dev`
+3. **Before pushing**, make sure these pass:
+   ```bash
+   npm run type-check
+   npm run lint
+   npm run format:check
+   ```
+4. **Commit narrowly** — stage specific files (`git add src/lib/foo.ts`), not `git add .` — and write a clear, conventional message (e.g. `feat(search): add alias fallback`).
+5. **Open a pull request** describing the change and its motivation.
 
-Run the safety rails before pushing:
-
-```bash
-npm run lint && npm run type-check && npm run build
-```
-
-<div align="right">
-
-[↑ Back to top](#-best-city-spots)
-
-</div>
+Please respect the project's principles: keep data sources visible, label AI output, and never weaken the cost-guard layers. New schema changes go in `supabase/migrations/` as ordered, idempotent files.
 
 ---
 
 ## 📄 License
 
-Released under the [MIT License](LICENSE) — © 2026 Sagar Awale.
+Released under the **[MIT License](LICENSE)** — © 2026 Sagar Awale. You're free to use, modify, and distribute it; attribution is appreciated.
+
+---
+
+## 🙏 Acknowledgements
+
+- **Data & APIs:** [Supabase](https://supabase.com/), [Google Places](https://developers.google.com/maps/documentation/places/web-service/op-overview), [Google Gemini](https://ai.google.dev/), [OpenAI](https://openai.com/), [OpenWeatherMap](https://openweathermap.org/), [Open-Meteo](https://open-meteo.com/), [SimpleMaps World Cities](https://simplemaps.com/data/world-cities)
+- **Maps & tiles:** [Leaflet](https://leafletjs.com/) + [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
+- Built with [Next.js](https://nextjs.org/), [React](https://react.dev/), and [Tailwind CSS](https://tailwindcss.com/)
 
 <div align="center">
-
 <br />
 
-**Built with care for people who travel deliberately.**
+**Best City Spots** — city intelligence for deliberate travel.
+
+<sub>If this project is useful or interesting to you, consider giving it a ⭐.</sub>
 
 </div>
