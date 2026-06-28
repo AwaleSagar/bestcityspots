@@ -32,6 +32,7 @@ Search, compare, and explore the world's cities with **live weather & air qualit
 [**Configuration**](#-environment--service-configuration) ·
 [**Scripts**](#-scripts) ·
 [**Deployment**](#-deployment) ·
+[**Security**](#-security) ·
 [**Contributing**](#-contributing)
 
 </div>
@@ -163,7 +164,7 @@ pip install "psycopg[binary]"
 python scripts/setup_supabase.py        # add --skip-seed to re-run schema only
 ```
 
-Prefer SQL? Paste `supabase/setup_all_blank_project.sql` into the Supabase SQL editor, then seed with `npx tsx scripts/seed-cities.ts data/worldcities.csv`.
+Prefer SQL? Paste `supabase/setup_all_blank_project.sql` into the Supabase SQL editor, then seed with `npx tsx scripts/seed-cities.ts data/worldcities.csv` (add `--limit=500` to seed only the top 500 cities by population for a lighter setup).
 
 ### 4 · Verify & run
 
@@ -302,6 +303,7 @@ Copy `.env.example` → `.env.local`. All keys are validated at runtime by Zod (
 | `npm run test:supabase`                    | Backend test harness (tables, RLS, RPCs)            |
 | `npm run warm-cache`                       | Populate caches (the only intended paid-spend path) |
 | `npm run warm-cache:trending` · `:dry-run` | Warm trending only · no-spend preview               |
+| `npm run warm-top-cities`                  | Focused warmer for the top-N cities by population    |
 | `npm run analytics` · `analytics:30d`      | Usage/traffic reports                               |
 | `npm run import:cost`                      | Import the cost-of-living index                     |
 | `npm run test`                             | Lightweight metric/share unit checks                |
@@ -325,6 +327,21 @@ cd deploy/ansible
 ansible-playbook playbook.yml --ask-vault-pass \
   -e app_version=v1.0.0 -e confirm=bestcityspots-prod --check --diff
 ```
+
+---
+
+## 🔒 Security
+
+Best City Spots treats the database as the trust boundary and ships with a hardened read/write posture:
+
+- **Service-role-only writes.** All cache/insights/analytics tables enforce RLS: public `SELECT`, writes hard-locked to `service_role`. The public anon key (shipped to browsers) can read public content but cannot mutate anything. Cache write paths gate on `requireServerClient()` (`src/lib/supabase.ts`), which throws if the service-role key is missing rather than silently degrading.
+- **No stored-content injection.** JSON-LD blocks render via `dangerouslySetInnerHTML` but always serialize through `serializeJsonLd()` (`src/lib/json-ld.ts`), which escapes `</script>` breakout sequences at every embed site (OWASP guidance).
+- **Validated everywhere.** API inputs, query params, and AI/provider responses are all validated with Zod before use.
+- **Hardened response headers.** HSTS, `X-Frame-Options: DENY`, `X-Content-Type-Options`, `Referrer-Policy`, and `Permissions-Policy` are set in `next.config.ts`. (CSP ships in `Report-Only` mode while directives stabilize.)
+- **Cost-bounded by design.** Every paid provider call (Gemini, Google Places) passes through a durable daily-spend ledger (`provider_daily_usage` + `src/lib/cost-guard.ts`) with a per-provider circuit breaker, so the app fails closed before overspending.
+- **Privacy-conscious analytics.** Aggregate counts only, consent-based geo, and no per-user profiling. No end-user auth flow is required to use the app.
+
+See [`AGENTS.md`](AGENTS.md) for the full security model and `SECURITY.md`-style guidance when reporting issues.
 
 ---
 

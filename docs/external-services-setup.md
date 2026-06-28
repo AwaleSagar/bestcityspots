@@ -29,11 +29,13 @@ bringing up the app on a fresh production machine. Companion docs:
 3. Search: `supabase/elastic_search.sql`, `supabase/20260412_places_search_filters.sql`
 4. Analytics: `supabase/visitor_analytics.sql`, `supabase/analytics_functions.sql`
 5. Hardening: `supabase/harden_security.sql`, then
-   `supabase/fix_city_ai_insights_rls.sql` (this order — fix re-creates
-   policies harden defines), then `supabase/20260311_places_cache_cost_optimization.sql`
+   `supabase/20260311_places_cache_cost_optimization.sql`
 6. Migrations: everything in `supabase/migrations/` by timestamp —
    **`202606111000_provider_budget_and_cache_idempotency.sql` is mandatory**
-   (the production cost guard fails closed without it).
+   (the production cost guard fails closed without it). The later migrations
+   lock `city_ai_insights` writes to `service_role` (`202606281400`) and
+   create `ai_trending_cache` + `place_saves_daily` (`202606281500`,
+   `202606120900`).
 
 **Seed data**
 
@@ -42,7 +44,8 @@ bringing up the app on a fresh production machine. Companion docs:
 **RLS policy invariants (verify, don't assume)**
 
 - Cache tables (`city_places_cache`, `place_details_cache`, `city_ai_insights`,
-  `city_weather_cache`, `city_metrics`): public `SELECT`, writes `service_role` only.
+  `city_weather_cache`, `city_metrics`, `ai_trending_cache`): public `SELECT`, writes `service_role` only.
+- `place_saves_daily`: `service_role` only (incremented via `record_place_save()` RPC).
 - `provider_daily_usage`: `service_role` only (read and write).
 - Analytics tables: writes via RPCs with `service_role`; no anon writes.
 - Quick check: `select tablename, policyname, roles from pg_policies where schemaname='public';`

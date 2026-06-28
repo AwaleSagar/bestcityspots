@@ -12,6 +12,7 @@ This project is primarily a public web application with a small REST-style surfa
 - `GET /api/cities/sphere` — cached city visualization data
 - `GET /api/cities/insight` — SSE-streamed AI city briefing (cache-first)
 - `GET /api/places/search` — filtered places search with cost-guard + circuit breaker
+- `POST /api/places/save-event` — anonymous aggregate "saved this" counter (US-12)
 - `GET /api/health` — lightweight dependency status (token-gated detail)
 
 There is no GraphQL layer, no separate microservice boundary, and no event-streaming platform in the repo today.
@@ -43,8 +44,8 @@ Current backend organization:
 
 - `src/app/api/**`: HTTP endpoints
 - `src/app/actions.ts`: server actions
-- `src/lib/supabase.ts`: client initialization
-- `src/lib/*.ts`: service layer for cities, places, weather, metrics, intelligence, ranking, and validation
+- `src/lib/supabase.ts`: client initialization (`requireServerClient()` gates all writes)
+- `src/lib/*.ts`: service layer for cities, places, weather, metrics, intelligence, ranking, validation, and JSON-LD serialization (`json-ld.ts`)
 - `supabase/*.sql`: schema, policies, indexes, and RPC definitions
 - `scripts/*`: operational tooling for cache warming, analytics reporting, and backfills
 
@@ -60,6 +61,9 @@ Current backend organization:
   - `city_weather_cache`
   - `city_metrics`
   - `ai_trending_cache`
+  - `place_saves_daily` (anonymous aggregate save counters)
+  - `provider_daily_usage` (durable cost-guard spend ledger)
+  - `cache_hit_stats`
   - aggregated analytics tables such as `daily_visitor_stats`
 - Search is database-native through `search_cities_elastic`, backed by FTS, trigram indexes, and alias tables.
 - Supabase Storage is used for cached Google Places imagery.
@@ -70,9 +74,10 @@ Current backend organization:
 
 - Treat the product as a mostly public-read application.
 - RLS is a core security boundary and should be reviewed whenever tables or policies change.
-- Public data is generally readable with anon/authenticated roles; sensitive writes should be limited to `service_role`.
+- Public data is generally readable with anon/authenticated roles; **all writes are hard-locked to `service_role`** — cache write paths gate on `requireServerClient()` (`src/lib/supabase.ts`), which throws if the service-role key is missing rather than silently degrading to the anon client.
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` to the client. Keep privileged writes in server-only code.
 - Validate request payloads and model outputs with Zod before trusting them.
+- JSON-LD embedded via `dangerouslySetInnerHTML` must serialize through `serializeJsonLd()` (`src/lib/json-ld.ts`) to neutralize `</script>` breakout; it is applied at every JSON-LD script site.
 - Preserve hardened response headers configured in `next.config.ts`.
 - Analytics is designed to be privacy-conscious and aggregate-first. Geo collection should remain consent-based.
 
@@ -98,7 +103,7 @@ Auth/authorization status from the repo:
 ### Error Handling And Logging
 
 - Handle failures explicitly in `src/lib` and route handlers.
-- Current convention is pragmatic `console.warn`, `console.error`, and occasional `console.info`; no structured logger is wired up yet.
+- Structured logging is available via `createLogger` (`src/lib/logger.ts`); prefer it for new code, while older modules still use pragmatic `console.warn`/`console.error`/`console.info`.
 - For user-facing reads, prefer graceful degradation (`null`, `[]`, stale cache fallback, or provider fallback) over hard failure when upstream services are unavailable.
 - For write paths, fail safely and keep logs actionable.
 
@@ -122,5 +127,5 @@ Auth/authorization status from the repo:
 ### Known Assumptions
 
 - The repo is clearly Docker-ready, but the primary production host is not explicitly documented.
-- No CI/CD workflow is committed in `.github/workflows` at the moment.
+- CI runs lint + type-check + build on push/PR to main via `.github/workflows/ci.yml` (Node 20).
 - No formal compliance requirement beyond privacy-conscious behavior and GDPR-style geo consent is documented yet.

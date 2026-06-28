@@ -1,6 +1,6 @@
 # Contributing to Best City Spots
 
-Thanks for contributing! This guide focuses on project-specific conventions. For high-level architecture see [PROJECT.md](PROJECT.md); for setup see [README.md](README.md).
+Thanks for contributing! This guide focuses on project-specific conventions. For architecture and security model see [AGENTS.md](AGENTS.md); for the file map see [PROJECT.md](PROJECT.md); for setup see [README.md](README.md).
 
 ## Getting started
 
@@ -8,7 +8,7 @@ Thanks for contributing! This guide focuses on project-specific conventions. For
 git clone https://github.com/AwaleSagar/bestcityspots.git
 cd bestcityspots
 npm install
-cp .env.local.example .env.local   # (or create one — see README)
+cp .env.example .env.local   # (or create one — see README)
 npm run dev
 ```
 

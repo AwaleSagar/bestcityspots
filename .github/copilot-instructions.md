@@ -4,33 +4,14 @@
 
 - **Name:** Best City Spots — premium urban-intelligence web app for deliberate travelers.
 - **Stack:** Next.js 16 (App Router, React 19, TypeScript 5 strict), Tailwind CSS 4, Supabase (Postgres + Storage + RLS), Framer Motion, Zod.
-- **Providers:** Google Gemini (`gemini-3-flash-preview`), Google Places (New), OpenWeatherMap, Open-Meteo.
-- See [`PROJECT.md`](../PROJECT.md) and [`AGENTS.md`](../AGENTS.md) for deeper context.
+- **Canonical architecture source:** [`AGENTS.md`](../AGENTS.md) — full tech stack, data strategy, security model, and file map. This file covers Copilot-specific workflow + conventions; defer to `AGENTS.md` for anything restated here.
 
-## 2. Architecture
+## 2. Architecture (quick map — see AGENTS.md for detail)
 
-- **`src/app/`** — Routes, layouts, server actions, `api/*` route handlers. Prefer Server Components.
-- **`src/lib/`** — Business logic core. All DB access, provider calls, and AI generation live here. Route handlers stay thin.
-  - `env.ts` — typed env via `publicEnv()` / `serverEnv()` / `requireServerEnv()`.
-  - `http.ts` — outbound HTTP with timeouts, retry+jitter, per-provider circuit breaker.
-  - `providers/{gemini,googlePlaces,openweather,openMeteo}.ts` — provider wrappers; all third-party calls go through these.
-  - `intelligence.ts` — Gemini AI insights (cache-first via `city_ai_insights`).
-  - `places.ts`, `weather.ts`, `metrics.ts`, `cities.ts`, `ranking.ts` — service modules.
-  - `cache.ts`, `cache-config.ts` — tiered TTLs + `schemaVersion` invalidation; AI also uses `PROMPT_VERSIONS` from `providers/gemini.ts`.
-  - `cost-guard.ts` — daily call-limit guard for paid providers.
-  - `validation.ts` — shared Zod schemas (inputs + AI / provider outputs).
-  - `supabase.ts` — lazy anon + service-role clients.
-  - `storage.ts` — `localStorage`/`sessionStorage` wrapper (client-side only).
-- **`src/components/`** — UI: analytics, effects, features, layout, pages, sections, seo, ui.
-- **`src/hooks/`** — `useDeviceType`, `useNetworkQuality`, `useRecentSearches`.
-- **`supabase/`** — Baseline SQL at root; new schema changes in `supabase/migrations/<YYYYMMDDHHMM>_*.sql` (idempotent, one concern per file).
-
-### Read path
-
-1. Server Component / route handler / server action → `src/lib/*` function.
-2. Function checks the Supabase cache table (`city_ai_insights`, `city_places_cache`, `city_weather_cache`, `city_metrics`, `ai_trending_cache`, …).
-3. On miss/stale → call provider via `providers/*` (which routes through `http.ts`) → return data → upsert cache (often in the background).
-4. Client components receive strictly-typed, Zod-validated props.
+- `src/app/` — routes, layouts, server actions, `api/*` route handlers. Prefer Server Components.
+- `src/lib/` — business logic, DB access, provider calls, AI generation. Route handlers stay thin. All privileged Supabase writes go through `requireServerClient()` (`src/lib/supabase.ts`); JSON-LD embeds serialize through `serializeJsonLd()` (`src/lib/json-ld.ts`).
+- `src/components/` — UI (analytics, effects, features, layout, pages, sections, seo, ui).
+- `supabase/` — baseline SQL at root; new schema changes in `supabase/migrations/<YYYYMMDDHHMM>_*.sql` (idempotent, one concern per file). **All cache/insights writes are `service_role`-only by RLS.**
 
 ## 3. Critical workflows
 
@@ -48,7 +29,7 @@
 - **HTTP:** all third-party calls go through `src/lib/http.ts` and `src/lib/providers/*`. Never `fetch()` an external API from elsewhere.
 - **Validation:** every API input, query param, and AI/provider output is validated with Zod. Reuse schemas from `src/lib/validation.ts`.
 - **Cache-first:** check DB → call provider → upsert cache. Invalidate by bumping `CACHE_TIERS[*].schemaVersion` (or `PROMPT_VERSIONS` for AI).
-- **Server-only:** start server-only modules with `import "server-only"`. Privileged Supabase ops use `supabaseServer`; reads from client/anon use `supabase`.
+- **Server-only:** start server-only modules with `import "server-only"`. Privileged Supabase **writes** use `requireServerClient()` (throws if the service-role key is missing); public reads may use the anon client.
 - **Styling:** Tailwind 4 utilities + liquid-glass CSS variables from `src/app/globals.css` (e.g. `--color-glass`, `--liquid-glow-1`, `--shadow-3xl`). No hardcoded colors. No inline `style={{}}` for static styling.
 - **Components:** prefer Server Components; mark `"use client"` only when you need browser APIs, event handlers, state, or effects.
 - **Errors:** handle explicitly in `src/lib`. Read paths prefer graceful degradation (`null`, `[]`, stale cache fallback) over throwing.
@@ -67,4 +48,5 @@
 - `GET /api/cities/sphere` — sphere visualization data (`mode=categories|population|category`).
 - `GET /api/cities/insight` — SSE-streamed AI city briefing (`stale` → `chunk` → `complete`).
 - `GET /api/places/search` — filtered places search (type, rating, price tier, sort, paging, geo).
+- `POST /api/places/save-event` — anonymous aggregate "saved this" counter (US-12).
 - `GET /api/health` — dependency health (token-gated detail via `HEALTH_CHECK_TOKEN`).

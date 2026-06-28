@@ -1,16 +1,14 @@
 # Platform
 
-This directory hosts cross-domain infrastructure modules.
+Cross-domain infrastructure modules. Currently implemented:
 
-## Planned modules
+1. **data-access** — repositories and persistence adapters (cache row reads/writes for insights, weather, metrics, places).
+2. **cache** — SWR orchestration, TTL/version policy.
 
-1. provider-gateway - wrappers around third-party APIs.
-2. data-access - repositories and persistence adapters.
-3. cache - SWR orchestration, TTL/version policy.
-4. observability - logging, correlation, telemetry.
+Not yet implemented (aspirational): `provider-gateway` (third-party API wrappers — currently live in `src/lib/providers/*`) and `observability` (structured logging currently in `src/lib/logger.ts`).
 
 ## Rules
 
-1. Domain modules may depend on platform modules.
-2. UI and route layers should not directly depend on provider-gateway internals.
+1. Domain/service modules may depend on platform modules.
+2. UI and route layers should not directly depend on data-access internals.
 3. Keep platform APIs stable and minimal; expose typed contracts.

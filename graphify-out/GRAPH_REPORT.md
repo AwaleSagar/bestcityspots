@@ -1,205 +1,205 @@
-# Graph Report - .  (2026-06-19)
+# Graph Report - .  (2026-06-28)
 
 ## Corpus Check
-- 191 files · ~163,445 words
+- 32 files · ~99,999 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 691 nodes · 827 edges · 166 communities detected
-- Extraction: 96% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 26 edges (avg confidence: 0.76)
+- 799 nodes · 1010 edges · 166 communities detected
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 59 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
-- [[_COMMUNITY_Rationale Illustration Overview|Rationale Illustration Overview]]
-- [[_COMMUNITY_Buildplaceimagepublicurl Buildplacesrequestkey Dedupeplaces|Buildplaceimagepublicurl Buildplacesrequestkey Dedupeplaces]]
-- [[_COMMUNITY_Warm Cache Checkinsightscachestatus|Warm Cache Checkinsightscachestatus]]
-- [[_COMMUNITY_Step Env Sql|Step Env Sql]]
-- [[_COMMUNITY_Constructor Backoffms Breakerkey|Constructor Backoffms Breakerkey]]
-- [[_COMMUNITY_Map Asset Symbol|Map Asset Symbol]]
-- [[_COMMUNITY_Test Supabase Backend|Test Supabase Backend]]
-- [[_COMMUNITY_Check Env Test|Check Env Test]]
-- [[_COMMUNITY_Formatnumber Getcityviews Getdailytrend|Formatnumber Getcityviews Getdailytrend]]
-- [[_COMMUNITY_Extracterrormessage Extractplaces Formatsample|Extracterrormessage Extractplaces Formatsample]]
-- [[_COMMUNITY_Builddaydirectionsurl Getaddresscontext Getinsidertips|Builddaydirectionsurl Getaddresscontext Getinsidertips]]
-- [[_COMMUNITY_Gettoday Parsereferrer Parseuseragent|Gettoday Parsereferrer Parseuseragent]]
-- [[_COMMUNITY_Storage Getjsonstorageitem Getsessionstorageitem|Storage Getjsonstorageitem Getsessionstorageitem]]
-- [[_COMMUNITY_Cityhref Describesupabaseerror Findnearest|Cityhref Describesupabaseerror Findnearest]]
-- [[_COMMUNITY_Lrucache Clear Constructor|Lrucache Clear Constructor]]
-- [[_COMMUNITY_Compact Publicenv Readpublicenvvalue|Compact Publicenv Readpublicenvvalue]]
-- [[_COMMUNITY_Architecture Document Stack|Architecture Document Stack]]
-- [[_COMMUNITY_Document Feature Cost|Document Feature Cost]]
-- [[_COMMUNITY_Route Get Healthtimeouterror|Route Get Healthtimeouterror]]
-- [[_COMMUNITY_Analyticsprovider Generatesessionid Getgeoconsent|Analyticsprovider Generatesessionid Getgeoconsent]]
-- [[_COMMUNITY_Runrpc Upsertcityviews Upsertdailyvisitorstats|Runrpc Upsertcityviews Upsertdailyvisitorstats]]
-- [[_COMMUNITY_Dailylimit Ispaidproviderenabled Localstate|Dailylimit Ispaidproviderenabled Localstate]]
-- [[_COMMUNITY_Supabase Buildanonclient Buildserverclient|Supabase Buildanonclient Buildserverclient]]
-- [[_COMMUNITY_Comfortfromtemp Fetchfreshmetrics Getcitymetrics|Comfortfromtemp Fetchfreshmetrics Getcitymetrics]]
-- [[_COMMUNITY_Capradius Fetchphotobytes Getapikey|Capradius Fetchphotobytes Getapikey]]
-- [[_COMMUNITY_Compressid Decodesharedlist Encodesharedlist|Compressid Decodesharedlist Encodesharedlist]]
-- [[_COMMUNITY_Aqilabelfromowm Aqilabelfrompm25 Canonicalvital|Aqilabelfromowm Aqilabelfrompm25 Canonicalvital]]
-- [[_COMMUNITY_Rankingengine Calculatebayesianscore Calculateviralityboost|Rankingengine Calculatebayesianscore Calculateviralityboost]]
-- [[_COMMUNITY_Cachecontrolfor Classifyage Days|Cachecontrolfor Classifyage Days]]
-- [[_COMMUNITY_Buildcityinsightprompt Getcityinsight Getintelligenttrending|Buildcityinsightprompt Getcityinsight Getintelligenttrending]]
-- [[_COMMUNITY_Extractbalancedjson Generatetext Generatetextstream|Extractbalancedjson Generatetext Generatetextstream]]
-- [[_COMMUNITY_Page Tsx Coremetricsskeleton|Page Tsx Coremetricsskeleton]]
-- [[_COMMUNITY_Coercetoinsight Pickarray Pickstring|Coercetoinsight Pickarray Pickstring]]
-- [[_COMMUNITY_Topical Hubs Getcitiesbyids|Topical Hubs Getcitiesbyids]]
-- [[_COMMUNITY_Getdistancekm Iswithinmaxpricetier Mappricelevel|Getdistancekm Iswithinmaxpricetier Mappricelevel]]
-- [[_COMMUNITY_Createlogger Currentlevel Emit|Createlogger Currentlevel Emit]]
-- [[_COMMUNITY_Generatetext Generatetextstream Getapikey|Generatetext Generatetextstream Getapikey]]
-- [[_COMMUNITY_Provider Google Aggregate|Provider Google Aggregate]]
-- [[_COMMUNITY_Seed Cities Assignuniqueslugs|Seed Cities Assignuniqueslugs]]
-- [[_COMMUNITY_Handleaccept Handledecline Handledismiss|Handleaccept Handledecline Handledismiss]]
-- [[_COMMUNITY_Weather Fetchfreshweather Getcityweather|Weather Fetchfreshweather Getcityweather]]
-- [[_COMMUNITY_Getcitiesbycountry Getcountrybyslug Getrelatedcities|Getcitiesbycountry Getcountrybyslug Getrelatedcities]]
-- [[_COMMUNITY_Fisheryatesshuffle Getcategoryids Getcitiesfromcategory|Fisheryatesshuffle Getcategoryids Getcitiesfromcategory]]
-- [[_COMMUNITY_Generatetext Generatetextstream Isaienabled|Generatetext Generatetextstream Isaienabled]]
-- [[_COMMUNITY_Provider Document Nginx|Provider Document Nginx]]
-- [[_COMMUNITY_Fail Main Parsecsvline|Fail Main Parsecsvline]]
-- [[_COMMUNITY_Buildfaqs Faqcontent Faqfallback|Buildfaqs Faqcontent Faqfallback]]
-- [[_COMMUNITY_Loadcolumn Parseslugs Removehref|Loadcolumn Parseslugs Removehref]]
-- [[_COMMUNITY_Route Post Readjsonbodywithlimit|Route Post Readjsonbodywithlimit]]
-- [[_COMMUNITY_Swr Orchestrate Runcachefirstswr|Swr Orchestrate Runcachefirstswr]]
-- [[_COMMUNITY_Weather Cache Repository|Weather Cache Repository]]
-- [[_COMMUNITY_Getdbclient Readcitymetricscache Writecitymetricscache|Getdbclient Readcitymetricscache Writecitymetricscache]]
-- [[_COMMUNITY_Getdbclient Readcityinsightcache Writecityinsightcache|Getdbclient Readcityinsightcache Writecityinsightcache]]
-- [[_COMMUNITY_Readplacescache Writeplacescache Writeplacescacheevent|Readplacescache Writeplacescache Writeplacescacheevent]]
-- [[_COMMUNITY_Blurhashtodataurl Optimizedimageinner Shouldbypassnextimageo|Blurhashtodataurl Optimizedimageinner Shouldbypassnextimageo]]
-- [[_COMMUNITY_Getaqicolor Gettempcolor Gettempiconcolor|Getaqicolor Gettempcolor Gettempiconcolor]]
-- [[_COMMUNITY_Usenetworkquality Determinequality Getconnection|Usenetworkquality Determinequality Getconnection]]
-- [[_COMMUNITY_Hasvalue Selectavailablemetrics Shouldrendermetricspanel|Hasvalue Selectavailablemetrics Shouldrendermetricspanel]]
-- [[_COMMUNITY_Conditionfromweathercode Fetchcurrent Fetchpm25|Conditionfromweathercode Fetchcurrent Fetchpm25]]
-- [[_COMMUNITY_Affiliate Adr 002|Affiliate Adr 002]]
-- [[_COMMUNITY_Parsesameas Rootlayout Layout|Parsesameas Rootlayout Layout]]
-- [[_COMMUNITY_Cityrelatedsection Relatedcontent Tsx|Cityrelatedsection Relatedcontent Tsx]]
-- [[_COMMUNITY_Scrollreveal Staggercontainer Tsx|Scrollreveal Staggercontainer Tsx]]
-- [[_COMMUNITY_Mobilebottomnav Getnavicon Tsx|Mobilebottomnav Getnavicon Tsx]]
-- [[_COMMUNITY_Getplacesavetotals Recordplacesave Place|Getplacesavetotals Recordplacesave Place]]
-- [[_COMMUNITY_Formatpopulation Formatrelativetime Format|Formatpopulation Formatrelativetime Format]]
-- [[_COMMUNITY_Generatesizes Getqualityvalue Transforms|Generatesizes Getqualityvalue Transforms]]
-- [[_COMMUNITY_Incident Billing Backend|Incident Billing Backend]]
-- [[_COMMUNITY_Decision Incremental Migration|Decision Incremental Migration]]
-- [[_COMMUNITY_Logo Next Wordmark|Logo Next Wordmark]]
-- [[_COMMUNITY_Testsearch Test Supabase|Testsearch Test Supabase]]
-- [[_COMMUNITY_Robots|Robots]]
-- [[_COMMUNITY_Sitemap|Sitemap]]
-- [[_COMMUNITY_Manifest|Manifest]]
-- [[_COMMUNITY_Notfound Not Found|Notfound Not Found]]
-- [[_COMMUNITY_Cleanestairhubpage Page Tsx|Cleanestairhubpage Page Tsx]]
-- [[_COMMUNITY_Topcitiespage Page Tsx|Topcitiespage Page Tsx]]
-- [[_COMMUNITY_Methodologypage Page Tsx|Methodologypage Page Tsx]]
-- [[_COMMUNITY_Aboutpage Page Tsx|Aboutpage Page Tsx]]
-- [[_COMMUNITY_Shimmer Experiencesskeleton Tsx|Shimmer Experiencesskeleton Tsx]]
-- [[_COMMUNITY_Cityvitalsfallback Page Parts|Cityvitalsfallback Page Parts]]
-- [[_COMMUNITY_Cityplanningpanel Tsx|Cityplanningpanel Tsx]]
-- [[_COMMUNITY_Getexperiencecategorycolor Experience Theme|Getexperiencecategorycolor Experience Theme]]
-- [[_COMMUNITY_Getseasoncolor Aibriefingclient Tsx|Getseasoncolor Aibriefingclient Tsx]]
-- [[_COMMUNITY_Aibriefingsection Tsx|Aibriefingsection Tsx]]
-- [[_COMMUNITY_Experiencessection Tsx|Experiencessection Tsx]]
-- [[_COMMUNITY_Addcity Comparepicker Tsx|Addcity Comparepicker Tsx]]
-- [[_COMMUNITY_Digitalnomadhubpage Page Tsx|Digitalnomadhubpage Page Tsx]]
-- [[_COMMUNITY_Countriesindexpage Page Tsx|Countriesindexpage Page Tsx]]
-- [[_COMMUNITY_Isactivenavpath Nav|Isactivenavpath Nav]]
-- [[_COMMUNITY_Freshnessstamp Tsx|Freshnessstamp Tsx]]
-- [[_COMMUNITY_Hotspot Tsx|Hotspot Tsx]]
-- [[_COMMUNITY_Fadedelay Heroheader Tsx|Fadedelay Heroheader Tsx]]
-- [[_COMMUNITY_Freeresourcecta Tsx|Freeresourcecta Tsx]]
-- [[_COMMUNITY_Principlessection Tsx|Principlessection Tsx]]
-- [[_COMMUNITY_Sitefooter Tsx|Sitefooter Tsx]]
-- [[_COMMUNITY_Themeprovider Tsx|Themeprovider Tsx]]
-- [[_COMMUNITY_Sitenav Tsx|Sitenav Tsx]]
-- [[_COMMUNITY_Usecitysearchcontroller|Usecitysearchcontroller]]
-- [[_COMMUNITY_Sanitizesearchinput Search Config|Sanitizesearchinput Search Config]]
-- [[_COMMUNITY_Highlightmatchfn Citysearch Tsx|Highlightmatchfn Citysearch Tsx]]
-- [[_COMMUNITY_Topcitiespagecontent Tsx Scrolltotop|Topcitiespagecontent Tsx Scrolltotop]]
-- [[_COMMUNITY_Aboutpagecontent Tsx|Aboutpagecontent Tsx]]
-- [[_COMMUNITY_Lazygeoconsentbanner Tsx|Lazygeoconsentbanner Tsx]]
-- [[_COMMUNITY_Pagetracker Tsx|Pagetracker Tsx]]
-- [[_COMMUNITY_Cityviewtracker Tsx|Cityviewtracker Tsx]]
-- [[_COMMUNITY_Userecentsearches|Userecentsearches]]
-- [[_COMMUNITY_Usedevicetype|Usedevicetype]]
-- [[_COMMUNITY_Parsepartialjson Partialjson|Parsepartialjson Partialjson]]
-- [[_COMMUNITY_Gethealth Health|Gethealth Health]]
-- [[_COMMUNITY_Useanalytics|Useanalytics]]
-- [[_COMMUNITY_Haversinekm Geo|Haversinekm Geo]]
-- [[_COMMUNITY_Fetchcurrentweather Openweather|Fetchcurrentweather Openweather]]
+- [[_COMMUNITY_requireServerClient() — write gate|requireServerClient() — write gate]]
+- [[_COMMUNITY_City Detail Page (orchestrator)|City Detail Page (orchestrator)]]
+- [[_COMMUNITY_setup_supabase.py|setup_supabase.py]]
+- [[_COMMUNITY_places.ts|places.ts]]
+- [[_COMMUNITY_warm-top-cities.ts|warm-top-cities.ts]]
+- [[_COMMUNITY_warm-cache.ts|warm-cache.ts]]
+- [[_COMMUNITY_http.ts|http.ts]]
+- [[_COMMUNITY_Intent Map Illustration Asset|Intent Map Illustration Asset]]
+- [[_COMMUNITY_test-supabase-backend.ts|test-supabase-backend.ts]]
+- [[_COMMUNITY_test-keys.py|test-keys.py]]
+- [[_COMMUNITY_main()|main()]]
+- [[_COMMUNITY_test-google-places.ts|test-google-places.ts]]
+- [[_COMMUNITY_experience-helpers.ts|experience-helpers.ts]]
+- [[_COMMUNITY_processAnalyticsBatch()|processAnalyticsBatch()]]
+- [[_COMMUNITY_storage.ts|storage.ts]]
+- [[_COMMUNITY_cities.ts|cities.ts]]
+- [[_COMMUNITY_LruCache|LruCache]]
+- [[_COMMUNITY_env.ts|env.ts]]
+- [[_COMMUNITY_Project Overview Document|Project Overview Document]]
+- [[_COMMUNITY_GET()|GET()]]
+- [[_COMMUNITY_AnalyticsProvider.tsx|AnalyticsProvider.tsx]]
+- [[_COMMUNITY_supabase.ts|supabase.ts]]
+- [[_COMMUNITY_runRpc()|runRpc()]]
+- [[_COMMUNITY_cost-guard.ts|cost-guard.ts]]
+- [[_COMMUNITY_metrics.ts|metrics.ts]]
+- [[_COMMUNITY_googlePlaces.ts|googlePlaces.ts]]
+- [[_COMMUNITY_share-list.ts|share-list.ts]]
+- [[_COMMUNITY_mapping.ts|mapping.ts]]
+- [[_COMMUNITY_RankingEngine|RankingEngine]]
+- [[_COMMUNITY_cache-config.ts|cache-config.ts]]
+- [[_COMMUNITY_intelligence.ts|intelligence.ts]]
+- [[_COMMUNITY_gemini.ts|gemini.ts]]
+- [[_COMMUNITY_generateStaticParams()|generateStaticParams()]]
+- [[_COMMUNITY_AIBriefingStreamClient.tsx|AIBriefingStreamClient.tsx]]
+- [[_COMMUNITY_topical-hubs.ts|topical-hubs.ts]]
+- [[_COMMUNITY_place-search-utils.ts|place-search-utils.ts]]
+- [[_COMMUNITY_logger.ts|logger.ts]]
+- [[_COMMUNITY_openai.ts|openai.ts]]
+- [[_COMMUNITY_Readme Document|Readme Document]]
+- [[_COMMUNITY_seed-cities.ts|seed-cities.ts]]
+- [[_COMMUNITY_GeoConsentBanner.tsx|GeoConsentBanner.tsx]]
+- [[_COMMUNITY_weather.ts|weather.ts]]
+- [[_COMMUNITY_countries.ts|countries.ts]]
+- [[_COMMUNITY_sphere-categories.ts|sphere-categories.ts]]
+- [[_COMMUNITY_ai.ts|ai.ts]]
+- [[_COMMUNITY_Deploy Runbook Document|Deploy Runbook Document]]
+- [[_COMMUNITY_Rationale Trust and Wayfinding Visual Language|Rationale: Trust and Wayfinding Visual Language]]
+- [[_COMMUNITY_CONTRIBUTING no process.env direct; NEXT_PUBLIC_ only on c|CONTRIBUTING: no process.env direct; NEXT_PUBLIC_* only on c]]
+- [[_COMMUNITY_main()|main()]]
+- [[_COMMUNITY_CityFAQSection.tsx|CityFAQSection.tsx]]
+- [[_COMMUNITY_page.tsx|page.tsx]]
+- [[_COMMUNITY_POST()|POST()]]
+- [[_COMMUNITY_swr.ts|swr.ts]]
+- [[_COMMUNITY_weather-cache-repository.ts|weather-cache-repository.ts]]
+- [[_COMMUNITY_getDbClient()|getDbClient()]]
+- [[_COMMUNITY_city-insights-repository.ts|city-insights-repository.ts]]
+- [[_COMMUNITY_places-cache-repository.ts|places-cache-repository.ts]]
+- [[_COMMUNITY_OptimizedImage.tsx|OptimizedImage.tsx]]
+- [[_COMMUNITY_CityVitals.tsx|CityVitals.tsx]]
+- [[_COMMUNITY_useNetworkQuality.ts|useNetworkQuality.ts]]
+- [[_COMMUNITY_metrics-display.ts|metrics-display.ts]]
+- [[_COMMUNITY_openMeteo.ts|openMeteo.ts]]
+- [[_COMMUNITY_Bestcityspots User Stories Document|Bestcityspots User Stories Document]]
+- [[_COMMUNITY_Adr 002 Affiliate Links Document|Adr 002 Affiliate Links Document]]
+- [[_COMMUNITY_Graph Report Summary|Graph Report Summary]]
+- [[_COMMUNITY_layout.tsx|layout.tsx]]
+- [[_COMMUNITY_CityRelatedSection.tsx|CityRelatedSection.tsx]]
+- [[_COMMUNITY_ScrollReveal.tsx|ScrollReveal.tsx]]
+- [[_COMMUNITY_MobileBottomNav.tsx|MobileBottomNav.tsx]]
+- [[_COMMUNITY_place-saves.ts|place-saves.ts]]
+- [[_COMMUNITY_format.ts|format.ts]]
+- [[_COMMUNITY_image-transforms.ts|image-transforms.ts]]
+- [[_COMMUNITY_Backend Incident Actions Document|Backend Incident Actions Document]]
+- [[_COMMUNITY_Adr 001 Cost Of Living Source Document|Adr 001 Cost Of Living Source Document]]
+- [[_COMMUNITY_Supabase Migrations Convention|Supabase Migrations Convention]]
+- [[_COMMUNITY_Next.js Wordmark Logo|Next.js Wordmark Logo]]
+- [[_COMMUNITY_AI Briefing Seal Illustration|AI Briefing Seal Illustration]]
+- [[_COMMUNITY_robots()|robots()]]
+- [[_COMMUNITY_sitemap()|sitemap()]]
+- [[_COMMUNITY_manifest()|manifest()]]
+- [[_COMMUNITY_NotFound()|NotFound()]]
+- [[_COMMUNITY_CleanestAirHubPage()|CleanestAirHubPage()]]
+- [[_COMMUNITY_TopCitiesPage()|TopCitiesPage()]]
+- [[_COMMUNITY_MethodologyPage()|MethodologyPage()]]
+- [[_COMMUNITY_AboutPage()|AboutPage()]]
+- [[_COMMUNITY_Shimmer()|Shimmer()]]
+- [[_COMMUNITY_CityVitalsFallback()|CityVitalsFallback()]]
+- [[_COMMUNITY_CityPlanningPanel()|CityPlanningPanel()]]
+- [[_COMMUNITY_getExperienceCategoryColor()|getExperienceCategoryColor()]]
+- [[_COMMUNITY_getSeasonColor()|getSeasonColor()]]
+- [[_COMMUNITY_AIBriefingSection()|AIBriefingSection()]]
+- [[_COMMUNITY_ExperiencesSection()|ExperiencesSection()]]
+- [[_COMMUNITY_addCity()|addCity()]]
+- [[_COMMUNITY_DigitalNomadHubPage()|DigitalNomadHubPage()]]
+- [[_COMMUNITY_CountriesIndexPage()|CountriesIndexPage()]]
+- [[_COMMUNITY_isActiveNavPath()|isActiveNavPath()]]
+- [[_COMMUNITY_FreshnessStamp()|FreshnessStamp()]]
+- [[_COMMUNITY_fadeDelay()|fadeDelay()]]
+- [[_COMMUNITY_FreeResourceCTA()|FreeResourceCTA()]]
+- [[_COMMUNITY_PrinciplesSection()|PrinciplesSection()]]
+- [[_COMMUNITY_SiteFooter()|SiteFooter()]]
+- [[_COMMUNITY_ThemeProvider.tsx|ThemeProvider.tsx]]
+- [[_COMMUNITY_SiteNav()|SiteNav()]]
+- [[_COMMUNITY_useCitySearchController.ts|useCitySearchController.ts]]
+- [[_COMMUNITY_sanitizeSearchInput()|sanitizeSearchInput()]]
+- [[_COMMUNITY_highlightMatchFn()|highlightMatchFn()]]
+- [[_COMMUNITY_TopCitiesPageContent.tsx|TopCitiesPageContent.tsx]]
+- [[_COMMUNITY_AboutPageContent()|AboutPageContent()]]
+- [[_COMMUNITY_LazyGeoConsentBanner()|LazyGeoConsentBanner()]]
+- [[_COMMUNITY_PageTracker()|PageTracker()]]
+- [[_COMMUNITY_CityViewTracker()|CityViewTracker()]]
+- [[_COMMUNITY_useRecentSearches.ts|useRecentSearches.ts]]
+- [[_COMMUNITY_useDeviceType.ts|useDeviceType.ts]]
+- [[_COMMUNITY_parsePartialJson()|parsePartialJson()]]
+- [[_COMMUNITY_getHealth()|getHealth()]]
+- [[_COMMUNITY_useAnalytics.ts|useAnalytics.ts]]
+- [[_COMMUNITY_haversineKm()|haversineKm()]]
+- [[_COMMUNITY_fetchCurrentWeather()|fetchCurrentWeather()]]
+- [[_COMMUNITY_BCS Asset Naming Standard|BCS Asset Naming Standard]]
 - [[_COMMUNITY_Color Audit Document|Color Audit Document]]
-- [[_COMMUNITY_Lint Typecheck Build|Lint Typecheck Build]]
-- [[_COMMUNITY_Asset Bcs Naming|Asset Bcs Naming]]
-- [[_COMMUNITY_Hero Skyline Waterfront|Hero Skyline Waterfront]]
-- [[_COMMUNITY_Next Env|Next Env]]
-- [[_COMMUNITY_Next Config|Next Config]]
-- [[_COMMUNITY_Trending Destinations|Trending Destinations]]
-- [[_COMMUNITY_Test Ranking|Test Ranking]]
-- [[_COMMUNITY_Test Share List|Test Share List]]
-- [[_COMMUNITY_Test Metrics Display|Test Metrics Display]]
-- [[_COMMUNITY_Diagnose Images|Diagnose Images]]
-- [[_COMMUNITY_Clear Places Cache|Clear Places Cache]]
-- [[_COMMUNITY_Verify Refactor|Verify Refactor]]
-- [[_COMMUNITY_Opengraph Tsx|Opengraph Tsx]]
-- [[_COMMUNITY_Actions|Actions]]
-- [[_COMMUNITY_Page Tsx|Page Tsx]]
-- [[_COMMUNITY_Page Tsx|Page Tsx]]
-- [[_COMMUNITY_Page Tsx|Page Tsx]]
-- [[_COMMUNITY_Aibriefingskeleton Tsx|Aibriefingskeleton Tsx]]
-- [[_COMMUNITY_Citytravelessentialssection Tsx|Citytravelessentialssection Tsx]]
-- [[_COMMUNITY_Page Tsx|Page Tsx]]
-- [[_COMMUNITY_Scrollprogress Tsx|Scrollprogress Tsx]]
-- [[_COMMUNITY_Interactivebutton Tsx|Interactivebutton Tsx]]
-- [[_COMMUNITY_Breadcrumbs Tsx|Breadcrumbs Tsx]]
-- [[_COMMUNITY_Trustindicators Tsx|Trustindicators Tsx]]
-- [[_COMMUNITY_Herobackground Tsx|Herobackground Tsx]]
-- [[_COMMUNITY_Homesearchshowcase Tsx|Homesearchshowcase Tsx]]
-- [[_COMMUNITY_Herosearchcta Tsx|Herosearchcta Tsx]]
-- [[_COMMUNITY_Themetoggle Tsx|Themetoggle Tsx]]
-- [[_COMMUNITY_Desktopnavlinks Tsx|Desktopnavlinks Tsx]]
-- [[_COMMUNITY_Citymap Tsx|Citymap Tsx]]
-- [[_COMMUNITY_Topicalhublayout Tsx|Topicalhublayout Tsx]]
-- [[_COMMUNITY_Citycard Tsx|Citycard Tsx]]
-- [[_COMMUNITY_Index|Index]]
-- [[_COMMUNITY_Validation|Validation]]
-- [[_COMMUNITY_Style Document|Style Document]]
-- [[_COMMUNITY_Bestcityspots Review Document|Bestcityspots Review Document]]
-- [[_COMMUNITY_Claude Graphify Instructions|Claude Graphify Instructions]]
-- [[_COMMUNITY_Restructuring Final Outcome|Restructuring Final Outcome]]
-- [[_COMMUNITY_Restructuring Baseline Document|Restructuring Baseline Document]]
-- [[_COMMUNITY_Restructuring Status Document|Restructuring Status Document]]
-- [[_COMMUNITY_Restructuring Frontend Document|Restructuring Frontend Document]]
-- [[_COMMUNITY_Domain Oriented Plus|Domain Oriented Plus]]
-- [[_COMMUNITY_Frontend Decomposition Slice|Frontend Decomposition Slice]]
-- [[_COMMUNITY_Reliability Hardening Slice|Reliability Hardening Slice]]
-- [[_COMMUNITY_Preblurred Mesh Backdrops|Preblurred Mesh Backdrops]]
-- [[_COMMUNITY_Wcag Compliance|Wcag Compliance]]
-- [[_COMMUNITY_European Accessibility Act|European Accessibility Act]]
-- [[_COMMUNITY_Graphify Knowledge Graph|Graphify Knowledge Graph]]
-- [[_COMMUNITY_Lower Regression Risk|Lower Regression Risk]]
-- [[_COMMUNITY_Static Dataset Avoids|Static Dataset Avoids]]
-- [[_COMMUNITY_Preblurred Mesh Avoids|Preblurred Mesh Avoids]]
-- [[_COMMUNITY_Raise Muted Contrast|Raise Muted Contrast]]
+- [[_COMMUNITY_Platform Dependency Rules|Platform Dependency Rules]]
+- [[_COMMUNITY_Hero Skyline Waterfront Photo|Hero Skyline Waterfront Photo]]
+- [[_COMMUNITY_serializeJsonLd()|serializeJsonLd()]]
+- [[_COMMUNITY_next-env.d.ts|next-env.d.ts]]
+- [[_COMMUNITY_next.config.ts|next.config.ts]]
+- [[_COMMUNITY_trending-destinations.ts|trending-destinations.ts]]
+- [[_COMMUNITY_test-ranking.ts|test-ranking.ts]]
+- [[_COMMUNITY_test-share-list.ts|test-share-list.ts]]
+- [[_COMMUNITY_test-metrics-display.ts|test-metrics-display.ts]]
+- [[_COMMUNITY_verify-refactor.ts|verify-refactor.ts]]
+- [[_COMMUNITY_opengraph-image.tsx|opengraph-image.tsx]]
+- [[_COMMUNITY_actions.ts|actions.ts]]
+- [[_COMMUNITY_page.tsx|page.tsx]]
+- [[_COMMUNITY_page.tsx|page.tsx]]
+- [[_COMMUNITY_page.tsx|page.tsx]]
+- [[_COMMUNITY_AIBriefingSkeleton.tsx|AIBriefingSkeleton.tsx]]
+- [[_COMMUNITY_CityTravelEssentialsSection.tsx|CityTravelEssentialsSection.tsx]]
+- [[_COMMUNITY_page.tsx|page.tsx]]
+- [[_COMMUNITY_ScrollProgress.tsx|ScrollProgress.tsx]]
+- [[_COMMUNITY_Breadcrumbs.tsx|Breadcrumbs.tsx]]
+- [[_COMMUNITY_TrustIndicators.tsx|TrustIndicators.tsx]]
+- [[_COMMUNITY_HeroBackground.tsx|HeroBackground.tsx]]
+- [[_COMMUNITY_HomeSearchShowcase.tsx|HomeSearchShowcase.tsx]]
+- [[_COMMUNITY_HeroSearchCTA.tsx|HeroSearchCTA.tsx]]
+- [[_COMMUNITY_ThemeToggle.tsx|ThemeToggle.tsx]]
+- [[_COMMUNITY_DesktopNavLinks.tsx|DesktopNavLinks.tsx]]
+- [[_COMMUNITY_CityMap.tsx|CityMap.tsx]]
+- [[_COMMUNITY_TopicalHubLayout.tsx|TopicalHubLayout.tsx]]
+- [[_COMMUNITY_CityCard.tsx|CityCard.tsx]]
+- [[_COMMUNITY_index.ts|index.ts]]
+- [[_COMMUNITY_validation.ts|validation.ts]]
+- [[_COMMUNITY_Code Style Document|Code Style Document]]
+- [[_COMMUNITY_Bestcityspots UI UX Review Document|Bestcityspots UI UX Review Document]]
+- [[_COMMUNITY_Claude Graphify Instructions Document|Claude Graphify Instructions Document]]
+- [[_COMMUNITY_Preblurred Mesh Backdrops Pattern|Preblurred Mesh Backdrops Pattern]]
+- [[_COMMUNITY_WCAG 2.2 AA Compliance|WCAG 2.2 AA Compliance]]
+- [[_COMMUNITY_European Accessibility Act June 2025|European Accessibility Act June 2025]]
+- [[_COMMUNITY_Graphify Knowledge Graph Artifacts|Graphify Knowledge Graph Artifacts]]
+- [[_COMMUNITY_Static Dataset Avoids Runtime Cost Rationale|Static Dataset Avoids Runtime Cost Rationale]]
+- [[_COMMUNITY_Preblurred Mesh Avoids Scroll Jank Rationale|Preblurred Mesh Avoids Scroll Jank Rationale]]
+- [[_COMMUNITY_Raise Muted Contrast To Meet AA Rationale|Raise Muted Contrast To Meet AA Rationale]]
+- [[_COMMUNITY_Methodology Pipeline Ranking Illustration|Methodology Pipeline Ranking Illustration]]
+- [[_COMMUNITY_Breadcrumbs UI component|Breadcrumbs UI component]]
+- [[_COMMUNITY_supabaseServer export (service-role or null)|supabaseServer export (service-role or null)]]
+- [[_COMMUNITY_readCityWeatherCache() — public read|readCityWeatherCache() — public read]]
+- [[_COMMUNITY_readCityMetricsCache() — public read|readCityMetricsCache() — public read]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `main()` - 12 edges
-2. `fetchFreshPlaces()` - 12 edges
-3. `httpFetch()` - 11 edges
-4. `runTest()` - 10 edges
-5. `main()` - 10 edges
-6. `fail()` - 10 edges
-7. `processAnalyticsBatch()` - 10 edges
-8. `info()` - 9 edges
-9. `main()` - 9 edges
-10. `LruCache` - 9 edges
+1. `City Detail Page (orchestrator)` - 19 edges
+2. `serializeJsonLd (</script> JSON-LD escaper)` - 14 edges
+3. `main()` - 12 edges
+4. `main()` - 12 edges
+5. `fetchFreshPlaces()` - 12 edges
+6. `httpFetch()` - 11 edges
+7. `runTest()` - 10 edges
+8. `main()` - 10 edges
+9. `fail()` - 10 edges
+10. `processAnalyticsBatch()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `File Document SVG Icon` --semantically_similar_to--> `Graph Report Summary`  [INFERRED] [semantically similar]
   public/file.svg → graphify-out/GRAPH_REPORT.md
-- `About Transparent Atlas Layered Map Illustration` --conceptually_related_to--> `Target Architecture Boundaries`  [AMBIGUOUS]
-  public/illustrations/about-transparent-atlas.webp → docs/restructuring/phase-01-target-architecture-and-boundaries.md
-- `Methodology Pipeline Ranking Illustration` --conceptually_related_to--> `Repository Seams for Cache and Analytics`  [INFERRED]
-  public/illustrations/methodology-pipeline.webp → docs/restructuring/phase-02-backend-decomposition-slice-01.md
-- `Methodology Pipeline Ranking Illustration` --conceptually_related_to--> `Shared Cache SWR Orchestration`  [INFERRED]
-  public/illustrations/methodology-pipeline.webp → docs/restructuring/phase-02-backend-decomposition-slice-01.md
-- `Idempotent SQL Migration Strategy` --conceptually_related_to--> `Repository Seams for Cache and Analytics`  [AMBIGUOUS]
-  supabase/migrations/README.md → docs/restructuring/phase-02-backend-decomposition-slice-01.md
+- `EXPECTED_RLS_TABLES (RLS enforcement contract)` --conceptually_related_to--> `Security Model (RLS core boundary, service_role writes)`  [INFERRED]
+  scripts/setup_supabase.py → AGENTS.md
+- `step_verify_rest()` --rationale_for--> `external-services: RLS policy invariants (public SELECT, service_role writes)`  [INFERRED]
+  scripts/setup_supabase.py → docs/external-services-setup.md
+- `Ansible rationale: Supabase migrations not run from deploy (footgun)` --conceptually_related_to--> `main()`  [INFERRED]
+  deploy/ansible/README.md → scripts/setup_supabase.py
+- `Conviction: honesty over hype (AI as assistance not authority)` --rationale_for--> `getCityInsight() — SWR AI insight fetch`  [INFERRED]
+  README.md → src/lib/intelligence.ts
 
 ## Hyperedges (group relationships)
 - **Cost Protection Defense In Depth** — incident_crawler_api_billing_spike, control_nginx_rate_limiting, control_provider_budget_rpc_claim_provider_use, strategy_warmer_only_paid_spend [EXTRACTED 1.00]
@@ -214,886 +214,872 @@
 
 ## Communities
 
-### Community 0 - "Rationale Illustration Overview"
-Cohesion: 0.06
-Nodes (34): About Transparent Atlas Layered Map Illustration, AI Briefing Seal Illustration, City AI Candidate Population List, Urban Scale Candidate Signal, Domain Module Template, Domains Directory Overview, File Document SVG Icon, Global 50 Editorial Collage Cover (+26 more)
+### Community 0 - "requireServerClient() — write gate"
+Cohesion: 0.04
+Nodes (61): Cache table inventory (cities, city_ai_insights, ai_trending_cache, place_saves_daily...), AGENTS.md — canonical architecture source, provider_daily_usage durable cost-guard ledger, Data Strategy (cache-first/SWR, Postgres-native search), Graceful-degradation principle (null/[]/stale over throw), Known Assumption: no Redis/memcached/Kafka in repo, Security Model (RLS core boundary, service_role writes), Deploy guardrails (confirm token, pinned ref, live-fetch lock) (+53 more)
 
-### Community 1 - "Buildplaceimagepublicurl Buildplacesrequestkey Dedupeplaces"
+### Community 1 - "City Detail Page (orchestrator)"
+Cohesion: 0.1
+Nodes (38): About Page, Accessibility Statement Page, Best Cities by Air Quality Hub, Best Cities for Digital Nomads Hub, Best Cities to Visit in [month] Hub, AI Briefing Client Component, AIBriefingSection (server wrapper for AI briefing), City FAQ Section (FAQPage + Speakable JSON-LD) (+30 more)
+
+### Community 2 - "setup_supabase.py"
+Cohesion: 0.14
+Nodes (29): CONTRIBUTING: schema changes in ordered idempotent migrations, Ansible rationale: Supabase migrations not run from deploy (footgun), BASE_SCHEMA_SQL (inline tables absent from repo), EXPECTED_RLS_TABLES (RLS enforcement contract), SQL_FILES_IN_ORDER (dependency-ordered apply), build_db_url(), connect(), fail() (+21 more)
+
+### Community 3 - "places.ts"
 Cohesion: 0.15
 Nodes (25): buildPlaceImagePublicUrl(), buildPlacesRequestKey(), dedupePlaces(), enrichRankedPlaceImages(), fetchAndCachePlaces(), fetchFreshPlaces(), fetchFromGoogle(), filterPlacesByRadius() (+17 more)
 
-### Community 2 - "Warm Cache Checkinsightscachestatus"
+### Community 4 - "warm-top-cities.ts"
+Cohesion: 0.15
+Nodes (23): ageDays(), ageMinutes(), blankStats(), claimBudget(), createSupabaseClient(), generateBlurhash(), generateInsightsText(), getAqiLabel() (+15 more)
+
+### Community 5 - "warm-cache.ts"
 Cohesion: 0.16
 Nodes (21): checkInsightsCacheStatus(), checkMetricsCacheStatus(), checkPlacesCacheStatus(), checkWeatherCacheStatus(), claimProviderBudget(), createSupabaseClient(), getAqiLabel(), getTopCitiesByPopulation() (+13 more)
 
-### Community 3 - "Step Env Sql"
-Cohesion: 0.27
-Nodes (19): build_db_url(), connect(), fail(), info(), load_dotenv_files(), main(), query(), Populate os.environ from .env.local / .env / .env.production     (existing shell (+11 more)
-
-### Community 4 - "Constructor Backoffms Breakerkey"
+### Community 6 - "http.ts"
 Cohesion: 0.18
 Nodes (16): backoffMs(), breakerKey(), CircuitOpenError, getBreaker(), HttpError, httpFetch(), httpJson(), isAbortError() (+8 more)
 
-### Community 5 - "Map Asset Symbol"
+### Community 7 - "Intent Map Illustration Asset"
 Cohesion: 0.11
 Nodes (19): 404 Off The Map Illustration Asset, Folded Map Visual, Lost Navigation Path, Missing Page Empty State, Compare Empty Illustration Asset, Balanced Evaluation Scale, Comparison Placeholder Cards, Home Hero Loop Poster Asset (+11 more)
 
-### Community 6 - "Test Supabase Backend"
+### Community 8 - "test-supabase-backend.ts"
 Cohesion: 0.28
 Nodes (13): main(), paint(), probe(), runTest(), shouldRunSuite(), skipTest(), suiteConsistency(), suitePerformance() (+5 more)
 
-### Community 7 - "Check Env Test"
+### Community 9 - "test-keys.py"
 Cohesion: 0.53
 Nodes (12): c(), check_ai(), check_database(), check_places(), check_weather(), env(), http(), load_env_files() (+4 more)
 
-### Community 8 - "Formatnumber Getcityviews Getdailytrend"
+### Community 10 - "main()"
 Cohesion: 0.32
 Nodes (12): c(), formatNumber(), getCityViews(), getDailyTrend(), getDeviceStats(), getGeoStats(), getOverview(), getTrafficSources() (+4 more)
 
-### Community 9 - "Extracterrormessage Extractplaces Formatsample"
+### Community 11 - "test-google-places.ts"
 Cohesion: 0.31
 Nodes (10): extractErrorMessage(), extractPlaces(), formatSample(), isPlaceResult(), isValidDisplayName(), jsonType(), mapJsonLayout(), parseArgs() (+2 more)
 
-### Community 10 - "Builddaydirectionsurl Getaddresscontext Getinsidertips"
+### Community 12 - "experience-helpers.ts"
 Cohesion: 0.2
 Nodes (2): getInsiderTips(), getNeighborhood()
 
-### Community 11 - "Gettoday Parsereferrer Parseuseragent"
+### Community 13 - "processAnalyticsBatch()"
 Cohesion: 0.35
 Nodes (10): getToday(), parseReferrer(), parseUserAgent(), processAnalyticsBatch(), recordCityView(), recordDailyVisitorStats(), recordDeviceStats(), recordGeoStats() (+2 more)
 
-### Community 12 - "Storage Getjsonstorageitem Getsessionstorageitem"
+### Community 14 - "storage.ts"
 Cohesion: 0.45
 Nodes (10): getJsonStorageItem(), getSessionStorageItem(), getStorageItem(), hasLocalStorage(), hasSessionStorage(), removeStorageItem(), setJsonStorageItem(), setSessionStorageItem() (+2 more)
 
-### Community 13 - "Cityhref Describesupabaseerror Findnearest"
+### Community 15 - "cities.ts"
 Cohesion: 0.36
 Nodes (8): describeSupabaseError(), findNearest(), findNearestCity(), getCityById(), getCityBySlug(), normalizeQuery(), queryCitiesInBox(), searchCities()
 
-### Community 14 - "Lrucache Clear Constructor"
+### Community 16 - "LruCache"
 Cohesion: 0.33
 Nodes (1): LruCache
 
-### Community 15 - "Compact Publicenv Readpublicenvvalue"
+### Community 17 - "env.ts"
 Cohesion: 0.42
 Nodes (8): compact(), publicEnv(), readPublicEnvValue(), readServerEnvValue(), requirePublicEnv(), requireServerEnv(), serverEnv(), warnOnce()
 
-### Community 16 - "Architecture Document Stack"
+### Community 18 - "Project Overview Document"
 Cohesion: 0.22
 Nodes (10): Agents Architecture Context Document, Cities Insight SSE API, Layered Monolith Architecture, Contributing Guide, Daily Cost Guard Limits, Cache First Stale While Revalidate Pattern, Project Overview Document, Next.js 16 App Router Stack (+2 more)
 
-### Community 17 - "Document Feature Cost"
-Cohesion: 0.2
-Nodes (10): Adr 001 Cost Of Living Source Document, Bestcityspots User Stories Document, Numbeo Data API Citation, Quarterly Cost Index CSV Import Decision, City Comparison Route Feature, Embedded City Map Feature, Shareable Saved Places Link Feature, Long Tail Hollow City Pages Issue (+2 more)
-
-### Community 18 - "Route Get Healthtimeouterror"
+### Community 19 - "GET()"
 Cohesion: 0.28
 Nodes (4): GET(), HealthTimeoutError, isAbortError(), withTimeout()
 
-### Community 19 - "Analyticsprovider Generatesessionid Getgeoconsent"
+### Community 20 - "AnalyticsProvider.tsx"
 Cohesion: 0.25
 Nodes (2): generateSessionId(), getOrCreateSession()
 
-### Community 20 - "Runrpc Upsertcityviews Upsertdailyvisitorstats"
+### Community 21 - "supabase.ts"
+Cohesion: 0.33
+Nodes (6): buildAnonClient(), buildServerClient(), getAnonClient(), getServerClient(), hasServerClient(), requireServerClient()
+
+### Community 22 - "runRpc()"
 Cohesion: 0.46
 Nodes (7): runRpc(), upsertCityViews(), upsertDailyVisitorStats(), upsertDeviceStats(), upsertGeoStats(), upsertTrafficSource(), upsertUserAction()
 
-### Community 21 - "Dailylimit Ispaidproviderenabled Localstate"
+### Community 23 - "cost-guard.ts"
 Cohesion: 0.46
 Nodes (7): dailyLimit(), isPaidProviderEnabled(), localState(), parseLimit(), todayKey(), tryClaimPaidProviderUse(), warnOnce()
 
-### Community 22 - "Supabase Buildanonclient Buildserverclient"
-Cohesion: 0.36
-Nodes (5): buildAnonClient(), buildServerClient(), getAnonClient(), getServerClient(), hasServerClient()
-
-### Community 23 - "Comfortfromtemp Fetchfreshmetrics Getcitymetrics"
+### Community 24 - "metrics.ts"
 Cohesion: 0.36
 Nodes (4): comfortFromTemp(), fetchFreshMetrics(), getOpenMeteoAirQuality(), getOpenMeteoWeather()
 
-### Community 24 - "Capradius Fetchphotobytes Getapikey"
+### Community 25 - "googlePlaces.ts"
 Cohesion: 0.54
 Nodes (7): capRadius(), fetchPhotoBytes(), getApiKey(), getFieldMask(), runPlacesRequest(), searchNearby(), searchText()
 
-### Community 25 - "Compressid Decodesharedlist Encodesharedlist"
+### Community 26 - "share-list.ts"
 Cohesion: 0.43
 Nodes (5): decodeSharedList(), encodeSharedList(), expandId(), fromBase64Url(), toBase64Url()
 
-### Community 26 - "Aqilabelfromowm Aqilabelfrompm25 Canonicalvital"
+### Community 27 - "mapping.ts"
 Cohesion: 0.38
 Nodes (3): aqiLabelFromOwm(), aqiLabelFromPm25(), owmAqiFromPm25()
 
-### Community 27 - "Rankingengine Calculatebayesianscore Calculateviralityboost"
+### Community 28 - "RankingEngine"
 Cohesion: 0.43
 Nodes (1): RankingEngine
 
-### Community 28 - "Cachecontrolfor Classifyage Days"
+### Community 29 - "cache-config.ts"
 Cohesion: 0.29
 Nodes (0): 
 
-### Community 29 - "Buildcityinsightprompt Getcityinsight Getintelligenttrending"
+### Community 30 - "intelligence.ts"
 Cohesion: 0.48
 Nodes (6): buildCityInsightPrompt(), getCityInsight(), getIntelligentTrendingCities(), matchCitiesInDb(), readCachedCityInsight(), upsertCityInsight()
 
-### Community 30 - "Extractbalancedjson Generatetext Generatetextstream"
+### Community 31 - "gemini.ts"
 Cohesion: 0.48
 Nodes (6): extractBalancedJson(), generateText(), generateTextStream(), getClient(), sanitizeJsonArrayResponse(), sanitizeJsonResponse()
 
-### Community 31 - "Page Tsx Coremetricsskeleton"
+### Community 32 - "generateStaticParams()"
 Cohesion: 0.4
 Nodes (2): generateMetadata(), generateStaticParams()
 
-### Community 32 - "Coercetoinsight Pickarray Pickstring"
+### Community 33 - "AIBriefingStreamClient.tsx"
 Cohesion: 0.47
 Nodes (3): coerceToInsight(), pickArray(), pickString()
 
-### Community 33 - "Topical Hubs Getcitiesbyids"
+### Community 34 - "topical-hubs.ts"
 Cohesion: 0.33
 Nodes (0): 
 
-### Community 34 - "Getdistancekm Iswithinmaxpricetier Mappricelevel"
+### Community 35 - "place-search-utils.ts"
 Cohesion: 0.47
 Nodes (4): getDistanceKm(), isWithinMaxPriceTier(), mapPriceLevel(), sortPlaces()
 
-### Community 35 - "Createlogger Currentlevel Emit"
+### Community 36 - "logger.ts"
 Cohesion: 0.47
 Nodes (3): currentLevel(), emit(), isStructured()
 
-### Community 36 - "Generatetext Generatetextstream Getapikey"
+### Community 37 - "openai.ts"
 Cohesion: 0.8
 Nodes (5): generateText(), generateTextStream(), getApiKey(), reasonFromStatus(), requestCompletion()
 
-### Community 37 - "Provider Google Aggregate"
+### Community 38 - "Readme Document"
 Cohesion: 0.33
 Nodes (6): Aggregate Only Privacy First Analytics, Google Gemini Provider, Google Places New Provider, Open Meteo Provider, OpenWeatherMap Provider, Readme Document
 
-### Community 38 - "Seed Cities Assignuniqueslugs"
+### Community 39 - "seed-cities.ts"
 Cohesion: 0.7
 Nodes (4): assignUniqueSlugs(), main(), parseCsvLine(), slugifyCity()
 
-### Community 39 - "Handleaccept Handledecline Handledismiss"
+### Community 40 - "GeoConsentBanner.tsx"
 Cohesion: 0.5
 Nodes (2): handleDismiss(), handleKeyDown()
 
-### Community 40 - "Weather Fetchfreshweather Getcityweather"
+### Community 41 - "weather.ts"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 41 - "Getcitiesbycountry Getcountrybyslug Getrelatedcities"
+### Community 42 - "countries.ts"
 Cohesion: 0.4
 Nodes (0): 
 
-### Community 42 - "Fisheryatesshuffle Getcategoryids Getcitiesfromcategory"
+### Community 43 - "sphere-categories.ts"
 Cohesion: 0.5
 Nodes (2): fisherYatesShuffle(), getMixedCitiesFromCategories()
 
-### Community 43 - "Generatetext Generatetextstream Isaienabled"
+### Community 44 - "ai.ts"
 Cohesion: 0.6
 Nodes (3): generateText(), generateTextStream(), providerOrder()
 
-### Community 44 - "Provider Document Nginx"
+### Community 45 - "Deploy Runbook Document"
 Cohesion: 0.6
 Nodes (5): Nginx Rate Limiting And Bot Blocking, Durable Provider Budget RPC Claim Provider Use, Deploy Runbook Document, External Services Setup Document, Warmer Only Paid Spend Strategy
 
-### Community 45 - "Fail Main Parsecsvline"
+### Community 46 - "Rationale: Trust and Wayfinding Visual Language"
+Cohesion: 0.5
+Nodes (5): About Transparent Atlas Layered Map Illustration, Global 50 Editorial Collage Cover, Rationale: Trust and Wayfinding Visual Language, Trending Contours Topographic Texture, Trust Field Contour Texture
+
+### Community 47 - "CONTRIBUTING: no process.env direct; NEXT_PUBLIC_* only on c"
+Cohesion: 0.4
+Nodes (5): CONTRIBUTING: no process.env direct; NEXT_PUBLIC_* only on client, CONTRIBUTING: all third-party HTTP via http.ts, Platform aspirational: provider-gateway + observability not yet split, Lazy client rationale (import never throws), supabase anon Proxy (lazy, fail-at-use)
+
+### Community 48 - "main()"
 Cohesion: 0.83
 Nodes (3): fail(), main(), parseCsvLine()
 
-### Community 46 - "Buildfaqs Faqcontent Faqfallback"
+### Community 49 - "CityFAQSection.tsx"
 Cohesion: 0.67
 Nodes (2): buildFaqs(), FAQContent()
 
-### Community 47 - "Loadcolumn Parseslugs Removehref"
+### Community 50 - "page.tsx"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 48 - "Route Post Readjsonbodywithlimit"
+### Community 51 - "POST()"
 Cohesion: 0.67
 Nodes (2): POST(), readJsonBodyWithLimit()
 
-### Community 49 - "Swr Orchestrate Runcachefirstswr"
+### Community 52 - "swr.ts"
 Cohesion: 0.83
 Nodes (3): orchestrate(), runCacheFirstSWR(), safeWrite()
 
-### Community 50 - "Weather Cache Repository"
+### Community 53 - "weather-cache-repository.ts"
 Cohesion: 0.83
 Nodes (3): getDbClient(), readCityWeatherCache(), writeCityWeatherCache()
 
-### Community 51 - "Getdbclient Readcitymetricscache Writecitymetricscache"
+### Community 54 - "getDbClient()"
 Cohesion: 0.83
 Nodes (3): getDbClient(), readCityMetricsCache(), writeCityMetricsCache()
 
-### Community 52 - "Getdbclient Readcityinsightcache Writecityinsightcache"
+### Community 55 - "city-insights-repository.ts"
 Cohesion: 0.67
 Nodes (2): getDbClient(), writeCityInsightCache()
 
-### Community 53 - "Readplacescache Writeplacescache Writeplacescacheevent"
+### Community 56 - "places-cache-repository.ts"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 54 - "Blurhashtodataurl Optimizedimageinner Shouldbypassnextimageo"
+### Community 57 - "OptimizedImage.tsx"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 55 - "Getaqicolor Gettempcolor Gettempiconcolor"
+### Community 58 - "CityVitals.tsx"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 56 - "Usenetworkquality Determinequality Getconnection"
+### Community 59 - "useNetworkQuality.ts"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 57 - "Hasvalue Selectavailablemetrics Shouldrendermetricspanel"
+### Community 60 - "metrics-display.ts"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 58 - "Conditionfromweathercode Fetchcurrent Fetchpm25"
+### Community 61 - "openMeteo.ts"
 Cohesion: 0.5
 Nodes (0): 
 
-### Community 59 - "Affiliate Adr 002"
+### Community 62 - "Bestcityspots User Stories Document"
+Cohesion: 0.5
+Nodes (4): Bestcityspots User Stories Document, City Comparison Route Feature, Embedded City Map Feature, Shareable Saved Places Link Feature
+
+### Community 63 - "Adr 002 Affiliate Links Document"
 Cohesion: 0.5
 Nodes (4): Adr 002 Affiliate Links Document, Booking Partner Programme Citation, Bookingcom Deep Link Affiliate Decision, Plain Anchors Keep CWV Cost Near Zero Rationale
 
-### Community 60 - "Parsesameas Rootlayout Layout"
+### Community 64 - "Graph Report Summary"
+Cohesion: 0.5
+Nodes (4): File Document SVG Icon, Most Connected God Nodes, Graph Report Summary, Hyperedge Relationship Index
+
+### Community 65 - "layout.tsx"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 61 - "Cityrelatedsection Relatedcontent Tsx"
+### Community 66 - "CityRelatedSection.tsx"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 62 - "Scrollreveal Staggercontainer Tsx"
+### Community 67 - "ScrollReveal.tsx"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 63 - "Mobilebottomnav Getnavicon Tsx"
+### Community 68 - "MobileBottomNav.tsx"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 64 - "Getplacesavetotals Recordplacesave Place"
+### Community 69 - "place-saves.ts"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 65 - "Formatpopulation Formatrelativetime Format"
+### Community 70 - "format.ts"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 66 - "Generatesizes Getqualityvalue Transforms"
+### Community 71 - "image-transforms.ts"
 Cohesion: 0.67
 Nodes (0): 
 
-### Community 67 - "Incident Billing Backend"
+### Community 72 - "Backend Incident Actions Document"
 Cohesion: 0.67
 Nodes (3): Backend Incident Actions Document, Google Billing Resolve Issues Citation, Crawler Driven API Billing Spike Incident
 
-### Community 68 - "Decision Incremental Migration"
+### Community 73 - "Adr 001 Cost Of Living Source Document"
 Cohesion: 0.67
-Nodes (3): Incremental Migration Decision, Warning First Guardrails Decision, Restructuring Decision Log Document
+Nodes (3): Adr 001 Cost Of Living Source Document, Numbeo Data API Citation, Quarterly Cost Index CSV Import Decision
 
-### Community 69 - "Logo Next Wordmark"
+### Community 74 - "Supabase Migrations Convention"
+Cohesion: 0.67
+Nodes (3): Idempotent SQL Migration Strategy, Supabase Migrations Convention, Timestamped Ordered Migration Files
+
+### Community 75 - "Next.js Wordmark Logo"
 Cohesion: 0.67
 Nodes (3): Next.js Wordmark Logo, Vercel Triangle Logo, Browser Window SVG Icon
 
-### Community 70 - "Testsearch Test Supabase"
+### Community 76 - "AI Briefing Seal Illustration"
+Cohesion: 0.67
+Nodes (3): AI Briefing Seal Illustration, Globe Grid SVG Icon, Crystal Diamond Brand Mark
+
+### Community 77 - "robots()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 71 - "Robots"
+### Community 78 - "sitemap()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 72 - "Sitemap"
+### Community 79 - "manifest()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 73 - "Manifest"
+### Community 80 - "NotFound()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 74 - "Notfound Not Found"
+### Community 81 - "CleanestAirHubPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 75 - "Cleanestairhubpage Page Tsx"
+### Community 82 - "TopCitiesPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 76 - "Topcitiespage Page Tsx"
+### Community 83 - "MethodologyPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 77 - "Methodologypage Page Tsx"
+### Community 84 - "AboutPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 78 - "Aboutpage Page Tsx"
+### Community 85 - "Shimmer()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 79 - "Shimmer Experiencesskeleton Tsx"
+### Community 86 - "CityVitalsFallback()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 80 - "Cityvitalsfallback Page Parts"
+### Community 87 - "CityPlanningPanel()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 81 - "Cityplanningpanel Tsx"
+### Community 88 - "getExperienceCategoryColor()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 82 - "Getexperiencecategorycolor Experience Theme"
+### Community 89 - "getSeasonColor()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 83 - "Getseasoncolor Aibriefingclient Tsx"
+### Community 90 - "AIBriefingSection()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 84 - "Aibriefingsection Tsx"
+### Community 91 - "ExperiencesSection()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 85 - "Experiencessection Tsx"
+### Community 92 - "addCity()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 86 - "Addcity Comparepicker Tsx"
+### Community 93 - "DigitalNomadHubPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 87 - "Digitalnomadhubpage Page Tsx"
+### Community 94 - "CountriesIndexPage()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 88 - "Countriesindexpage Page Tsx"
+### Community 95 - "isActiveNavPath()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 89 - "Isactivenavpath Nav"
+### Community 96 - "FreshnessStamp()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 90 - "Freshnessstamp Tsx"
+### Community 97 - "fadeDelay()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 91 - "Hotspot Tsx"
+### Community 98 - "FreeResourceCTA()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 92 - "Fadedelay Heroheader Tsx"
+### Community 99 - "PrinciplesSection()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 93 - "Freeresourcecta Tsx"
+### Community 100 - "SiteFooter()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 94 - "Principlessection Tsx"
+### Community 101 - "ThemeProvider.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 95 - "Sitefooter Tsx"
+### Community 102 - "SiteNav()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 96 - "Themeprovider Tsx"
+### Community 103 - "useCitySearchController.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 97 - "Sitenav Tsx"
+### Community 104 - "sanitizeSearchInput()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 98 - "Usecitysearchcontroller"
+### Community 105 - "highlightMatchFn()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 99 - "Sanitizesearchinput Search Config"
+### Community 106 - "TopCitiesPageContent.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 100 - "Highlightmatchfn Citysearch Tsx"
+### Community 107 - "AboutPageContent()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 101 - "Topcitiespagecontent Tsx Scrolltotop"
+### Community 108 - "LazyGeoConsentBanner()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 102 - "Aboutpagecontent Tsx"
+### Community 109 - "PageTracker()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 103 - "Lazygeoconsentbanner Tsx"
+### Community 110 - "CityViewTracker()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 104 - "Pagetracker Tsx"
+### Community 111 - "useRecentSearches.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 105 - "Cityviewtracker Tsx"
+### Community 112 - "useDeviceType.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 106 - "Userecentsearches"
+### Community 113 - "parsePartialJson()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 107 - "Usedevicetype"
+### Community 114 - "getHealth()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 108 - "Parsepartialjson Partialjson"
+### Community 115 - "useAnalytics.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 109 - "Gethealth Health"
+### Community 116 - "haversineKm()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 110 - "Useanalytics"
+### Community 117 - "fetchCurrentWeather()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 111 - "Haversinekm Geo"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 112 - "Fetchcurrentweather Openweather"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 113 - "Color Audit Document"
-Cohesion: 1.0
-Nodes (2): Color Audit Document, Azure Atlas Palette Direction
-
-### Community 114 - "Lint Typecheck Build"
-Cohesion: 1.0
-Nodes (2): CI Lint Typecheck Build Gate, Restructuring Phase 04 Dx Reliability Document
-
-### Community 115 - "Asset Bcs Naming"
+### Community 118 - "BCS Asset Naming Standard"
 Cohesion: 1.0
 Nodes (2): BCS Asset Naming Standard, Visual Asset Prompts Document
 
-### Community 116 - "Hero Skyline Waterfront"
+### Community 119 - "Color Audit Document"
+Cohesion: 1.0
+Nodes (2): Color Audit Document, Azure Atlas Palette Direction
+
+### Community 120 - "Platform Dependency Rules"
+Cohesion: 1.0
+Nodes (2): Platform Dependency Rules, Platform Infrastructure Overview
+
+### Community 121 - "Hero Skyline Waterfront Photo"
 Cohesion: 1.0
 Nodes (2): Hero Skyline Waterfront Photo, Home Hero Coastal City Panorama
 
-### Community 117 - "Next Env"
+### Community 122 - "serializeJsonLd()"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 118 - "Next Config"
+### Community 123 - "next-env.d.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 119 - "Trending Destinations"
+### Community 124 - "next.config.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 120 - "Test Ranking"
+### Community 125 - "trending-destinations.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 121 - "Test Share List"
+### Community 126 - "test-ranking.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 122 - "Test Metrics Display"
+### Community 127 - "test-share-list.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 123 - "Diagnose Images"
+### Community 128 - "test-metrics-display.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 124 - "Clear Places Cache"
+### Community 129 - "verify-refactor.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 125 - "Verify Refactor"
+### Community 130 - "opengraph-image.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 126 - "Opengraph Tsx"
+### Community 131 - "actions.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 127 - "Actions"
+### Community 132 - "page.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 128 - "Page Tsx"
+### Community 133 - "page.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 129 - "Page Tsx"
+### Community 134 - "page.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 130 - "Page Tsx"
+### Community 135 - "AIBriefingSkeleton.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 131 - "Aibriefingskeleton Tsx"
+### Community 136 - "CityTravelEssentialsSection.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 132 - "Citytravelessentialssection Tsx"
+### Community 137 - "page.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 133 - "Page Tsx"
+### Community 138 - "ScrollProgress.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 134 - "Scrollprogress Tsx"
+### Community 139 - "Breadcrumbs.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 135 - "Interactivebutton Tsx"
+### Community 140 - "TrustIndicators.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 136 - "Breadcrumbs Tsx"
+### Community 141 - "HeroBackground.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 137 - "Trustindicators Tsx"
+### Community 142 - "HomeSearchShowcase.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 138 - "Herobackground Tsx"
+### Community 143 - "HeroSearchCTA.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 139 - "Homesearchshowcase Tsx"
+### Community 144 - "ThemeToggle.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 140 - "Herosearchcta Tsx"
+### Community 145 - "DesktopNavLinks.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 141 - "Themetoggle Tsx"
+### Community 146 - "CityMap.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 142 - "Desktopnavlinks Tsx"
+### Community 147 - "TopicalHubLayout.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 143 - "Citymap Tsx"
+### Community 148 - "CityCard.tsx"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 144 - "Topicalhublayout Tsx"
+### Community 149 - "index.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 145 - "Citycard Tsx"
+### Community 150 - "validation.ts"
 Cohesion: 1.0
 Nodes (0): 
 
-### Community 146 - "Index"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 147 - "Validation"
-Cohesion: 1.0
-Nodes (0): 
-
-### Community 148 - "Style Document"
+### Community 151 - "Code Style Document"
 Cohesion: 1.0
 Nodes (1): Code Style Document
 
-### Community 149 - "Bestcityspots Review Document"
+### Community 152 - "Bestcityspots UI UX Review Document"
 Cohesion: 1.0
 Nodes (1): Bestcityspots UI UX Review Document
 
-### Community 150 - "Claude Graphify Instructions"
+### Community 153 - "Claude Graphify Instructions Document"
 Cohesion: 1.0
 Nodes (1): Claude Graphify Instructions Document
 
-### Community 151 - "Restructuring Final Outcome"
-Cohesion: 1.0
-Nodes (1): Restructuring Final Outcome Document
-
-### Community 152 - "Restructuring Baseline Document"
-Cohesion: 1.0
-Nodes (1): Restructuring Phase 00 Baseline Document
-
-### Community 153 - "Restructuring Status Document"
-Cohesion: 1.0
-Nodes (1): Restructuring Status Document
-
-### Community 154 - "Restructuring Frontend Document"
-Cohesion: 1.0
-Nodes (1): Restructuring Phase 03 Frontend Document
-
-### Community 155 - "Domain Oriented Plus"
-Cohesion: 1.0
-Nodes (1): Domain Oriented Plus Platform Modules Decision
-
-### Community 156 - "Frontend Decomposition Slice"
-Cohesion: 1.0
-Nodes (1): Phase 3 Frontend Decomposition Slice 01
-
-### Community 157 - "Reliability Hardening Slice"
-Cohesion: 1.0
-Nodes (1): Phase 4 DX Reliability Hardening Slice 01
-
-### Community 158 - "Preblurred Mesh Backdrops"
+### Community 154 - "Preblurred Mesh Backdrops Pattern"
 Cohesion: 1.0
 Nodes (1): Preblurred Mesh Backdrops Pattern
 
-### Community 159 - "Wcag Compliance"
+### Community 155 - "WCAG 2.2 AA Compliance"
 Cohesion: 1.0
 Nodes (1): WCAG 2.2 AA Compliance
 
-### Community 160 - "European Accessibility Act"
+### Community 156 - "European Accessibility Act June 2025"
 Cohesion: 1.0
 Nodes (1): European Accessibility Act June 2025
 
-### Community 161 - "Graphify Knowledge Graph"
+### Community 157 - "Graphify Knowledge Graph Artifacts"
 Cohesion: 1.0
 Nodes (1): Graphify Knowledge Graph Artifacts
 
-### Community 162 - "Lower Regression Risk"
-Cohesion: 1.0
-Nodes (1): Lower Regression Risk Versus Big Bang Rewrite Rationale
-
-### Community 163 - "Static Dataset Avoids"
+### Community 158 - "Static Dataset Avoids Runtime Cost Rationale"
 Cohesion: 1.0
 Nodes (1): Static Dataset Avoids Runtime Cost Rationale
 
-### Community 164 - "Preblurred Mesh Avoids"
+### Community 159 - "Preblurred Mesh Avoids Scroll Jank Rationale"
 Cohesion: 1.0
 Nodes (1): Preblurred Mesh Avoids Scroll Jank Rationale
 
-### Community 165 - "Raise Muted Contrast"
+### Community 160 - "Raise Muted Contrast To Meet AA Rationale"
 Cohesion: 1.0
 Nodes (1): Raise Muted Contrast To Meet AA Rationale
 
+### Community 161 - "Methodology Pipeline Ranking Illustration"
+Cohesion: 1.0
+Nodes (1): Methodology Pipeline Ranking Illustration
+
+### Community 162 - "Breadcrumbs UI component"
+Cohesion: 1.0
+Nodes (1): Breadcrumbs UI component
+
+### Community 163 - "supabaseServer export (service-role or null)"
+Cohesion: 1.0
+Nodes (1): supabaseServer export (service-role or null)
+
+### Community 164 - "readCityWeatherCache() — public read"
+Cohesion: 1.0
+Nodes (1): readCityWeatherCache() — public read
+
+### Community 165 - "readCityMetricsCache() — public read"
+Cohesion: 1.0
+Nodes (1): readCityMetricsCache() — public read
+
 ## Ambiguous Edges - Review These
-- `Target Architecture Boundaries` → `About Transparent Atlas Layered Map Illustration`  [AMBIGUOUS]
-  public/illustrations/about-transparent-atlas.webp · relation: conceptually_related_to
-- `Repository Seams for Cache and Analytics` → `Idempotent SQL Migration Strategy`  [AMBIGUOUS]
-  supabase/migrations/README.md · relation: conceptually_related_to
 - `Missing Page Empty State` → `Comparison Placeholder Cards`  [AMBIGUOUS]
   public/illustrations/404-off-the-map.webp · relation: semantically_similar_to
+- `Root Layout (Organization + WebSite JSON-LD)` → `Next.js env type declarations (generated)`  [AMBIGUOUS]
+  next-env.d.ts · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **69 isolated node(s):** `Populate os.environ from .env.local / .env / .env.production     (existing shell`, `Return (connection, flavor) using psycopg v3 or psycopg2.`, `Execute a (possibly multi-statement) SQL string in one transaction.`, `Verify PostgREST + RLS posture over HTTP (uses stdlib only).`, `HealthTimeoutError` (+64 more)
+- **98 isolated node(s):** `Populate os.environ from .env.local / .env / .env.production     (existing shell`, `Return (connection, flavor) using psycopg v3 or psycopg2.`, `Execute a (possibly multi-statement) SQL string in one transaction.`, `Verify PostgREST + RLS posture over HTTP (uses stdlib only).`, `HealthTimeoutError` (+93 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Testsearch Test Supabase`** (2 nodes): `testSearch()`, `test-supabase.ts`
+- **Thin community `robots()`** (2 nodes): `robots()`, `robots.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Robots`** (2 nodes): `robots()`, `robots.ts`
+- **Thin community `sitemap()`** (2 nodes): `sitemap()`, `sitemap.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sitemap`** (2 nodes): `sitemap()`, `sitemap.ts`
+- **Thin community `manifest()`** (2 nodes): `manifest()`, `manifest.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Manifest`** (2 nodes): `manifest()`, `manifest.ts`
+- **Thin community `NotFound()`** (2 nodes): `NotFound()`, `not-found.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Notfound Not Found`** (2 nodes): `NotFound()`, `not-found.tsx`
+- **Thin community `CleanestAirHubPage()`** (2 nodes): `CleanestAirHubPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Cleanestairhubpage Page Tsx`** (2 nodes): `CleanestAirHubPage()`, `page.tsx`
+- **Thin community `TopCitiesPage()`** (2 nodes): `TopCitiesPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Topcitiespage Page Tsx`** (2 nodes): `TopCitiesPage()`, `page.tsx`
+- **Thin community `MethodologyPage()`** (2 nodes): `MethodologyPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Methodologypage Page Tsx`** (2 nodes): `MethodologyPage()`, `page.tsx`
+- **Thin community `AboutPage()`** (2 nodes): `AboutPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Aboutpage Page Tsx`** (2 nodes): `AboutPage()`, `page.tsx`
+- **Thin community `Shimmer()`** (2 nodes): `Shimmer()`, `ExperiencesSkeleton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Shimmer Experiencesskeleton Tsx`** (2 nodes): `Shimmer()`, `ExperiencesSkeleton.tsx`
+- **Thin community `CityVitalsFallback()`** (2 nodes): `CityVitalsFallback()`, `city-page-parts.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Cityvitalsfallback Page Parts`** (2 nodes): `CityVitalsFallback()`, `city-page-parts.tsx`
+- **Thin community `CityPlanningPanel()`** (2 nodes): `CityPlanningPanel()`, `CityPlanningPanel.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Cityplanningpanel Tsx`** (2 nodes): `CityPlanningPanel()`, `CityPlanningPanel.tsx`
+- **Thin community `getExperienceCategoryColor()`** (2 nodes): `getExperienceCategoryColor()`, `experience-theme.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Getexperiencecategorycolor Experience Theme`** (2 nodes): `getExperienceCategoryColor()`, `experience-theme.ts`
+- **Thin community `getSeasonColor()`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Getseasoncolor Aibriefingclient Tsx`** (2 nodes): `getSeasonColor()`, `AIBriefingClient.tsx`
+- **Thin community `AIBriefingSection()`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Aibriefingsection Tsx`** (2 nodes): `AIBriefingSection()`, `AIBriefingSection.tsx`
+- **Thin community `ExperiencesSection()`** (2 nodes): `ExperiencesSection()`, `ExperiencesSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Experiencessection Tsx`** (2 nodes): `ExperiencesSection()`, `ExperiencesSection.tsx`
+- **Thin community `addCity()`** (2 nodes): `addCity()`, `ComparePicker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Addcity Comparepicker Tsx`** (2 nodes): `addCity()`, `ComparePicker.tsx`
+- **Thin community `DigitalNomadHubPage()`** (2 nodes): `DigitalNomadHubPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Digitalnomadhubpage Page Tsx`** (2 nodes): `DigitalNomadHubPage()`, `page.tsx`
+- **Thin community `CountriesIndexPage()`** (2 nodes): `CountriesIndexPage()`, `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Countriesindexpage Page Tsx`** (2 nodes): `CountriesIndexPage()`, `page.tsx`
+- **Thin community `isActiveNavPath()`** (2 nodes): `isActiveNavPath()`, `nav.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Isactivenavpath Nav`** (2 nodes): `isActiveNavPath()`, `nav.ts`
+- **Thin community `FreshnessStamp()`** (2 nodes): `FreshnessStamp()`, `FreshnessStamp.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Freshnessstamp Tsx`** (2 nodes): `FreshnessStamp()`, `FreshnessStamp.tsx`
+- **Thin community `fadeDelay()`** (2 nodes): `fadeDelay()`, `HeroHeader.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hotspot Tsx`** (2 nodes): `Hotspot()`, `Hotspot.tsx`
+- **Thin community `FreeResourceCTA()`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Fadedelay Heroheader Tsx`** (2 nodes): `fadeDelay()`, `HeroHeader.tsx`
+- **Thin community `PrinciplesSection()`** (2 nodes): `PrinciplesSection()`, `PrinciplesSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Freeresourcecta Tsx`** (2 nodes): `FreeResourceCTA()`, `FreeResourceCTA.tsx`
+- **Thin community `SiteFooter()`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Principlessection Tsx`** (2 nodes): `PrinciplesSection()`, `PrinciplesSection.tsx`
+- **Thin community `ThemeProvider.tsx`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sitefooter Tsx`** (2 nodes): `SiteFooter()`, `SiteFooter.tsx`
+- **Thin community `SiteNav()`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Themeprovider Tsx`** (2 nodes): `ThemeProvider.tsx`, `ThemeProvider()`
+- **Thin community `useCitySearchController.ts`** (2 nodes): `useCitySearchController.ts`, `useCitySearchController()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sitenav Tsx`** (2 nodes): `SiteNav()`, `SiteNav.tsx`
+- **Thin community `sanitizeSearchInput()`** (2 nodes): `sanitizeSearchInput()`, `city-search-config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Usecitysearchcontroller`** (2 nodes): `useCitySearchController.ts`, `useCitySearchController()`
+- **Thin community `highlightMatchFn()`** (2 nodes): `highlightMatchFn()`, `CitySearch.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Sanitizesearchinput Search Config`** (2 nodes): `sanitizeSearchInput()`, `city-search-config.ts`
+- **Thin community `TopCitiesPageContent.tsx`** (2 nodes): `TopCitiesPageContent.tsx`, `scrollToTop()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Highlightmatchfn Citysearch Tsx`** (2 nodes): `highlightMatchFn()`, `CitySearch.tsx`
+- **Thin community `AboutPageContent()`** (2 nodes): `AboutPageContent()`, `AboutPageContent.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Topcitiespagecontent Tsx Scrolltotop`** (2 nodes): `TopCitiesPageContent.tsx`, `scrollToTop()`
+- **Thin community `LazyGeoConsentBanner()`** (2 nodes): `LazyGeoConsentBanner()`, `LazyGeoConsentBanner.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Aboutpagecontent Tsx`** (2 nodes): `AboutPageContent()`, `AboutPageContent.tsx`
+- **Thin community `PageTracker()`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Lazygeoconsentbanner Tsx`** (2 nodes): `LazyGeoConsentBanner()`, `LazyGeoConsentBanner.tsx`
+- **Thin community `CityViewTracker()`** (2 nodes): `CityViewTracker()`, `CityViewTracker.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Pagetracker Tsx`** (2 nodes): `PageTracker()`, `PageTracker.tsx`
+- **Thin community `useRecentSearches.ts`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Cityviewtracker Tsx`** (2 nodes): `CityViewTracker()`, `CityViewTracker.tsx`
+- **Thin community `useDeviceType.ts`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Userecentsearches`** (2 nodes): `useRecentSearches.ts`, `useRecentSearches()`
+- **Thin community `parsePartialJson()`** (2 nodes): `parsePartialJson()`, `partialJson.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Usedevicetype`** (2 nodes): `useDeviceType.ts`, `useDeviceType()`
+- **Thin community `getHealth()`** (2 nodes): `getHealth()`, `health.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Parsepartialjson Partialjson`** (2 nodes): `parsePartialJson()`, `partialJson.ts`
+- **Thin community `useAnalytics.ts`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Gethealth Health`** (2 nodes): `getHealth()`, `health.ts`
+- **Thin community `haversineKm()`** (2 nodes): `haversineKm()`, `geo.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Useanalytics`** (2 nodes): `useAnalytics.ts`, `useAnalytics()`
+- **Thin community `fetchCurrentWeather()`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Haversinekm Geo`** (2 nodes): `haversineKm()`, `geo.ts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Fetchcurrentweather Openweather`** (2 nodes): `fetchCurrentWeather()`, `openweather.ts`
+- **Thin community `BCS Asset Naming Standard`** (2 nodes): `BCS Asset Naming Standard`, `Visual Asset Prompts Document`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Color Audit Document`** (2 nodes): `Color Audit Document`, `Azure Atlas Palette Direction`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Lint Typecheck Build`** (2 nodes): `CI Lint Typecheck Build Gate`, `Restructuring Phase 04 Dx Reliability Document`
+- **Thin community `Platform Dependency Rules`** (2 nodes): `Platform Dependency Rules`, `Platform Infrastructure Overview`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Asset Bcs Naming`** (2 nodes): `BCS Asset Naming Standard`, `Visual Asset Prompts Document`
+- **Thin community `Hero Skyline Waterfront Photo`** (2 nodes): `Hero Skyline Waterfront Photo`, `Home Hero Coastal City Panorama`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Hero Skyline Waterfront`** (2 nodes): `Hero Skyline Waterfront Photo`, `Home Hero Coastal City Panorama`
+- **Thin community `serializeJsonLd()`** (2 nodes): `serializeJsonLd()`, `json-ld.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Next Env`** (1 nodes): `next-env.d.ts`
+- **Thin community `next-env.d.ts`** (1 nodes): `next-env.d.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Next Config`** (1 nodes): `next.config.ts`
+- **Thin community `next.config.ts`** (1 nodes): `next.config.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trending Destinations`** (1 nodes): `trending-destinations.ts`
+- **Thin community `trending-destinations.ts`** (1 nodes): `trending-destinations.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Test Ranking`** (1 nodes): `test-ranking.ts`
+- **Thin community `test-ranking.ts`** (1 nodes): `test-ranking.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Test Share List`** (1 nodes): `test-share-list.ts`
+- **Thin community `test-share-list.ts`** (1 nodes): `test-share-list.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Test Metrics Display`** (1 nodes): `test-metrics-display.ts`
+- **Thin community `test-metrics-display.ts`** (1 nodes): `test-metrics-display.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Diagnose Images`** (1 nodes): `diagnose-images.ts`
+- **Thin community `verify-refactor.ts`** (1 nodes): `verify-refactor.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Clear Places Cache`** (1 nodes): `clear-places-cache.ts`
+- **Thin community `opengraph-image.tsx`** (1 nodes): `opengraph-image.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Verify Refactor`** (1 nodes): `verify-refactor.ts`
+- **Thin community `actions.ts`** (1 nodes): `actions.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Opengraph Tsx`** (1 nodes): `opengraph-image.tsx`
+- **Thin community `page.tsx`** (1 nodes): `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Actions`** (1 nodes): `actions.ts`
+- **Thin community `page.tsx`** (1 nodes): `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Page Tsx`** (1 nodes): `page.tsx`
+- **Thin community `page.tsx`** (1 nodes): `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Page Tsx`** (1 nodes): `page.tsx`
+- **Thin community `AIBriefingSkeleton.tsx`** (1 nodes): `AIBriefingSkeleton.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Page Tsx`** (1 nodes): `page.tsx`
+- **Thin community `CityTravelEssentialsSection.tsx`** (1 nodes): `CityTravelEssentialsSection.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Aibriefingskeleton Tsx`** (1 nodes): `AIBriefingSkeleton.tsx`
+- **Thin community `page.tsx`** (1 nodes): `page.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Citytravelessentialssection Tsx`** (1 nodes): `CityTravelEssentialsSection.tsx`
+- **Thin community `ScrollProgress.tsx`** (1 nodes): `ScrollProgress.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Page Tsx`** (1 nodes): `page.tsx`
+- **Thin community `Breadcrumbs.tsx`** (1 nodes): `Breadcrumbs.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Scrollprogress Tsx`** (1 nodes): `ScrollProgress.tsx`
+- **Thin community `TrustIndicators.tsx`** (1 nodes): `TrustIndicators.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Interactivebutton Tsx`** (1 nodes): `InteractiveButton.tsx`
+- **Thin community `HeroBackground.tsx`** (1 nodes): `HeroBackground.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Breadcrumbs Tsx`** (1 nodes): `Breadcrumbs.tsx`
+- **Thin community `HomeSearchShowcase.tsx`** (1 nodes): `HomeSearchShowcase.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Trustindicators Tsx`** (1 nodes): `TrustIndicators.tsx`
+- **Thin community `HeroSearchCTA.tsx`** (1 nodes): `HeroSearchCTA.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Herobackground Tsx`** (1 nodes): `HeroBackground.tsx`
+- **Thin community `ThemeToggle.tsx`** (1 nodes): `ThemeToggle.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Homesearchshowcase Tsx`** (1 nodes): `HomeSearchShowcase.tsx`
+- **Thin community `DesktopNavLinks.tsx`** (1 nodes): `DesktopNavLinks.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Herosearchcta Tsx`** (1 nodes): `HeroSearchCTA.tsx`
+- **Thin community `CityMap.tsx`** (1 nodes): `CityMap.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Themetoggle Tsx`** (1 nodes): `ThemeToggle.tsx`
+- **Thin community `TopicalHubLayout.tsx`** (1 nodes): `TopicalHubLayout.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Desktopnavlinks Tsx`** (1 nodes): `DesktopNavLinks.tsx`
+- **Thin community `CityCard.tsx`** (1 nodes): `CityCard.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Citymap Tsx`** (1 nodes): `CityMap.tsx`
+- **Thin community `index.ts`** (1 nodes): `index.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Topicalhublayout Tsx`** (1 nodes): `TopicalHubLayout.tsx`
+- **Thin community `validation.ts`** (1 nodes): `validation.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Citycard Tsx`** (1 nodes): `CityCard.tsx`
+- **Thin community `Code Style Document`** (1 nodes): `Code Style Document`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Index`** (1 nodes): `index.ts`
+- **Thin community `Bestcityspots UI UX Review Document`** (1 nodes): `Bestcityspots UI UX Review Document`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Validation`** (1 nodes): `validation.ts`
+- **Thin community `Claude Graphify Instructions Document`** (1 nodes): `Claude Graphify Instructions Document`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Style Document`** (1 nodes): `Code Style Document`
+- **Thin community `Preblurred Mesh Backdrops Pattern`** (1 nodes): `Preblurred Mesh Backdrops Pattern`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Bestcityspots Review Document`** (1 nodes): `Bestcityspots UI UX Review Document`
+- **Thin community `WCAG 2.2 AA Compliance`** (1 nodes): `WCAG 2.2 AA Compliance`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Claude Graphify Instructions`** (1 nodes): `Claude Graphify Instructions Document`
+- **Thin community `European Accessibility Act June 2025`** (1 nodes): `European Accessibility Act June 2025`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restructuring Final Outcome`** (1 nodes): `Restructuring Final Outcome Document`
+- **Thin community `Graphify Knowledge Graph Artifacts`** (1 nodes): `Graphify Knowledge Graph Artifacts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restructuring Baseline Document`** (1 nodes): `Restructuring Phase 00 Baseline Document`
+- **Thin community `Static Dataset Avoids Runtime Cost Rationale`** (1 nodes): `Static Dataset Avoids Runtime Cost Rationale`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restructuring Status Document`** (1 nodes): `Restructuring Status Document`
+- **Thin community `Preblurred Mesh Avoids Scroll Jank Rationale`** (1 nodes): `Preblurred Mesh Avoids Scroll Jank Rationale`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Restructuring Frontend Document`** (1 nodes): `Restructuring Phase 03 Frontend Document`
+- **Thin community `Raise Muted Contrast To Meet AA Rationale`** (1 nodes): `Raise Muted Contrast To Meet AA Rationale`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Domain Oriented Plus`** (1 nodes): `Domain Oriented Plus Platform Modules Decision`
+- **Thin community `Methodology Pipeline Ranking Illustration`** (1 nodes): `Methodology Pipeline Ranking Illustration`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Frontend Decomposition Slice`** (1 nodes): `Phase 3 Frontend Decomposition Slice 01`
+- **Thin community `Breadcrumbs UI component`** (1 nodes): `Breadcrumbs UI component`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Reliability Hardening Slice`** (1 nodes): `Phase 4 DX Reliability Hardening Slice 01`
+- **Thin community `supabaseServer export (service-role or null)`** (1 nodes): `supabaseServer export (service-role or null)`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Preblurred Mesh Backdrops`** (1 nodes): `Preblurred Mesh Backdrops Pattern`
+- **Thin community `readCityWeatherCache() — public read`** (1 nodes): `readCityWeatherCache() — public read`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Wcag Compliance`** (1 nodes): `WCAG 2.2 AA Compliance`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `European Accessibility Act`** (1 nodes): `European Accessibility Act June 2025`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Graphify Knowledge Graph`** (1 nodes): `Graphify Knowledge Graph Artifacts`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Lower Regression Risk`** (1 nodes): `Lower Regression Risk Versus Big Bang Rewrite Rationale`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Static Dataset Avoids`** (1 nodes): `Static Dataset Avoids Runtime Cost Rationale`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Preblurred Mesh Avoids`** (1 nodes): `Preblurred Mesh Avoids Scroll Jank Rationale`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Raise Muted Contrast`** (1 nodes): `Raise Muted Contrast To Meet AA Rationale`
+- **Thin community `readCityMetricsCache() — public read`** (1 nodes): `readCityMetricsCache() — public read`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **What is the exact relationship between `Target Architecture Boundaries` and `About Transparent Atlas Layered Map Illustration`?**
-  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **What is the exact relationship between `Repository Seams for Cache and Analytics` and `Idempotent SQL Migration Strategy`?**
-  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `Missing Page Empty State` and `Comparison Placeholder Cards`?**
   _Edge tagged AMBIGUOUS (relation: semantically_similar_to) - confidence is low._
+- **What is the exact relationship between `Root Layout (Organization + WebSite JSON-LD)` and `Next.js env type declarations (generated)`?**
+  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
+- **Why does `Security Model (RLS core boundary, service_role writes)` connect `requireServerClient() — write gate` to `setup_supabase.py`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `external-services: RLS policy invariants (public SELECT, service_role writes)` connect `requireServerClient() — write gate` to `setup_supabase.py`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Are the 4 inferred relationships involving `City Detail Page (orchestrator)` (e.g. with `Root Layout (Organization + WebSite JSON-LD)` and `City FAQ Section (FAQPage + Speakable JSON-LD)`) actually correct?**
+  _`City Detail Page (orchestrator)` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Populate os.environ from .env.local / .env / .env.production     (existing shell`, `Return (connection, flavor) using psycopg v3 or psycopg2.`, `Execute a (possibly multi-statement) SQL string in one transaction.` to the rest of the system?**
-  _69 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Rationale Illustration Overview` be split into smaller, more focused modules?**
-  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
-- **Should `Map Asset Symbol` be split into smaller, more focused modules?**
-  _Cohesion score 0.11 - nodes in this community are weakly interconnected._
+  _98 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `requireServerClient() — write gate` be split into smaller, more focused modules?**
+  _Cohesion score 0.04 - nodes in this community are weakly interconnected._
