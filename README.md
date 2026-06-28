@@ -98,26 +98,31 @@ It is built around two convictions:
 
 The app is **cache-first**: user requests are served from Supabase caches and never trigger a paid API call on their own. Fresh data enters out-of-band through the cache warmer, and a four-layer guard keeps spend bounded even if a layer fails.
 
+**System & cache-first data flow**
+
+```mermaid
+flowchart TD
+  V([Visitor]) --> N["nginx edge<br/>rate-limit · bot block"]
+  N -->|origin closed 127.0.0.1:3000| SSR["Next.js 16 SSR · React 19<br/>cache-first reads"]
+  SSR -->|cache hit / stale| SB[("Supabase<br/>Postgres · Storage · RLS")]
+  SSR -.->|cache miss / stale| CG{"cost-guard<br/>claim_provider_use()"}
+  CG -->|budget OK| PV["Paid providers<br/>Places · Gemini/OpenAI · OpenWeather"]
+  CG -.->|fail-closed → stale fallback| SB
+  PV -->|Zod-validate → upsert cache| SB
 ```
-                ┌──────────────────────────────────────────────┐
-   Visitor ──▶  │  nginx (Layer 1)  rate-limits · bot blocks    │
-                └───────────────┬──────────────────────────────┘
-                                │  127.0.0.1:3000 (origin closed)
-                ┌───────────────▼──────────────────────────────┐
-                │  Next.js 16 SSR · React 19                    │
-                │   • cache-first reads (Supabase)              │
-                │   • cost-guard kill switches (Layer 2)        │
-                └───────────────┬──────────────────────────────┘
-                                │
-        ┌───────────────────────┼───────────────────────────────┐
-        ▼                       ▼                                ▼
-┌───────────────┐   ┌────────────────────────┐   ┌──────────────────────────┐
-│  Supabase     │   │  Durable budget (L3)   │   │  Paid providers          │
-│  Postgres ·   │   │  claim_provider_use()  │   │  Places · Gemini/OpenAI  │
-│  Storage · RLS│   │  atomic daily counter  │   │  · OpenWeatherMap        │
-└───────────────┘   └────────────────────────┘   └──────────────────────────┘
-                                │
-                    GCP quota caps + budget kill (Layer 4, console)
+
+**Four-layer cost defense** — a paid request must clear every layer; any one can stop it, so spend stays bounded even if another layer fails.
+
+```mermaid
+flowchart LR
+  REQ([Paid API request]) --> L1["L1 · Edge<br/>nginx rate-limit"]
+  L1 --> L2["L2 · App kill-switch<br/>LIVE_FETCH_ENABLED = false"]
+  L2 --> L3["L3 · Durable budget<br/>claim_provider_use() · fail-closed"]
+  L3 --> L4["L4 · Platform caps<br/>GCP quotas + budget kill"]
+  L4 --> CALL([Provider call])
+  L1 -.->|block| STOP([stopped])
+  L2 -.->|disabled| STOP
+  L3 -.->|over budget| STOP
 ```
 
 | Layer                   | Mechanism                                                  | Where                              |
