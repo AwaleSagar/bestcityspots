@@ -1,5 +1,5 @@
 import "server-only";
-import { supabase, supabaseServer } from "@/lib/supabase";
+import { requireServerClient, supabase, supabaseServer } from "@/lib/supabase";
 
 function getDbClient() {
   return supabaseServer ?? supabase;
@@ -37,7 +37,7 @@ export async function writeCityWeatherCache(
   cityId: number,
   weather: CityWeatherCacheRow
 ): Promise<void> {
-  const db = getDbClient();
+  const db = requireServerClient();
   const { error } = await db
     .from("city_weather_cache")
     .upsert({ city_id: cityId, ...weather }, { onConflict: "city_id" });

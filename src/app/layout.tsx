@@ -1,3 +1,4 @@
+import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Instrument_Sans } from "next/font/google";
 import { AnalyticsProvider, PageTracker } from "@/components/analytics";
@@ -205,7 +206,7 @@ export default function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
         <ThemeProvider
           attribute="class"

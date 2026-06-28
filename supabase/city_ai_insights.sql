@@ -21,19 +21,22 @@ for select
 to anon, authenticated
 using (true);
 
--- Allow server-side upserts via anon/authenticated (non-PII, cached content).
+-- Writes restricted to service_role. The anon key ships to browsers, so
+-- permitting anon writes would allow stored content injection. Server write
+-- paths use the service-role client via requireServerClient().
 drop policy if exists city_ai_insights_insert on public.city_ai_insights;
 create policy city_ai_insights_insert
 on public.city_ai_insights
 for insert
-to anon, authenticated
+to service_role
 with check (true);
 
 drop policy if exists city_ai_insights_update on public.city_ai_insights;
 create policy city_ai_insights_update
 on public.city_ai_insights
 for update
-to anon, authenticated
-using (true);
+to service_role
+using (true)
+with check (true);
 
 create index if not exists city_ai_insights_updated_at_idx on public.city_ai_insights (updated_at desc);

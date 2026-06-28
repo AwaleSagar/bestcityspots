@@ -18,6 +18,8 @@
     "warm-cache": "tsx scripts/warm-cache.ts",
     "warm-cache:trending": "tsx scripts/warm-cache.ts --trending-only",
     "warm-cache:dry-run": "tsx scripts/warm-cache.ts --dry-run",
+    "warm-top-cities": "tsx scripts/warm-top-cities.ts",
+    "warm-top-cities:dry-run": "tsx scripts/warm-top-cities.ts --dry-run",
     "analytics": "tsx scripts/analytics-report.ts",
     "analytics:30d": "tsx scripts/analytics-report.ts --days 30",
     "analytics:json": "tsx scripts/analytics-report.ts --json",
@@ -35,7 +37,7 @@
     "framer-motion": "^12.25.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
-    "next": "16.1.1",
+    "next": "^16.2.9",
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -48,9 +50,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/sharp": "^0.31.1",
     "eslint": "^9",
-    "eslint-config-next": "16.1.1",
+    "eslint-config-next": "^16.2.9",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-security": "^3.0.1",
     "prettier": "^3.4.2",
@@ -58,5 +59,9 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "^8.5.16",
+    "ws": "^8.21.0"
   }
 }

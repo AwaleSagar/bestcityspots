@@ -63,6 +63,24 @@ export function hasServerClient(): boolean {
   return getServerClient() !== null;
 }
 
+/**
+ * Returns the service-role client, throwing if it is unavailable.
+ *
+ * Use this for any *write* path so that a missing `SUPABASE_SERVICE_ROLE_KEY`
+ * fails loudly instead of silently degrading to the anon client (whose writes
+ * would be rejected by RLS anyway, masking a real misconfiguration and leaking
+ * provider budget on every subsequent cache miss).
+ */
+export function requireServerClient(): SupabaseClient {
+  const client = getServerClient();
+  if (!client) {
+    throw new Error(
+      "[supabase] service-role client is unavailable — set SUPABASE_SERVICE_ROLE_KEY for privileged writes."
+    );
+  }
+  return client;
+}
+
 /** Lazy Proxy: constructs the underlying anon client on first property access. */
 function lazyAnonProxy(): SupabaseClient {
   // Resolved client captured after first successful build so subsequent

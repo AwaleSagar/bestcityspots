@@ -230,20 +230,23 @@ for select
 to anon, authenticated
 using (true);
 
--- Allow server-side upserts via anon/authenticated (non-PII, cached content).
+-- Writes restricted to service_role. The anon key ships to browsers, so
+-- permitting anon writes would allow stored content injection. Server write
+-- paths use the service-role client via requireServerClient().
 drop policy if exists city_ai_insights_insert on public.city_ai_insights;
 create policy city_ai_insights_insert
 on public.city_ai_insights
 for insert
-to anon, authenticated
+to service_role
 with check (true);
 
 drop policy if exists city_ai_insights_update on public.city_ai_insights;
 create policy city_ai_insights_update
 on public.city_ai_insights
 for update
-to anon, authenticated
-using (true);
+to service_role
+using (true)
+with check (true);
 
 create index if not exists city_ai_insights_updated_at_idx on public.city_ai_insights (updated_at desc);
 
@@ -1084,7 +1087,8 @@ create policy city_ai_insights_update
 on public.city_ai_insights
 for update
 to service_role
-using (true);
+using (true)
+with check (true);
 
 -- 2. Ensure RLS is enabled on all tables (Redundant safety check)
 alter table public.cities enable row level security;
@@ -1096,27 +1100,29 @@ alter table public.city_ai_insights enable row level security;
 
 
 
--- ═══ fix_city_ai_insights_rls.sql ═══
--- Fix RLS policies for city_ai_insights to allow server-side upserts
--- Run this in your Supabase SQL editor if upserts are still failing
+-- ═══ city_ai_insights RLS lockdown (mirrors migrations/202606281400_lock_city_ai_insights_rls.sql) ═══
+-- Lock down city_ai_insights writes to service_role ONLY.
+-- SECURITY FIX (C1, stored-content-injection): an earlier version of this
+-- block re-opened INSERT/UPDATE to anon/authenticated to work around upsert
+-- failures. Because the anon key ships to every browser, that allowed anyone
+-- to persist arbitrary content that renders on every city page. The real fix
+-- for upsert failures is using the service-role client, not weakening RLS.
 
 -- Drop existing policies
 drop policy if exists city_ai_insights_insert on public.city_ai_insights;
 drop policy if exists city_ai_insights_update on public.city_ai_insights;
 
--- Allow inserts for anon/authenticated (server-side operations)
+-- Writes restricted to service_role
 create policy city_ai_insights_insert
 on public.city_ai_insights
 for insert
-to anon, authenticated
+to service_role
 with check (true);
 
--- Allow updates for anon/authenticated (server-side operations)
--- The 'using' clause allows selecting existing rows, 'with check' allows updating them
 create policy city_ai_insights_update
 on public.city_ai_insights
 for update
-to anon, authenticated
+to service_role
 using (true)
 with check (true);
 
@@ -1639,4 +1645,113 @@ begin
     end if;
   end loop;
 end $$;
+
+
+
+-- ═══ migrations/202606120900_place_save_counters.sql ═══
+-- US-12: anonymous "travelers saved this" counters. One aggregate row per
+-- (place, day). No user identifiers, no sessions, no IPs.
+
+create table if not exists public.place_saves_daily (
+  place_id text not null,
+  day date not null default current_date,
+  saves integer not null default 0,
+  primary key (place_id, day)
+);
+
+comment on table public.place_saves_daily is
+  'Anonymous aggregate save counts per place per day (US-12). Written only via record_place_save().';
+
+alter table public.place_saves_daily enable row level security;
+
+drop policy if exists "place_saves_daily_service_role_all" on public.place_saves_daily;
+create policy "place_saves_daily_service_role_all"
+on public.place_saves_daily
+for all
+to service_role
+using (true)
+with check (true);
+
+create or replace function public.record_place_save(p_place_id text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_place_id is null or p_place_id !~ '^[A-Za-z0-9_-]{4,128}$' then
+    return;
+  end if;
+
+  insert into public.place_saves_daily as t (place_id, day, saves)
+  values (p_place_id, current_date, 1)
+  on conflict (place_id, day) do update
+    set saves = t.saves + 1;
+end;
+$$;
+
+revoke all on function public.record_place_save(text) from public;
+grant execute on function public.record_place_save(text) to service_role;
+
+create or replace function public.get_place_save_totals(p_place_ids text[])
+returns table (place_id text, total bigint)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select place_id, sum(saves)::bigint as total
+  from public.place_saves_daily
+  where place_id = any (p_place_ids)
+  group by place_id;
+$$;
+
+revoke all on function public.get_place_save_totals(text[]) from public;
+grant execute on function public.get_place_save_totals(text[]) to service_role;
+
+
+
+-- ═══ migrations/202606281500_create_ai_trending_cache.sql ═══
+-- Trending-destinations cache (24h). Referenced by src/lib/intelligence.ts
+-- but previously never created by any SQL file. Singleton row keyed id=1.
+-- service_role-only writes; public read.
+
+create table if not exists public.ai_trending_cache (
+  id smallint primary key default 1,
+  city_names jsonb not null default '[]'::jsonb,
+  prompt_version integer not null default 1,
+  schema_version integer not null default 1,
+  updated_at timestamptz not null default now(),
+  constraint ai_trending_cache_singleton check (id = 1)
+);
+
+comment on table public.ai_trending_cache is
+  'Singleton cache of AI-generated trending destination names (24h). Written via service_role only.';
+
+alter table public.ai_trending_cache enable row level security;
+
+drop policy if exists ai_trending_cache_select on public.ai_trending_cache;
+create policy ai_trending_cache_select
+on public.ai_trending_cache
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists ai_trending_cache_insert on public.ai_trending_cache;
+create policy ai_trending_cache_insert
+on public.ai_trending_cache
+for insert
+to service_role
+with check (true);
+
+drop policy if exists ai_trending_cache_update on public.ai_trending_cache;
+create policy ai_trending_cache_update
+on public.ai_trending_cache
+for update
+to service_role
+using (true)
+with check (true);
+
+insert into public.ai_trending_cache (id) values (1) on conflict (id) do nothing;
+
 

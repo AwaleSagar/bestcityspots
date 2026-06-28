@@ -1,9 +1,5 @@
 import "server-only";
-import { supabase, supabaseServer } from "@/lib/supabase";
-
-function getDbClient() {
-  return supabaseServer ?? supabase;
-}
+import { requireServerClient, supabase } from "@/lib/supabase";
 
 export interface CityInsightCacheRow {
   intro: string | null;
@@ -38,7 +34,7 @@ export async function writeCityInsightCache(
     updated_at: string;
   }
 ): Promise<void> {
-  const db = getDbClient();
+  const db = requireServerClient();
   const { error } = await db
     .from("city_ai_insights")
     .upsert({ city_id: cityId, ...payload }, { onConflict: "city_id" });

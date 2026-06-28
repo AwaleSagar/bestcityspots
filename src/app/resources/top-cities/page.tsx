@@ -1,3 +1,4 @@
+import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import { getTopCities } from "@/lib/cities";
 import TopCitiesPageContent from "@/components/pages/TopCitiesPageContent";
@@ -82,11 +83,11 @@ export default async function TopCitiesPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListStructuredData) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListStructuredData) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbStructuredData) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
       />
       <TopCitiesPageContent cities={cities} />
     </>

@@ -1,5 +1,5 @@
 import "server-only";
-import { supabase, supabaseServer } from "./supabase";
+import { supabase, requireServerClient } from "./supabase";
 import { City } from "./cities";
 import { z } from "zod";
 import {
@@ -238,7 +238,15 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
   }
 
   // 3) Cache update (fire-and-forget) with prompt_version.
-  const cacheClient = supabaseServer || supabase;
+  let cacheClient;
+  try {
+    cacheClient = requireServerClient();
+  } catch (e) {
+    log.warn("trending_cache_write_skipped", {
+      error: e instanceof Error ? e.message : String(e),
+    });
+    return await matchCitiesInDb(cityNames);
+  }
   cacheClient
     .from("ai_trending_cache")
     .upsert({

@@ -15,7 +15,8 @@ create policy city_ai_insights_update
 on public.city_ai_insights
 for update
 to service_role
-using (true);
+using (true)
+with check (true);
 
 -- 2. Ensure RLS is enabled on all tables (Redundant safety check)
 alter table public.cities enable row level security;

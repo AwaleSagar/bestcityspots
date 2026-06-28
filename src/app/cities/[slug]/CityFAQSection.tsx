@@ -1,3 +1,4 @@
+import { serializeJsonLd } from "@/lib/json-ld";
 import { Suspense } from "react";
 import type { City } from "@/lib/cities";
 import { readCachedCityInsight } from "@/lib/intelligence";
@@ -101,11 +102,11 @@ async function FAQContent({ city }: { city: City }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(speakableJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(speakableJsonLd) }}
       />
       <section className="space-y-6" aria-labelledby="city-faq-heading">
         <h2 id="city-faq-heading" className="labelled-rule">

@@ -1,3 +1,4 @@
+import { serializeJsonLd } from "@/lib/json-ld";
 import { getCityById, getCityBySlug, getTopCities, cityHref, type City } from "@/lib/cities";
 import { haversineKm } from "@/lib/geo";
 import { readCachedCityInsight } from "@/lib/intelligence";
@@ -289,7 +290,7 @@ async function ExperiencesWrapper({
       {placeJsonLd["@graph"].length > 0 ? (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(placeJsonLd) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(placeJsonLd) }}
         />
       ) : null}
       <div className="space-y-3">
@@ -490,11 +491,11 @@ function ReducedCityPage({
     <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(touristJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(touristJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <CityViewTracker cityId={city.id} />
       <div
@@ -730,11 +731,11 @@ export default async function CityPage({
     <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(touristJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(touristJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <CityViewTracker cityId={city.id} />
       <div

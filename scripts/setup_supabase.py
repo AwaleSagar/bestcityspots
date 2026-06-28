@@ -64,12 +64,14 @@ SQL_FILES_IN_ORDER = [
     "visitor_analytics.sql",
     "analytics_functions.sql",
     "harden_security.sql",
-    "fix_city_ai_insights_rls.sql",
     "20260311_places_cache_cost_optimization.sql",
     "migrations/202604241700_cache_schema_versions.sql",
     "migrations/202605080000_cities_slug_seo.sql",
     "migrations/202606111000_provider_budget_and_cache_idempotency.sql",
+    "migrations/202606120900_place_save_counters.sql",
     "migrations/202606141200_fix_search_cities_elastic_coord_types.sql",
+    "migrations/202606281400_lock_city_ai_insights_rls.sql",
+    "migrations/202606281500_create_ai_trending_cache.sql",
 ]
 
 # Base tables that exist in production but have no CREATE TABLE in the repo
@@ -158,6 +160,8 @@ EXPECTED_TABLES = [
     "city_views_daily",
     "user_actions_daily",
     "provider_daily_usage",
+    "place_saves_daily",
+    "ai_trending_cache",
     "setup_script_ledger",
 ]
 
@@ -165,6 +169,8 @@ EXPECTED_FUNCTIONS = [
     "claim_provider_use",
     "get_provider_usage",
     "record_cache_event",
+    "record_place_save",
+    "get_place_save_totals",
     "search_cities_elastic",
     "slugify_city",
     "cities_search_document_trigger",
@@ -178,6 +184,8 @@ EXPECTED_RLS_TABLES = [
     "city_weather_cache",
     "city_ai_insights",
     "provider_daily_usage",
+    "place_saves_daily",
+    "ai_trending_cache",
 ]
 
 

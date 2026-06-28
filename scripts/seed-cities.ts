@@ -30,7 +30,17 @@ if (!url || !serviceKey) {
 
 const csvPath = process.argv[2];
 if (!csvPath || !fs.existsSync(csvPath)) {
-  console.error(`CSV not found. Usage: npx tsx scripts/seed-cities.ts <path>`);
+  console.error(`CSV not found. Usage: npx tsx scripts/seed-cities.ts <path> [--limit=N]`);
+  process.exit(1);
+}
+
+// Optional --limit=N: keep only the top N cities by population (descending).
+// Useful for lightweight setups (staging, demos) where the full 42k-row seed
+// is unnecessary. Null = seed everything.
+const limitArg = process.argv.slice(3).find((a) => a.startsWith("--limit"));
+const limit = limitArg ? Number.parseInt(limitArg.split("=")[1] ?? "", 10) : null;
+if (limitArg && (!Number.isFinite(limit) || (limit ?? 0) <= 0)) {
+  console.error(`Invalid --limit value. Usage: --limit=N (positive integer)`);
   process.exit(1);
 }
 
@@ -191,9 +201,16 @@ async function main() {
     });
   }
 
-  // Pass 2: collision-free slugs across the entire dataset.
+  // Pass 2: optionally keep only the top N by population, then resolve
+  // collision-free slugs across the (possibly reduced) set.
+  if (limit !== null && rows.length > limit) {
+    rows.sort((a, b) => (b.population ?? -1) - (a.population ?? -1) || a.id - b.id);
+    rows.length = limit;
+  }
   assignUniqueSlugs(rows);
-  console.log(`parsed ${rows.length} rows (${skipped} skipped); slugs deduplicated`);
+  console.log(
+    `parsed ${rows.length}${limit !== null ? ` (top-${limit} by population)` : ""} rows (${skipped} skipped); slugs deduplicated`
+  );
 
   // Pass 3: batched upsert.
   let inserted = 0;
