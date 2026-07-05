@@ -113,7 +113,17 @@ const METRIC_ICONS: Record<string, ComponentType<{ className?: string }>> = {
   health_access_per_100k: Activity,
 };
 
-async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCityById>> }) {
+// Panel shell lives inside the async component so that when a city has too
+// few metrics the whole panel (heading included) disappears instead of
+// leaving an empty titled card. Rendered twice: desktop sidebar and a
+// mobile (lg:hidden) block, since the sidebar is display:none on phones.
+async function CoreMetricsPanel({
+  city,
+  className,
+}: {
+  city: Awaited<ReturnType<typeof getCityById>>;
+  className: string;
+}) {
   if (!city) return null;
   const metrics = await getCityMetrics(city);
   const rows = selectAvailableMetrics(metrics);
@@ -123,8 +133,11 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
   if (!shouldRenderMetricsPanel(rows)) return null;
 
   return (
-    <>
-      <div className="grid grid-cols-1 gap-4">
+    <div className={className}>
+      <h4 className="text-muted text-xs font-semibold tracking-[0.25em] uppercase">
+        Core Metrics
+      </h4>
+      <div className="mt-6 grid grid-cols-1 gap-4">
         {rows.map((row) => (
           <MetricCard
             key={row.key}
@@ -144,7 +157,7 @@ async function CoreMetricsCard({ city }: { city: Awaited<ReturnType<typeof getCi
           {`Last verified ${new Date(metrics.updated_at).toLocaleDateString()}`}
         </div>
       ) : null}
-    </>
+    </div>
   );
 }
 
@@ -860,6 +873,16 @@ export default async function CityPage({
               className="atlas-panel-strong relative space-y-6 rounded-2xl p-6 sm:rounded-2xl lg:hidden"
             />
 
+            {/* Mobile-only Core Metrics — the sidebar copy is display:none
+                below lg, so without this block phone users never see cost /
+                safety / connectivity data. */}
+            <Suspense fallback={<CoreMetricsSkeleton />}>
+              <CoreMetricsPanel
+                city={city}
+                className="atlas-panel rounded-2xl p-6 sm:rounded-3xl lg:hidden"
+              />
+            </Suspense>
+
             <Suspense fallback={<ExperiencesSkeleton />}>
               <ExperiencesWrapper cityName={city.city} lat={finalLat} lng={finalLng} />
             </Suspense>
@@ -884,14 +907,12 @@ export default async function CityPage({
               className="atlas-panel-strong relative space-y-8 rounded-2xl p-6 sm:rounded-3xl md:p-10"
             />
 
-            <div className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:p-10">
-              <h4 className="text-muted text-xs font-semibold tracking-[0.25em] uppercase">
-                Core Metrics
-              </h4>
-              <Suspense fallback={<CoreMetricsSkeleton />}>
-                <CoreMetricsCard city={city} />
-              </Suspense>
-            </div>
+            <Suspense fallback={<CoreMetricsSkeleton />}>
+              <CoreMetricsPanel
+                city={city}
+                className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:p-10"
+              />
+            </Suspense>
           </div>
         </div>
       </div>

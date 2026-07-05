@@ -223,7 +223,10 @@ export default function RootLayout({
             >
               Skip to content
             </a>
-            <div className="flex min-h-screen flex-col">
+            {/* Mobile: reserve space for the fixed MobileBottomNav (min-h-14
+                = 3.5rem) plus the home-indicator safe area so footer links
+                are never hidden behind it. */}
+            <div className="flex min-h-screen flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
               <div className="flex flex-1 flex-col">{children}</div>
               <SiteFooter />
             </div>

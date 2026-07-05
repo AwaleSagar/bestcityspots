@@ -78,7 +78,7 @@ export default function ComparePicker({ current }: ComparePickerProps) {
           onFocus={() => results.length > 0 && setOpen(true)}
           placeholder="Search cities to compare…"
           autoComplete="off"
-          className="text-foreground placeholder:text-muted w-full bg-transparent text-sm outline-none"
+          className="text-foreground placeholder:text-muted w-full bg-transparent text-base outline-none"
           role="combobox"
           aria-expanded={open}
           aria-controls="compare-results"

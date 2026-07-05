@@ -720,7 +720,7 @@ export default function ExperiencesSection({
 
       {/* Tab Switcher with Count Badges */}
       <div className="flex flex-col gap-4">
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+        <div className="scroll-row -mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
           <div className="border-line bg-background/55 flex w-max items-center gap-1.5 rounded-2xl border p-1.5 sm:w-fit md:rounded-2xl">
             {tabs.map((tab) => {
               const Icon = tab.icon;

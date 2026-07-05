@@ -620,6 +620,19 @@ html {
   justify-content: center;
 }
 
+/* Horizontal swipe rows (tab switchers, chip rails). Contains overscroll so
+   a swipe at the row's edge doesn't trigger browser back-navigation, and
+   hides the scrollbar that otherwise renders under the pills on Android. */
+.scroll-row {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
 .container-gutter {
   padding-left: max(1rem, min(4vw, 2rem), env(safe-area-inset-left));
   padding-right: max(1rem, min(4vw, 2rem), env(safe-area-inset-right));
@@ -694,6 +707,16 @@ html {
 }
 
 /* ─── Map (US-05/US-06) ─── */
+
+/* Leaflet assigns z-index 200–700 to its panes and 1000 to its controls,
+   which beats the sticky header / mobile bottom nav (z-200) and makes the
+   map float above them while scrolling. `isolation: isolate` + z-index: 0
+   traps all of Leaflet's internal z-indexes inside the card's own stacking
+   context, so the whole map scrolls under fixed chrome like any other card. */
+.bcs-map {
+  isolation: isolate;
+  z-index: 0;
+}
 
 .bcs-map .leaflet-container {
   width: 100%;

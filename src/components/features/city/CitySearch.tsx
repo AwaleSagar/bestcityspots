@@ -4,11 +4,10 @@ import type { ReactNode } from "react";
 import { memo, useCallback, useId, useRef } from "react";
 import { cityHref, City, CitySearchResult } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Search, MapPin, ArrowRight, Activity, LocateFixed, Sparkles } from "lucide-react";
+import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react";
 import Link from "next/link";
 import { useCitySearchController } from "./useCitySearchController";
 import {
-  CITY_SEARCH_FILTERS,
   DROPDOWN_MAX_HEIGHT,
   PLACEHOLDER_HINTS,
   sanitizeSearchInput,
@@ -57,8 +56,6 @@ function CitySearch({ topCities }: CitySearchProps) {
     isLocating,
     activeIndex,
     setActiveIndex,
-    activeFilter,
-    setActiveFilter,
     placeholderIdx,
     handleKeyDown,
     handleLocate,
@@ -66,7 +63,6 @@ function CitySearch({ topCities }: CitySearchProps) {
     addRecentCity,
     isVirtualKeyboardOpen,
     adaptiveHints,
-    topFuzzyHint,
   } = useCitySearchController({ containerRef });
 
   const matchTypeLabel = useCallback((r: CitySearchResult) => {
@@ -125,7 +121,11 @@ function CitySearch({ topCities }: CitySearchProps) {
           aria-expanded={shouldShowResults}
           aria-controls={resultsListId}
           aria-activedescendant={activeOptionId}
-          className="border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full rounded-xl border py-4 pr-14 pl-12 text-sm font-semibold shadow-sm transition-all duration-300 outline-none sm:rounded-2xl md:rounded-3xl md:py-5 md:pr-18 md:pl-16 md:text-lg"
+          className={`border-line bg-surface/88 text-foreground hover:border-accent/18 focus:border-accent/28 w-full border py-4 pr-14 pl-12 text-base font-semibold shadow-sm transition-all duration-300 outline-none md:py-5 md:pr-18 md:pl-16 md:text-lg ${
+            shouldShowResults
+              ? "rounded-t-xl rounded-b-none sm:rounded-t-2xl md:rounded-t-3xl"
+              : "rounded-xl sm:rounded-2xl md:rounded-3xl"
+          }`}
         />
 
         {/* Principle 4: Contrast - Loading indicator */}
@@ -149,54 +149,33 @@ function CitySearch({ topCities }: CitySearchProps) {
         </div>
       </motion.div>
 
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 px-1 sm:px-2">
-        <div className="text-xs font-medium tracking-wide">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={
-                isLocating
-                  ? "locating"
-                  : isSearching
-                    ? "searching"
-                    : shouldShowResults && topFuzzyHint
-                      ? "hint"
-                      : shouldShowResults
-                        ? "count"
-                        : "idle"
-              }
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-              animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: -6 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: transitionEase }}
-              className="text-foreground/30 min-h-[1rem]"
-              aria-live="polite"
-            >
-              {isLocating ? (
-                <span className="text-accent">Finding your location...</span>
-              ) : isSearching ? (
-                <span className="text-accent">Searching...</span>
-              ) : shouldShowResults && topFuzzyHint ? (
-                <span className="text-muted flex items-center gap-1.5">
-                  <Sparkles className="text-accent h-3 w-3" />
-                  Did you mean <span className="text-accent font-bold">{topFuzzyHint}</span>?
-                  <span className="ml-1 opacity-40">·</span>
-                  <span className="opacity-60">{searchResults.length} results</span>
-                </span>
-              ) : shouldShowResults ? (
-                <span className="text-muted">{searchResults.length} results</span>
-              ) : null}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+      {/* Google-style seamless dropdown: no visible status text between the
+          bar and the results. Result count is still announced to screen
+          readers (WCAG 4.1.3). */}
+      <div className="sr-only" aria-live="polite">
+        {isLocating
+          ? "Finding your location"
+          : isSearching
+            ? "Searching"
+            : shouldShowResults
+              ? `${searchResults.length} results`
+              : ""}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 px-1 sm:px-2" aria-label="Adaptive search context">
-        {adaptiveHints.map((hint) => (
-          <span key={hint} className="source-chip">
-            {hint}
-          </span>
-        ))}
-      </div>
+      {/* Decorative context chips are hidden while results are open so the
+          dropdown sits tight against the search bar. */}
+      {!shouldShowResults && (
+        <div
+          className="mt-4 flex flex-wrap gap-2 px-1 sm:px-2"
+          aria-label="Adaptive search context"
+        >
+          {adaptiveHints.map((hint) => (
+            <span key={hint} className="source-chip">
+              {hint}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Progressive Disclosure - Show trending/recent when empty */}
       <AnimatePresence mode="wait">
@@ -269,54 +248,30 @@ function CitySearch({ topCities }: CitySearchProps) {
           </motion.div>
         )}
 
-        {/* Results directly below input */}
+        {/* Results attached directly to the input — square top corners meet
+            the input's square bottom corners, no margin, no interstitial
+            content. The input's own bottom border acts as the divider. */}
         {shouldShowResults && (
           <motion.div
             key="results"
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-            animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            exit={shouldReduceMotion ? undefined : { opacity: 0, y: 8 }}
-            transition={{ duration: shouldReduceMotion ? 0 : 0.3, ease: transitionEase }}
-            className={`mt-6 space-y-4 ${isVirtualKeyboardOpen ? "pb-[50vh]" : ""}`}
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
+            animate={shouldReduceMotion ? undefined : { opacity: 1 }}
+            exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.18, ease: transitionEase }}
+            className={isVirtualKeyboardOpen ? "pb-[50vh]" : ""}
             style={{
               maxHeight: isVirtualKeyboardOpen ? DROPDOWN_MAX_HEIGHT : "none",
             }}
           >
-            <motion.div className="flex gap-2 px-1 sm:px-2">
-              {CITY_SEARCH_FILTERS.map((filter) => (
-                <motion.button
-                  key={filter.id}
-                  type="button"
-                  onClick={() => setActiveFilter(activeFilter === filter.id ? null : filter.id)}
-                  whileHover={shouldReduceMotion ? undefined : { y: -1.5 }}
-                  whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
-                  transition={{ duration: 0.18, ease: transitionEase }}
-                  className={`touch-target min-h-[var(--touch-target-min)] rounded-full border px-4 py-2 text-xs font-semibold tracking-[0.14em] uppercase transition-all duration-200 ${
-                    activeFilter === filter.id
-                      ? "border-accent/24 bg-accent-soft text-accent-strong"
-                      : "border-line bg-surface/72 text-muted hover:border-accent/16 hover:text-foreground"
-                  }`}
-                >
-                  {filter.label}
-                </motion.button>
-              ))}
-            </motion.div>
             <motion.ul
               id={resultsListId}
               role="listbox"
               aria-label="City search results"
-              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-xl shadow-xl sm:rounded-2xl md:rounded-3xl ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
+              className={`glass-dropdown divide-line divide-y overflow-hidden rounded-t-none rounded-b-xl border-t-0 shadow-xl sm:rounded-b-2xl md:rounded-b-3xl ${isVirtualKeyboardOpen ? "max-h-[40vh] overflow-y-auto" : ""}`}
             >
               {searchResults.map((city, idx) => (
                 <motion.li
                   key={city.id}
-                  initial={shouldReduceMotion ? false : { opacity: 0, x: -10 }}
-                  animate={shouldReduceMotion ? undefined : { opacity: 1, x: 0 }}
-                  transition={{
-                    duration: shouldReduceMotion ? 0 : 0.32,
-                    ease: transitionEase,
-                    delay: shouldReduceMotion ? 0 : idx * 0.03,
-                  }}
                   className={`group/item cursor-pointer transition-all duration-200 ${activeIndex === idx ? "bg-accent-soft/80" : "hover:bg-surface/72"}`}
                   role="option"
                   aria-selected={activeIndex === idx}
