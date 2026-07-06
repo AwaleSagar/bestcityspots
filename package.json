@@ -26,7 +26,10 @@
     "test:metrics": "tsx scripts/test-metrics-display.ts",
     "import:cost": "tsx scripts/import-cost-index.ts",
     "test:share": "tsx scripts/test-share-list.ts",
-    "test": "npm run test:metrics && npm run test:share"
+    "test:atmosphere": "tsx scripts/test-atmosphere.ts",
+    "test:fingerprint": "tsx scripts/test-fingerprint.ts",
+    "test:mixer": "tsx scripts/test-mixer.ts",
+    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

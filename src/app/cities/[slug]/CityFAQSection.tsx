@@ -24,7 +24,7 @@ interface FAQItem {
  * for rich-result eligibility, and a `SpeakableSpecification` block so the
  * city summary is voice-search-eligible.
  */
-function buildFaqs(city: City, intro: string | null, comfort: string | null): FAQItem[] {
+export function buildFaqs(city: City, intro: string | null, comfort: string | null): FAQItem[] {
   const cityCountry = `${city.city}, ${city.country}`;
   return [
     {

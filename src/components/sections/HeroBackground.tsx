@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 
 /**
@@ -18,6 +19,16 @@ import { useReducedMotion } from "framer-motion";
  */
 export default function HeroBackground() {
   const shouldReduceMotion = useReducedMotion();
+  // Living Atlas spillover: visitors browsing in their local evening get the
+  // dusk edition of the coastal loop. Decided after mount (SSR renders the
+  // default) so hydration stays clean; the video lazy-fades in regardless.
+  const [isEvening, setIsEvening] = useState(false);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    const evening = hour >= 17 && hour < 22;
+    queueMicrotask(() => setIsEvening(evening));
+  }, []);
 
   return (
     <div className="absolute inset-0 -z-10" aria-hidden="true">
@@ -35,19 +46,31 @@ export default function HeroBackground() {
       {/* Ambient loop, layered over the still */}
       {!shouldReduceMotion && (
         <video
+          key={isEvening ? "dusk" : "day"}
           className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-1000"
           autoPlay
           muted
           loop
           playsInline
           preload="none"
-          poster="/videos/home-hero-loop-poster.webp"
+          poster={
+            isEvening ? "/videos/home-hero-loop-dusk-poster.webp" : "/videos/home-hero-loop-poster.webp"
+          }
           onCanPlay={(event) => {
             event.currentTarget.style.opacity = "1";
           }}
         >
-          <source src="/videos/home-hero-loop.webm" type="video/webm" />
-          <source src="/videos/home-hero-loop.mp4" type="video/mp4" />
+          {isEvening ? (
+            <>
+              <source src="/videos/home-hero-loop-dusk.webm" type="video/webm" />
+              <source src="/videos/home-hero-loop-dusk.mp4" type="video/mp4" />
+            </>
+          ) : (
+            <>
+              <source src="/videos/home-hero-loop.webm" type="video/webm" />
+              <source src="/videos/home-hero-loop.mp4" type="video/mp4" />
+            </>
+          )}
         </video>
       )}
 

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { cityHref, type City } from "@/lib/cities";
 import { formatPopulation } from "@/lib/format";
+import CityFingerprint from "@/components/ui/CityFingerprint";
 
 interface CityCardProps {
   city: Pick<City, "id" | "slug" | "city" | "country" | "admin_name" | "population">;
@@ -21,10 +22,13 @@ export default function CityCard({ city, context }: CityCardProps) {
       href={cityHref(city)}
       className="border-line bg-surface/65 hover:bg-surface text-foreground group flex h-full items-center justify-between gap-4 rounded-lg border px-4 py-3 transition-colors duration-200"
     >
+      <CityFingerprint
+        city={{ id: city.id, population: city.population }}
+        className="h-9 w-9 shrink-0"
+      />
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-base font-semibold tracking-tight">{city.city}</h3>
         <p className="text-muted truncate text-xs">
-          <MapPin className="mr-1 inline h-3 w-3" aria-hidden />
           {city.admin_name ? `${city.admin_name}, ${city.country}` : city.country}
         </p>
         {context ? (

@@ -120,3 +120,4 @@ bestcityspots-visual-asset-prompts.md
 # Ansible: never commit real inventory or decrypted secrets (examples are fine)
 deploy/ansible/inventory.ini
 deploy/ansible/group_vars/vault.yml
+public/_incoming/

@@ -4,8 +4,9 @@ import type { ReactNode } from "react";
 import { memo, useCallback, useId, useRef } from "react";
 import { cityHref, City, CitySearchResult } from "@/lib/cities";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Search, MapPin, ArrowRight, Activity, LocateFixed } from "lucide-react";
+import { Search, ArrowRight, Activity, LocateFixed } from "lucide-react";
 import Link from "next/link";
+import CityFingerprint from "@/components/ui/CityFingerprint";
 import { useCitySearchController } from "./useCitySearchController";
 import {
   DROPDOWN_MAX_HEIGHT,
@@ -294,12 +295,14 @@ function CitySearch({ topCities }: CitySearchProps) {
                             : "border-line bg-surface/72 group-hover/item:border-accent/16 group-hover/item:bg-accent-soft/60"
                         }`}
                       >
-                        <MapPin
-                          className={`h-4.5 w-4.5 transition-colors duration-200 md:h-5 md:w-5 ${
-                            activeIndex === idx
-                              ? "text-accent"
-                              : "text-muted group-hover/item:text-accent"
-                          }`}
+                        <CityFingerprint
+                          city={{
+                            id: city.id,
+                            lat: city.lat,
+                            lng: city.lng,
+                            population: city.population,
+                          }}
+                          className="h-8 w-8 md:h-9 md:w-9"
                         />
                       </div>
                       <div className="min-w-0">

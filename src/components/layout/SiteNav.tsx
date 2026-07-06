@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MapPinned } from "lucide-react";
 import DesktopNavLinks from "@/components/layout/DesktopNavLinks";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import PaletteTrigger from "@/components/features/palette/PaletteTrigger";
 
 export default function SiteNav() {
   return (
@@ -22,6 +23,7 @@ export default function SiteNav() {
 
         <div className="flex shrink-0 items-center gap-1">
           <DesktopNavLinks />
+          <PaletteTrigger />
           <ThemeToggle />
         </div>
       </div>

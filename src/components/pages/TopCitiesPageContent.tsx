@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Globe2, MapPinned, Users } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import PrioritiesMixer from "@/components/features/mixer/PrioritiesMixer";
 import { formatPopulation } from "@/lib/format";
 import { cityHref } from "@/lib/cities";
 
@@ -188,6 +189,12 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
               </div>
             </ScrollReveal>
           </header>
+
+          {/* Priorities Mixer (innovation proposal Idea 3): private,
+              client-side re-ranking over the public metrics cache. */}
+          <ScrollReveal animation="fade-up">
+            <PrioritiesMixer cities={cities} />
+          </ScrollReveal>
 
           <section className="mt-12">
             <div className="labelled-rule">Featured Cities</div>

@@ -39,7 +39,12 @@ export default function MobileBottomNav() {
                 }`}
                 aria-current={isActive ? "page" : undefined}
               >
-                <Icon className="h-5 w-5" aria-hidden />
+                <Icon
+                  className={`h-5 w-5 transition-transform duration-200 motion-reduce:transform-none ${
+                    isActive ? "-translate-y-0.5 scale-110" : ""
+                  }`}
+                  aria-hidden
+                />
                 <span className="text-xs font-medium">{label}</span>
               </Link>
             </li>

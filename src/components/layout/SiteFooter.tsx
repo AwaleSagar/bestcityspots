@@ -8,6 +8,7 @@ const exploreLinks = [
   { href: "/resources/top-cities", label: "Top cities" },
   { href: "/best-cities-by-air-quality", label: "Cleanest air" },
   { href: "/best-cities-for-digital-nomads", label: "For digital nomads" },
+  { href: "/passport", label: "Your passport" },
 ] as const;
 
 const companyLinks = [

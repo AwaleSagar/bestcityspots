@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Instrument_Sans } from "next/font/google";
 import { AnalyticsProvider, PageTracker } from "@/components/analytics";
 import LazyGeoConsentBanner from "@/components/analytics/LazyGeoConsentBanner";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import CommandPalette from "@/components/features/palette/CommandPalette";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SiteNav from "@/components/layout/SiteNav";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
@@ -231,6 +232,7 @@ export default function RootLayout({
               <SiteFooter />
             </div>
             <MobileBottomNav />
+            <CommandPalette />
             <LazyGeoConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>

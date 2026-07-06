@@ -15,11 +15,14 @@ import ExperiencesSkeleton from "./ExperiencesSkeleton";
 import AIBriefingSection from "./AIBriefingSection";
 import AIBriefingSkeleton from "./AIBriefingSkeleton";
 import CityFAQSection from "./CityFAQSection";
+import BriefingChips from "./BriefingChips";
 import CityRelatedSection from "./CityRelatedSection";
 import CityPlanningPanel from "./CityPlanningPanel";
 import CityTravelEssentialsSection from "./CityTravelEssentialsSection";
 import CityVitals from "@/components/features/city/CityVitals";
 import CityMap from "@/components/features/city/CityMap";
+import CityAtmosphere from "@/components/features/city/CityAtmosphere";
+import SeasonalityDial from "@/components/features/city/SeasonalityDial";
 import {
   MapPin,
   Users,
@@ -501,7 +504,10 @@ function ReducedCityPage({
   breadcrumbJsonLd: object;
 }) {
   return (
-    <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
+    <main
+      id="main-content"
+      className="text-foreground relative min-h-screen bg-transparent font-sans"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(touristJsonLd) }}
@@ -511,6 +517,10 @@ function ReducedCityPage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <CityViewTracker cityId={city.id} />
+      {/* Living Atlas backdrop — same treatment as the full profile. */}
+      <Suspense fallback={null}>
+        <CityAtmosphere lat={city.lat} lng={city.lng} weatherPromise={getCachedCityWeather(city)} />
+      </Suspense>
       <div
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
@@ -741,7 +751,10 @@ export default async function CityPage({
   const finalLat = validCoords.lat ?? city.lat;
   const finalLng = validCoords.lng ?? city.lng;
   return (
-    <main id="main-content" className="text-foreground min-h-screen bg-transparent font-sans">
+    <main
+      id="main-content"
+      className="text-foreground relative min-h-screen bg-transparent font-sans"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(touristJsonLd) }}
@@ -751,6 +764,11 @@ export default async function CityPage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
       <CityViewTracker cityId={city.id} />
+      {/* Living Atlas: decorative sky reacting to the city's local daylight
+          and cached weather. Suspense-isolated so it never blocks the page. */}
+      <Suspense fallback={null}>
+        <CityAtmosphere lat={finalLat} lng={finalLng} weatherPromise={getCachedCityWeather(city)} />
+      </Suspense>
       <div
         className="container-gutter mx-auto max-w-5xl px-4 py-12 sm:px-6"
         style={{ paddingTop: "max(3rem, calc(env(safe-area-inset-top, 0px) + 4rem))" }}
@@ -794,7 +812,7 @@ export default async function CityPage({
                   Public data
                 </span>
               </div>
-              <h1 className="text-foreground block text-[clamp(2.4rem,6vw,4.6rem)] leading-[0.95] break-words">
+              <h1 className="text-foreground animate-fade-up block text-[clamp(2.4rem,6vw,4.6rem)] leading-[0.95] break-words">
                 {city.city}{" "}
                 <span className="text-muted-strong text-[0.42em] tracking-[0.18em] uppercase">
                   Travel Guide
@@ -815,6 +833,12 @@ export default async function CityPage({
 
             <Suspense fallback={<AIBriefingSkeleton />}>
               <AIBriefingSection city={city} />
+            </Suspense>
+
+            {/* Anticipatory follow-up chips (proposal Idea 7) — cached FAQ
+                answers as inline disclosures, zero request-time AI. */}
+            <Suspense fallback={null}>
+              <BriefingChips city={city} />
             </Suspense>
 
             <section className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:gap-8">
@@ -866,6 +890,10 @@ export default async function CityPage({
               capital={city.capital}
               population={city.population}
             />
+
+            {/* Seasonality dial (proposal Idea 5): month wheel routing into
+                the best-cities-to-visit-in hubs. */}
+            <SeasonalityDial cityName={city.city} lat={finalLat} />
 
             {/* Mobile-only CTA - shown before experiences */}
             <CityPlanningPanel

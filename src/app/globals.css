@@ -706,6 +706,256 @@ html {
   animation: pulse-glow 5s ease-in-out infinite;
 }
 
+/* ─── Seasonality dial ─── */
+
+.season-dial-wedge {
+  transition:
+    opacity 0.2s ease,
+    stroke 0.2s ease;
+  cursor: pointer;
+}
+
+.season-dial a:hover .season-dial-wedge,
+.season-dial a:focus-visible .season-dial-wedge {
+  opacity: 1;
+}
+
+.season-dial-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  fill: var(--color-background);
+  pointer-events: none;
+}
+
+.season-dial-center {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  fill: var(--color-muted);
+}
+
+.season-dial-center-month {
+  font-size: 0.85rem;
+  font-weight: 700;
+  fill: var(--color-foreground);
+}
+
+/* ─── Atlas Passport ─── */
+
+.passport-stamp {
+  display: block;
+  border: 1.5px dashed color-mix(in oklab, var(--color-accent) 24%, var(--color-line));
+  border-radius: 1.25rem;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  background: color-mix(in oklab, var(--color-surface) 65%, transparent);
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+  transform: rotate(var(--stamp-tilt, 0deg));
+}
+
+.passport-stamp:nth-child(3n) {
+  --stamp-tilt: -1.2deg;
+}
+
+.passport-stamp:nth-child(3n + 2) {
+  --stamp-tilt: 0.9deg;
+}
+
+.passport-stamp:hover {
+  border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-line));
+  transform: rotate(0deg) scale(1.02);
+}
+
+.passport-stamp svg {
+  margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .passport-stamp,
+  .passport-stamp:hover {
+    transform: none;
+  }
+}
+
+/* ─── Briefing chips (anticipatory Q&A) ─── */
+
+.briefing-chip {
+  border: 1px solid var(--color-line);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--color-surface) 72%, transparent);
+  transition: border-color 0.2s ease;
+}
+
+.briefing-chip[open],
+.briefing-chip:hover {
+  border-color: color-mix(in oklab, var(--color-accent) 18%, var(--color-line));
+}
+
+.briefing-chip-summary {
+  cursor: pointer;
+  list-style: none;
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.briefing-chip-summary::-webkit-details-marker {
+  display: none;
+}
+
+.briefing-chip-summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.briefing-chip[open] .briefing-chip-summary::after {
+  content: "–";
+}
+
+/* ─── Command palette ─── */
+
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: color-mix(in oklab, var(--color-foreground) 22%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.palette-panel {
+  width: 100%;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.25rem 1.25rem 0 0;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.palette-results {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (min-width: 640px) {
+  .palette-overlay {
+    align-items: flex-start;
+    padding: 12vh 1.5rem 0;
+  }
+
+  .palette-panel {
+    max-width: 34rem;
+    max-height: 60vh;
+    border-radius: 1.25rem;
+  }
+}
+
+/* ─── Priorities Mixer ─── */
+
+.mixer-slider {
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-accent) 14%, var(--color-line));
+  outline-offset: 4px;
+  cursor: pointer;
+}
+
+.mixer-slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-background);
+  box-shadow: var(--shadow-sm);
+}
+
+.mixer-slider::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-background);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The balance illustration bakes a paper background; soften it on charcoal. */
+.dark .mixer-empty-art {
+  opacity: 0.85;
+  filter: brightness(0.92);
+  border-radius: 1rem;
+}
+
+/* ─── Living Atlas (weather-reactive city atmosphere) ─── */
+
+/* Decorative backdrop behind the city-page hero. The plate image lazy-loads
+   and fades in so LCP stays on text; the veil carries the temperature tint.
+   Bottom mask dissolves into the page background on both themes. */
+.atlas-atmosphere {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: min(68vh, 620px);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -1;
+  mask-image: linear-gradient(to bottom, black 45%, transparent 96%);
+  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 96%);
+  --atlas-opacity: 0.38;
+}
+
+.dark .atlas-atmosphere {
+  --atlas-opacity: 0.28;
+}
+
+.atlas-atmosphere-img {
+  object-fit: cover;
+  opacity: 0;
+  transform-origin: center;
+  animation:
+    atlas-fade-in 1.4s ease-out 0.15s forwards,
+    atlas-drift var(--atlas-drift-duration, 80s) ease-in-out infinite alternate;
+}
+
+.atlas-atmosphere-veil {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 75% at 50% 0%, var(--atlas-tint, transparent), transparent 72%);
+}
+
+@keyframes atlas-fade-in {
+  to {
+    opacity: var(--atlas-opacity, 0.38);
+  }
+}
+
+@keyframes atlas-drift {
+  from {
+    transform: scale(1.06) translateX(-1.25%);
+  }
+  to {
+    transform: scale(1.06) translateX(1.25%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-atmosphere-img {
+    animation: atlas-fade-in 0.01s forwards;
+    transform: scale(1.03);
+  }
+}
+
 /* ─── Map (US-05/US-06) ─── */
 
 /* Leaflet assigns z-index 200–700 to its panes and 1000 to its controls,
