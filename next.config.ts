@@ -10,6 +10,13 @@ try {
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // D1 View Transitions (redesign 2026 H2): enables the browser View Transitions
+  // API for App Router navigations. Default is a tuned cross-fade; the city
+  // hero gets a named transition so city→city navigations morph the hero.
+  // Reduced-motion users get instant navigation (see globals.css guard).
+  experimental: {
+    viewTransition: true,
+  },
   images: {
     qualities: [75, 85],
     remotePatterns: [

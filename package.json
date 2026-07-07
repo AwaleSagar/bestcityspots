@@ -29,7 +29,12 @@
     "test:atmosphere": "tsx scripts/test-atmosphere.ts",
     "test:fingerprint": "tsx scripts/test-fingerprint.ts",
     "test:mixer": "tsx scripts/test-mixer.ts",
-    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer"
+    "test:warm-priority": "tsx scripts/test-warm-priority.ts",
+    "design:scrape": "tsx scripts/design-scrape/run.ts",
+    "design:aggregate": "tsx scripts/design-scrape/aggregate.ts",
+    "design:signals": "tsx scripts/design-scrape/signals.ts",
+    "design:components": "tsx scripts/design-scrape/components.ts",
+    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer && npm run test:warm-priority"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -421,6 +421,24 @@
       when: warm_cache_cron | bool
       tags: [cron]
 
+    # Photo pre-warmer: places + POI photos (Supabase Storage + BlurHash) for
+    # the priority city list — analytics demand → curated global popularity →
+    # population (see src/lib/warm-priority.ts). Runs after the data warmer so
+    # place rows are fresh; claims from the same durable daily budget, so the
+    # two crons together can never exceed the provider envelope.
+    - name: Nightly photo pre-warm cron (priority cities, budget-bounded)
+      ansible.builtin.cron:
+        name: "bestcityspots photo pre-warm"
+        user: "{{ app_user }}"
+        minute: "40"
+        hour: "3"
+        job: >-
+          cd {{ app_dir }} && set -a && . ./.env.production && set +a &&
+          npm run warm-top-cities -- --limit=60 --no-ai
+          >> /var/log/bcs-warm-photos.log 2>&1
+      when: warm_cache_cron | bool
+      tags: [cron]
+
   # ---------------------------------------------------------------------------
   post_tasks:
     - name: "Verify · origin port 3000 is NOT reachable externally"

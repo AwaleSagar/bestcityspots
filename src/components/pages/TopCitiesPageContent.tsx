@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Globe2, MapPinned, Users } from "lucide-react";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import TrendingBadge from "@/components/ui/TrendingBadge";
 import PrioritiesMixer from "@/components/features/mixer/PrioritiesMixer";
 import { formatPopulation } from "@/lib/format";
 import { cityHref } from "@/lib/cities";
@@ -20,6 +21,8 @@ interface City {
   lat: number;
   lng: number;
   population: number;
+  /** §3: true when this city is in the audience-demand top decile. */
+  trending?: boolean;
 }
 
 interface TopCitiesPageContentProps {
@@ -70,6 +73,7 @@ function CityCard({ city, rank }: { city: City; rank: number }) {
         </div>
         <div className="flex items-center gap-2">
           {city.capital === "primary" ? <span className="badge-featured">Capital</span> : null}
+          {city.trending ? <TrendingBadge /> : null}
           <ArrowRight className="text-accent h-4 w-4" aria-hidden />
         </div>
       </div>
@@ -256,11 +260,7 @@ export default function TopCitiesPageContent({ cities }: TopCitiesPageContentPro
                     Go to explorer
                     <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <button
-                    type="button"
-                    onClick={scrollToTop}
-                    className="btn-secondary"
-                  >
+                  <button type="button" onClick={scrollToTop} className="btn-secondary">
                     Back to top
                   </button>
                 </div>

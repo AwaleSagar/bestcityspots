@@ -1,0 +1,733 @@
+{
+  "generated": "2026-07-07T05:10:12.662Z",
+  "sourceCount": 98,
+  "summary": {
+    "buttonPrimary": {
+      "n": 67,
+      "radius": {
+        "sharp": 21,
+        "soft": 19,
+        "rounded": 6,
+        "pill": 21
+      },
+      "radiusDominant": "sharp",
+      "fillDominant": "brand",
+      "flatPct": "87%",
+      "peersForCitation": [
+        "AFAR",
+        "BBC Travel",
+        "Booking.com",
+        "Citymapper",
+        "Context Travel"
+      ]
+    },
+    "buttonSecondary": {
+      "n": 56,
+      "radius": {
+        "sharp": 25,
+        "soft": 17,
+        "rounded": 7,
+        "pill": 7
+      },
+      "radiusDominant": "sharp",
+      "fillDominant": "light",
+      "flatPct": "88%",
+      "peersForCitation": [
+        "AFAR",
+        "Agoda",
+        "Best Cities",
+        "Booking.com",
+        "Expatistan"
+      ]
+    },
+    "input": {
+      "n": 70,
+      "radius": {
+        "sharp": 50,
+        "soft": 10,
+        "rounded": 1,
+        "pill": 9
+      },
+      "radiusDominant": "sharp",
+      "fillDominant": "ghost",
+      "flatPct": "89%",
+      "peersForCitation": [
+        "AFAR",
+        "Agoda",
+        "Atlas Obscura",
+        "Context Travel",
+        "Culture Trip"
+      ]
+    }
+  },
+  "details": {
+    "buttonPrimary": {
+      "sampleCount": 67,
+      "radiusBuckets": {
+        "sharp": 21,
+        "soft": 19,
+        "rounded": 6,
+        "pill": 21
+      },
+      "fillTypes": {
+        "brand": 40,
+        "light": 6,
+        "dark": 19,
+        "ghost": 2
+      },
+      "flatCount": 58,
+      "examples": {
+        "sharp": [
+          {
+            "slug": "afar",
+            "name": "AFAR",
+            "url": "https://www.afar.com",
+            "segment": "magazine",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "brand",
+            "flat": true
+          },
+          {
+            "slug": "atlas-obscura",
+            "name": "Atlas Obscura",
+            "url": "https://www.atlasobscura.com",
+            "segment": "city-guide",
+            "radiusPx": 3,
+            "radiusBucket": "sharp",
+            "fill": "dark",
+            "flat": true
+          },
+          {
+            "slug": "bbc-travel",
+            "name": "BBC Travel",
+            "url": "https://www.bbc.com/travel",
+            "segment": "magazine",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "brand",
+            "flat": true
+          }
+        ],
+        "soft": [
+          {
+            "slug": "best-cities",
+            "name": "Best Cities",
+            "url": "https://www.bestcities.org",
+            "segment": "rankings",
+            "radiusPx": 6,
+            "radiusBucket": "soft",
+            "fill": "dark",
+            "flat": true
+          },
+          {
+            "slug": "devour-barcelona",
+            "name": "Devour Barcelona",
+            "url": "https://www.devourbarcelonafoodtours.com",
+            "segment": "experiences",
+            "radiusPx": 8,
+            "radiusBucket": "soft",
+            "fill": "ghost",
+            "flat": true
+          },
+          {
+            "slug": "expatistan",
+            "name": "Expatistan",
+            "url": "https://www.expatistan.com",
+            "segment": "digital-nomad",
+            "radiusPx": 12,
+            "radiusBucket": "soft",
+            "fill": "brand",
+            "flat": false
+          }
+        ],
+        "rounded": [
+          {
+            "slug": "eating-europe",
+            "name": "Eating Europe",
+            "url": "https://www.eatingeurope.com",
+            "segment": "experiences",
+            "radiusPx": 23,
+            "radiusBucket": "rounded",
+            "fill": "brand",
+            "flat": true
+          },
+          {
+            "slug": "google-flights",
+            "name": "Google Flights",
+            "url": "https://www.google.com/travel/flights",
+            "segment": "transit",
+            "radiusPx": 24,
+            "radiusBucket": "rounded",
+            "fill": "brand",
+            "flat": false
+          },
+          {
+            "slug": "google-travel",
+            "name": "Google Travel",
+            "url": "https://www.google.com/travel",
+            "segment": "transit",
+            "radiusPx": 24,
+            "radiusBucket": "rounded",
+            "fill": "brand",
+            "flat": false
+          }
+        ],
+        "pill": [
+          {
+            "slug": "agoda",
+            "name": "Agoda",
+            "url": "https://www.agoda.com",
+            "segment": "marketplace",
+            "radiusPx": 999,
+            "radiusBucket": "pill",
+            "fill": "dark",
+            "flat": true
+          },
+          {
+            "slug": "citymapper",
+            "name": "Citymapper",
+            "url": "https://citymapper.com",
+            "segment": "transit",
+            "radiusPx": 96,
+            "radiusBucket": "pill",
+            "fill": "brand",
+            "flat": true
+          },
+          {
+            "slug": "getyourguide",
+            "name": "GetYourGuide",
+            "url": "https://www.getyourguide.com",
+            "segment": "experiences",
+            "radiusPx": 80,
+            "radiusBucket": "pill",
+            "fill": "dark",
+            "flat": true
+          }
+        ]
+      },
+      "notablePeers": [
+        {
+          "slug": "afar",
+          "name": "AFAR",
+          "url": "https://www.afar.com",
+          "segment": "magazine",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "bbc-travel",
+          "name": "BBC Travel",
+          "url": "https://www.bbc.com/travel",
+          "segment": "magazine",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "booking",
+          "name": "Booking.com",
+          "url": "https://www.booking.com",
+          "segment": "marketplace",
+          "radiusPx": 4,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "citymapper",
+          "name": "Citymapper",
+          "url": "https://citymapper.com",
+          "segment": "transit",
+          "radiusPx": 96,
+          "radiusBucket": "pill",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "context-travel",
+          "name": "Context Travel",
+          "url": "https://www.contexttravel.com",
+          "segment": "experiences",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "eating-europe",
+          "name": "Eating Europe",
+          "url": "https://www.eatingeurope.com",
+          "segment": "experiences",
+          "radiusPx": 23,
+          "radiusBucket": "rounded",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "foursquare",
+          "name": "Foursquare",
+          "url": "https://foursquare.com",
+          "segment": "discovery",
+          "radiusPx": 6,
+          "radiusBucket": "soft",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "gadventures",
+          "name": "G Adventures",
+          "url": "https://www.gadventures.com",
+          "segment": "experiences",
+          "radiusPx": 4,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        }
+      ]
+    },
+    "buttonSecondary": {
+      "sampleCount": 56,
+      "radiusBuckets": {
+        "sharp": 25,
+        "soft": 17,
+        "rounded": 7,
+        "pill": 7
+      },
+      "fillTypes": {
+        "brand": 6,
+        "light": 31,
+        "dark": 10,
+        "ghost": 9
+      },
+      "flatCount": 49,
+      "examples": {
+        "sharp": [
+          {
+            "slug": "afar",
+            "name": "AFAR",
+            "url": "https://www.afar.com",
+            "segment": "magazine",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "brand",
+            "flat": true
+          },
+          {
+            "slug": "atlas-obscura",
+            "name": "Atlas Obscura",
+            "url": "https://www.atlasobscura.com",
+            "segment": "city-guide",
+            "radiusPx": 3,
+            "radiusBucket": "sharp",
+            "fill": "ghost",
+            "flat": true
+          },
+          {
+            "slug": "bbc-travel",
+            "name": "BBC Travel",
+            "url": "https://www.bbc.com/travel",
+            "segment": "magazine",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "ghost",
+            "flat": true
+          }
+        ],
+        "soft": [
+          {
+            "slug": "best-cities",
+            "name": "Best Cities",
+            "url": "https://www.bestcities.org",
+            "segment": "rankings",
+            "radiusPx": 6,
+            "radiusBucket": "soft",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "foursquare",
+            "name": "Foursquare",
+            "url": "https://foursquare.com",
+            "segment": "discovery",
+            "radiusPx": 6,
+            "radiusBucket": "soft",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "headout",
+            "name": "Headout",
+            "url": "https://www.headout.com",
+            "segment": "experiences",
+            "radiusPx": 8,
+            "radiusBucket": "soft",
+            "fill": "light",
+            "flat": true
+          }
+        ],
+        "rounded": [
+          {
+            "slug": "citymapper",
+            "name": "Citymapper",
+            "url": "https://citymapper.com",
+            "segment": "transit",
+            "radiusPx": 20,
+            "radiusBucket": "rounded",
+            "fill": "light",
+            "flat": false
+          },
+          {
+            "slug": "google-flights",
+            "name": "Google Flights",
+            "url": "https://www.google.com/travel/flights",
+            "segment": "transit",
+            "radiusPx": 18,
+            "radiusBucket": "rounded",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "google-travel",
+            "name": "Google Travel",
+            "url": "https://www.google.com/travel",
+            "segment": "transit",
+            "radiusPx": 18,
+            "radiusBucket": "rounded",
+            "fill": "light",
+            "flat": true
+          }
+        ],
+        "pill": [
+          {
+            "slug": "agoda",
+            "name": "Agoda",
+            "url": "https://www.agoda.com",
+            "segment": "marketplace",
+            "radiusPx": 999,
+            "radiusBucket": "pill",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "eating-europe",
+            "name": "Eating Europe",
+            "url": "https://www.eatingeurope.com",
+            "segment": "experiences",
+            "radiusPx": 25,
+            "radiusBucket": "pill",
+            "fill": "dark",
+            "flat": true
+          },
+          {
+            "slug": "lonely-planet",
+            "name": "Lonely Planet",
+            "url": "https://www.lonelyplanet.com",
+            "segment": "city-guide",
+            "radiusPx": 33554400,
+            "radiusBucket": "pill",
+            "fill": "ghost",
+            "flat": true
+          }
+        ]
+      },
+      "notablePeers": [
+        {
+          "slug": "afar",
+          "name": "AFAR",
+          "url": "https://www.afar.com",
+          "segment": "magazine",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "agoda",
+          "name": "Agoda",
+          "url": "https://www.agoda.com",
+          "segment": "marketplace",
+          "radiusPx": 999,
+          "radiusBucket": "pill",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "best-cities",
+          "name": "Best Cities",
+          "url": "https://www.bestcities.org",
+          "segment": "rankings",
+          "radiusPx": 6,
+          "radiusBucket": "soft",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "booking",
+          "name": "Booking.com",
+          "url": "https://www.booking.com",
+          "segment": "marketplace",
+          "radiusPx": 4,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "expatistan",
+          "name": "Expatistan",
+          "url": "https://www.expatistan.com",
+          "segment": "digital-nomad",
+          "radiusPx": 2,
+          "radiusBucket": "sharp",
+          "fill": "brand",
+          "flat": true
+        },
+        {
+          "slug": "foursquare",
+          "name": "Foursquare",
+          "url": "https://foursquare.com",
+          "segment": "discovery",
+          "radiusPx": 6,
+          "radiusBucket": "soft",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "google-flights",
+          "name": "Google Flights",
+          "url": "https://www.google.com/travel/flights",
+          "segment": "transit",
+          "radiusPx": 18,
+          "radiusBucket": "rounded",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "google-travel",
+          "name": "Google Travel",
+          "url": "https://www.google.com/travel",
+          "segment": "transit",
+          "radiusPx": 18,
+          "radiusBucket": "rounded",
+          "fill": "light",
+          "flat": true
+        }
+      ]
+    },
+    "input": {
+      "sampleCount": 70,
+      "radiusBuckets": {
+        "sharp": 50,
+        "soft": 10,
+        "rounded": 1,
+        "pill": 9
+      },
+      "fillTypes": {
+        "brand": 0,
+        "light": 30,
+        "dark": 4,
+        "ghost": 36
+      },
+      "flatCount": 62,
+      "examples": {
+        "sharp": [
+          {
+            "slug": "afar",
+            "name": "AFAR",
+            "url": "https://www.afar.com",
+            "segment": "magazine",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "africa-alive",
+            "name": "Singita",
+            "url": "https://www.singita.com",
+            "segment": "luxury",
+            "radiusPx": 0,
+            "radiusBucket": "sharp",
+            "fill": "ghost",
+            "flat": true
+          },
+          {
+            "slug": "agoda",
+            "name": "Agoda",
+            "url": "https://www.agoda.com",
+            "segment": "marketplace",
+            "radiusPx": 4,
+            "radiusBucket": "sharp",
+            "fill": "light",
+            "flat": true
+          }
+        ],
+        "soft": [
+          {
+            "slug": "best-cities",
+            "name": "Best Cities",
+            "url": "https://www.bestcities.org",
+            "segment": "rankings",
+            "radiusPx": 8,
+            "radiusBucket": "soft",
+            "fill": "dark",
+            "flat": true
+          },
+          {
+            "slug": "citymapper",
+            "name": "Citymapper",
+            "url": "https://citymapper.com",
+            "segment": "transit",
+            "radiusPx": 5,
+            "radiusBucket": "soft",
+            "fill": "ghost",
+            "flat": true
+          },
+          {
+            "slug": "helo",
+            "name": "HelloTickets",
+            "url": "https://www.hellotickets.com",
+            "segment": "experiences",
+            "radiusPx": 12,
+            "radiusBucket": "soft",
+            "fill": "ghost",
+            "flat": true
+          }
+        ],
+        "rounded": [
+          {
+            "slug": "hostelworld",
+            "name": "Hostelworld",
+            "url": "https://www.hostelworld.com",
+            "segment": "marketplace",
+            "radiusPx": 16,
+            "radiusBucket": "rounded",
+            "fill": "light",
+            "flat": true
+          }
+        ],
+        "pill": [
+          {
+            "slug": "frommers",
+            "name": "Frommer's",
+            "url": "https://www.frommers.com",
+            "segment": "city-guide",
+            "radiusPx": 44,
+            "radiusBucket": "pill",
+            "fill": "ghost",
+            "flat": true
+          },
+          {
+            "slug": "gadventures",
+            "name": "G Adventures",
+            "url": "https://www.gadventures.com",
+            "segment": "experiences",
+            "radiusPx": 999,
+            "radiusBucket": "pill",
+            "fill": "light",
+            "flat": true
+          },
+          {
+            "slug": "hotels",
+            "name": "Hotels.com",
+            "url": "https://www.hotels.com",
+            "segment": "marketplace",
+            "radiusPx": 40,
+            "radiusBucket": "pill",
+            "fill": "light",
+            "flat": true
+          }
+        ]
+      },
+      "notablePeers": [
+        {
+          "slug": "afar",
+          "name": "AFAR",
+          "url": "https://www.afar.com",
+          "segment": "magazine",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "agoda",
+          "name": "Agoda",
+          "url": "https://www.agoda.com",
+          "segment": "marketplace",
+          "radiusPx": 4,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "atlas-obscura",
+          "name": "Atlas Obscura",
+          "url": "https://www.atlasobscura.com",
+          "segment": "city-guide",
+          "radiusPx": 3,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "context-travel",
+          "name": "Context Travel",
+          "url": "https://www.contexttravel.com",
+          "segment": "experiences",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "culture-trip",
+          "name": "Culture Trip",
+          "url": "https://theculturetrip.com",
+          "segment": "city-guide",
+          "radiusPx": 4,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "gadventures",
+          "name": "G Adventures",
+          "url": "https://www.gadventures.com",
+          "segment": "experiences",
+          "radiusPx": 999,
+          "radiusBucket": "pill",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "headout",
+          "name": "Headout",
+          "url": "https://www.headout.com",
+          "segment": "experiences",
+          "radiusPx": 0,
+          "radiusBucket": "sharp",
+          "fill": "light",
+          "flat": true
+        },
+        {
+          "slug": "hostelworld",
+          "name": "Hostelworld",
+          "url": "https://www.hostelworld.com",
+          "segment": "marketplace",
+          "radiusPx": 16,
+          "radiusBucket": "rounded",
+          "fill": "light",
+          "flat": true
+        }
+      ]
+    }
+  },
+  "citation": {
+    "purpose": "Peer evidence for component decisions. Each redesign choice cites the dominant field pattern and our deliberate divergence where applicable.",
+    "generatedBy": "scripts/design-scrape/components.ts"
+  }
+}

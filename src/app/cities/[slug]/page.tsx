@@ -137,9 +137,7 @@ async function CoreMetricsPanel({
 
   return (
     <div className={className}>
-      <h4 className="text-muted text-xs font-semibold tracking-[0.25em] uppercase">
-        Core Metrics
-      </h4>
+      <h4 className="text-muted text-xs font-semibold tracking-[0.25em] uppercase">Core Metrics</h4>
       <div className="mt-6 grid grid-cols-1 gap-4">
         {rows.map((row) => (
           <MetricCard
@@ -799,7 +797,7 @@ export default async function CityPage({
         <div className="grid grid-cols-1 items-start gap-10 sm:gap-14 lg:grid-cols-12 lg:gap-20">
           {/* Main Info Column */}
           <div className="space-y-14 lg:col-span-8">
-            <header className="organic-panel relative overflow-visible rounded-2xl p-5 sm:rounded-3xl md:rounded-4xl md:p-8">
+            <header className="city-hero-transition organic-panel relative overflow-visible rounded-2xl p-5 sm:rounded-3xl md:rounded-4xl md:p-8">
               <div className="animate-pulse-glow pointer-events-none absolute -top-20 -left-20 -z-10 h-72 w-72 rounded-full bg-[color:var(--color-accent-soft)] blur-[150px]" />
               <div className="mb-3 flex flex-wrap items-center gap-3 md:mb-4">
                 <span className="eyebrow">
@@ -830,6 +828,11 @@ export default async function CityPage({
                 </Suspense>
               </div>
             </header>
+
+            {/* B2 scrollytelling order: "when to go" answers the second question
+                a traveler has, so the Seasonality Dial moves up immediately after
+                the arrival header — ahead of the briefing, vitals, and essentials. */}
+            <SeasonalityDial cityName={city.city} lat={finalLat} />
 
             <Suspense fallback={<AIBriefingSkeleton />}>
               <AIBriefingSection city={city} />
@@ -890,10 +893,6 @@ export default async function CityPage({
               capital={city.capital}
               population={city.population}
             />
-
-            {/* Seasonality dial (proposal Idea 5): month wheel routing into
-                the best-cities-to-visit-in hubs. */}
-            <SeasonalityDial cityName={city.city} lat={finalLat} />
 
             {/* Mobile-only CTA - shown before experiences */}
             <CityPlanningPanel

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import CityCard from "@/components/seo/CityCard";
+import MixerAffordance from "@/components/ui/MixerAffordance";
 import type { CityWithMetric } from "@/lib/topical-hubs";
 
 interface TopicalHubLayoutProps {
@@ -55,6 +56,10 @@ export default function TopicalHubLayout({
           </Link>
           .
         </p>
+
+        {/* B4: mixer everywhere — one-line affordance reusing stored weights
+            so every hub feels personal. Progressive enhancement (client-only). */}
+        <MixerAffordance />
 
         <section aria-labelledby="ranked-cities-heading" className="mt-10">
           <h2

@@ -2,7 +2,16 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-/* ─── Tailwind Theme (radius scale — keep utilities and tokens in sync) ─── */
+/* ─── Tailwind Theme (radius scale — keep utilities and tokens in sync) ───
+   A3 three-step component-radius law (redesign 2026 H2, evidenced against
+   docs/component-patterns.json, n=181 component samples across 98 peers):
+     • pill  → rounded-full / --radius-full : actions (buttons) + chips
+     • xl    → rounded-xl  / --radius-xl    : cards, panels, stamps
+     • md    → rounded-md  / --radius-md    : inputs + inline controls
+   The field clusters sharp (96/181 at 0–4px) — our soft scale is the
+   documented divergence (see competitor-design-signals.md). Kill one-off
+   intermediate values; do not introduce rounded-lg / rounded-2xl on cards
+   or actions. */
 
 @theme {
   --radius-sm: 0.5rem;
@@ -35,6 +44,15 @@
   --color-muted-strong: oklch(0.4 0.018 55);
   --color-line: color-mix(in oklab, var(--foreground) 8%, transparent);
   --color-accent: oklch(0.642 0.187 31); /* Coral Spark #E8543F — icons/identity (3.4:1 UI) */
+  /* A1 Coral discipline (redesign 2026 H2). Coral appears in exactly three
+     roles — (1) primary action fills (via --color-accent-strong/Clay Press,
+     never raw Coral Spark which fails 4.5:1 with light text), (2) active /
+     current / focus states, (3) one hero moment per viewport (e.g. the
+     search-shell glow). Everything decorative steps down to a low-opacity
+     color-mix tint, Dune Gold, or the cool counterweights. Evidence: only
+     21/98 peers ship a saturated warm primary, and most are muted ochres —
+     coral's distinction comes from scarcity + hue, not presence. Audit log
+     lives in docs/design-tokens.md §Coral usage. */
   --color-accent-strong: oklch(
     0.555 0.169 31
   ); /* Clay Press #C2402E — links 4.8:1, btn fill 4.9:1 */
@@ -414,6 +432,8 @@ html {
 .intent-card {
   position: relative;
   overflow: hidden;
+  /* A3: card → --radius-xl. */
+  border-radius: var(--radius-xl);
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   transition:
@@ -448,21 +468,31 @@ html {
 /* ─── Cards ─── */
 
 .atlas-frame {
+  /* A3: cards/panels → --radius-xl (soft signature; field skews sharp). */
+  border-radius: var(--radius-xl);
   border: 1px solid var(--color-line);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
 }
 
 .atlas-panel {
+  /* C glass-2.0: 1px inner light edge + small lift, no new blur layer
+     (INP budget is a hard constraint — no backdrop-filter here). */
+  border-radius: var(--radius-xl);
   border: 1px solid var(--color-line);
   background: var(--color-surface);
-  box-shadow: none;
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 color-mix(in oklab, var(--color-elevated) 60%, transparent);
 }
 
 .atlas-panel-strong {
+  border-radius: var(--radius-xl);
   border: 1px solid color-mix(in oklab, var(--color-accent) 10%, var(--color-line));
   background: var(--color-surface-strong);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 color-mix(in oklab, var(--color-elevated) 60%, transparent);
 }
 
 /* ─── Typography Patterns ─── */
@@ -575,7 +605,9 @@ html {
   gap: 0.5rem;
   min-height: 44px;
   padding: 0.65rem 1.3rem;
-  border-radius: var(--radius-lg);
+  /* A3: actions are pills. Field is bimodal sharp/pill (component-patterns.json:
+     primary 21 sharp / 21 pill); we commit to pill as the soft signature. */
+  border-radius: var(--radius-full);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -746,7 +778,8 @@ html {
 .passport-stamp {
   display: block;
   border: 1.5px dashed color-mix(in oklab, var(--color-accent) 24%, var(--color-line));
-  border-radius: 1.25rem;
+  /* A3: card/stamp → --radius-xl (was 1.25rem one-off, same value, now codified). */
+  border-radius: var(--radius-xl);
   padding: 1.25rem 1rem;
   text-align: center;
   background: color-mix(in oklab, var(--color-surface) 65%, transparent);
@@ -783,8 +816,9 @@ html {
 /* ─── Briefing chips (anticipatory Q&A) ─── */
 
 .briefing-chip {
+  /* A3: panel → --radius-xl (was 1rem one-off). */
+  border-radius: var(--radius-xl);
   border: 1px solid var(--color-line);
-  border-radius: 1rem;
   background: color-mix(in oklab, var(--color-surface) 72%, transparent);
   transition: border-color 0.2s ease;
 }
@@ -1074,14 +1108,21 @@ html {
   }
 
   .btn-primary:hover {
+    /* C: flat on hover — 58/67 peers are flat; shadowed CTAs read dated. */
     background: var(--color-accent-deep);
-    box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
 
+  .btn-primary:active {
+    /* Clay Press pressed state — scale-down, no shadow. */
+    background: var(--color-accent-deep);
+    transform: translateY(0) scale(0.98);
+  }
+
   .btn-secondary:hover {
-    border-color: color-mix(in oklab, var(--color-accent) 20%, var(--color-line));
-    background: var(--color-surface-strong);
+    /* C: border-tint, NOT fill-swap (32/56 peers are light-ghost; the tint
+       communicates state without the dated surface-swap). */
+    border-color: color-mix(in oklab, var(--color-accent) 35%, var(--color-line));
   }
 
   .interactive-card:hover {
@@ -1113,5 +1154,121 @@ html {
   .interactive-card:active {
     transform: scale(0.99);
     transition: transform 0.1s ease;
+  }
+}
+
+/* ─── View Transitions (redesign 2026 H2, D1) ─── */
+
+/* The default root cross-fade, retuned to the calm-organic easing so route
+   changes feel like the rest of the motion system. Kept short (250ms) — long
+   route transitions read as lag. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.25s;
+  animation-timing-function: var(--transition-organic);
+}
+
+/* Named morph: the city-page hero. When navigating city → city, both snapshots
+   contain an element with this name, so the hero (title + atmosphere frame)
+   morphs continuously rather than cross-fading with the rest of the page.
+   Navigating list → city animates the hero in as a gentle scale+fade. */
+.city-hero-transition {
+  view-transition-name: city-hero;
+}
+
+::view-transition-group(city-hero) {
+  animation-duration: 0.4s;
+  animation-timing-function: var(--transition-fluid);
+}
+
+::view-transition-old(city-hero) {
+  animation-name: city-hero-out;
+  animation-duration: 0.4s;
+  animation-timing-function: var(--transition-fluid);
+}
+
+::view-transition-new(city-hero) {
+  animation-name: city-hero-in;
+  animation-duration: 0.4s;
+  animation-timing-function: var(--transition-fluid);
+}
+
+@keyframes city-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes city-hero-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(1.01);
+  }
+}
+
+/* Reduced-motion: instant navigation, no morph. The View Transitions API
+   respects prefers-reduced-motion when duration is zeroed. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  ::view-transition-group(*) {
+    animation: none !important;
+  }
+}
+
+/* ─── Night Atlas (redesign 2026 H2, D2) ─── */
+
+/* Dark mode gets its own personality: aurora-tinted panel glows that read as
+   a cool night-sky horizon on card top edges. Light mode stays unchanged.
+   All box-shadow only — no new DOM, no blur layers, INP-safe. */
+
+.dark .atlas-panel,
+.dark .atlas-frame,
+.dark .atlas-panel-strong {
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 oklch(0.32 0.03 250 / 0.5);
+}
+
+/* Aurora outer breath on the strongest panels — a barely-perceptible cool
+   glow that gives the dark canvas depth without competing with content.
+   Static (no animation) per the one-ambient-layer-per-viewport rule. */
+.dark .atlas-panel-strong {
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 0 oklch(0.34 0.04 250 / 0.55),
+    0 0 32px oklch(0.28 0.05 250 / 0.08);
+}
+
+/* Baked-background SVGs (mixer balance, passport stamps) were drawn for a
+   paper field. In dark mode, soften + cool them rather than shipping a
+   second asset set — same pattern as the Leaflet tile filter. */
+.dark img[src*="mixer-balance.svg"],
+.dark img[src*="passport-stamps.svg"] {
+  filter: brightness(0.82) saturate(0.7) hue-rotate(-8deg);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Night Atlas is static by design; no motion to disable. Guard exists for
+     completeness so future aurora animation is caught by the policy. */
+  .dark .atlas-panel-strong {
+    box-shadow:
+      var(--shadow-sm),
+      inset 0 1px 0 oklch(0.34 0.04 250 / 0.55);
   }
 }

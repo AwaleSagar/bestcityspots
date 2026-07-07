@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Scale, Users, MapPin, X, Sparkles } from "lucide-react";
 import { getCityBySlug, type City } from "@/lib/cities";
 import { getCityWeather } from "@/lib/weather";
-import { getCityMetrics } from "@/lib/metrics";
+import { getCityMetrics, type CityMetrics } from "@/lib/metrics";
 import { readCachedCityInsight } from "@/lib/intelligence";
 import { selectAvailableMetrics, type DisplayMetric } from "@/lib/metrics-display";
 import { formatPopulation } from "@/lib/format";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import CityFingerprint from "@/components/ui/CityFingerprint";
+import type { FingerprintMetrics } from "@/lib/fingerprint";
 import ComparePicker from "./ComparePicker";
 
 // US-07 (audit AF-4): side-by-side city comparison built entirely from the
@@ -34,6 +36,8 @@ interface ComparisonColumn {
   weather: Awaited<ReturnType<typeof getCityWeather>>;
   metrics: DisplayMetric[];
   insightIntro: string | null;
+  /** v2: raw metrics that modulate the fingerprint (pollution → texture). */
+  fingerprintMetrics: FingerprintMetrics;
 }
 
 function parseSlugs(raw: string | undefined): string[] {
@@ -47,18 +51,25 @@ async function loadColumn(slug: string): Promise<ComparisonColumn | null> {
   const city = await getCityBySlug(slug);
   if (!city) return null;
 
-  const [weather, metrics, insightRead] = await Promise.all([
+  const [weather, rawMetrics, insightRead] = await Promise.all([
     getCityWeather(city),
     getCityMetrics(city),
     readCachedCityInsight(city.id).catch(() => ({ insight: null })),
   ]);
 
+  const metrics: CityMetrics | null = rawMetrics;
   return {
     city,
     slug,
     weather,
     metrics: selectAvailableMetrics(metrics),
     insightIntro: insightRead.insight?.intro?.slice(0, 180) ?? null,
+    fingerprintMetrics: {
+      pollution_pm25: metrics?.pollution_pm25 ?? null,
+      safety_score: metrics?.safety_score ?? null,
+      cost_index: metrics?.cost_index ?? null,
+      connectivity_mbps: metrics?.connectivity_mbps ?? null,
+    },
   };
 }
 
@@ -103,23 +114,26 @@ export default async function ComparePage({
 
         {columns.length === 0 ? (
           <div className="organic-panel mt-12 flex flex-col items-center gap-6 rounded-3xl p-8 text-center md:flex-row md:gap-10 md:p-12 md:text-left">
+            {/* B3: the balance-scale identity — the shipped mixer-balance asset
+                finally used here, signalling the comparison intent. */}
             <Image
-              src="/illustrations/compare-empty.webp"
-              alt="Two empty comparison cards waiting to be filled"
+              src="/illustrations/mixer-balance.svg"
+              alt="A balanced scale waiting for cities to compare"
               width={600}
               height={480}
-              className="w-full max-w-[16rem] shrink-0"
+              className="text-muted w-full max-w-[16rem] shrink-0"
             />
             <div>
               <h2 className="text-foreground text-2xl font-bold tracking-tight">
-                Start with any city
+                Weigh any two or three cities
               </h2>
               <p className="text-muted mt-3 max-w-lg text-sm leading-relaxed">
                 Search above, or jump in from{" "}
                 <Link href="/resources/top-cities" className="text-link">
                   The Global 50
                 </Link>{" "}
-                — every city page has a Compare shortcut.
+                — every city page has a Compare shortcut. The URL is the comparison, so you can
+                share it exactly as built.
               </p>
             </div>
           </div>
@@ -136,17 +150,33 @@ export default async function ComparePage({
                 aria-label={`${column.city.city} comparison column`}
               >
                 <header className="flex items-start justify-between gap-3">
-                  <div>
-                    <Link
-                      href={`/cities/${column.slug}`}
-                      className="text-foreground hover:text-accent-strong text-2xl font-bold tracking-tight transition-colors"
-                    >
-                      {column.city.city}
-                    </Link>
-                    <p className="text-muted mt-1 flex items-center gap-1.5 text-xs font-semibold tracking-[0.15em] uppercase">
-                      <MapPin className="h-3 w-3" aria-hidden />
-                      {column.city.country}
-                    </p>
+                  <div className="flex items-start gap-3">
+                    {/* B3: fingerprint as the column identity — each city gets
+                        its deterministic contour glyph as a visual anchor.
+                        v2 (S4): metrics modulate the rings — clean-air cities
+                        read smoother, safe cities slightly bolder. */}
+                    <CityFingerprint
+                      city={{
+                        id: column.city.id,
+                        lat: column.city.lat,
+                        lng: column.city.lng,
+                        population: column.city.population,
+                        metrics: column.fingerprintMetrics,
+                      }}
+                      className="mt-0.5 h-10 w-10 shrink-0 text-[color:var(--color-muted-strong)]"
+                    />
+                    <div>
+                      <Link
+                        href={`/cities/${column.slug}`}
+                        className="text-foreground hover:text-accent-strong text-2xl font-bold tracking-tight transition-colors"
+                      >
+                        {column.city.city}
+                      </Link>
+                      <p className="text-muted mt-1 flex items-center gap-1.5 text-xs font-semibold tracking-[0.15em] uppercase">
+                        <MapPin className="h-3 w-3" aria-hidden />
+                        {column.city.country}
+                      </p>
+                    </div>
                   </div>
                   <Link
                     href={removeHref(activeSlugs, column.slug)}
@@ -198,9 +228,23 @@ export default async function ComparePage({
                 </dl>
 
                 {column.insightIntro ? (
-                  <p className="text-muted text-sm leading-relaxed">
-                    <Sparkles className="text-accent mr-1.5 inline h-3.5 w-3.5" aria-hidden />
-                    <span className="text-muted-strong font-semibold">AI summary:</span>{" "}
+                  /* B3 + A2: verdict lines get the display serif — the
+                     editorial voice that distinguishes us from the
+                     marketplace crowd (see design-tokens.md). */
+                  <p
+                    className="text-muted-strong text-sm leading-relaxed"
+                    style={{ fontFamily: "var(--font-display), ui-serif, serif" }}
+                  >
+                    <Sparkles
+                      className="text-accent mr-1.5 inline h-3.5 w-3.5 align-baseline"
+                      aria-hidden
+                    />
+                    <span
+                      className="text-muted font-semibold"
+                      style={{ fontFamily: "var(--font-sans)" }}
+                    >
+                      AI summary:
+                    </span>{" "}
                     {column.insightIntro}
                     {column.insightIntro.length >= 180 ? "…" : ""}
                   </p>

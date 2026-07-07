@@ -5,18 +5,31 @@
  * rings in the brand palette, seeded from stable city attributes so the same
  * city always draws the same mark, on the server or the client, forever.
  *
- * v1 is an *identity* mark (identicon-style), not a data visualization:
- * list surfaces (search rows, hub cards) don't carry the metrics vector, so
- * rings derive from id/geo/population only. If list payloads ever include
- * metrics, `ringCount`/amplitudes are the natural place to encode them (the
- * proposal's v2). Colors are CSS custom properties so glyphs adapt to theme.
+ * v1 is an *identity* mark (identicon-style): rings derive from id/geo/
+ * population only, so list surfaces (which don't carry the metrics vector)
+ * render the same mark as the city page.
+ *
+ * v2 (redesign 2026 H2, S4 polish): when metrics are supplied (city page
+ * only), they subtly modulate ring amplitude and stroke — clean-air cities
+ * read smoother, safe cities read slightly more confident. The modulation is
+ * capped at ±25% so identity stays stable and recognizable. Colors are CSS
+ * custom properties so glyphs adapt to theme.
  */
+
+export interface FingerprintMetrics {
+  pollution_pm25?: number | null;
+  safety_score?: number | null;
+  cost_index?: number | null;
+  connectivity_mbps?: number | null;
+}
 
 export interface FingerprintSeed {
   id: string | number;
   lat?: number | null;
   lng?: number | null;
   population?: number | null;
+  /** v2: optional metrics that subtly modulate ring shape (city page only). */
+  metrics?: FingerprintMetrics | null;
 }
 
 export interface FingerprintRing {
@@ -86,12 +99,14 @@ function ringPath(
   random: () => number,
   baseRadius: number,
   cx: number,
-  cy: number
+  cy: number,
+  amplitudeScale = 1
 ): string {
   const harmonicA = 2 + Math.floor(random() * 3); // 2–4 lobes
   const harmonicB = 5 + Math.floor(random() * 3); // 5–7 ripples
-  const amplitudeA = 0.05 + random() * 0.07;
-  const amplitudeB = 0.02 + random() * 0.03;
+  // v2: amplitude scales with metrics (clean air → smooth, polluted → textured).
+  const amplitudeA = (0.05 + random() * 0.07) * amplitudeScale;
+  const amplitudeB = (0.02 + random() * 0.03) * amplitudeScale;
   const phaseA = random() * Math.PI * 2;
   const phaseB = random() * Math.PI * 2;
 
@@ -131,6 +146,18 @@ export function getCityFingerprint(seed: FingerprintSeed): Fingerprint {
   const count = ringCount(seed.population);
   const colorOffset = Math.floor(random() * RING_COLORS.length);
 
+  // v2: metric modulation — subtle (±25%), identity-preserving.
+  // Clean air (low pm25) → smoother rings; polluted → slightly more textured.
+  const pm = seed.metrics?.pollution_pm25;
+  const amplitudeScale =
+    pm != null && Number.isFinite(pm) ? 1 + Math.max(0, Math.min(0.25, (pm - 10) / 140)) : 1;
+  // Safe cities read slightly more confident (bolder stroke).
+  const safety = seed.metrics?.safety_score;
+  const strokeScale =
+    safety != null && Number.isFinite(safety)
+      ? 0.9 + Math.max(0, Math.min(0.25, (safety / 100) * 0.25))
+      : 1;
+
   const cx = 32;
   const cy = 32;
   const outerRadius = 26;
@@ -142,10 +169,11 @@ export function getCityFingerprint(seed: FingerprintSeed): Fingerprint {
     const t = count === 1 ? 0 : i / (count - 1);
     const jitter = (random() - 0.5) * 2.5;
     const baseRadius = innerRadius + (outerRadius - innerRadius) * t + jitter;
+    const isOuter = i === count - 1;
     rings.push({
-      d: ringPath(random, Math.max(4, baseRadius), cx, cy),
+      d: ringPath(random, Math.max(4, baseRadius), cx, cy, amplitudeScale),
       color: RING_COLORS.at((colorOffset + i) % RING_COLORS.length) ?? RING_COLORS[0],
-      strokeWidth: i === count - 1 ? 2 : 1.5,
+      strokeWidth: (isOuter ? 2 : 1.5) * strokeScale,
     });
   }
 

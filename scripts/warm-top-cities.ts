@@ -13,8 +13,17 @@
  *
  * Usage: npx tsx scripts/warm-top-cities.ts [options]
  *
+ * City selection (default): demand-first priority list —
+ *   1. most-viewed cities from Supabase analytics (city_views_daily, 30d)
+ *   2. curated globally-popular destinations (src/lib/warm-priority.ts,
+ *      Euromonitor arrivals + landmark research), with landmark queries
+ *      enriched by each city's iconic POI names
+ *   3. population fallback to fill the limit
+ * Use --population-only for the legacy pure-population ordering.
+ *
  * Options:
- *   --limit=N            Top N cities by population (default: 50)
+ *   --limit=N            Number of cities to warm (default: 50)
+ *   --population-only    Skip analytics/curated priority; population order only
  *   --images-per-type=N  Photos to fetch per category, by review count (default: 6)
  *   --concurrency=N      Cities processed in parallel (default: 3)
  *   --no-ai              Skip AI insights (Gemini)
@@ -46,6 +55,12 @@ config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 
 import { CACHE_TTL } from "../src/lib/cache-config";
+import {
+  POPULAR_DESTINATIONS,
+  buildLandmarkQuery,
+  landmarkHintsFor,
+  mergePriorityLists,
+} from "../src/lib/warm-priority";
 
 // ============================================================================
 // Types & configuration
@@ -105,10 +120,13 @@ const PLACES_FIELD_MASK = [
   "places.photos",
 ].join(",");
 
-function primaryQuery(cityName: string, type: PlaceType): string {
+function primaryQuery(cityName: string, type: PlaceType, country?: string): string {
   switch (type) {
     case "landmarks":
-      return `Top landmarks and attractions in ${cityName}`;
+      // Curated cities name their iconic POIs so the Places response (and
+      // the photo cache built from it) anchors on what users search for.
+      // Same request count — relevance only, zero extra spend.
+      return buildLandmarkQuery(cityName, landmarkHintsFor(cityName, country));
     case "restaurants":
       return `Best restaurants, local food, street food, and cheap eats in ${cityName}`;
     case "hotels":
@@ -146,6 +164,8 @@ interface CliArgs {
   metrics: boolean;
   dryRun: boolean;
   help: boolean;
+  /** false → legacy pure population ordering (--population-only). */
+  priority: boolean;
 }
 
 function parseArgs(): CliArgs {
@@ -159,6 +179,7 @@ function parseArgs(): CliArgs {
     metrics: false,
     dryRun: false,
     help: false,
+    priority: true,
   };
 
   for (const arg of args) {
@@ -172,6 +193,7 @@ function parseArgs(): CliArgs {
     else if (arg === "--no-photos") result.photos = false;
     else if (arg === "--metrics") result.metrics = true;
     else if (arg === "--dry-run") result.dryRun = true;
+    else if (arg === "--population-only") result.priority = false;
   }
 
   return result;
@@ -181,12 +203,14 @@ function showHelp(): void {
   console.log(`
 Warm Top-Cities CLI for BestCitySpots
 =====================================
-Warms places (+ photos), weather, and AI insights for the top N cities by
-population. See file header for the full option list.
+Warms places (+ photos), weather, and AI insights for N cities, prioritized
+by real visitor demand (Supabase analytics) → researched global popularity
+→ population. See file header for the full option list.
 
   npx tsx scripts/warm-top-cities.ts --limit=50
   npx tsx scripts/warm-top-cities.ts --limit=50 --dry-run
   npx tsx scripts/warm-top-cities.ts --limit=25 --no-ai --metrics
+  npx tsx scripts/warm-top-cities.ts --population-only   # legacy ordering
 `);
 }
 
@@ -215,6 +239,92 @@ async function getTopCitiesByPopulation(supabase: SupabaseClient, limit: number)
     return [];
   }
   return (data || []) as City[];
+}
+
+/**
+ * Supabase insights: cities YOUR visitors opened most in the last `days`.
+ * Queried at warm time so every nightly run re-prioritizes on real demand.
+ * Analytics are aggregate-only (privacy-first) — city_id + counters.
+ */
+async function getMostViewedCities(
+  supabase: SupabaseClient,
+  days: number,
+  limit: number
+): Promise<City[]> {
+  const from = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("city_views_daily")
+    .select("city_id, views")
+    .gte("stat_date", from);
+  if (error || !data || data.length === 0) {
+    if (error) console.warn("  [priority] city_views_daily unavailable:", error.message);
+    return [];
+  }
+
+  const totals = new Map<number, number>();
+  for (const row of data as Array<{ city_id: number; views: number | null }>) {
+    totals.set(row.city_id, (totals.get(row.city_id) ?? 0) + (row.views ?? 0));
+  }
+  const rankedIds = [...totals.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([id]) => id);
+  if (rankedIds.length === 0) return [];
+
+  const { data: cityRows, error: cityError } = await supabase
+    .from("cities")
+    .select("id, city, city_ascii, country, lat, lng, population, admin_name")
+    .in("id", rankedIds);
+  if (cityError || !cityRows) return [];
+
+  const byId = new Map((cityRows as City[]).map((c) => [c.id, c]));
+  return rankedIds.map((id) => byId.get(id)).filter((c): c is City => Boolean(c));
+}
+
+/**
+ * Predicted demand: resolve the researched globally-popular destinations
+ * (Euromonitor arrivals + attraction magnets — see src/lib/warm-priority.ts)
+ * against the cities table. Order preserved from the curated ranking.
+ */
+async function getCuratedPopularCities(supabase: SupabaseClient): Promise<City[]> {
+  const names = POPULAR_DESTINATIONS.map((d) => d.city);
+  const { data, error } = await supabase
+    .from("cities")
+    .select("id, city, city_ascii, country, lat, lng, population, admin_name")
+    .in("city_ascii", names);
+  if (error || !data) {
+    if (error) console.warn("  [priority] curated lookup failed:", error.message);
+    return [];
+  }
+  const rows = data as City[];
+  const resolved: City[] = [];
+  for (const destination of POPULAR_DESTINATIONS) {
+    const match = rows.find(
+      (row) =>
+        row.city_ascii.toLowerCase() === destination.city.toLowerCase() &&
+        row.country.toLowerCase().includes(destination.country.toLowerCase())
+    );
+    if (match) resolved.push(match);
+  }
+  return resolved;
+}
+
+/**
+ * The warm list: demand (your analytics) → predicted (researched popularity)
+ * → reach (population). Dedupes to `limit`.
+ */
+async function buildPriorityCityList(supabase: SupabaseClient, limit: number): Promise<City[]> {
+  const [mostViewed, curated, byPopulation] = await Promise.all([
+    getMostViewedCities(supabase, 30, limit),
+    getCuratedPopularCities(supabase),
+    getTopCitiesByPopulation(supabase, limit),
+  ]);
+  const merged = mergePriorityLists(mostViewed, curated, byPopulation, limit);
+  console.log(
+    `Priority mix: ${mostViewed.length} analytics-demand + ${curated.length} curated-popular ` +
+      `+ population fallback → ${merged.length} cities to warm`
+  );
+  return merged;
 }
 
 // ============================================================================
@@ -421,7 +531,7 @@ async function warmPlaces(
         "X-Goog-FieldMask": PLACES_FIELD_MASK,
       },
       body: JSON.stringify({
-        textQuery: primaryQuery(city.city, type),
+        textQuery: primaryQuery(city.city, type, city.country),
         maxResultCount: 20,
         locationBias: {
           circle: { center: { latitude: city.lat, longitude: city.lng }, radius: 50000 },
@@ -904,7 +1014,9 @@ ${args.dryRun ? "DRY RUN — no API calls, no writes" : ""}
   const supabase = createSupabaseClient();
   const startTime = Date.now();
 
-  const cities = await getTopCitiesByPopulation(supabase, args.limit);
+  const cities = args.priority
+    ? await buildPriorityCityList(supabase, args.limit)
+    : await getTopCitiesByPopulation(supabase, args.limit);
   if (cities.length === 0) {
     console.error("Error: no cities found to warm");
     process.exit(1);
