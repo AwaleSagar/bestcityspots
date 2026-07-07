@@ -354,7 +354,6 @@ async function claimBudget(
   const { data, error } = await supabase.rpc("claim_provider_use", {
     p_provider: provider,
     p_day: new Date().toISOString().slice(0, 10),
-    // eslint-disable-next-line security/detect-object-injection -- provider is a typed union key
     p_limit: BUDGETS[provider],
   });
   if (error) {

@@ -36,6 +36,19 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Dev/ops tooling (cache warmers, seeders, design-scrape, importers) under
+  // `scripts/` legitimately reads files from computed paths and indexes parsed
+  // JSON / config objects by design. These two rules are tuned for
+  // request-handling code where inputs can be attacker-controlled; in one-off
+  // CLIs the inputs are operator-controlled, so the false positives here add
+  // noise without security value.
+  {
+    files: ["scripts/**/*.{ts,tsx,js,mjs}"],
+    rules: {
+      "security/detect-object-injection": "off",
+      "security/detect-non-literal-fs-filename": "off",
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

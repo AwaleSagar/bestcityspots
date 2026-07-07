@@ -1,5 +1,5 @@
 import "server-only";
-import { supabase, supabaseServer } from "./supabase";
+import { supabaseServer } from "./supabase";
 import { rankingEngine } from "./ranking";
 import { haversineKm } from "./geo";
 import sharp from "sharp";

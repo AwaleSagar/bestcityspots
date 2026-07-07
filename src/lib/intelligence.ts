@@ -15,7 +15,16 @@ import {
   writeCityInsightCache,
 } from "@/platform/data-access/city-insights-repository";
 
-export { PROMPT_VERSIONS } from "./providers/ai";
+// Re-exported so route handlers can stream + validate AI output through the
+// domain module instead of reaching into @/lib/providers/* directly (enforced
+// by the no-restricted-imports architecture guardrail in eslint.config.mjs).
+export {
+  PROMPT_VERSIONS,
+  generateTextStream,
+  sanitizeJsonResponse,
+  isAIEnabled,
+  type AIStreamStart,
+} from "./providers/ai";
 
 /**
  * Canonical prompt for a single-city AI briefing. Exported so the streaming

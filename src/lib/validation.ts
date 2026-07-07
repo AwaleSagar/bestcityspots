@@ -9,7 +9,7 @@ import { z } from "zod";
 export const safeString = z.string().trim().min(1, "Required");
 
 // Email validation
-export const emailSchema = z.string().email("Invalid email address").trim().toLowerCase();
+export const emailSchema = z.string().trim().toLowerCase().email("Invalid email address");
 
 // Strong password policy (min 8 chars, mixed case, numbers/symbols optional but recommended)
 // Adjust complexity based on requirements.

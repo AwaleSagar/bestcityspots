@@ -6,9 +6,11 @@ import {
   buildCityInsightPrompt,
   readCachedCityInsight,
   upsertCityInsight,
+  generateTextStream,
+  sanitizeJsonResponse,
+  isAIEnabled,
   type CityInsight,
 } from "@/lib/intelligence";
-import { generateTextStream, sanitizeJsonResponse, isAIEnabled } from "@/lib/providers/ai";
 import { cityIdSchema } from "@/lib/validation";
 import { createLogger } from "@/lib/logger";
 
@@ -118,6 +120,11 @@ export async function GET(req: NextRequest) {
 
   const correlationId = aiStart.correlationId;
 
+  // Flipped by the stream's cancel() when the client navigates away. The
+  // streaming loop checks it so we stop pulling (and paying for) Gemini
+  // tokens that nobody will receive, instead of draining the whole response.
+  let clientDisconnected = false;
+
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       const encoder = new TextEncoder();
@@ -131,6 +138,7 @@ export async function GET(req: NextRequest) {
 
       try {
         for await (const piece of aiStart.stream) {
+          if (clientDisconnected) return;
           accumulated += piece;
           controller.enqueue(encoder.encode(sse({ type: "chunk", text: piece })));
         }
@@ -145,6 +153,13 @@ export async function GET(req: NextRequest) {
         } else {
           controller.enqueue(encoder.encode(sse({ type: "error", reason: "stream_aborted" })));
         }
+        controller.close();
+        return;
+      }
+
+      // Client left before the response completed — discard the partial
+      // payload and skip the cache write; there is no one left to serve it.
+      if (clientDisconnected) {
         controller.close();
         return;
       }
@@ -168,6 +183,12 @@ export async function GET(req: NextRequest) {
         }
       }
       controller.close();
+    },
+    cancel() {
+      // Fired by the platform when the downstream Response is cancelled
+      // (client closed the connection). start() bails at its next checkpoint
+      // instead of continuing to consume the provider stream.
+      clientDisconnected = true;
     },
   });
 

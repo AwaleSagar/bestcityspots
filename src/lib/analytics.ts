@@ -120,14 +120,17 @@ export function parseReferrer(referrer: string | null): {
   if (refLower.includes("tiktok")) return { sourceType: "social", sourceName: "TikTok" };
   if (refLower.includes("youtube")) return { sourceType: "social", sourceName: "YouTube" };
 
+  // Email check MUST precede the organic-search block: a webmail referrer
+  // like mail.google.com or mail.yahoo.com would otherwise match the
+  // generic "google"/"yahoo" substring and be misclassified as search.
+  if (refLower.includes("mail.") || refLower.includes("outlook") || refLower.includes("gmail"))
+    return { sourceType: "email", sourceName: "Email" };
+
   if (refLower.includes("google")) return { sourceType: "organic", sourceName: "Google" };
   if (refLower.includes("bing")) return { sourceType: "organic", sourceName: "Bing" };
   if (refLower.includes("duckduckgo")) return { sourceType: "organic", sourceName: "DuckDuckGo" };
   if (refLower.includes("yahoo")) return { sourceType: "organic", sourceName: "Yahoo" };
   if (refLower.includes("baidu")) return { sourceType: "organic", sourceName: "Baidu" };
-
-  if (refLower.includes("mail.") || refLower.includes("outlook") || refLower.includes("gmail"))
-    return { sourceType: "email", sourceName: "Email" };
 
   try {
     const url = new URL(referrer);

@@ -129,6 +129,8 @@ export function parsePartialJson<T = unknown>(raw: string): T | null {
 
   // Close remaining open structures (LIFO).
   for (let i = stack.length - 1; i >= 0; i -= 1) {
+    // i is a bounded loop index over a local array.
+    // eslint-disable-next-line security/detect-object-injection
     const open = stack[i];
     if (open === "{") candidate += "}";
     else if (open === "[") candidate += "]";

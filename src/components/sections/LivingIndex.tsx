@@ -82,8 +82,11 @@ export default async function LivingIndex({ cities }: LivingIndexProps) {
 
       <ul className="card-grid" role="list">
         {cities.map((city, index) => {
-          const weather: WeatherData | null =
-            weatherResults[index].status === "fulfilled" ? weatherResults[index].value : null;
+          // index is the bounded map index into weatherResults (a settled-result
+          // array parallel to cities), not dynamic input.
+          // eslint-disable-next-line security/detect-object-injection
+          const result = weatherResults[index];
+          const weather: WeatherData | null = result.status === "fulfilled" ? result.value : null;
           const atmosphere = getCityAtmosphere({
             lat: city.lat,
             lng: city.lng,

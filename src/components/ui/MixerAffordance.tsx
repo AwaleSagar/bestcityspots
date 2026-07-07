@@ -23,6 +23,9 @@ export default function MixerAffordance() {
   useEffect(() => {
     const saved = getJsonStorageItem(WEIGHTS_STORAGE_KEY, DEFAULT_WEIGHTS) as Partial<MixerWeights>;
     const isCustom = (Object.keys(DEFAULT_WEIGHTS) as Array<keyof MixerWeights>).some(
+      // key iterates the static DEFAULT_WEIGHTS keys (cost/air/safety/connectivity),
+      // not attacker-controlled input; saved[key] reads a typed MixerWeights field.
+      // eslint-disable-next-line security/detect-object-injection
       (key) => typeof saved[key] === "number" && saved[key] !== DEFAULT_WEIGHTS[key]
     );
     // Deferred per the codebase convention (no sync setState in effects).

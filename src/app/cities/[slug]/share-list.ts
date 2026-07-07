@@ -60,6 +60,9 @@ export function encodeSharedList(
 ): string {
   const unique = [...new Set(ids)].slice(0, MAX_SHARED_PLACES);
   const entries = unique.map((id) => {
+    // id is a validated place id (regex-checked at the call boundary) used as a
+    // Record<string, number> key, not arbitrary user input here.
+    // eslint-disable-next-line security/detect-object-injection
     const day = days[id];
     const suffix = typeof day === "number" && day > 0 ? `@${day}` : "";
     return compressId(id) + suffix;
@@ -88,6 +91,9 @@ export function decodeSharedList(token: string): SharedList | null {
     ids.push(id);
     if (version === VERSION_V2 && rawDay) {
       const day = Number.parseInt(rawDay, 10);
+      // id is regex-validated above (`/^[A-Za-z0-9_-]{4,128}$/`) before this
+      // assignment, and day is a bounded integer; both are safe Record keys.
+      // eslint-disable-next-line security/detect-object-injection
       if (Number.isInteger(day) && day > 0 && day <= 99) days[id] = day;
     }
   }

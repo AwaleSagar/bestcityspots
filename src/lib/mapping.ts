@@ -23,12 +23,16 @@ import { z } from "zod";
 // Places
 // ---------------------------------------------------------------------------
 
+// Aligned with `PlacePriceTier` (src/lib/places.ts) so the two layers share a
+// single vocabulary — `isWithinMaxPriceTier` filters on this exact set, and a
+// divergent enum here (previously "cheap"/"luxury") would silently break
+// price filtering if this canonical layer were ever wired into the pipeline.
 export const CanonicalPriceLevel = z.enum([
   "free",
-  "cheap",
+  "inexpensive",
   "moderate",
   "expensive",
-  "luxury",
+  "very_expensive",
   "unknown",
 ]);
 export type CanonicalPriceLevel = z.infer<typeof CanonicalPriceLevel>;
@@ -132,10 +136,10 @@ export type CanonicalCityVitals = z.infer<typeof CanonicalCityVitals>;
 
 const GOOGLE_PRICE_MAP: Record<string, CanonicalPriceLevel> = {
   PRICE_LEVEL_FREE: "free",
-  PRICE_LEVEL_INEXPENSIVE: "cheap",
+  PRICE_LEVEL_INEXPENSIVE: "inexpensive",
   PRICE_LEVEL_MODERATE: "moderate",
   PRICE_LEVEL_EXPENSIVE: "expensive",
-  PRICE_LEVEL_VERY_EXPENSIVE: "luxury",
+  PRICE_LEVEL_VERY_EXPENSIVE: "very_expensive",
 };
 
 /** Compact type used by `src/lib/places.ts`; kept loose to avoid circular deps. */

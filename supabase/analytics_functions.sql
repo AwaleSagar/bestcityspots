@@ -35,7 +35,10 @@ begin
     p_unique, 
     p_pageviews,
     p_duration,
-    case when p_visits > 0 then (p_bounce * 100 / p_visits) else 0 end,
+    -- Bounce rate is a per-SESSION metric: the denominator is the session
+    -- count (p_unique), never pageviews (p_visits). The merges below weight
+    -- by unique_visitors for the same reason.
+    case when p_unique > 0 then (p_bounce * 100 / p_unique) else 0 end,
     p_new,
     p_returning
   )
@@ -45,17 +48,17 @@ begin
     unique_visitors = daily_visitor_stats.unique_visitors + excluded.unique_visitors,
     page_views = daily_visitor_stats.page_views + excluded.page_views,
     avg_session_duration_sec = case 
-      when daily_visitor_stats.total_visits + excluded.total_visits > 0 
-      then ((daily_visitor_stats.avg_session_duration_sec * daily_visitor_stats.total_visits) + 
-            (excluded.avg_session_duration_sec * excluded.total_visits)) / 
-           (daily_visitor_stats.total_visits + excluded.total_visits)
+      when daily_visitor_stats.unique_visitors + excluded.unique_visitors > 0 
+      then ((daily_visitor_stats.avg_session_duration_sec * daily_visitor_stats.unique_visitors) + 
+            (excluded.avg_session_duration_sec * excluded.unique_visitors)) / 
+           (daily_visitor_stats.unique_visitors + excluded.unique_visitors)
       else 0 
     end,
     bounce_rate_pct = case 
-      when daily_visitor_stats.total_visits + excluded.total_visits > 0 
-      then ((daily_visitor_stats.bounce_rate_pct * daily_visitor_stats.total_visits) + 
-            (excluded.bounce_rate_pct * excluded.total_visits)) / 
-           (daily_visitor_stats.total_visits + excluded.total_visits)
+      when daily_visitor_stats.unique_visitors + excluded.unique_visitors > 0 
+      then ((daily_visitor_stats.bounce_rate_pct * daily_visitor_stats.unique_visitors) + 
+            (excluded.bounce_rate_pct * excluded.unique_visitors)) / 
+           (daily_visitor_stats.unique_visitors + excluded.unique_visitors)
       else 0 
     end,
     new_visitors = daily_visitor_stats.new_visitors + excluded.new_visitors,

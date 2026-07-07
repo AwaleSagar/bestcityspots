@@ -30,11 +30,20 @@
     "test:fingerprint": "tsx scripts/test-fingerprint.ts",
     "test:mixer": "tsx scripts/test-mixer.ts",
     "test:warm-priority": "tsx scripts/test-warm-priority.ts",
+    "test:validation": "tsx scripts/test-validation.ts",
+    "test:json-ld": "tsx scripts/test-json-ld.ts",
+    "test:cost-guard": "tsx --conditions=react-server scripts/test-cost-guard.ts",
+    "test:image-transforms": "tsx scripts/test-image-transforms.ts",
+    "test:providers": "tsx --conditions=react-server scripts/test-providers.ts",
+    "test:api-routes": "tsx --conditions=react-server scripts/test-api-routes.ts",
+    "test:actions": "tsx --conditions=react-server scripts/test-actions.ts",
+    "test:storage": "tsx scripts/test-storage.ts",
+    "test:use-analytics": "tsx scripts/test-use-analytics.ts",
     "design:scrape": "tsx scripts/design-scrape/run.ts",
     "design:aggregate": "tsx scripts/design-scrape/aggregate.ts",
     "design:signals": "tsx scripts/design-scrape/signals.ts",
     "design:components": "tsx scripts/design-scrape/components.ts",
-    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer && npm run test:warm-priority"
+    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer && npm run test:warm-priority && npm run test:validation && npm run test:json-ld && npm run test:cost-guard && npm run test:image-transforms && npm run test:providers && npm run test:api-routes && npm run test:actions && npm run test:storage && npm run test:use-analytics"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -25,6 +25,8 @@ const LEVELS: Record<LogLevel, number> = {
 
 function currentLevel(): number {
   const configured = serverEnv().LOG_LEVEL;
+  // configured is a validated LogLevel enum from serverEnv(), not user input.
+  // eslint-disable-next-line security/detect-object-injection
   if (configured) return LEVELS[configured];
   return serverEnv().NODE_ENV === "production" ? LEVELS.info : LEVELS.debug;
 }
@@ -44,6 +46,8 @@ export interface Logger {
 }
 
 function emit(level: LogLevel, base: LogContext, event: string, fields?: LogContext) {
+  // level is the typed LogLevel parameter, not dynamic input.
+  // eslint-disable-next-line security/detect-object-injection
   if (LEVELS[level] < currentLevel()) return;
   const record = {
     ts: new Date().toISOString(),
@@ -89,11 +93,19 @@ export function newCorrelationId(): string {
   if (typeof globalThis.crypto !== "undefined" && globalThis.crypto.getRandomValues) {
     globalThis.crypto.getRandomValues(bytes);
   } else {
-    for (let i = 0; i < bytes.length; i += 1) bytes[i] = Math.floor(Math.random() * 256);
+    // i is a bounded loop index over a Uint8Array; assignment by index is the
+    // idiomatic in-place fill for a typed array.
+    for (let i = 0; i < bytes.length; i += 1) {
+      // eslint-disable-next-line security/detect-object-injection
+      bytes[i] = Math.floor(Math.random() * 256);
+    }
   }
   let b64 = "";
   // Convert without Buffer dep
-  for (let i = 0; i < bytes.length; i += 1) b64 += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += 1) {
+    // eslint-disable-next-line security/detect-object-injection
+    b64 += String.fromCharCode(bytes[i]);
+  }
   // btoa handles ASCII
   return (typeof btoa === "function" ? btoa(b64) : Buffer.from(b64, "binary").toString("base64"))
     .replace(/\+/g, "-")
