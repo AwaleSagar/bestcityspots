@@ -145,7 +145,7 @@ function main() {
   L.push("");
   L.push("> Slim headline-signals doc. Computed from the 98-site dataset");
   L.push("> (`.firecrawl/design/tokens.json`) by `scripts/design-scrape/signals.ts`.");
-  L.push("> Cited by `bestcityspots-redesign-plan-2026.md` §1. Full per-site detail in");
+  L.push("> Full per-site detail in");
   L.push("> `competitor-design-catalog.md`; component-level stats in");
   L.push("> `component-patterns.json`.");
   L.push("");

@@ -2,7 +2,7 @@
 
 > Slim headline-signals doc. Computed from the 98-site dataset
 > (`.firecrawl/design/tokens.json`) by `scripts/design-scrape/signals.ts`.
-> Cited by `bestcityspots-redesign-plan-2026.md` §1. Full per-site detail in
+> Full per-site detail in
 > `competitor-design-catalog.md`; component-level stats in
 > `component-patterns.json`.
 
