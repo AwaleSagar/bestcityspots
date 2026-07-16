@@ -19,11 +19,10 @@ import {
   writePlacesCache,
   writePlacesCacheEvent,
 } from "@/platform/data-access/places-cache-repository";
+import { createLogger } from "./logger";
 
-const API_KEY = serverEnv().GOOGLE_PLACES_API_KEY;
-if (!API_KEY) {
-  console.warn("[places] GOOGLE_PLACES_API_KEY not set — place enrichment disabled.");
-}
+const log = createLogger({ component: "places" });
+
 const BUCKET = "place_images";
 const IMAGE_MAX_WIDTH = 800;
 const IMAGE_MAX_HEIGHT = 600;
@@ -508,9 +507,13 @@ function normalizeCachedPlace(
 
   const extraImageUrls = (place as CachedLandmark).imageUrls;
   if (Array.isArray(extraImageUrls)) {
+    // Only rewrite entries that reference *this place's* storage object
+    // (same `{placeId}.jpg` path). Rewriting any bucket URL would collapse
+    // distinct images to one if a place ever carries multiple.
+    const expectedSuffix = `${bucketPath}${place.id}.jpg`;
     const normalizedImageUrls = extraImageUrls
       .filter((value): value is string => typeof value === "string" && value.length > 0)
-      .map((value) => (value.includes(bucketPath) ? expectedUrl : value));
+      .map((value) => (value.endsWith(expectedSuffix) ? expectedUrl : value));
 
     // Compare element-wise instead of stringifying — avoids two full
     // JSON.stringify passes per cached place on every cache hit.
@@ -666,22 +669,25 @@ export async function getTopPlaces(
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
-  if (!API_KEY) {
+  // Read lazily (not at module load) so scripts that populate env after
+  // import — e.g. dotenv in warmers — still get enrichment.
+  if (!serverEnv().GOOGLE_PLACES_API_KEY) {
     console.warn(`[places] Missing API key; returning empty for ${cityName} / ${type}`);
     return [];
   }
 
-  console.info(
-    `[places-debug] getTopPlaces(${cityName}/${type}): allowProviderFetch=${Boolean(
-      opts?.allowProviderFetch
-    )} liveEnabled=${isPaidProviderEnabled("google-places")}`
-  );
+  log.debug("get_top_places", {
+    cityName,
+    type,
+    allowProviderFetch: Boolean(opts?.allowProviderFetch),
+    liveEnabled: isPaidProviderEnabled("google-places"),
+  });
 
   try {
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
     const cache = bypassCache ? null : await readPlacesCache(cityName, type);
-    console.info(`[places-debug] ${cityName}/${type}: cacheHit=${Boolean(cache)}`);
+    log.debug("cache_lookup", { cityName, type, hit: Boolean(cache) });
 
     if (cache) {
       const updatedAt = new Date(cache.updated_at);
@@ -735,20 +741,19 @@ export async function getTopPlaces(
     }
 
     if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
-      console.warn(
-        `[places-debug] ${cityName}/${type}: BLOCKED live fetch (allowProviderFetch=${Boolean(
-          opts?.allowProviderFetch
-        )} liveEnabled=${isPaidProviderEnabled("google-places")}) -> returning []`
-      );
+      // Routine in production (cache-only, warmer-only spend) — debug, not warn.
+      log.debug("live_fetch_blocked", {
+        cityName,
+        type,
+        allowProviderFetch: Boolean(opts?.allowProviderFetch),
+        liveEnabled: isPaidProviderEnabled("google-places"),
+      });
       recordPlacesCacheEvent(type, false);
       return [];
     }
 
-    console.info(`[places-debug] ${cityName}/${type}: fetching live from Google Places…`);
     const fetched = await fetchAndCachePlaces(cityName, type, opts);
-    console.info(
-      `[places-debug] ${cityName}/${type}: live fetch returned ${fetched.length} place(s)`
-    );
+    log.debug("live_fetch_done", { cityName, type, count: fetched.length });
     return fetched;
   } catch (e) {
     if (isAbortError(e)) {

@@ -179,7 +179,12 @@ async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   }
 
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(resolve, ms);
+    // Detach the abort listener on normal wake-up so repeated sleeps against
+    // a shared long-lived signal don't accumulate listeners.
+    const timeout = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
     const onAbort = () => {
       clearTimeout(timeout);
       reject(signal?.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError"));

@@ -4,7 +4,9 @@ import { AnalyticsPayloadSchema, processAnalyticsBatch } from "@/lib/analytics";
 
 const MAX_PAYLOAD_BYTES = 64 * 1024;
 
-async function readJsonBodyWithLimit(request: NextRequest) {
+type BodyReadResult = { tooLarge: true } | { invalid: true } | { value: unknown };
+
+async function readJsonBodyWithLimit(request: NextRequest): Promise<BodyReadResult | null> {
   const reader = request.body?.getReader();
   if (!reader) return null;
 
@@ -28,7 +30,11 @@ async function readJsonBodyWithLimit(request: NextRequest) {
     offset += chunk.byteLength;
   }
 
-  return { value: JSON.parse(new TextDecoder().decode(body)) as unknown };
+  try {
+    return { value: JSON.parse(new TextDecoder().decode(body)) as unknown };
+  } catch {
+    return { invalid: true };
+  }
 }
 
 // =============================================================================
@@ -51,11 +57,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await readJsonBodyWithLimit(request);
-    if (body?.tooLarge) {
+    if (body && "tooLarge" in body) {
       return NextResponse.json({ error: "Payload too large" }, { status: 413 });
     }
+    if (body && "invalid" in body) {
+      return NextResponse.json({ error: "Malformed JSON" }, { status: 400 });
+    }
 
-    const result = AnalyticsPayloadSchema.safeParse(body?.value);
+    const result = AnalyticsPayloadSchema.safeParse(body ? body.value : undefined);
 
     if (!result.success) {
       return NextResponse.json(
