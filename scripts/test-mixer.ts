@@ -32,7 +32,10 @@ console.log("weight gating");
     "all-zero weights → empty",
     rankCities(rows, { cost: 0, air: 0, safety: 0, connectivity: 0 }).length === 0
   );
-  check("empty rows → empty", rankCities([], { cost: 100, air: 0, safety: 0, connectivity: 0 }).length === 0);
+  check(
+    "empty rows → empty",
+    rankCities([], { cost: 100, air: 0, safety: 0, connectivity: 0 }).length === 0
+  );
 }
 
 console.log("direction correctness");
@@ -48,12 +51,18 @@ console.log("direction correctness");
 console.log("null handling");
 {
   const bySafety = rankCities(rows, { cost: 0, air: 0, safety: 100, connectivity: 0 });
-  check("city with only safety data still ranks", bySafety.some((r) => r.city_id === 4));
+  check(
+    "city with only safety data still ranks",
+    bySafety.some((r) => r.city_id === 4)
+  );
   const byCost = rankCities(rows, { cost: 100, air: 0, safety: 0, connectivity: 0 });
   check("city missing the only active metric is omitted", !byCost.some((r) => r.city_id === 4));
   const mixed = rankCities(rows, { cost: 50, air: 0, safety: 50, connectivity: 0 });
   const partial = mixed.find((r) => r.city_id === 4);
-  check("partial-data city reports coverage 1 of 2", partial?.coverage === 1 && partial.activeDimensions === 2);
+  check(
+    "partial-data city reports coverage 1 of 2",
+    partial?.coverage === 1 && partial.activeDimensions === 2
+  );
 }
 
 console.log("score sanity");

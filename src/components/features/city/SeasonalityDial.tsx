@@ -90,7 +90,10 @@ export default function SeasonalityDial({ cityName, lat }: SeasonalityDialProps)
   const currentMonth = new Date().getUTCMonth();
 
   return (
-    <section aria-labelledby="seasonality-dial-heading" className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:p-10">
+    <section
+      aria-labelledby="seasonality-dial-heading"
+      className="atlas-panel rounded-2xl p-6 sm:rounded-3xl md:p-10"
+    >
       <h2
         id="seasonality-dial-heading"
         className="flex items-center gap-3 text-xl font-bold tracking-tight md:text-2xl"
@@ -143,16 +146,16 @@ export default function SeasonalityDial({ cityName, lat }: SeasonalityDialProps)
             );
           })}
           <circle cx={100} cy={100} r={40} fill="var(--color-surface)" stroke="var(--color-line)" />
-          <text
-            x={100}
-            y={94}
-            textAnchor="middle"
-            className="season-dial-center"
-            aria-hidden
-          >
+          <text x={100} y={94} textAnchor="middle" className="season-dial-center" aria-hidden>
             now
           </text>
-          <text x={100} y={112} textAnchor="middle" className="season-dial-center-month" aria-hidden>
+          <text
+            x={100}
+            y={112}
+            textAnchor="middle"
+            className="season-dial-center-month"
+            aria-hidden
+          >
             {MONTH_INITIALS.at(currentMonth)}
             {(MONTHS.at(currentMonth) ?? "").slice(1, 3)}
           </text>

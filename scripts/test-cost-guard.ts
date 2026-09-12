@@ -17,7 +17,7 @@ try {
     filename: serverOnlyPath,
     children: [],
     path: "",
-    paths: []
+    paths: [],
   } as any;
 } catch (e) {
   // Empty fallback if server-only is not present
@@ -52,7 +52,10 @@ async function runClaims() {
 
   console.log("isPaidProviderEnabled verification");
   check("gemini enabled when live-fetch-enabled is true", isPaidProviderEnabled("gemini") === true);
-  check("places disabled when live-fetch-enabled is false", isPaidProviderEnabled("google-places") === false);
+  check(
+    "places disabled when live-fetch-enabled is false",
+    isPaidProviderEnabled("google-places") === false
+  );
 
   // Test Case A: openai limit of 0 should immediately return false
   const claimOpenAi = await tryClaimPaidProviderUse("openai", "test_openai");

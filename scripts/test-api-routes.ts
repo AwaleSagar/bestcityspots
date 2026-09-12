@@ -17,7 +17,7 @@ try {
     filename: serverOnlyPath,
     children: [],
     path: "",
-    paths: []
+    paths: [],
   } as any;
 } catch (e) {
   // Ignore
@@ -49,32 +49,42 @@ async function runApiTests() {
   try {
     const req = new NextRequest("http://localhost:3000/api/health", {
       headers: {
-        "authorization": "Bearer debug-token-test",
+        authorization: "Bearer debug-token-test",
       },
     });
 
     const response = await healthGET(req);
     check("health route handler executes without throwing", response !== undefined);
-    check("response status is successful (200) or service unavailable (503)", response.status === 200 || response.status === 503);
-    
+    check(
+      "response status is successful (200) or service unavailable (503)",
+      response.status === 200 || response.status === 503
+    );
+
     const bodyText = await response.text();
-    check("response returns non-empty content", typeof bodyText === "string" && bodyText.length > 0);
+    check(
+      "response returns non-empty content",
+      typeof bodyText === "string" && bodyText.length > 0
+    );
   } catch (err) {
-    check("health route handler runs successfully", false, err instanceof Error ? err.message : String(err));
+    check(
+      "health route handler runs successfully",
+      false,
+      err instanceof Error ? err.message : String(err)
+    );
   }
 
   console.log("POST /api/analytics Validation Check (Invalid payload)");
   try {
     // Construct request with invalid payload (empty events list)
     const payload = {
-      events: []
+      events: [],
     };
-    
+
     const bodyStream = new ReadableStream({
       start(controller) {
         controller.enqueue(new TextEncoder().encode(JSON.stringify(payload)));
         controller.close();
-      }
+      },
     });
 
     const req = new NextRequest("http://localhost:3000/api/analytics", {
@@ -83,14 +93,21 @@ async function runApiTests() {
       duplex: "half",
       headers: {
         "content-type": "application/json",
-      }
+      },
     } as any);
 
     const response = await analyticsPOST(req);
     check("analytics route handler executing on invalid payload", response !== undefined);
-    check("response status is bad request (400) or service unavailable (503)", response.status === 400 || response.status === 503);
+    check(
+      "response status is bad request (400) or service unavailable (503)",
+      response.status === 400 || response.status === 503
+    );
   } catch (err) {
-    check("analytics route handler executes without error", false, err instanceof Error ? err.message : String(err));
+    check(
+      "analytics route handler executes without error",
+      false,
+      err instanceof Error ? err.message : String(err)
+    );
   }
 
   console.log("POST /api/analytics Excess Sizing Gating check");
@@ -100,8 +117,8 @@ async function runApiTests() {
         type: "click",
         path: "/cities/paris",
         referrer: "google.com",
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     };
     const bodyStr = JSON.stringify(hugePayload);
 
@@ -110,7 +127,7 @@ async function runApiTests() {
       start(controller) {
         controller.enqueue(new TextEncoder().encode(bodyStr));
         controller.close();
-      }
+      },
     });
 
     const req = new NextRequest("http://localhost:3000/api/analytics", {
@@ -119,15 +136,19 @@ async function runApiTests() {
       duplex: "half",
       headers: {
         "content-type": "application/json",
-        "content-length": String(new TextEncoder().encode(bodyStr).byteLength)
-      }
+        "content-length": String(new TextEncoder().encode(bodyStr).byteLength),
+      },
     } as any);
 
     const response = await analyticsPOST(req);
     check("analytics route blocks oversized payload", response !== undefined);
     check("response status is payload too large (413)", response.status === 413);
   } catch (err) {
-    check("analytics route blocks oversized payload successfully", false, err instanceof Error ? err.message : String(err));
+    check(
+      "analytics route blocks oversized payload successfully",
+      false,
+      err instanceof Error ? err.message : String(err)
+    );
   }
 
   if (failures > 0) {

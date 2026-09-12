@@ -5,9 +5,10 @@ import TopicalHubLayout from "@/components/seo/TopicalHubLayout";
 import { getCleanestAirCities } from "@/lib/topical-hubs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 const year = new Date().getFullYear();
 
@@ -17,16 +18,14 @@ export const metadata: Metadata = {
   alternates: { canonical: "/best-cities-by-air-quality" },
   openGraph: {
     title: `Best Cities by Air Quality (${year}) | Best City Spots`,
-    description:
-      "Cities with the cleanest air right now, ranked by cached PM2.5 readings.",
+    description: "Cities with the cleanest air right now, ranked by cached PM2.5 readings.",
     url: "/best-cities-by-air-quality",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: `Best Cities by Air Quality (${year}) | Best City Spots`,
-    description:
-      "Cities with the cleanest air right now, ranked by cached PM2.5 readings.",
+    description: "Cities with the cleanest air right now, ranked by cached PM2.5 readings.",
   },
 };
 

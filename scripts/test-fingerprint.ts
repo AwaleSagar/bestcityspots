@@ -53,9 +53,7 @@ console.log("structure");
   check("ring colors are theme tokens", true);
 
   // All coordinates must stay inside the 64×64 viewBox.
-  const numbers = megacity.rings
-    .flatMap((ring) => ring.d.match(/-?\d+\.?\d*/g) ?? [])
-    .map(Number);
+  const numbers = megacity.rings.flatMap((ring) => ring.d.match(/-?\d+\.?\d*/g) ?? []).map(Number);
   const inBox = numbers.every((n) => n >= -2 && n <= 66);
   check("coordinates stay in viewBox", inBox);
 }

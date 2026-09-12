@@ -308,7 +308,7 @@ Copy `.env.example` → `.env.local`. All keys are validated at runtime by Zod (
 | `npm run test:supabase`                    | Backend test harness (tables, RLS, RPCs)            |
 | `npm run warm-cache`                       | Populate caches (the only intended paid-spend path) |
 | `npm run warm-cache:trending` · `:dry-run` | Warm trending only · no-spend preview               |
-| `npm run warm-top-cities`                  | Focused warmer for the top-N cities by population    |
+| `npm run warm-top-cities`                  | Focused warmer for the top-N cities by population   |
 | `npm run analytics` · `analytics:30d`      | Usage/traffic reports                               |
 | `npm run import:cost`                      | Import the cost-of-living index                     |
 | `npm run test`                             | Lightweight metric/share unit checks                |

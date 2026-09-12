@@ -20,7 +20,10 @@ console.log("serializeJsonLd verification");
   const simpleObject = { name: "Eiffel Tower", rating: 4.8 };
   const serializedSimple = serializeJsonLd(simpleObject);
   check("serializes simple object to valid JSON string", typeof serializedSimple === "string");
-  check("serialized JSON is parseable and deep-equals source", JSON.parse(serializedSimple).name === "Eiffel Tower");
+  check(
+    "serialized JSON is parseable and deep-equals source",
+    JSON.parse(serializedSimple).name === "Eiffel Tower"
+  );
 
   // Threat Scenario 1: Literal </script> block escape / HTML-breakout protection
   const maliciousObject = {
@@ -28,10 +31,10 @@ console.log("serializeJsonLd verification");
     description: "Ampersand & bracket < test > content",
   };
   const serializedMalicious = serializeJsonLd(maliciousObject);
-  
+
   check("neutralizes </script> tag by escaping <", !serializedMalicious.includes("</script>"));
   check("neutralizes script start tag", !serializedMalicious.includes("<script>"));
-  
+
   // Checking exact replacements according to target design:
   // replace(/&/g, "&amp;")
   // replace(/</g, "&lt;")

@@ -5,9 +5,10 @@ import TopicalHubLayout from "@/components/seo/TopicalHubLayout";
 import { getDigitalNomadCities } from "@/lib/topical-hubs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 const year = new Date().getFullYear();
 

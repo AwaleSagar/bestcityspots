@@ -17,7 +17,7 @@ try {
     filename: serverOnlyPath,
     children: [],
     path: "",
-    paths: []
+    paths: [],
   } as any;
 } catch (e) {
   // Empty
@@ -47,7 +47,7 @@ console.log("useAnalytics Hook Verification");
 
   try {
     const analytics = useAnalytics();
-    
+
     check("returns safe fallbacks when outside provider boundary", analytics !== undefined);
     check("hasGeoConsent defaults to false", analytics.hasGeoConsent === false);
     check("trackPageView is a no-op function", typeof analytics.trackPageView === "function");
@@ -73,11 +73,17 @@ console.log("useAnalytics Hook Verification");
 // Test Case B: Calling useAnalytics inside an AnalyticsProvider (context is active)
 {
   const mockContextValue = {
-    trackPageView: (p: string) => { console.log(`      → mockPageTrack: ${p}`); },
-    trackAction: (a: string) => { console.log(`      → mockActionTrack: ${a}`); },
-    trackCityView: (id: number) => { console.log(`      → mockCityTrack: ${id}`); },
+    trackPageView: (p: string) => {
+      console.log(`      → mockPageTrack: ${p}`);
+    },
+    trackAction: (a: string) => {
+      console.log(`      → mockActionTrack: ${a}`);
+    },
+    trackCityView: (id: number) => {
+      console.log(`      → mockCityTrack: ${id}`);
+    },
     setGeoConsent: (c: boolean) => {},
-    hasGeoConsent: true
+    hasGeoConsent: true,
   };
 
   const originalUseContext = react.useContext;
@@ -85,7 +91,7 @@ console.log("useAnalytics Hook Verification");
 
   try {
     const analytics = useAnalytics();
-    
+
     check("returns active context value within provider", analytics === mockContextValue);
     check("retrieves true hasGeoConsent state", analytics.hasGeoConsent === true);
     check("retrieves mock analytics functions", typeof analytics.trackPageView === "function");

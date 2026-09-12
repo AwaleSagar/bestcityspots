@@ -122,9 +122,7 @@ function useInsightStream(cityId: number, initialInsight: CityInsight | null) {
           while ((sepIdx = buffer.indexOf("\n\n")) !== -1) {
             const rawEvent = buffer.slice(0, sepIdx);
             buffer = buffer.slice(sepIdx + 2);
-            const dataLine = rawEvent
-              .split("\n")
-              .find((line) => line.startsWith("data:"));
+            const dataLine = rawEvent.split("\n").find((line) => line.startsWith("data:"));
             if (!dataLine) continue;
             const json = dataLine.slice(5).trim();
             let evt: StreamEvent;

@@ -22,8 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/press" },
   openGraph: {
     title: "Press Kit | Best City Spots",
-    description:
-      "Brand assets, methodology link, and journalist contact for Best City Spots.",
+    description: "Brand assets, methodology link, and journalist contact for Best City Spots.",
     url: "/press",
     type: "website",
   },
@@ -61,9 +60,7 @@ export default function PressPage() {
             <Sparkles className="text-accent h-3.5 w-3.5" aria-hidden />
             Press kit
           </span>
-          <h1 className="page-title text-foreground mt-6 max-w-2xl">
-            Press kit and brand assets.
-          </h1>
+          <h1 className="page-title text-foreground mt-6 max-w-2xl">Press kit and brand assets.</h1>
           <p className="lede mt-5 max-w-xl">
             Best City Spots is an editorial atlas of global cities &mdash; live signals,
             neighborhood texture, and AI-assisted briefings, available without a sign-up.
@@ -111,8 +108,8 @@ export default function PressPage() {
               <li>
                 <strong className="text-foreground">What it is:</strong>{" "}
                 <span className="text-muted-strong">
-                  A free, no-sign-up city research tool combining live weather and air-quality
-                  data with AI-assisted briefings.
+                  A free, no-sign-up city research tool combining live weather and air-quality data
+                  with AI-assisted briefings.
                 </span>
               </li>
               <li>

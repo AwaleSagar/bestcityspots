@@ -7,10 +7,7 @@ import { ArrowRight, BookMarked, MapPin, StickyNote } from "lucide-react";
 import { cityHref, type City } from "@/lib/cities";
 import { getJsonStorageItem } from "@/lib/storage";
 import CityFingerprint from "@/components/ui/CityFingerprint";
-import {
-  SAVED_PLACES_STORAGE_KEY,
-  type SavedPlace,
-} from "@/app/cities/[slug]/experience-helpers";
+import { SAVED_PLACES_STORAGE_KEY, type SavedPlace } from "@/app/cities/[slug]/experience-helpers";
 
 const RECENT_KEY = "atlas_recent_searches";
 
@@ -70,9 +67,9 @@ export default function PassportContent() {
           </span>
           <h1 className="page-title text-foreground mt-4">Your quiet record of exploration.</h1>
           <p className="lede mt-4 max-w-2xl">
-            Every city you research stamps itself here, and every place you save adds an
-            expedition mark. This passport lives only in this browser — no account, no cloud, no
-            streaks to keep.
+            Every city you research stamps itself here, and every place you save adds an expedition
+            mark. This passport lives only in this browser — no account, no cloud, no streaks to
+            keep.
           </p>
         </div>
       </header>
@@ -147,8 +144,8 @@ export default function PassportContent() {
           <div>
             <h2 className="text-xl font-bold tracking-tight">No stamps yet.</h2>
             <p className="text-muted mx-auto mt-2 max-w-md text-sm leading-relaxed">
-              Search a city and open its guide — it will stamp itself here automatically. Save a
-              few places and they become expedition marks.
+              Search a city and open its guide — it will stamp itself here automatically. Save a few
+              places and they become expedition marks.
             </p>
           </div>
           <Link href="/" className="btn-secondary group">

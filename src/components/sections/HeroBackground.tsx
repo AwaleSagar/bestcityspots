@@ -54,7 +54,9 @@ export default function HeroBackground() {
           playsInline
           preload="none"
           poster={
-            isEvening ? "/videos/home-hero-loop-dusk-poster.webp" : "/videos/home-hero-loop-poster.webp"
+            isEvening
+              ? "/videos/home-hero-loop-dusk-poster.webp"
+              : "/videos/home-hero-loop-poster.webp"
           }
           onCanPlay={(event) => {
             event.currentTarget.style.opacity = "1";

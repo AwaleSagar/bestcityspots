@@ -70,21 +70,11 @@ export function conditionFromWeatherCode(code: number | null): string {
   if (code >= 1 && code <= 3) return "cloudy";
   if (code >= 45 && code <= 48) return "fog";
   // 51-67: drizzle/rain. 80-82: rain showers. 83-84: heavy rain showers.
-  if (
-    (code >= 51 && code <= 67) ||
-    (code >= 80 && code <= 82) ||
-    code === 83 ||
-    code === 84
-  ) {
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code === 83 || code === 84) {
     return "rain";
   }
   // 71-77: snow fall. 85-86: snow showers. 87-88: snow showers (rare codes).
-  if (
-    (code >= 71 && code <= 77) ||
-    (code >= 85 && code <= 86) ||
-    code === 87 ||
-    code === 88
-  ) {
+  if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86) || code === 87 || code === 88) {
     return "snow";
   }
   // 90-94 are reserved/rare thunderstorm-adjacent codes; 95-99 are explicit

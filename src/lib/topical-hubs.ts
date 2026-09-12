@@ -96,8 +96,7 @@ export const getDigitalNomadCities = reactCache(async (): Promise<CityWithMetric
       if (!city) return null;
       if ((city.population ?? 0) < 200_000) return null;
       const mbps = row.connectivity_mbps ?? 0;
-      const climateBonus =
-        row.climate_comfort && /Mild|Warm/i.test(row.climate_comfort) ? 12 : 0;
+      const climateBonus = row.climate_comfort && /Mild|Warm/i.test(row.climate_comfort) ? 12 : 0;
       const safetyBonus = (row.safety_score ?? 0) > 60 ? 6 : 0;
       const score = mbps + climateBonus + safetyBonus;
       const label = `${mbps ? `${Math.round(mbps)} Mbps · ` : ""}${row.climate_comfort ?? "Climate: pending"}`;

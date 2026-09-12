@@ -18,21 +18,13 @@ function check(name: string, condition: boolean, detail = "") {
 
 console.log("image-transforms: getQualityValue");
 {
-  check(
-    "resolves high preset",
-    getQualityValue("high") === 85,
-    `high=${getQualityValue("high")}`
-  );
+  check("resolves high preset", getQualityValue("high") === 85, `high=${getQualityValue("high")}`);
   check(
     "resolves medium preset",
     getQualityValue("medium") === 70,
     `medium=${getQualityValue("medium")}`
   );
-  check(
-    "resolves low preset",
-    getQualityValue("low") === 50,
-    `low=${getQualityValue("low")}`
-  );
+  check("resolves low preset", getQualityValue("low") === 50, `low=${getQualityValue("low")}`);
 }
 
 console.log("image-transforms: generateSizes");
