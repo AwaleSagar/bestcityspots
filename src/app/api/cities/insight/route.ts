@@ -12,6 +12,7 @@ import {
   type CityInsight,
 } from "@/lib/intelligence";
 import { cityIdSchema } from "@/lib/validation";
+import { tryClaimOnDemandAiUse } from "@/lib/cost-guard";
 import { createLogger } from "@/lib/logger";
 
 const log = createLogger({ component: "api/cities/insight" });
@@ -35,6 +36,23 @@ function sse(payload: SsePayload): string {
   return `data: ${JSON.stringify(payload)}\n\n`;
 }
 
+const SSE_HEADERS = {
+  "Content-Type": "text/event-stream; charset=utf-8",
+  "Cache-Control": "no-cache, no-transform",
+  Connection: "keep-alive",
+} as const;
+
+/** Emit a single SSE event and close — used by every non-streaming outcome. */
+function sseOnce(payload: SsePayload): Response {
+  const stream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(sse(payload)));
+      controller.close();
+    },
+  });
+  return new Response(stream, { headers: SSE_HEADERS });
+}
+
 export async function GET(req: NextRequest) {
   let cityId: number;
   try {
@@ -55,67 +73,45 @@ export async function GET(req: NextRequest) {
 
   // Fast path: cache fresh — emit a single complete event and close.
   if (cacheRead.fresh && cacheRead.insight) {
-    const stream = new ReadableStream<Uint8Array>({
-      start(controller) {
-        const encoder = new TextEncoder();
-        controller.enqueue(encoder.encode(sse({ type: "complete", insight: cacheRead.insight! })));
-        controller.close();
-      },
-    });
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        Connection: "keep-alive",
-      },
-    });
+    return sseOnce({ type: "complete", insight: cacheRead.insight });
   }
 
   // Either engine being enabled is enough — the facade handles fallback.
   if (!isAIEnabled()) {
-    const stream = new ReadableStream<Uint8Array>({
-      start(controller) {
-        const encoder = new TextEncoder();
-        if (cacheRead.insight) {
-          controller.enqueue(encoder.encode(sse({ type: "complete", insight: cacheRead.insight })));
-        } else {
-          controller.enqueue(encoder.encode(sse({ type: "error", reason: "ai_disabled" })));
-        }
-        controller.close();
-      },
-    });
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        Connection: "keep-alive",
-      },
-    });
+    return sseOnce(
+      cacheRead.insight
+        ? { type: "complete", insight: cacheRead.insight }
+        : { type: "error", reason: "ai_disabled" }
+    );
+  }
+
+  // SECURITY (audit M-2): this endpoint is unauthenticated and generates for
+  // any city whose cached insight is cold or stale, so it is the one request
+  // path where a visitor can spend provider budget. Claim from the separate,
+  // smaller on-demand envelope first — the engine's own budget is still
+  // claimed inside the provider module, so an attacker walking a list of
+  // uncached cities can burn at most AI_ON_DEMAND_DAILY_CALL_LIMIT calls and
+  // never starve the nightly warmer. Denial degrades exactly like a provider
+  // outage: stale cache if we have one, otherwise an SSE error event.
+  if (!(await tryClaimOnDemandAiUse(`city_insight:${cityId}`))) {
+    log.info("on_demand_budget_exhausted", { cityId, hasStale: Boolean(cacheRead.insight) });
+    return sseOnce(
+      cacheRead.insight
+        ? { type: "complete", insight: cacheRead.insight }
+        : { type: "error", reason: "rate_limit" }
+    );
   }
 
   // Cold/stale path: stream Gemini.
   const aiStart = await generateTextStream(buildCityInsightPrompt(city));
   if (!aiStart.ok) {
-    const stream = new ReadableStream<Uint8Array>({
-      start(controller) {
-        const encoder = new TextEncoder();
-        // If we have a stale cache row, hand it back so the UI can render
-        // something instead of blanking out.
-        if (cacheRead.insight) {
-          controller.enqueue(encoder.encode(sse({ type: "complete", insight: cacheRead.insight })));
-        } else {
-          controller.enqueue(encoder.encode(sse({ type: "error", reason: aiStart.reason })));
-        }
-        controller.close();
-      },
-    });
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        Connection: "keep-alive",
-      },
-    });
+    // If we have a stale cache row, hand it back so the UI can render
+    // something instead of blanking out.
+    return sseOnce(
+      cacheRead.insight
+        ? { type: "complete", insight: cacheRead.insight }
+        : { type: "error", reason: aiStart.reason }
+    );
   }
 
   const correlationId = aiStart.correlationId;

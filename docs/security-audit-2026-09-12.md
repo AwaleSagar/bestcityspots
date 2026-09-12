@@ -15,17 +15,68 @@ and no missing-authentication issue was found in application code — the weakne
 concentrated in the **database function grants** and in **abuse/DoS resistance of
 unauthenticated endpoints**.
 
-| ID | Severity | Title |
-| --- | --- | --- |
-| [H-1](#h-1) | High | Analytics `SECURITY DEFINER` RPCs are executable by the public anon key (RLS bypass) |
-| [M-1](#m-1) | Medium | `place_images` storage bucket accepts uploads from any `authenticated` user |
-| [M-2](#m-2) | Medium | Unauthenticated requests can drain the whole daily AI budget (`/api/cities/insight`) |
-| [M-3](#m-3) | Medium | Spoofable `x-vercel-ip-*` headers trusted as visitor geography |
-| [M-4](#m-4) | Medium | Unbounded analytics strings → unlimited distinct rows + write amplification |
-| [L-1](#l-1) | Low | Known CVEs in direct production dependencies (`next`, `sharp`) |
-| [L-2](#l-2) | Low | `SECURITY DEFINER` functions without `set search_path` |
-| [L-3](#l-3) | Low | CSP is Report-Only with no reporting endpoint — collects nothing, enforces nothing |
-| [L-4](#l-4) | Low | `search_cities_elastic` reachable by anon with an uncapped query string |
+## Remediation status
+
+**All nine findings are fixed** in the same branch as this report. Each finding
+section below is unchanged (it documents the vulnerability as found); this table
+says where the fix landed.
+
+| ID  | Status | Fix                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| --- | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H-1 | Fixed  | `supabase/migrations/202609121200_harden_function_grants_and_storage.sql` revokes the default `PUBLIC` EXECUTE from all six analytics RPCs and re-grants `service_role` only. Baseline `supabase/analytics_functions.sql` and `supabase/setup_all_blank_project.sql` updated so fresh projects are not born vulnerable. **Requires applying the migration to the live database — the code change alone does not close it.** |
+| M-1 | Fixed  | Same migration + `supabase/place_images_bucket.sql`: the `place_images` INSERT policy is now `service_role` only. Also requires applying.                                                                                                                                                                                                                                                                                   |
+| M-2 | Fixed  | New on-demand budget: `tryClaimOnDemandAiUse()` (`src/lib/cost-guard.ts`), claimed by `/api/cities/insight` before any generation, configured by `AI_ON_DEMAND_DAILY_CALL_LIMIT` (prod default 5, wired through `docker-compose.yml` and the ansible env template). Visitor-triggered generation can no longer drain the engine budget or starve the warmer.                                                                |
+| M-3 | Fixed  | `deploy/ansible/templates/bestcityspots-proxy.conf.j2` (and the reference nginx config) clear all `X-Vercel-IP-*` headers; `sanitizeCountryCode()` / `sanitizeGeoCity()` (`src/lib/analytics.ts`) shape-check and bound whatever still arrives, and the city is dropped entirely without a valid country code.                                                                                                              |
+| M-4 | Fixed  | `AnalyticsEventSchema` bounds every string and number; referral `source_name` must be a valid, lowercased, ≤128-char hostname or it collapses into one `unknown` bucket; per-request city-view fan-out capped at 10 distinct ids.                                                                                                                                                                                           |
+| L-1 | Fixed  | `next` `^16.2.9` → `^16.3.5`, `sharp` `^0.34.5` → `^0.35.4`, `eslint-config-next` to match, plus `npm audit fix` for transitives. `npm audit` now reports **0 vulnerabilities** (was 14 total / 5 production).                                                                                                                                                                                                              |
+| L-2 | Fixed  | `set search_path = public` pinned on all six `SECURITY DEFINER` analytics functions (migration + baseline).                                                                                                                                                                                                                                                                                                                 |
+| L-3 | Fixed  | New `POST /api/csp-report` sink (logs only, no persistence, 16 KB cap); `next.config.ts` adds `report-uri` + `report-to` and a `Reporting-Endpoints` header, and drops `'unsafe-eval'` from `script-src` outside development. The policy stays Report-Only — enforcing it still needs the nonce rollout described below.                                                                                                    |
+| L-4 | Fixed  | `search_cities_elastic` truncates the normalized query to 100 characters (migration). Also requires applying.                                                                                                                                                                                                                                                                                                               |
+
+Two cosmetic notes from the end of this report are fixed too: `/api/analytics` and
+`/api/places/search` no longer echo Zod issues in their 400 bodies.
+
+### Verification
+
+`npm run lint`, `npm run type-check` and `npm run build` all pass on the upgraded
+dependencies. The verification scripts pass, including a new
+`npm run test:analytics-hardening` (32 assertions over the M-3/M-4 helpers).
+`npm run test:providers` fails in the review sandbox only because outbound
+Open-Meteo hosts are not on the sandbox's network allowlist — unrelated to these
+changes.
+
+### Residual risk / follow-ups
+
+- **The three SQL fixes are inert until the migration is applied** to the
+  Supabase project. Until then H-1, M-1 and L-4 remain open in production.
+- **Supabase sign-ups**: M-1's fix removes the `authenticated` grant, but the
+  product has no user accounts at all. Disabling sign-ups in the Supabase
+  dashboard removes the `authenticated` role as an attack surface entirely.
+- **CSP is still Report-Only.** Collecting violations is now possible; moving to
+  an enforced, nonce-based `script-src` remains its own piece of work.
+- **M-4 bounds row growth but does not eliminate it**: a determined attacker can
+  still mint one `traffic_sources_daily` row per distinct valid hostname, through
+  nginx's rate limit. If growth is ever observed, bucket rare hostnames (e.g.
+  keep the top-N per day, fold the rest into `other`).
+- **Next.js view transitions**: the security upgrade to Next 16.3.5 required
+  removing `experimental.viewTransition` from `next.config.ts` — the flag no
+  longer exists upstream. The `::view-transition-*` CSS is untouched; if the
+  city→city hero morph needs explicit re-enabling, it is now done with React's
+  `<ViewTransition>` component. Worth a visual check on a city→city navigation.
+
+---
+
+| ID          | Severity | Title                                                                                |
+| ----------- | -------- | ------------------------------------------------------------------------------------ |
+| [H-1](#h-1) | High     | Analytics `SECURITY DEFINER` RPCs are executable by the public anon key (RLS bypass) |
+| [M-1](#m-1) | Medium   | `place_images` storage bucket accepts uploads from any `authenticated` user          |
+| [M-2](#m-2) | Medium   | Unauthenticated requests can drain the whole daily AI budget (`/api/cities/insight`) |
+| [M-3](#m-3) | Medium   | Spoofable `x-vercel-ip-*` headers trusted as visitor geography                       |
+| [M-4](#m-4) | Medium   | Unbounded analytics strings → unlimited distinct rows + write amplification          |
+| [L-1](#l-1) | Low      | Known CVEs in direct production dependencies (`next`, `sharp`)                       |
+| [L-2](#l-2) | Low      | `SECURITY DEFINER` functions without `set search_path`                               |
+| [L-3](#l-3) | Low      | CSP is Report-Only with no reporting endpoint — collects nothing, enforces nothing   |
+| [L-4](#l-4) | Low      | `search_cities_elastic` reachable by anon with an uncapped query string              |
 
 ---
 
@@ -38,7 +89,7 @@ The app has **no end-user authentication**. Two trust boundaries matter:
    browser, so `NEXT_PUBLIC_SUPABASE_ANON_KEY` and the project URL are in every bundle.
    Anything the `anon` role can do at the PostgREST layer, the internet can do —
    **bypassing nginx rate limits, the Next.js app, and every application-layer check.**
-   This is the correct model *provided* RLS and function grants are airtight.
+   This is the correct model _provided_ RLS and function grants are airtight.
 2. **The Next.js origin** is fronted by nginx with per-IP rate limits
    (`deploy/nginx/bestcityspots.conf`), which slows but does not stop a distributed
    attacker.
@@ -48,6 +99,7 @@ Findings are ranked by what an unauthenticated internet attacker can actually ac
 ---
 
 <a id="h-1"></a>
+
 ## H-1 (High) — Analytics `SECURITY DEFINER` RPCs are executable by the public anon key
 
 **Files:** `supabase/analytics_functions.sql:1-215` (grants at `:210-215`),
@@ -87,6 +139,7 @@ The project already knows the correct pattern — every function added later use
 revoke all on function public.claim_provider_use(text, date, integer) from public;
 grant execute on function public.claim_provider_use(text, date, integer) to service_role;
 ```
+
 (`supabase/migrations/202606111000_provider_budget_and_cache_idempotency.sql:69-70`;
 same for `record_place_save` / `get_place_save_totals` in `202606120900`.)
 The six analytics functions were simply never brought in line.
@@ -106,17 +159,17 @@ bundle.
 
 ### Impact
 
-* **Direct RLS bypass.** The documented posture ("all writes are hard-locked to
+- **Direct RLS bypass.** The documented posture ("all writes are hard-locked to
   `service_role`", `AGENTS.md` → Security Model) does not hold for six write paths.
-* **Attacker-controlled product surface.** `city_views_daily` feeds
+- **Attacker-controlled product surface.** `city_views_daily` feeds
   `queryMostViewedCities()` → `fetchLivingIndexCities()` and `fetchTrendingCityIds()`
   (`src/app/actions.ts:55-137`), which render the homepage **Living Index** and the
   "trending with readers" chips on hub pages. Inflating one city's counter promotes that
   city onto the front door. The 24 h `unstable_cache` delays but does not prevent it.
-* **Business-data corruption.** Every visitor, traffic-source, device, geo and action
+- **Business-data corruption.** Every visitor, traffic-source, device, geo and action
   metric can be written to arbitrary values by anyone, silently. Analytics reporting
   (`scripts/analytics-report.ts`) becomes untrustworthy with no audit trail.
-* **Storage growth.** `upsert_traffic_source` takes free-text `p_source_type` /
+- **Storage growth.** `upsert_traffic_source` takes free-text `p_source_type` /
   `p_source_name`, which are part of the unique key — unlimited distinct rows.
 
 ### Remediation
@@ -161,6 +214,7 @@ Nothing in the app breaks: all six are called only through
 ---
 
 <a id="m-1"></a>
+
 ## M-1 (Medium) — `place_images` bucket accepts uploads from any `authenticated` user
 
 **Files:** `supabase/place_images_bucket.sql:16-19`,
@@ -204,6 +258,7 @@ sign-ups entirely in the Supabase dashboard — the product has no user accounts
 ---
 
 <a id="m-2"></a>
+
 ## M-2 (Medium) — Unauthenticated requests can drain the entire daily AI budget
 
 **Files:** `src/app/api/cities/insight/route.ts:38-97`, `src/lib/cost-guard.ts:50-62`
@@ -234,18 +289,19 @@ The same shape exists for Places on SSR city pages (`ExperiencesWrapper` passes
 
 **Fix options** (any one substantially closes it):
 
-* Serve the insight endpoint **cache-only** and let `scripts/warm-cache.ts` own all
+- Serve the insight endpoint **cache-only** and let `scripts/warm-cache.ts` own all
   generation — matching the Places posture, which is already cache-only in production.
-* Allow on-demand generation only for cities in the warmed set (`isCityWarm`, already
+- Allow on-demand generation only for cities in the warmed set (`isCityWarm`, already
   implemented and used on the same page).
-* Give on-demand generation its own small sub-budget (e.g. 5/day) so a drain cannot starve
+- Give on-demand generation its own small sub-budget (e.g. 5/day) so a drain cannot starve
   the warmer, which is the path that produces value for every future visitor.
-* At minimum, tighten the `/api/cities/insight` nginx zone well below the generic
+- At minimum, tighten the `/api/cities/insight` nginx zone well below the generic
   `/api/` rate.
 
 ---
 
 <a id="m-3"></a>
+
 ## M-3 (Medium) — Spoofable `x-vercel-ip-*` headers trusted as visitor geography
 
 **Files:** `src/app/api/analytics/route.ts:76-83`,
@@ -254,8 +310,7 @@ The same shape exists for Places on SSR city pages (`ExperiencesWrapper` passes
 ```ts
 const countryCode = request.headers.get("x-vercel-ip-country") || null;
 const metadata = {
-  ...
-  countryCode,
+  ...countryCode,
   countryName: countryCode,
   city: request.headers.get("x-vercel-ip-city") || null,
 };
@@ -290,6 +345,7 @@ off-Vercel, derive it from a GeoIP module at the proxy into a header you set you
 ---
 
 <a id="m-4"></a>
+
 ## M-4 (Medium) — Unbounded analytics strings → unlimited rows and write amplification
 
 **Files:** `src/lib/analytics.ts:43-59`, `:102-141`, `:293-343`,
@@ -334,15 +390,16 @@ and cap the number of distinct `cityId`s processed per batch.
 ---
 
 <a id="l-1"></a>
+
 ## L-1 (Low) — Known CVEs in direct production dependencies
 
 `npm audit --omit=dev` reports 5 production vulnerabilities (1 critical, 3 high,
 1 moderate). The two that are **direct** dependencies:
 
-| Package | Installed | Advisories |
-| --- | --- | --- |
-| `next` | `^16.2.9` | **Critical** — middleware/proxy bypass in App Router (Turbopack, single locale); SSRF in Server Actions on custom servers; DoS in App Router Server Actions. Range affected: `9.3.4-canary.0 – 16.3.2`. |
-| `sharp` | `^0.34.5` | **High** — inherited libvips CVE-2026-33327/33328/35590/35591 and libheif GHSA-g89c-p67h-r497 / GHSA-2jg2-4ch7-h545. Fixed in `0.35.4`. |
+| Package | Installed | Advisories                                                                                                                                                                                              |
+| ------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `next`  | `^16.2.9` | **Critical** — middleware/proxy bypass in App Router (Turbopack, single locale); SSRF in Server Actions on custom servers; DoS in App Router Server Actions. Range affected: `9.3.4-canary.0 – 16.3.2`. |
+| `sharp` | `^0.34.5` | **High** — inherited libvips CVE-2026-33327/33328/35590/35591 and libheif GHSA-g89c-p67h-r497 / GHSA-2jg2-4ch7-h545. Fixed in `0.35.4`.                                                                 |
 
 Transitives: `postcss` (high), `nanoid` (high), `baseline-browser-mapping` (moderate).
 
@@ -360,6 +417,7 @@ to `.github/workflows/ci.yml` so this is caught continuously.
 ---
 
 <a id="l-2"></a>
+
 ## L-2 (Low) — `SECURITY DEFINER` functions without `set search_path`
 
 **Files:** `supabase/analytics_functions.sql` (all six functions),
@@ -376,6 +434,7 @@ Roll into the H-1 migration (`alter function ... set search_path = public`).
 ---
 
 <a id="l-3"></a>
+
 ## L-3 (Low) — CSP is Report-Only, has no reporting endpoint, and would be weak enforced
 
 **File:** `next.config.ts:76-97`
@@ -397,6 +456,7 @@ and drop `unsafe-eval` in production before promoting to enforced.
 ---
 
 <a id="l-4"></a>
+
 ## L-4 (Low) — `search_cities_elastic` is anon-executable with an uncapped query string
 
 **File:** `supabase/elastic_search.sql:97-229` (grant at `:226`)
@@ -424,38 +484,38 @@ the existing `lower(trim(...))`) and return early on queries below ~2 characters
 
 Recorded so future reviews do not re-tread the same ground:
 
-* **No SQL injection.** Every Supabase call uses the query builder or parameterized RPCs.
+- **No SQL injection.** Every Supabase call uses the query builder or parameterized RPCs.
   The only dynamic SQL is in a maintenance `do $$` block over a hard-coded table array
   (`202606111000`), and it uses `format(... %I ...)`.
-* **No XSS sink.** All 26 `dangerouslySetInnerHTML` sites go through `serializeJsonLd()`
+- **No XSS sink.** All 26 `dangerouslySetInnerHTML` sites go through `serializeJsonLd()`
   (`src/lib/json-ld.ts`), which escapes `&`, `<`, `>`, U+2028/U+2029 — correct for
   `</script>` breakout. No `eval`, `new Function`, or `child_process` in application code
   (one `spawn` in the offline `scripts/design-scrape` tool). External links carry
   `rel="noopener noreferrer"`, affiliate links add `sponsored nofollow`.
-* **Share tokens are safe.** `decodeSharedList()` (`src/app/cities/[slug]/share-list.ts`)
+- **Share tokens are safe.** `decodeSharedList()` (`src/app/cities/[slug]/share-list.ts`)
   bounds token length, regex-validates every id before using it as an object key, caps the
   list at 50, and — importantly — resolves ids only against data already rendered on the
   page, so a crafted link cannot inject content.
-* **Write paths are service-role gated.** `requireServerClient()` throws rather than
+- **Write paths are service-role gated.** `requireServerClient()` throws rather than
   degrading to anon (`src/lib/supabase.ts:74-82`); insight/weather/metrics repositories
   use it; `supabaseServer` resolves to `null` in client bundles.
-* **Table RLS is correct** for `cities`, `city_metrics`, `city_ai_insights`,
+- **Table RLS is correct** for `cities`, `city_metrics`, `city_ai_insights`,
   `city_places_cache`, `place_details_cache`, `city_weather_cache`, `cache_hit_stats`,
   `place_saves_daily`, `provider_daily_usage`, `city_search_aliases` and the six analytics
   tables: public/anon SELECT where appropriate, writes restricted to `service_role`. The
   `city_ai_insights` stored-content-injection issue (C1) is properly fixed and documented
   in `202606281400`.
-* **Cost guard is sound.** Atomic claim via `claim_provider_use`, durable across restarts,
+- **Cost guard is sound.** Atomic claim via `claim_provider_use`, durable across restarts,
   **fails closed in production** when Supabase is unreachable (`cost-guard.ts:135-158`);
   both AI engines claim from their own budget so provider fallback cannot bypass spend
   control.
-* **Input validation is consistent.** Every route handler Zod-validates before use; both
+- **Input validation is consistent.** Every route handler Zod-validates before use; both
   POST endpoints enforce byte caps by streaming the body rather than buffering it first.
-* **Secrets hygiene.** No secrets committed (`AIza…`/`eyJ…`/`sk-…` scans clean); CI uses
+- **Secrets hygiene.** No secrets committed (`AIza…`/`eyJ…`/`sk-…` scans clean); CI uses
   dummy values and is `pull_request`-triggered, not `pull_request_target`; the Dockerfile
   deliberately keeps paid-provider keys out of build args/layers and runs as a non-root
   user; the ansible env template is 0600 and vault-sourced.
-* **`/api/health`** returns only `{ok}` unless a `Bearer HEALTH_CHECK_TOKEN` is presented,
+- **`/api/health`** returns only `{ok}` unless a `Bearer HEALTH_CHECK_TOKEN` is presented,
   and does not cache 503s.
 
 Two cosmetic notes not counted as findings: `/api/places/search` and `/api/analytics`

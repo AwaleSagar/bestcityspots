@@ -12,7 +12,7 @@ Next.js 16 (App Router, React 19, TypeScript 5 strict) · Tailwind 4 · Supabase
 .
 ├── src/
 │   ├── app/                # App Router: routes, layouts, server actions
-│   │   ├── api/            # REST: analytics, cities/sphere, cities/insight, places/{search,save-event}, health
+│   │   ├── api/            # REST: analytics, cities/sphere, cities/insight, places/{search,save-event}, health, csp-report
 │   │   ├── cities/         # /cities listing + /cities/[slug] detail
 │   │   ├── countries/      # /countries hub + /countries/[slug]
 │   │   ├── best-cities-*/  # Topical SEO hubs (air quality, nomads, monthly)

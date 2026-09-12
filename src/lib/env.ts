@@ -42,6 +42,12 @@ const serverSchema = z.object({
   OPENAI_API_KEY: z.string().min(10).optional(),
   OPENAI_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
   OPENAI_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
+  /**
+   * Daily envelope for visitor-triggered AI generation (audit M-2). Claimed
+   * in addition to the engine budget so an unauthenticated caller cannot
+   * drain the whole provider budget and starve the cache warmer.
+   */
+  AI_ON_DEMAND_DAILY_CALL_LIMIT: z.string().regex(/^\d+$/).optional(),
   /** Preferred AI engine; the other becomes the fallback. Default: gemini. */
   AI_PROVIDER: z.enum(["gemini", "openai"]).optional(),
   OPENWEATHERMAP_API_KEY: z.string().min(10).optional(),
@@ -128,6 +134,7 @@ export function serverEnv(): ServerEnv {
       OPENAI_API_KEY: process.env.OPENAI_API_KEY,
       OPENAI_LIVE_FETCH_ENABLED: process.env.OPENAI_LIVE_FETCH_ENABLED,
       OPENAI_DAILY_CALL_LIMIT: process.env.OPENAI_DAILY_CALL_LIMIT,
+      AI_ON_DEMAND_DAILY_CALL_LIMIT: process.env.AI_ON_DEMAND_DAILY_CALL_LIMIT,
       AI_PROVIDER: process.env.AI_PROVIDER,
       OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
       NODE_ENV: process.env.NODE_ENV,
@@ -192,6 +199,8 @@ function readServerEnvValue(key: keyof ServerEnv): ServerEnv[keyof ServerEnv] {
       return env.OPENAI_LIVE_FETCH_ENABLED;
     case "OPENAI_DAILY_CALL_LIMIT":
       return env.OPENAI_DAILY_CALL_LIMIT;
+    case "AI_ON_DEMAND_DAILY_CALL_LIMIT":
+      return env.AI_ON_DEMAND_DAILY_CALL_LIMIT;
     case "AI_PROVIDER":
       return env.AI_PROVIDER;
     case "OPENWEATHERMAP_API_KEY":

@@ -1,6 +1,11 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase";
-import { AnalyticsPayloadSchema, processAnalyticsBatch } from "@/lib/analytics";
+import {
+  AnalyticsPayloadSchema,
+  processAnalyticsBatch,
+  sanitizeCountryCode,
+  sanitizeGeoCity,
+} from "@/lib/analytics";
 
 const MAX_PAYLOAD_BYTES = 64 * 1024;
 
@@ -67,19 +72,23 @@ export async function POST(request: NextRequest) {
     const result = AnalyticsPayloadSchema.safeParse(body ? body.value : undefined);
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: "Invalid payload", details: result.error.issues },
-        { status: 400 }
-      );
+      // Deliberately opaque: echoing Zod issues leaks the internal schema shape
+      // to an unauthenticated caller. Details stay in the server log.
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const countryCode = request.headers.get("x-vercel-ip-country") || null;
+    // SECURITY (audit M-3): `x-vercel-ip-*` are only trustworthy when the app
+    // runs behind Vercel's edge, which overwrites them. This deployment is
+    // nginx → Node, so the proxy must strip them (deploy/nginx/*) and we
+    // additionally shape-check whatever arrives: a two-letter country code and
+    // a bounded, control-character-free city, or nothing at all.
+    const countryCode = sanitizeCountryCode(request.headers.get("x-vercel-ip-country"));
     const metadata = {
       userAgent: request.headers.get("user-agent") || "",
       referrer: request.headers.get("referer") || result.data.events[0]?.referrer || null,
       countryCode,
       countryName: countryCode,
-      city: request.headers.get("x-vercel-ip-city") || null,
+      city: countryCode ? sanitizeGeoCity(request.headers.get("x-vercel-ip-city")) : null,
     };
 
     after(() => {

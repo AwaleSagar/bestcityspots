@@ -43,7 +43,8 @@
     "design:aggregate": "tsx scripts/design-scrape/aggregate.ts",
     "design:signals": "tsx scripts/design-scrape/signals.ts",
     "design:components": "tsx scripts/design-scrape/components.ts",
-    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer && npm run test:warm-priority && npm run test:validation && npm run test:json-ld && npm run test:cost-guard && npm run test:image-transforms && npm run test:providers && npm run test:api-routes && npm run test:actions && npm run test:storage && npm run test:use-analytics"
+    "test": "npm run test:metrics && npm run test:share && npm run test:atmosphere && npm run test:fingerprint && npm run test:mixer && npm run test:warm-priority && npm run test:validation && npm run test:analytics-hardening && npm run test:json-ld && npm run test:cost-guard && npm run test:image-transforms && npm run test:providers && npm run test:api-routes && npm run test:actions && npm run test:storage && npm run test:use-analytics",
+    "test:analytics-hardening": "tsx --conditions=react-server scripts/test-analytics-hardening.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -54,12 +55,12 @@
     "framer-motion": "^12.25.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.562.0",
-    "next": "^16.2.9",
+    "next": "^16.3.5",
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "server-only": "^0.0.1",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -68,7 +69,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^16.2.9",
+    "eslint-config-next": "^16.3.5",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-security": "^3.0.1",
     "prettier": "^3.4.2",

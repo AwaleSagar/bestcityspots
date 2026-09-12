@@ -17,6 +17,7 @@ create or replace function public.upsert_daily_visitor_stats(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.daily_visitor_stats (
@@ -80,6 +81,7 @@ create or replace function public.upsert_traffic_source(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.traffic_sources_daily (
@@ -109,6 +111,7 @@ create or replace function public.upsert_device_stats(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.device_stats_daily (
@@ -137,6 +140,7 @@ create or replace function public.upsert_geo_stats(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.geo_stats_daily (
@@ -166,6 +170,7 @@ create or replace function public.upsert_city_views(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.city_views_daily (
@@ -192,6 +197,7 @@ create or replace function public.upsert_user_action(
 returns void
 language plpgsql
 security definer
+set search_path = public
 as $$
 begin
   insert into public.user_actions_daily (
@@ -207,9 +213,21 @@ end;
 $$;
 
 -- Grant execute permissions to service_role
-grant execute on function public.upsert_daily_visitor_stats to service_role;
-grant execute on function public.upsert_traffic_source to service_role;
-grant execute on function public.upsert_device_stats to service_role;
-grant execute on function public.upsert_geo_stats to service_role;
-grant execute on function public.upsert_city_views to service_role;
-grant execute on function public.upsert_user_action to service_role;
+-- SECURITY (audit H-1): PostgreSQL grants EXECUTE to PUBLIC by default, and
+-- granting to service_role does NOT remove it. Because these functions are
+-- SECURITY DEFINER and live in the PostgREST-exposed `public` schema, leaving
+-- the default in place let anyone holding the (browser-visible) anon key call
+-- them and write to every analytics table, bypassing RLS. Revoke first, then
+-- grant only to service_role — the same pattern as claim_provider_use().
+revoke all on function public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) from public, anon, authenticated;
+grant execute on function public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) to service_role;
+revoke all on function public.upsert_traffic_source(date, text, text, integer, integer) from public, anon, authenticated;
+grant execute on function public.upsert_traffic_source(date, text, text, integer, integer) to service_role;
+revoke all on function public.upsert_device_stats(date, text, text, text) from public, anon, authenticated;
+grant execute on function public.upsert_device_stats(date, text, text, text) to service_role;
+revoke all on function public.upsert_geo_stats(date, text, text, text) from public, anon, authenticated;
+grant execute on function public.upsert_geo_stats(date, text, text, text) to service_role;
+revoke all on function public.upsert_city_views(date, integer) from public, anon, authenticated;
+grant execute on function public.upsert_city_views(date, integer) to service_role;
+revoke all on function public.upsert_user_action(date, text) from public, anon, authenticated;
+grant execute on function public.upsert_user_action(date, text) to service_role;

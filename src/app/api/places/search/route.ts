@@ -30,14 +30,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid search parameters", details: parsed.error.issues },
-        { status: 400 }
-      );
+      // No `details`: echoing Zod issues hands an unauthenticated caller the
+      // internal schema shape for free.
+      return NextResponse.json({ error: "Invalid search parameters" }, { status: 400 });
     }
 
     const data = await searchPlaces({ ...parsed.data, signal: controller.signal });
-    const hasCoordinates = typeof parsed.data.lat === "number" && typeof parsed.data.lng === "number";
+    const hasCoordinates =
+      typeof parsed.data.lat === "number" && typeof parsed.data.lng === "number";
 
     return NextResponse.json(
       {
