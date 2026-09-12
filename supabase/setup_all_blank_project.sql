@@ -1758,6 +1758,250 @@ with check (true);
 insert into public.ai_trending_cache (id) values (1) on conflict (id) do nothing;
 
 
+-- ═══ migrations/202606141200_fix_search_cities_elastic_coord_types.sql ═══
+-- =============================================================================
+-- Fix: search_cities_elastic return type mismatch on lat/lng.
+--
+-- public.cities stores lat/lng as `double precision`, but every prior
+-- definition of search_cities_elastic declared `RETURNS TABLE (... lat numeric,
+-- lng numeric ...)`. Postgres requires the function body's output types to
+-- match the declared types exactly, so the RPC failed at call time with
+-- "structure of query does not match function result type" on any clean build
+-- whose cities table uses double precision (the canonical repo schema).
+--
+-- This recreates the function with `lat double precision, lng double precision`
+-- — which also matches the TypeScript `City` type (lat/lng: number); PostgREST
+-- serializes double precision as JSON numbers, whereas numeric came back as
+-- strings. Body is otherwise identical to the slug-aware definition in
+-- migrations/202605080000_cities_slug_seo.sql.
+--
+-- Idempotent: DROP IF EXISTS + CREATE OR REPLACE + GRANT.
+-- =============================================================================
+
+DROP FUNCTION IF EXISTS public.search_cities_elastic(text, int);
+
+CREATE OR REPLACE FUNCTION public.search_cities_elastic(
+  query text,
+  result_limit int DEFAULT 10
+)
+RETURNS TABLE (
+  id bigint,
+  city text,
+  city_ascii text,
+  slug text,
+  lat double precision,
+  lng double precision,
+  country text,
+  iso2 text,
+  iso3 text,
+  admin_name text,
+  capital text,
+  population bigint,
+  rank_score real,
+  match_type text
+) LANGUAGE plpgsql STABLE AS $$
+DECLARE
+  clean_query text;
+  tsq tsquery;
+  safe_limit int;
+BEGIN
+  safe_limit := LEAST(GREATEST(result_limit, 1), 50);
+  clean_query := lower(trim(public.f_unaccent(query)));
+
+  IF length(clean_query) < 1 THEN
+    RETURN;
+  END IF;
+
+  BEGIN
+    tsq := phraseto_tsquery('english', clean_query);
+    IF tsq IS NULL OR tsq = ''::tsquery THEN
+      tsq := plainto_tsquery('english', clean_query);
+    END IF;
+  EXCEPTION WHEN OTHERS THEN
+    tsq := plainto_tsquery('english', clean_query);
+  END;
+
+  RETURN QUERY
+  WITH
+  fts AS (
+    SELECT
+      c.id, c.city, c.city_ascii, c.slug, c.lat, c.lng, c.country,
+      c.iso2, c.iso3, c.admin_name, c.capital, c.population,
+      ts_rank_cd(c.search_document, tsq, 32) AS fts_rank,
+      'fts'::text AS mt
+    FROM public.cities c
+    WHERE c.search_document @@ tsq
+      AND tsq IS NOT NULL AND tsq != ''::tsquery
+    ORDER BY ts_rank_cd(c.search_document, tsq, 32) DESC,
+             c.population DESC NULLS LAST
+    LIMIT safe_limit
+  ),
+  fuzzy AS (
+    SELECT
+      c.id, c.city, c.city_ascii, c.slug, c.lat, c.lng, c.country,
+      c.iso2, c.iso3, c.admin_name, c.capital, c.population,
+      GREATEST(
+        similarity(lower(c.city_ascii), clean_query),
+        similarity(lower(c.country), clean_query),
+        word_similarity(clean_query, lower(c.city_ascii))
+      ) AS trgm_score,
+      'fuzzy'::text AS mt
+    FROM public.cities c
+    WHERE c.id NOT IN (SELECT f.id FROM fts f)
+      AND (
+        lower(c.city_ascii) % clean_query
+        OR lower(c.country) % clean_query
+        OR clean_query <% lower(c.city_ascii)
+      )
+    ORDER BY GREATEST(
+      similarity(lower(c.city_ascii), clean_query),
+      similarity(lower(c.country), clean_query),
+      word_similarity(clean_query, lower(c.city_ascii))
+    ) DESC,
+    c.population DESC NULLS LAST
+    LIMIT safe_limit
+  ),
+  alias_matches AS (
+    SELECT
+      c.id, c.city, c.city_ascii, c.slug, c.lat, c.lng, c.country,
+      c.iso2, c.iso3, c.admin_name, c.capital, c.population,
+      similarity(a.alias, clean_query) AS alias_score,
+      'alias'::text AS mt
+    FROM public.city_search_aliases a
+    JOIN public.cities c ON c.id = a.city_id
+    WHERE a.alias % clean_query
+       OR a.alias ILIKE clean_query || '%'
+       OR clean_query ILIKE a.alias || '%'
+  ),
+  combined AS (
+    SELECT *, fts_rank AS raw_score FROM fts
+    UNION ALL
+    SELECT *, trgm_score AS raw_score FROM fuzzy
+    UNION ALL
+    SELECT *, alias_score AS raw_score FROM alias_matches
+  ),
+  deduped AS (
+    SELECT DISTINCT ON (cb.id)
+      cb.id, cb.city, cb.city_ascii, cb.slug, cb.lat, cb.lng, cb.country,
+      cb.iso2, cb.iso3, cb.admin_name, cb.capital, cb.population,
+      cb.mt,
+      (cb.raw_score::real + (ln(GREATEST(cb.population, 1)) / 40.0)::real) AS final_score
+    FROM combined cb
+    ORDER BY cb.id, cb.raw_score DESC
+  )
+  SELECT
+    d.id, d.city, d.city_ascii, d.slug, d.lat, d.lng, d.country,
+    d.iso2, d.iso3, d.admin_name, d.capital, d.population,
+    d.final_score AS rank_score,
+    d.mt AS match_type
+  FROM deduped d
+  ORDER BY d.final_score DESC, d.population DESC NULLS LAST
+  LIMIT safe_limit;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.search_cities_elastic(text, int) TO anon, authenticated;
+
+
+
+-- ═══ migrations/202607071200_fix_daily_visitor_stats_bounce_duration_weighting.sql ═══
+-- =============================================================================
+-- Fix: upsert_daily_visitor_stats weighted per-session rates by pageviews.
+--
+-- bounce_rate_pct and avg_session_duration_sec are per-SESSION metrics, but
+-- the merge in upsert_daily_visitor_stats weighted them by total_visits
+-- (which recordDailyVisitorStats set to the pageview count). The effect was
+-- that a single bounced session with N pageviews reported a bounce rate of
+-- 100/N % instead of 100% — e.g. one bounced session of three pageviews
+-- surfaced as 33.3% rather than 100%. Average session duration was skewed
+-- the same way (sessions with more pageviews overweighted the mean).
+--
+-- This re-weights both merges by unique_visitors (the session count) and
+-- computes the initial bounce_rate_pct against p_unique. Page-view volume
+-- (total_visits, page_views) is unchanged, so dashboard traffic numbers are
+-- unaffected; only the per-session rates become correct.
+--
+-- No data backfill is required: existing daily rows keep their historical
+-- (incorrect) rates, and every write from this function forward is correct.
+--
+-- Idempotent: CREATE OR REPLACE preserves the existing signature/grants.
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.upsert_daily_visitor_stats(
+  p_date date,
+  p_visits integer,
+  p_unique integer,
+  p_pageviews integer,
+  p_duration integer,
+  p_bounce integer,
+  p_new integer,
+  p_returning integer
+)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  INSERT INTO public.daily_visitor_stats (
+    stat_date,
+    total_visits,
+    unique_visitors,
+    page_views,
+    avg_session_duration_sec,
+    bounce_rate_pct,
+    new_visitors,
+    returning_visitors
+  )
+  VALUES (
+    p_date,
+    p_visits,
+    p_unique,
+    p_pageviews,
+    p_duration,
+    -- Per-SESSION rate: denominator is the session count (p_unique).
+    CASE WHEN p_unique > 0 THEN (p_bounce * 100 / p_unique) ELSE 0 END,
+    p_new,
+    p_returning
+  )
+  ON CONFLICT (stat_date)
+  DO UPDATE SET
+    total_visits = daily_visitor_stats.total_visits + excluded.total_visits,
+    unique_visitors = daily_visitor_stats.unique_visitors + excluded.unique_visitors,
+    page_views = daily_visitor_stats.page_views + excluded.page_views,
+    avg_session_duration_sec = CASE
+      WHEN daily_visitor_stats.unique_visitors + excluded.unique_visitors > 0
+      THEN ((daily_visitor_stats.avg_session_duration_sec * daily_visitor_stats.unique_visitors) +
+            (excluded.avg_session_duration_sec * excluded.unique_visitors)) /
+           (daily_visitor_stats.unique_visitors + excluded.unique_visitors)
+      ELSE 0
+    END,
+    bounce_rate_pct = CASE
+      WHEN daily_visitor_stats.unique_visitors + excluded.unique_visitors > 0
+      THEN ((daily_visitor_stats.bounce_rate_pct * daily_visitor_stats.unique_visitors) +
+            (excluded.bounce_rate_pct * excluded.unique_visitors)) /
+           (daily_visitor_stats.unique_visitors + excluded.unique_visitors)
+      ELSE 0
+    END,
+    new_visitors = daily_visitor_stats.new_visitors + excluded.new_visitors,
+    returning_visitors = daily_visitor_stats.returning_visitors + excluded.returning_visitors,
+    updated_at = timezone('utc', now());
+END;
+$$;
+
+-- SECURITY: this function is SECURITY DEFINER, so it bypasses RLS. Pin its
+-- search_path and drop the EXECUTE grant PostgreSQL hands to PUBLIC by default
+-- (granting to service_role does not remove it) — otherwise the browser-visible
+-- anon key can call it through PostgREST. Added retroactively by the 2026-09-12
+-- audit (H-1/L-2); migrations/202609121200 applies the same fix to every
+-- analytics RPC for environments that already ran this file. Kept here so the
+-- migration is correct standalone and a from-scratch replay never leaves a
+-- window where the function is world-executable.
+ALTER FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) SET search_path = public;
+REVOKE ALL ON FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) TO service_role;
+
+
+
 -- ═══ migrations/202609121200_harden_function_grants_and_storage.sql ═══
 -- =============================================================================
 -- Security audit remediation (docs/security-audit-2026-09-12.md): H-1, L-2,

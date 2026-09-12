@@ -114,7 +114,7 @@ Auth/authorization status from the repo:
 
 ### Testing Expectations
 
-- Minimum safety rails are `npm run lint`, `npm run type-check`, and targeted script-based verification.
+- Minimum safety rails are `npm run verify` (lint, format, types, migration hygiene, verification scripts) plus targeted script-based checks for anything network- or credential-dependent.
 - There is not yet a full automated backend test suite in the repo.
 - When touching backend logic, add focused tests or executable verification scripts where practical, especially around ranking, validation, search behavior, cache freshness, and analytics aggregation.
 
@@ -132,5 +132,10 @@ Auth/authorization status from the repo:
 ### Known Assumptions
 
 - The repo is clearly Docker-ready, but the primary production host is not explicitly documented.
-- CI runs lint + type-check + build on push/PR to main via `.github/workflows/ci.yml` (Node 20).
+- CI runs lint, format check, type check, migration hygiene, the verification
+  scripts, the Next build, and a container build+boot smoke test on push/PR to
+  main (`.github/workflows/ci.yml`, Node 20); `.github/workflows/security.yml`
+  fails the build on high/critical advisories in production dependencies and
+  runs weekly. Deploys are manual via `.github/workflows/deploy.yml`. Locally,
+  `npm run verify` is the same gate set. Full detail: `docs/ci-cd.md`.
 - No formal compliance requirement beyond privacy-conscious behavior and GDPR-style geo consent is documented yet.

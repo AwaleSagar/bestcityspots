@@ -1,0 +1,189 @@
+name: Deploy
+
+# Manual by design. The production host is a single VM running
+# `docker compose` behind nginx, and `scripts/deploy.sh` already does the
+# careful part (fetch, build, health check, rollback). This workflow is the
+# remote trigger for it, so deploys are auditable in GitHub instead of
+# happening from someone's laptop over SSH.
+#
+# Auto-deploy on push to main is deliberately NOT enabled: the app's daily
+# provider budget and cache warmers make an unattended restart mid-day a
+# cost/latency event, not a no-op. When that changes, add:
+#
+#   push:
+#     tags: ["v*"]
+#
+# and keep the `production` environment's required reviewers in place.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag or SHA to deploy"
+        required: true
+        default: main
+        type: string
+      dry_run:
+        description: "Print what would happen without changing the host"
+        required: false
+        default: false
+        type: boolean
+      skip_health_check:
+        description: "Skip the post-deploy health poll (emergency use only)"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+# Never let two deploys touch the host at once; never cancel one midway.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Configure required reviewers on this environment to gate deploys, and
+    # store DEPLOY_HOST / DEPLOY_USER / DEPLOY_SSH_KEY / DEPLOY_SSH_KNOWN_HOSTS
+    # as environment secrets. See docs/ci-cd.md.
+    environment: production
+    steps:
+      # Fail fast and legibly when the environment has not been wired up yet,
+      # rather than dumping an ssh error. A deploy that cannot run must never
+      # report success.
+      - name: Check deployment secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          missing=""
+          [ -n "$DEPLOY_HOST" ] || missing="$missing DEPLOY_HOST"
+          [ -n "$DEPLOY_USER" ] || missing="$missing DEPLOY_USER"
+          [ -n "$DEPLOY_SSH_KEY" ] || missing="$missing DEPLOY_SSH_KEY"
+          [ -n "$DEPLOY_SSH_KNOWN_HOSTS" ] || missing="$missing DEPLOY_SSH_KNOWN_HOSTS"
+          if [ -n "$missing" ]; then
+            {
+              echo "### Deployment is not configured"
+              echo ""
+              echo "Missing environment secrets:$missing"
+              echo ""
+              echo "Add them under Settings → Environments → production."
+              echo "See docs/ci-cd.md for what each one holds."
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "All deployment secrets present."
+
+      # `ref` is interpolated into the remote shell command below. Anyone who
+      # can dispatch this workflow can already deploy, but an unvalidated value
+      # would turn a typo into arbitrary remote execution — so constrain it to
+      # the characters a git ref can actually contain.
+      - name: Validate ref
+        env:
+          DEPLOY_REF: ${{ inputs.ref }}
+        run: |
+          if ! printf '%s' "$DEPLOY_REF" | grep -qE '^[A-Za-z0-9][A-Za-z0-9._/-]{0,200}$'; then
+            echo "Refusing to deploy ref '$DEPLOY_REF': expected a branch, tag or SHA."
+            exit 1
+          fi
+          echo "Ref '$DEPLOY_REF' looks like a git ref."
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      # Values go through `env`, never straight into the shell body — the
+      # standard guard against expression-injection in `run:` blocks.
+      - name: Record what is being deployed
+        env:
+          DEPLOY_REF: ${{ inputs.ref }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          sha="$(git rev-parse HEAD)"
+          {
+            echo "### Deploying"
+            echo ""
+            echo "- Ref: \`$DEPLOY_REF\`"
+            echo "- Commit: \`$sha\`"
+            echo "- Dry run: \`$DRY_RUN\`"
+            echo ""
+            echo "SQL migrations are **not** applied by this workflow — check"
+            echo "\`supabase/migrations/\` for anything unapplied and run it first"
+            echo "(docs/ci-cd.md → Database migrations)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # First-party tooling only: the runner already has ssh, and pinning
+      # known_hosts avoids both a third-party action and host-key blind trust.
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Run deploy script on the host
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT || '22' }}
+          REPO_DIR: ${{ vars.DEPLOY_REPO_DIR || '/opt/bestcityspots' }}
+          DEPLOY_REF: ${{ inputs.ref }}
+          DRY_RUN: ${{ inputs.dry_run }}
+          SKIP_HEALTH_CHECK: ${{ inputs.skip_health_check }}
+        run: |
+          flags=""
+          if [ "$DRY_RUN" = "true" ]; then
+            flags="$flags --dry-run"
+          fi
+          if [ "$SKIP_HEALTH_CHECK" = "true" ]; then
+            flags="$flags --skip-health-check"
+          fi
+
+          # `scripts/deploy.sh` fetches the ref itself, rebuilds the image,
+          # health-checks the container and rolls back to the previous image on
+          # failure — so the remote command is intentionally thin.
+          ssh -i ~/.ssh/deploy_key \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o ConnectTimeout=15 \
+              -p "$DEPLOY_PORT" \
+              "$DEPLOY_USER@$DEPLOY_HOST" \
+              "set -Eeuo pipefail; cd '$REPO_DIR' && REPO_DIR='$REPO_DIR' GIT_BRANCH='$DEPLOY_REF' ./scripts/deploy.sh $flags"
+
+      # deploy.sh polls the container directly; this proves the public edge
+      # (nginx, TLS, DNS) is serving the new release too.
+      - name: Verify public health endpoint
+        if: ${{ inputs.dry_run == false && inputs.skip_health_check == false }}
+        env:
+          HEALTH_URL: ${{ vars.PUBLIC_HEALTH_URL || 'https://bestcityspots.com/api/health' }}
+        run: |
+          for attempt in $(seq 1 12); do
+            code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$HEALTH_URL" || true)"
+            if [ "$code" = "200" ]; then
+              echo "Public health check OK ($HEALTH_URL)."
+              echo "Public health check returned 200." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            echo "Attempt $attempt: HTTP $code — retrying in 10s."
+            sleep 10
+          done
+          echo "Public health endpoint never returned 200 ($HEALTH_URL)."
+          echo "The host-side deploy reported success, so the container is up;"
+          echo "investigate nginx/TLS/DNS before rolling back."
+          exit 1
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

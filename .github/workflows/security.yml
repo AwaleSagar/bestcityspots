@@ -1,0 +1,91 @@
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/security.yml
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - package-lock.json
+  schedule:
+    # Mondays 06:00 UTC. Advisories land after a lockfile is merged, so a
+    # PR-time audit alone goes stale — this is what actually catches them.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+# NOTE: do not make this a required status check. The push/PR triggers are
+# path-filtered, so on a PR that does not touch the lockfile this workflow never
+# runs — a required check would then wait forever. Protect `main` with the
+# "CI passed" job in ci.yml instead.
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      # Production dependencies ship to users — high or critical fails the
+      # build. The 2026-09-12 audit (L-1) found a critical `next` advisory and
+      # high `sharp` CVEs sitting unnoticed; this is the gate that stops that
+      # from recurring silently.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      # Dev dependencies cannot be reached by a request, so they report rather
+      # than block: a build-tool advisory should not wedge every PR, but it
+      # should be visible in the run summary.
+      - name: Audit all dependencies (advisory)
+        if: always()
+        run: |
+          if npm audit --audit-level=moderate; then
+            echo "No moderate-or-higher advisories across all dependencies." >> "$GITHUB_STEP_SUMMARY"
+          else
+            {
+              echo "### Dev-dependency advisories"
+              echo ""
+              echo "\`npm audit\` reports moderate-or-higher advisories that do not affect"
+              echo "the production bundle. Not blocking — clear them with \`npm audit fix\`"
+              echo "or a Dependabot bump when convenient."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # The anon Supabase key is public by design; the service-role key and
+      # provider keys never are. Cheap tripwire for the one mistake that would
+      # be catastrophic and is easy to make in an env example or a doc snippet.
+      - name: Scan for committed credentials
+        run: |
+          set +e
+          matches="$(grep -rInE \
+            "(AIza[0-9A-Za-z_-]{30,}|sk-[A-Za-z0-9]{20,}|eyJ[A-Za-z0-9_-]{30,}\.[A-Za-z0-9_-]{10,})" \
+            --exclude-dir=node_modules \
+            --exclude-dir=.git \
+            --exclude-dir=.next \
+            --exclude=package-lock.json \
+            . )"
+          set -e
+          if [ -n "$matches" ]; then
+            echo "Possible credential material committed to the repository:"
+            echo "$matches" | cut -c1-160
+            exit 1
+          fi
+          echo "No credential-shaped strings found."

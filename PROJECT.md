@@ -25,9 +25,10 @@ Next.js 16 (App Router, React 19, TypeScript 5 strict) · Tailwind 4 · Supabase
 │   ├── platform/           # Platform layer (data-access + cache repositories)
 │   └── lib/                # Service layer (business logic, mostly server-only)
 ├── supabase/               # SQL: baseline files + ordered migrations/
-├── scripts/                # Ops: cache warming, analytics, seeding, verification
+├── scripts/                # Ops: cache warming, analytics, seeding, verification, migration checks
 ├── public/                 # Static assets
 ├── data/                   # Local seed data (worldcities.csv; gitignored)
+├── .github/                # CI, security audit, manual deploy workflows (docs/ci-cd.md)
 ├── next.config.ts          # Next config + hardened response headers
 ├── Dockerfile, docker-compose.yml
 ├── tsconfig.json, eslint.config.mjs, postcss.config.mjs, .prettierrc

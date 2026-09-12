@@ -6,11 +6,39 @@ on:
   push:
     branches: [main]
 
-jobs:
-  quality:
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
+# Least privilege: nothing here writes to the repo or publishes anything.
+permissions:
+  contents: read
 
+# A superseded push stops burning minutes — but never cancel a run on main,
+# whose result gates deployment.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  NODE_VERSION: "20"
+  # Build-time placeholders. The build must never touch a real project or a
+  # paid provider: `generateStaticParams` degrades to an empty city list
+  # without Supabase, and the cost guard is cache-only in production unless a
+  # live-fetch flag is set, so a CI build makes zero paid calls. Keys are
+  # runtime-only by design (Dockerfile / incident action P4).
+  NEXT_PUBLIC_SUPABASE_URL: https://example.invalid
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci_dummy_anon_key_12345678901234567890
+  SUPABASE_SERVICE_ROLE_KEY: ci_dummy_service_role_key_12345678901234567890
+  GOOGLE_PLACES_API_KEY: ci_dummy_places_key
+  GOOGLE_GEMINI_API_KEY: ci_dummy_gemini_key
+  OPENWEATHERMAP_API_KEY: ci_dummy_openweather_key
+  GOOGLE_PLACES_LIVE_FETCH_ENABLED: "false"
+  GOOGLE_GEMINI_LIVE_FETCH_ENABLED: "false"
+
+jobs:
+  # Fast feedback: everything that needs no build output. Runs first so a
+  # typo fails in ~1 minute instead of after a full Next build.
+  quality:
+    name: Lint, format, types, migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,7 +46,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
       - name: Install dependencies
@@ -27,18 +55,174 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Format check
+        run: npm run format:check
+
       - name: Type check
         run: npm run type-check
+
+      # Guards the migrations ↔ blank-project-baseline contract and the
+      # SECURITY DEFINER rules from the 2026-09-12 audit. See
+      # scripts/check-migrations.ts.
+      - name: Migration hygiene
+        run: npm run check:migrations
+
+  test:
+    name: Verification scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `test:ci` is `test` minus `test:providers`, which makes live calls to
+      # Open-Meteo. A pipeline that goes red for a third party's outage gets
+      # ignored, so provider connectivity stays a local/manual check.
+      - name: Run verification scripts
+        run: npm run test:ci
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Reuse the Next build cache across runs on the same lockfile+source, so
+      # unchanged pages are not re-rendered every time.
+      - name: Restore Next.js cache
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'next.config.ts') }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            next-${{ runner.os }}-
 
       - name: Build
         run: npm run build
         env:
           NODE_ENV: production
-          NEXT_PUBLIC_SUPABASE_URL: https://example.invalid
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci_dummy_anon_key_12345678901234567890
-          SUPABASE_SERVICE_ROLE_KEY: ci_dummy_service_role_key_12345678901234567890
-          GOOGLE_PLACES_API_KEY: ci_dummy_places_key
-          GOOGLE_GEMINI_API_KEY: ci_dummy_gemini_key
-          OPENWEATHERMAP_API_KEY: ci_dummy_openweather_key
-          GOOGLE_PLACES_LIVE_FETCH_ENABLED: "false"
-          GOOGLE_GEMINI_LIVE_FETCH_ENABLED: "false"
+
+  # Production runs the container, not `next start`, so the image has to build
+  # too. Path-filtered to keep ordinary PRs fast: only runs when something the
+  # image actually depends on changed.
+  docker:
+    name: Container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Values reach the shell through `env`, never interpolated into the
+      # script body.
+      - name: Decide whether the image needs rebuilding
+        id: changes
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          base="$BASE_SHA"
+          if git diff --name-only "$base"...HEAD \
+            | grep -qE '^(Dockerfile|docker-compose\.yml|\.dockerignore|package(-lock)?\.json|next\.config\.ts|src/|public/)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "No image-affecting paths changed; skipping docker build." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Plain `docker build` rather than a third-party action: the runner
+      # already has Docker, and this keeps the supply chain to first-party
+      # actions only.
+      - name: Build image
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            --tag bestcityspots:ci \
+            .
+
+      # A build that succeeds but cannot boot is not a green build. `server.js`
+      # must come up and /api/health must answer; with placeholder Supabase
+      # credentials the dependency check reports unhealthy (503), which is the
+      # expected answer here — we are asserting the process serves traffic.
+      - name: Smoke test the image
+        if: steps.changes.outputs.run == 'true'
+        run: |
+          docker run -d --name bcs-ci -p 3000:3000 \
+            -e NODE_ENV=production \
+            -e HOSTNAME=0.0.0.0 \
+            -e NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            -e GOOGLE_PLACES_LIVE_FETCH_ENABLED=false \
+            -e GOOGLE_GEMINI_LIVE_FETCH_ENABLED=false \
+            bestcityspots:ci
+          for attempt in $(seq 1 30); do
+            code="$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/health || true)"
+            if [ "$code" = "200" ] || [ "$code" = "503" ]; then
+              echo "Container answered /api/health with HTTP $code after ${attempt}s."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Container never answered /api/health:"
+          docker logs bcs-ci || true
+          exit 1
+
+      - name: Container logs on failure
+        if: failure() && steps.changes.outputs.run == 'true'
+        run: docker logs bcs-ci || true
+
+      - name: Stop container
+        if: always() && steps.changes.outputs.run == 'true'
+        run: docker rm -f bcs-ci || true
+
+  # Single required status check to protect the branch with: it turns red if
+  # any job above failed, and stays meaningful when jobs are added or renamed.
+  ci-ok:
+    name: CI passed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [quality, test, build, docker]
+    if: always()
+    steps:
+      - name: Check job results
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          results="$RESULTS"
+          echo "Job results: $results"
+          for result in $results; do
+            if [ "$result" != "success" ] && [ "$result" != "skipped" ]; then
+              echo "A required job did not pass."
+              exit 1
+            fi
+          done
+          echo "All required jobs passed."
