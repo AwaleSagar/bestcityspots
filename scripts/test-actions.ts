@@ -17,7 +17,7 @@ try {
     filename: serverOnlyPath,
     children: [],
     path: "",
-    paths: []
+    paths: [],
   } as any;
 } catch (e) {
   // Empty
@@ -29,12 +29,12 @@ try {
   require.cache[nextCachePath] = {
     id: nextCachePath,
     exports: {
-      unstable_cache: (fn: any) => fn // identity pass-through
+      unstable_cache: (fn: any) => fn, // identity pass-through
     },
     loaded: true,
     filename: nextCachePath,
     children: [],
-    path: ""
+    path: "",
   } as any;
 } catch (e) {}
 
@@ -43,12 +43,12 @@ try {
   require.cache[reactPath] = {
     id: reactPath,
     exports: {
-      cache: (fn: any) => fn // identity pass-through
+      cache: (fn: any) => fn, // identity pass-through
     },
     loaded: true,
     filename: reactPath,
     children: [],
-    path: ""
+    path: "",
   } as any;
 } catch (e) {}
 
@@ -67,7 +67,8 @@ async function runActionTests() {
   console.log("Server Actions Gating Verification");
   try {
     // Dynamically import to ensure mock is cached first
-    const { fetchTrendingDestinations, fetchLivingIndexCities, fetchTrendingCityIds } = await import("../src/app/actions");
+    const { fetchTrendingDestinations, fetchLivingIndexCities, fetchTrendingCityIds } =
+      await import("../src/app/actions");
 
     check("fetchTrendingDestinations exists", typeof fetchTrendingDestinations === "function");
     check("fetchLivingIndexCities exists", typeof fetchLivingIndexCities === "function");
@@ -80,12 +81,16 @@ async function runActionTests() {
     // Call fetchLivingIndexCities — should gracefully degrade to fallback or complete
     const livingIndex = await fetchLivingIndexCities();
     check("fetchLivingIndexCities executes without throwing", Array.isArray(livingIndex));
-    
+
     // Call fetchTrendingCityIds — should gracefully degrade to fallback or complete
     const trendingIds = await fetchTrendingCityIds();
     check("fetchTrendingCityIds executes without throwing", Array.isArray(trendingIds));
   } catch (err) {
-    check("actions execution failed safely", false, err instanceof Error ? err.message : String(err));
+    check(
+      "actions execution failed safely",
+      false,
+      err instanceof Error ? err.message : String(err)
+    );
   }
 
   if (failures > 0) {

@@ -11,7 +11,7 @@ done; verify quarterly.
   **deny 3000**), fail2ban, unattended-upgrades.
 - Docker Engine + compose plugin.
 - App: pin-checked git checkout → `.env.production` (0600) → `docker compose
-  build && up -d`, with the previous image kept for rollback.
+build && up -d`, with the previous image kept for rollback.
 - nginx reverse proxy using the repo's `deploy/nginx/bestcityspots.conf`
   (rate limits + bot blocks), validated with `nginx -t` before every reload.
 - Optional certbot TLS.
@@ -59,17 +59,17 @@ Useful tags: `--tags hardening,firewall` · `--tags app` · `--tags nginx` · `-
 
 ## Guardrails (why a fat-fingered run can't hurt you)
 
-| Guardrail | Behaviour |
-|---|---|
-| Confirmation token | Refuses to run without `-e confirm=bestcityspots-prod`. |
-| Pinned ref only | Refuses `main`/`master`/`HEAD` unless `-e allow_unpinned=true`. |
-| Live-fetch lock | Keeps `GOOGLE_*_LIVE_FETCH_ENABLED=false`; enabling needs `-e allow_live_fetch=true`. |
-| Secret presence | Fails pre-flight if any required secret is empty (no half-deploys). |
+| Guardrail              | Behaviour                                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------------------------- |
+| Confirmation token     | Refuses to run without `-e confirm=bestcityspots-prod`.                                        |
+| Pinned ref only        | Refuses `main`/`master`/`HEAD` unless `-e allow_unpinned=true`.                                |
+| Live-fetch lock        | Keeps `GOOGLE_*_LIVE_FETCH_ENABLED=false`; enabling needs `-e allow_live_fetch=true`.          |
+| Secret presence        | Fails pre-flight if any required secret is empty (no half-deploys).                            |
 | Health gate + rollback | After `up -d`, polls `/api/health`; on failure restores the previous image and fails the play. |
-| Edge-only origin | Sets UFW deny 3000 and asserts it in `post_tasks`. |
-| Safe nginx reload | `nginx -t` validates before reload — a bad config never loads. |
-| Secret hygiene | `.env.production` is 0600; secret tasks use `no_log`. |
-| One host at a time | `serial: 1` + `any_errors_fatal: true`. |
+| Edge-only origin       | Sets UFW deny 3000 and asserts it in `post_tasks`.                                             |
+| Safe nginx reload      | `nginx -t` validates before reload — a bad config never loads.                                 |
+| Secret hygiene         | `.env.production` is 0600; secret tasks use `no_log`.                                          |
+| One host at a time     | `serial: 1` + `any_errors_fatal: true`.                                                        |
 
 ## Rollback
 
@@ -86,6 +86,6 @@ docker compose --env-file .env.production -p bestcityspots up -d
 
 - **Supabase migrations are not run by this playbook** (managed DB; running DDL
   from a deploy is itself a footgun). Apply migrations via the Supabase SQL
-  editor / `supabase db push` *before* deploying new code, per `deploy/README.md`.
+  editor / `supabase db push` _before_ deploying new code, per `deploy/README.md`.
 - Add `inventory.ini` and `group_vars/vault.yml` to `.gitignore` (the example
   files are safe to commit).

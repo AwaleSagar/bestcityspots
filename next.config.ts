@@ -8,15 +8,22 @@ try {
   // fallback: supabase.co matches *.supabase.co subdomains in some setups
 }
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
   output: "standalone",
-  // D1 View Transitions (redesign 2026 H2): enables the browser View Transitions
-  // API for App Router navigations. Default is a tuned cross-fade; the city
-  // hero gets a named transition so city→city navigations morph the hero.
-  // Reduced-motion users get instant navigation (see globals.css guard).
-  experimental: {
-    viewTransition: true,
-  },
+  // D1 View Transitions (redesign 2026 H2): the city hero gets a named
+  // transition so city→city navigations morph the hero, and reduced-motion
+  // users get instant navigation (see the globals.css guard).
+  //
+  // The `experimental.viewTransition` flag that used to enable this was
+  // REMOVED upstream in Next 16.3 (it no longer exists in ExperimentalConfig
+  // and nothing in the runtime reads it), so it is dropped here as part of the
+  // security upgrade off the vulnerable 16.2.x line. The `::view-transition-*`
+  // rules in globals.css are browser-level and stay in effect wherever the
+  // navigation triggers a view transition; if the cross-fade needs to be
+  // re-enabled explicitly, it is now done with React's <ViewTransition>
+  // component rather than a Next config flag.
   images: {
     qualities: [75, 85],
     remotePatterns: [
@@ -72,9 +79,14 @@ const nextConfig: NextConfig = {
           // inline runtime CSS/JS — a stricter nonce-based policy needs
           // its own focused rollout.
           //
-          // `report-uri` is omitted by default; once a reporting endpoint
-          // is configured, append a `report-to` directive and a
-          // `Reporting-Endpoints` header to capture violations.
+          // Security audit L-3: violations now report to /api/csp-report
+          // (both the modern `report-to` group declared in the
+          // `Reporting-Endpoints` header below and the legacy `report-uri`,
+          // which Safari and older Chrome still use). Without a sink the
+          // header neither blocked nor reported anything. `'unsafe-eval'`
+          // is also dropped outside development — the production bundle
+          // does not need it, and keeping it would mask real violations in
+          // the telemetry this policy exists to collect.
           {
             key: "Content-Security-Policy-Report-Only",
             value: [
@@ -87,12 +99,20 @@ const nextConfig: NextConfig = {
               "media-src 'self' blob:",
               "font-src 'self' data:",
               "style-src 'self' 'unsafe-inline'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              isDev
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+                : "script-src 'self' 'unsafe-inline'",
               "connect-src 'self' https: wss:",
               "manifest-src 'self'",
               "worker-src 'self' blob:",
               "upgrade-insecure-requests",
+              "report-uri /api/csp-report",
+              "report-to csp-endpoint",
             ].join("; "),
+          },
+          {
+            key: "Reporting-Endpoints",
+            value: 'csp-endpoint="/api/csp-report"',
           },
         ],
       },

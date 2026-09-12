@@ -11,8 +11,22 @@ type PaidProvider = "gemini" | "google-places" | "openai";
 // the incident showed a per-process Map resets on every container restart
 // (root cause 3), so the authoritative counter lives in Supabase and is
 // claimed atomically via the claim_provider_use() RPC.
-const providerState = new Map<PaidProvider, { day: string; count: number }>();
+const providerState = new Map<BudgetKey, { day: string; count: number }>();
 const warned = new Set<string>();
+
+/**
+ * Budgets are keyed by provider, plus one synthetic key for on-demand AI
+ * (audit M-2). `/api/cities/insight` is unauthenticated and generates for any
+ * city whose cached insight is cold or stale, so without a second, smaller
+ * envelope a handful of requests naming uncached cities could claim the whole
+ * daily provider budget and leave nothing for the nightly warmer — which is
+ * the path that produces value for every later visitor. On-demand requests
+ * claim from BOTH this envelope and their provider's, so the guarantee is:
+ * visitor-triggered generation can never consume more than ON_DEMAND_AI_KEY's
+ * limit per day, whichever engine serves it.
+ */
+const ON_DEMAND_AI_KEY = "ai-on-demand" as const;
+type BudgetKey = PaidProvider | typeof ON_DEMAND_AI_KEY;
 
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
@@ -61,11 +75,103 @@ function dailyLimit(provider: PaidProvider): number {
   );
 }
 
-function localState(provider: PaidProvider, day: string): { day: string; count: number } {
+/**
+ * Daily envelope for visitor-triggered (on-demand) AI generation. Deliberately
+ * a small fraction of the provider budget so an unauthenticated caller cannot
+ * starve the cache warmer. Configurable via `AI_ON_DEMAND_DAILY_CALL_LIMIT`.
+ */
+function onDemandAiLimit(): number {
+  const env = serverEnv();
+  return parseLimit(env.AI_ON_DEMAND_DAILY_CALL_LIMIT, env.NODE_ENV === "production" ? 5 : 100);
+}
+
+function localState(provider: BudgetKey, day: string): { day: string; count: number } {
   const current = providerState.get(provider);
   const state = current?.day === day ? current : { day, count: 0 };
   providerState.set(provider, state);
   return state;
+}
+
+/**
+ * Shared claim mechanics for any budget key: in-memory fast path, durable
+ * atomic claim via `claim_provider_use()`, fail-closed in production.
+ */
+async function claimBudget(key: BudgetKey, limit: number, context: string): Promise<boolean> {
+  const day = todayKey();
+  const state = localState(key, day);
+
+  if (state.count >= limit) {
+    warnOnce(
+      `${key}:limit:${day}`,
+      `[cost-guard] ${key} daily limit ${limit} reached; blocked ${context}`
+    );
+    return false;
+  }
+
+  const client = getServerClient();
+  const isProd = serverEnv().NODE_ENV === "production";
+
+  if (client) {
+    try {
+      const { data, error } = await client.rpc("claim_provider_use", {
+        p_provider: key,
+        p_day: day,
+        p_limit: limit,
+      });
+
+      if (error) throw error;
+
+      if (data === true) {
+        state.count += 1;
+        return true;
+      }
+
+      // Budget exhausted (possibly by another instance or the warmer):
+      // pin the local mirror so subsequent calls reject without a DB hit.
+      state.count = limit;
+      warnOnce(
+        `${key}:limit:${day}`,
+        `[cost-guard] ${key} daily limit ${limit} reached (durable); blocked ${context}`
+      );
+      return false;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (isProd) {
+        // Fail closed: an unreachable budget store must never translate into
+        // unmetered spend. Cache/fallback paths handle the denial gracefully.
+        warnOnce(
+          `${key}:claim-error:${day}`,
+          `[cost-guard] durable claim failed (${message}); failing closed for ${context}`
+        );
+        return false;
+      }
+      warnOnce(
+        `${key}:claim-error:${day}`,
+        `[cost-guard] durable claim failed (${message}); using in-memory fallback`
+      );
+      // fall through to in-memory accounting below
+    }
+  } else if (isProd) {
+    warnOnce(
+      `${key}:no-client`,
+      `[cost-guard] no service-role client in production; failing closed for ${context}`
+    );
+    return false;
+  }
+
+  // In-memory fallback (dev/test, or non-prod DB failure).
+  state.count += 1;
+  return true;
+}
+
+/**
+ * Claim one visitor-triggered AI generation against the on-demand envelope
+ * (audit M-2). Call this BEFORE the provider call in any request path a user
+ * can trigger; the provider's own budget is still claimed inside the provider
+ * module, so both envelopes apply.
+ */
+export async function tryClaimOnDemandAiUse(context: string): Promise<boolean> {
+  return claimBudget(ON_DEMAND_AI_KEY, onDemandAiLimit(), context);
 }
 
 /**
@@ -94,70 +200,5 @@ export async function tryClaimPaidProviderUse(
     return false;
   }
 
-  const limit = dailyLimit(provider);
-  const day = todayKey();
-  const state = localState(provider, day);
-
-  if (state.count >= limit) {
-    warnOnce(
-      `${provider}:limit:${day}`,
-      `[cost-guard] ${provider} daily limit ${limit} reached; blocked ${context}`
-    );
-    return false;
-  }
-
-  const client = getServerClient();
-  const isProd = serverEnv().NODE_ENV === "production";
-
-  if (client) {
-    try {
-      const { data, error } = await client.rpc("claim_provider_use", {
-        p_provider: provider,
-        p_day: day,
-        p_limit: limit,
-      });
-
-      if (error) throw error;
-
-      if (data === true) {
-        state.count += 1;
-        return true;
-      }
-
-      // Budget exhausted (possibly by another instance or the warmer):
-      // pin the local mirror so subsequent calls reject without a DB hit.
-      state.count = limit;
-      warnOnce(
-        `${provider}:limit:${day}`,
-        `[cost-guard] ${provider} daily limit ${limit} reached (durable); blocked ${context}`
-      );
-      return false;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (isProd) {
-        // Fail closed: an unreachable budget store must never translate into
-        // unmetered spend. Cache/fallback paths handle the denial gracefully.
-        warnOnce(
-          `${provider}:claim-error:${day}`,
-          `[cost-guard] durable claim failed (${message}); failing closed for ${context}`
-        );
-        return false;
-      }
-      warnOnce(
-        `${provider}:claim-error:${day}`,
-        `[cost-guard] durable claim failed (${message}); using in-memory fallback`
-      );
-      // fall through to in-memory accounting below
-    }
-  } else if (isProd) {
-    warnOnce(
-      `${provider}:no-client`,
-      `[cost-guard] no service-role client in production; failing closed for ${context}`
-    );
-    return false;
-  }
-
-  // In-memory fallback (dev/test, or non-prod DB failure).
-  state.count += 1;
-  return true;
+  return claimBudget(provider, dailyLimit(provider), context);
 }

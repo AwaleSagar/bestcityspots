@@ -97,7 +97,14 @@ async function runTest(
     const out = await fn();
     const durationMs = Math.round(performance.now() - start);
     if (out && out.warn) {
-      results.push({ suite, name, status: "warn", durationMs, message: out.warn, details: out.details });
+      results.push({
+        suite,
+        name,
+        status: "warn",
+        durationMs,
+        message: out.warn,
+        details: out.details,
+      });
       log.warn(`${name} ${paint(C.dim, `(${durationMs}ms)`)} — ${out.warn}`);
     } else {
       results.push({ suite, name, status: "pass", durationMs, details: out?.details });
@@ -133,9 +140,7 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local"
-  );
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local");
   process.exit(2);
 }
 
@@ -188,7 +193,9 @@ async function suiteSchema() {
   await runTest("schema", "cities has expected columns", async () => {
     const { data, error } = await anon
       .from("cities")
-      .select("id, city, city_ascii, country, iso2, iso3, admin_name, capital, population, lat, lng")
+      .select(
+        "id, city, city_ascii, country, iso2, iso3, admin_name, capital, population, lat, lng"
+      )
       .limit(1);
     if (error) throw new Error(error.message);
     assert(data && data.length > 0, "cities table is empty");
@@ -289,7 +296,8 @@ async function suiteRpc() {
       result_limit: 5,
     });
     if (error) throw new Error(error.message);
-    if (!data || data.length === 0) return { warn: "fuzzy did not resolve 'tokio' → expected Tokyo" };
+    if (!data || data.length === 0)
+      return { warn: "fuzzy did not resolve 'tokio' → expected Tokyo" };
   });
 
   await runTest("rpc", "search_cities_elastic empty query is safe", async () => {
@@ -336,9 +344,7 @@ async function suiteRls() {
 
   // Anon must NOT be able to insert into protected tables.
   await runTest("rls", "anon cannot insert into city_metrics", async () => {
-    const { error } = await anon
-      .from("city_metrics")
-      .insert({ city_id: -999999, cost_index: 0 });
+    const { error } = await anon.from("city_metrics").insert({ city_id: -999999, cost_index: 0 });
     assert(error, "RLS hole: anon insert into city_metrics succeeded");
   });
 
@@ -379,10 +385,7 @@ async function suiteConsistency() {
     if (error) throw new Error(error.message);
     if (!insights || insights.length === 0) return { warn: "no insights to validate" };
     const ids = insights.map((r) => r.city_id);
-    const { data: cities, error: cErr } = await anon
-      .from("cities")
-      .select("id")
-      .in("id", ids);
+    const { data: cities, error: cErr } = await anon.from("cities").select("id").in("id", ids);
     if (cErr) throw new Error(cErr.message);
     const known = new Set((cities ?? []).map((c) => c.id));
     const orphans = ids.filter((id) => !known.has(id));
@@ -439,7 +442,8 @@ interface PerfStat {
 
 function summarize(samples: number[], errors: number): PerfStat {
   const sorted = [...samples].sort((a, b) => a - b);
-  const pick = (p: number) => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))] ?? 0;
+  const pick = (p: number) =>
+    sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))] ?? 0;
   const mean = samples.reduce((s, n) => s + n, 0) / Math.max(1, samples.length);
   return {
     p50: Math.round(pick(0.5)),
@@ -532,7 +536,9 @@ async function suitePerformance() {
       (r) => r.status === "rejected" || (r.status === "fulfilled" && r.value.error)
     ).length;
     if (failed > 0) throw new Error(`${failed}/${CONCURRENCY} parallel reads failed`);
-    return { details: { concurrency: CONCURRENCY, totalMs, perReqMs: Math.round(totalMs / CONCURRENCY) } };
+    return {
+      details: { concurrency: CONCURRENCY, totalMs, perReqMs: Math.round(totalMs / CONCURRENCY) },
+    };
   });
 }
 
@@ -545,7 +551,9 @@ async function main() {
     console.log(paint(C.bold, "Supabase backend test harness"));
     log.dim(`url: ${SUPABASE_URL}`);
     log.dim(`service role: ${admin ? "available" : "missing (RLS-only mode)"}`);
-    log.dim(`suite filter: ${SUITE_FILTER ?? "all"} | iterations: ${PERF_ITERATIONS} | concurrency: ${CONCURRENCY}`);
+    log.dim(
+      `suite filter: ${SUITE_FILTER ?? "all"} | iterations: ${PERF_ITERATIONS} | concurrency: ${CONCURRENCY}`
+    );
   }
 
   // Surface obvious RLS holes early if no service role set.

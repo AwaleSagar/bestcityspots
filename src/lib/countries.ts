@@ -121,7 +121,11 @@ export async function getCitiesByCountry(country: string): Promise<City[]> {
  * module (audit 5.4) so every city page emits a meaningful internal-link
  * surface instead of being a crawl dead end.
  */
-export async function getRelatedCities(cityId: number, country: string, limit = 6): Promise<City[]> {
+export async function getRelatedCities(
+  cityId: number,
+  country: string,
+  limit = 6
+): Promise<City[]> {
   const safeLimit = Math.max(1, Math.min(20, limit));
   const { data, error } = await supabase
     .from("cities")

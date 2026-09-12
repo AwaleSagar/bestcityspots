@@ -99,7 +99,8 @@ export function parsePartialJson<T = unknown>(raw: string): T | null {
   // Walk backwards skipping whitespace.
   candidate = candidate.replace(/[\s\uFEFF\xA0]+$/g, "");
   // Drop trailing comma.
-  while (candidate.endsWith(",")) candidate = candidate.slice(0, -1).replace(/[\s\uFEFF\xA0]+$/g, "");
+  while (candidate.endsWith(","))
+    candidate = candidate.slice(0, -1).replace(/[\s\uFEFF\xA0]+$/g, "");
   // Drop trailing colon and the key it belongs to (`"foo":` -> remove).
   if (candidate.endsWith(":")) {
     candidate = candidate.slice(0, -1).replace(/[\s\uFEFF\xA0]+$/g, "");

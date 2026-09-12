@@ -60,9 +60,12 @@ console.log("storage: JSON LocalStorage serialization");
 {
   const complexData = { name: "Paris", rating: 4.8, active: true };
   setJsonStorageItem("favorite_city", complexData);
-  
+
   const parsedData = getJsonStorageItem<any>("favorite_city", null);
-  check("serializes and parses JSON objects correctly", parsedData !== null && parsedData.name === "Paris" && parsedData.rating === 4.8);
+  check(
+    "serializes and parses JSON objects correctly",
+    parsedData !== null && parsedData.name === "Paris" && parsedData.rating === 4.8
+  );
 
   const parsedFallback = getJsonStorageItem("non_existent_key", { defaultVal: true });
   check("resolves fallback value for missing items", parsedFallback.defaultVal === true);
@@ -76,7 +79,10 @@ console.log("storage: JSON LocalStorage serialization");
 console.log("storage: SessionStorage wrappers");
 {
   setSessionStorageItem("session_id", "session_abc123");
-  check("writes values into sessionStorage", getSessionStorageItem("session_id") === "session_abc123");
+  check(
+    "writes values into sessionStorage",
+    getSessionStorageItem("session_id") === "session_abc123"
+  );
 }
 
 if (failures > 0) {

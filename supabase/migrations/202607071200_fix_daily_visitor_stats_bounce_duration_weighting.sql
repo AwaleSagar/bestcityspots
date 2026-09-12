@@ -81,4 +81,14 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.upsert_daily_visitor_stats TO service_role;
+-- SECURITY: this function is SECURITY DEFINER, so it bypasses RLS. Pin its
+-- search_path and drop the EXECUTE grant PostgreSQL hands to PUBLIC by default
+-- (granting to service_role does not remove it) — otherwise the browser-visible
+-- anon key can call it through PostgREST. Added retroactively by the 2026-09-12
+-- audit (H-1/L-2); migrations/202609121200 applies the same fix to every
+-- analytics RPC for environments that already ran this file. Kept here so the
+-- migration is correct standalone and a from-scratch replay never leaves a
+-- window where the function is world-executable.
+ALTER FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) SET search_path = public;
+REVOKE ALL ON FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) FROM public, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.upsert_daily_visitor_stats(date, integer, integer, integer, integer, integer, integer, integer) TO service_role;

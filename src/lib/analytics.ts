@@ -40,16 +40,29 @@ export const ActionType = z.enum([
   "click_affiliate",
 ]);
 
+// SECURITY (audit M-4): every free-text and numeric field is bounded. The
+// endpoint is unauthenticated, so an uncapped `referrer` becomes an unlimited
+// number of distinct `traffic_sources_daily` rows (source_name is part of that
+// table's unique key), and uncapped durations/counts skew the weighted averages
+// in upsert_daily_visitor_stats(). Limits are generous for real clients:
+// a session id is 32 hex chars, a path is a URL path, a referrer is a URL.
+const MAX_SESSION_ID_LENGTH = 64;
+const MAX_PATH_LENGTH = 512;
+const MAX_REFERRER_LENGTH = 2048;
+/** One day in seconds — an upper bound no real session can legitimately exceed. */
+const MAX_SESSION_DURATION_SEC = 86_400;
+const MAX_PAGE_COUNT = 1_000;
+
 export const AnalyticsEventSchema = z.object({
   type: z.enum(["pageview", "action", "session_end"]),
-  sessionId: z.string().min(1),
+  sessionId: z.string().min(1).max(MAX_SESSION_ID_LENGTH),
   isNewVisitor: z.boolean().optional(),
-  path: z.string().optional(),
-  cityId: z.number().optional(),
+  path: z.string().max(MAX_PATH_LENGTH).optional(),
+  cityId: z.number().int().positive().optional(),
   action: ActionType.optional(),
-  referrer: z.string().optional(),
-  sessionDuration: z.number().optional(),
-  pageCount: z.number().optional(),
+  referrer: z.string().max(MAX_REFERRER_LENGTH).optional(),
+  sessionDuration: z.number().int().min(0).max(MAX_SESSION_DURATION_SEC).optional(),
+  pageCount: z.number().int().min(0).max(MAX_PAGE_COUNT).optional(),
   hasGeoConsent: z.boolean().optional(),
 });
 
@@ -57,6 +70,50 @@ export const AnalyticsPayloadSchema = z.object({
   events: z.array(AnalyticsEventSchema).min(1).max(50),
   timestamp: z.string(),
 });
+
+/**
+ * Distinct per-event RPC fan-out caps (audit M-4). A single unauthenticated
+ * request could otherwise trigger ~61 database round trips; these keep the
+ * worst case bounded while covering every realistic batch (a 50-event batch
+ * from one visitor touches a handful of cities at most).
+ */
+const MAX_DISTINCT_CITY_IDS_PER_BATCH = 10;
+
+/**
+ * Bound on a stored `traffic_sources_daily.source_name`, plus the shape a
+ * referral hostname must have to be stored at all (audit M-4).
+ */
+const MAX_SOURCE_NAME_LENGTH = 128;
+const HOSTNAME_RE = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
+
+/** Geo strings arrive in request headers — bound and shape-check them (audit M-3). */
+const MAX_GEO_CITY_LENGTH = 80;
+const COUNTRY_CODE_RE = /^[A-Za-z]{2}$/;
+
+/**
+ * Normalize an edge-provided country code to an ISO 3166-1 alpha-2 string, or
+ * `null` when it is absent or malformed. Anything that is not two letters is
+ * rejected outright rather than stored.
+ */
+export function sanitizeCountryCode(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return COUNTRY_CODE_RE.test(trimmed) ? trimmed.toUpperCase() : null;
+}
+
+/**
+ * Normalize an edge-provided city name: strip control characters, collapse
+ * whitespace, bound the length. Returns `null` when nothing usable remains.
+ */
+export function sanitizeGeoCity(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const cleaned = value
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!cleaned) return null;
+  return cleaned.slice(0, MAX_GEO_CITY_LENGTH);
+}
 
 export type AnalyticsEvent = z.infer<typeof AnalyticsEventSchema>;
 
@@ -132,9 +189,21 @@ export function parseReferrer(referrer: string | null): {
   if (refLower.includes("yahoo")) return { sourceType: "organic", sourceName: "Yahoo" };
   if (refLower.includes("baidu")) return { sourceType: "organic", sourceName: "Baidu" };
 
+  // SECURITY (audit M-4): `source_name` is part of the unique key on
+  // traffic_sources_daily, so an unconstrained value mints a new row per
+  // request. Only a syntactically valid http(s) hostname is stored, lowercased
+  // and length-capped; anything else collapses into the single "unknown"
+  // bucket rather than creating a row of its own.
   try {
     const url = new URL(referrer);
-    return { sourceType: "referral", sourceName: url.hostname };
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return { sourceType: "other", sourceName: "unknown" };
+    }
+    const hostname = url.hostname.toLowerCase();
+    if (!HOSTNAME_RE.test(hostname) || hostname.length > MAX_SOURCE_NAME_LENGTH) {
+      return { sourceType: "other", sourceName: "unknown" };
+    }
+    return { sourceType: "referral", sourceName: hostname };
   } catch {
     return { sourceType: "other", sourceName: "unknown" };
   }
@@ -337,7 +406,16 @@ export async function processAnalyticsBatch(
     if (event.cityId) cityIds.add(event.cityId);
     if (event.action) actions.add(event.action);
   }
-  for (const cityId of cityIds) writes.push(recordCityView(today, cityId));
+  // Hard cap the per-request RPC fan-out (audit M-4). `actions` is already
+  // bounded by the ActionType enum; distinct city ids are caller-chosen.
+  const cappedCityIds = [...cityIds].slice(0, MAX_DISTINCT_CITY_IDS_PER_BATCH);
+  if (cityIds.size > cappedCityIds.length) {
+    log.warn("city_view_fanout_capped", {
+      distinct: cityIds.size,
+      cap: MAX_DISTINCT_CITY_IDS_PER_BATCH,
+    });
+  }
+  for (const cityId of cappedCityIds) writes.push(recordCityView(today, cityId));
   for (const action of actions) writes.push(recordUserAction(today, action));
 
   await Promise.allSettled(writes);

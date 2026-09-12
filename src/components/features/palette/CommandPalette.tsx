@@ -154,9 +154,7 @@ export default function CommandPalette() {
     const needle = query.trim().toLowerCase();
     const routes = DESTINATIONS.filter(
       (d) =>
-        needle.length === 0 ||
-        d.label.toLowerCase().includes(needle) ||
-        d.keywords.includes(needle)
+        needle.length === 0 || d.label.toLowerCase().includes(needle) || d.keywords.includes(needle)
     )
       .slice(0, needle.length === 0 ? 6 : 4)
       .map((d) => ({ kind: "route" as const, href: d.href, label: d.label, icon: d.icon }));

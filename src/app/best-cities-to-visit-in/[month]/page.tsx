@@ -11,9 +11,10 @@ import {
 } from "@/lib/topical-hubs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (
-  publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com"
-).replace(/\/$/, "");
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+  /\/$/,
+  ""
+);
 
 type RouteParams = { month: string };
 
@@ -53,11 +54,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function BestCitiesByMonthPage({
-  params,
-}: {
-  params: Promise<RouteParams>;
-}) {
+export default async function BestCitiesByMonthPage({ params }: { params: Promise<RouteParams> }) {
   const { month } = await params;
   if (!isValidMonthSlug(month)) notFound();
 

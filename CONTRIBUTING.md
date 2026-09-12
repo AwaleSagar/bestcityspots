@@ -125,17 +125,32 @@ These are the rules that matter for this codebase. Please follow them.
 
 ## Testing & verification
 
-There is no full automated test suite yet. The minimum bar is:
+There is no full automated test suite yet. The minimum bar is one command —
+the same gates CI runs, so a green local run means a green pipeline:
 
 ```bash
-npm run lint
-npm run type-check
+npm run verify      # lint + format:check + type-check + check:migrations + test:ci
 npm run build       # smoke-build for non-trivial changes
 ```
 
-Targeted manual checks:
+Individually, if you want faster feedback on one thing:
 
 ```bash
+npm run lint
+npm run format:check      # `npm run format` to fix
+npm run type-check
+npm run check:migrations  # migration naming, baseline mirroring, SECURITY DEFINER rules
+npm run test:ci           # every verification script except the network-dependent ones
+```
+
+See [`docs/ci-cd.md`](docs/ci-cd.md) for what each pipeline job protects and
+how deploys work.
+
+Targeted manual checks — these need network or real credentials, which is why
+they are not in CI:
+
+```bash
+npm run test:providers       # live Open-Meteo / provider connectivity
 npm run test:google-places   # Google Places integration
 npm run test:supabase        # Supabase backend smoke tests
 npm run test:refactor        # Cross-cutting refactor verification
@@ -145,12 +160,14 @@ When touching ranking, validation, search, cache freshness, or analytics aggrega
 
 ## PR checklist
 
-- [ ] `npm run lint` passes with no security-plugin warnings
-- [ ] `npm run type-check` passes
+- [ ] `npm run verify` passes (lint with no security-plugin warnings, format, types, migrations, verification scripts)
 - [ ] No new `process.env` references — use `env.ts`
 - [ ] No direct `fetch` to third parties — goes through `http.ts` / `providers/*`
 - [ ] All new inputs / AI outputs validated with Zod
-- [ ] New SQL lives in `supabase/migrations/` and is idempotent
+- [ ] New SQL lives in `supabase/migrations/` and is idempotent, is mirrored into
+      `supabase/setup_all_blank_project.sql`, and any `security definer` function
+      pins `set search_path` and revokes the default `PUBLIC` grant
+      (`npm run check:migrations` enforces all of this)
 - [ ] RLS policies reviewed if tables / write paths changed
 - [ ] No secrets committed; no `SUPABASE_SERVICE_ROLE_KEY` reachable from client code
 - [ ] Documentation updated when behavior, routes, env vars, or scripts change

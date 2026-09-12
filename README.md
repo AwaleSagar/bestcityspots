@@ -13,6 +13,8 @@ Search, compare, and explore the world's cities with **live weather & air qualit
 
 <br />
 
+[![CI](https://github.com/AwaleSagar/bestcityspots/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/AwaleSagar/bestcityspots/actions/workflows/ci.yml)
+[![Security](https://github.com/AwaleSagar/bestcityspots/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/AwaleSagar/bestcityspots/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg?style=flat-square)](LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
@@ -288,13 +290,16 @@ Copy `.env.example` → `.env.local`. All keys are validated at runtime by Zod (
 <details open>
 <summary><strong>Development & quality</strong></summary>
 
-| Command                           | What it does                     |
-| --------------------------------- | -------------------------------- |
-| `npm run dev`                     | Start the dev server (Turbopack) |
-| `npm run build` / `npm run start` | Production build / serve         |
-| `npm run type-check`              | `tsc --noEmit` (strict)          |
-| `npm run lint` · `lint:fix`       | ESLint (with security plugin)    |
-| `npm run format` · `format:check` | Prettier                         |
+| Command                           | What it does                                          |
+| --------------------------------- | ----------------------------------------------------- |
+| `npm run verify`                  | **Every CI gate, locally** — run this before pushing  |
+| `npm run dev`                     | Start the dev server (Turbopack)                      |
+| `npm run build` / `npm run start` | Production build / serve                              |
+| `npm run type-check`              | `tsc --noEmit` (strict)                               |
+| `npm run lint` · `lint:fix`       | ESLint (with security plugin)                         |
+| `npm run format` · `format:check` | Prettier (exact-pinned — see docs/ci-cd.md)           |
+| `npm run check:migrations`        | Migration naming, baseline mirroring, RLS/grant rules |
+| `npm run test:ci`                 | Verification scripts that need no network or secrets  |
 
 </details>
 
@@ -308,7 +313,7 @@ Copy `.env.example` → `.env.local`. All keys are validated at runtime by Zod (
 | `npm run test:supabase`                    | Backend test harness (tables, RLS, RPCs)            |
 | `npm run warm-cache`                       | Populate caches (the only intended paid-spend path) |
 | `npm run warm-cache:trending` · `:dry-run` | Warm trending only · no-spend preview               |
-| `npm run warm-top-cities`                  | Focused warmer for the top-N cities by population    |
+| `npm run warm-top-cities`                  | Focused warmer for the top-N cities by population   |
 | `npm run analytics` · `analytics:30d`      | Usage/traffic reports                               |
 | `npm run import:cost`                      | Import the cost-of-living index                     |
 | `npm run test`                             | Lightweight metric/share unit checks                |
@@ -356,16 +361,14 @@ Contributions are welcome! To keep the history clean and the project healthy:
 
 1. **Fork** the repo and create a branch: `git checkout -b feat/your-feature`
 2. **Install & develop:** `npm install` → `npm run dev`
-3. **Before pushing**, make sure these pass:
+3. **Before pushing**, run the gate set CI runs:
    ```bash
-   npm run type-check
-   npm run lint
-   npm run format:check
+   npm run verify   # lint + format + types + migration checks + verification scripts
    ```
 4. **Commit narrowly** — stage specific files (`git add src/lib/foo.ts`), not `git add .` — and write a clear, conventional message (e.g. `feat(search): add alias fallback`).
 5. **Open a pull request** describing the change and its motivation.
 
-Please respect the project's principles: keep data sources visible, label AI output, and never weaken the cost-guard layers. New schema changes go in `supabase/migrations/` as ordered, idempotent files.
+Please respect the project's principles: keep data sources visible, label AI output, and never weaken the cost-guard layers. New schema changes go in `supabase/migrations/` as ordered, idempotent files, mirrored into `supabase/setup_all_blank_project.sql` (`npm run check:migrations` enforces both). See [`docs/ci-cd.md`](docs/ci-cd.md) for the pipeline and how deploys happen.
 
 ---
 

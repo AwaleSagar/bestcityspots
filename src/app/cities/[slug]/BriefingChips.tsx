@@ -21,8 +21,8 @@ export default async function BriefingChips({ city }: { city: City }) {
 
   const faqs = buildFaqs(city, insight?.intro?.trim() ?? null, metrics?.climate_comfort ?? null);
   // Best time to visit, tap water, visa — the three highest-intent follow-ups.
-  const picks = [faqs.at(0), faqs.at(4), faqs.at(5)].filter(
-    (faq): faq is NonNullable<typeof faq> => Boolean(faq)
+  const picks = [faqs.at(0), faqs.at(4), faqs.at(5)].filter((faq): faq is NonNullable<typeof faq> =>
+    Boolean(faq)
   );
   if (picks.length === 0) return null;
 

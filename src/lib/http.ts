@@ -45,12 +45,7 @@ const BREAKER_COOLDOWN_MS = 30_000;
 // unboundedly when callers pass dynamic strings (memory leak in long-running
 // processes / serverless reuse). Unknown providers are still tracked but
 // share a single "_other" bucket.
-const KNOWN_PROVIDERS = new Set<string>([
-  "gemini",
-  "openweather",
-  "open-meteo",
-  "google-places",
-]);
+const KNOWN_PROVIDERS = new Set<string>(["gemini", "openweather", "open-meteo", "google-places"]);
 const breakers = new Map<string, BreakerState>();
 
 function breakerKey(provider: string): string {
@@ -175,7 +170,9 @@ function isAbortError(error: unknown): boolean {
 
 async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   if (signal?.aborted) {
-    throw signal.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError");
+    throw signal.reason instanceof Error
+      ? signal.reason
+      : new DOMException("Aborted", "AbortError");
   }
 
   return new Promise((resolve, reject) => {
@@ -187,7 +184,9 @@ async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
     }, ms);
     const onAbort = () => {
       clearTimeout(timeout);
-      reject(signal?.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError"));
+      reject(
+        signal?.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError")
+      );
     };
 
     signal?.addEventListener("abort", onAbort, { once: true });

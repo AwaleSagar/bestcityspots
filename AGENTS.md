@@ -14,6 +14,7 @@ This project is primarily a public web application with a small REST-style surfa
 - `GET /api/places/search` — filtered places search with cost-guard + circuit breaker
 - `POST /api/places/save-event` — anonymous aggregate "saved this" counter (US-12)
 - `GET /api/health` — lightweight dependency status (token-gated detail)
+- `POST /api/csp-report` — CSP violation sink (logs only; no persistence)
 
 There is no GraphQL layer, no separate microservice boundary, and no event-streaming platform in the repo today.
 
@@ -75,6 +76,10 @@ Current backend organization:
 - Treat the product as a mostly public-read application.
 - RLS is a core security boundary and should be reviewed whenever tables or policies change.
 - Public data is generally readable with anon/authenticated roles; **all writes are hard-locked to `service_role`** — cache write paths gate on `requireServerClient()` (`src/lib/supabase.ts`), which throws if the service-role key is missing rather than silently degrading to the anon client.
+- RLS is not the only gate: a `SECURITY DEFINER` function **bypasses it**. Every such function must `revoke all ... from public, anon, authenticated`, then grant only `service_role`, and pin `set search_path = public`. PostgreSQL grants EXECUTE to `PUBLIC` by default and granting to another role does not remove it — the 2026-09-12 audit (H-1) found six analytics RPCs reachable with the browser-visible anon key for exactly this reason. Storage policies follow the same rule: `place_images` uploads are `service_role` only.
+- Request paths a visitor can trigger must never be able to spend the whole provider budget. Visitor-triggered AI generation claims from a separate, smaller envelope (`AI_ON_DEMAND_DAILY_CALL_LIMIT`, `tryClaimOnDemandAiUse()`) on top of the engine budget, so the nightly warmer cannot be starved (audit M-2).
+- Treat `x-vercel-ip-*` (and any other edge-set header) as attacker-controlled off Vercel: the proxy strips them (`deploy/ansible/templates/bestcityspots-proxy.conf.j2`) and the app re-validates shape and length before storing (audit M-3).
+- Bound every free-text and numeric field on unauthenticated endpoints — unbounded values become unbounded rows and unbounded RPC fan-out (audit M-4).
 - Never expose `SUPABASE_SERVICE_ROLE_KEY` to the client. Keep privileged writes in server-only code.
 - Validate request payloads and model outputs with Zod before trusting them.
 - JSON-LD embedded via `dangerouslySetInnerHTML` must serialize through `serializeJsonLd()` (`src/lib/json-ld.ts`) to neutralize `</script>` breakout; it is applied at every JSON-LD script site.
@@ -109,7 +114,7 @@ Auth/authorization status from the repo:
 
 ### Testing Expectations
 
-- Minimum safety rails are `npm run lint`, `npm run type-check`, and targeted script-based verification.
+- Minimum safety rails are `npm run verify` (lint, format, types, migration hygiene, verification scripts) plus targeted script-based checks for anything network- or credential-dependent.
 - There is not yet a full automated backend test suite in the repo.
 - When touching backend logic, add focused tests or executable verification scripts where practical, especially around ranking, validation, search behavior, cache freshness, and analytics aggregation.
 
@@ -127,5 +132,10 @@ Auth/authorization status from the repo:
 ### Known Assumptions
 
 - The repo is clearly Docker-ready, but the primary production host is not explicitly documented.
-- CI runs lint + type-check + build on push/PR to main via `.github/workflows/ci.yml` (Node 20).
+- CI runs lint, format check, type check, migration hygiene, the verification
+  scripts, the Next build, and a container build+boot smoke test on push/PR to
+  main (`.github/workflows/ci.yml`, Node 20); `.github/workflows/security.yml`
+  fails the build on high/critical advisories in production dependencies and
+  runs weekly. Deploys are manual via `.github/workflows/deploy.yml`. Locally,
+  `npm run verify` is the same gate set. Full detail: `docs/ci-cd.md`.
 - No formal compliance requirement beyond privacy-conscious behavior and GDPR-style geo consent is documented yet.

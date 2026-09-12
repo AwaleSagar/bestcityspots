@@ -14,13 +14,7 @@ export default function CityFingerprint({ city, className }: CityFingerprintProp
   const fingerprint = getCityFingerprint(city);
 
   return (
-    <svg
-      viewBox="0 0 64 64"
-      className={className}
-      aria-hidden="true"
-      focusable="false"
-      fill="none"
-    >
+    <svg viewBox="0 0 64 64" className={className} aria-hidden="true" focusable="false" fill="none">
       {fingerprint.rings.map((ring, index) => (
         <path
           key={index}

@@ -13,13 +13,7 @@
       "radiusDominant": "sharp",
       "fillDominant": "brand",
       "flatPct": "87%",
-      "peersForCitation": [
-        "AFAR",
-        "BBC Travel",
-        "Booking.com",
-        "Citymapper",
-        "Context Travel"
-      ]
+      "peersForCitation": ["AFAR", "BBC Travel", "Booking.com", "Citymapper", "Context Travel"]
     },
     "buttonSecondary": {
       "n": 56,
@@ -32,13 +26,7 @@
       "radiusDominant": "sharp",
       "fillDominant": "light",
       "flatPct": "88%",
-      "peersForCitation": [
-        "AFAR",
-        "Agoda",
-        "Best Cities",
-        "Booking.com",
-        "Expatistan"
-      ]
+      "peersForCitation": ["AFAR", "Agoda", "Best Cities", "Booking.com", "Expatistan"]
     },
     "input": {
       "n": 70,
@@ -51,13 +39,7 @@
       "radiusDominant": "sharp",
       "fillDominant": "ghost",
       "flatPct": "89%",
-      "peersForCitation": [
-        "AFAR",
-        "Agoda",
-        "Atlas Obscura",
-        "Context Travel",
-        "Culture Trip"
-      ]
+      "peersForCitation": ["AFAR", "Agoda", "Atlas Obscura", "Context Travel", "Culture Trip"]
     }
   },
   "details": {
