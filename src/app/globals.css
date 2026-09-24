@@ -1,0 +1,501 @@
+@import "tailwindcss";
+
+/*
+ * Best City Spots — "Editorial almanac" design system.
+ *
+ * Token reference and usage rules: docs/design-tokens.md
+ * Motion rules: docs/motion-policy.md
+ *
+ * Raw values live on :root / .dark as plain custom properties; the @theme
+ * block maps them to Tailwind utilities (bg-paper, text-ink, border-rule…)
+ * with `inline` so every utility resolves the live variable and dark mode is
+ * a pure variable swap. next-themes toggles the `.dark` class on <html>.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  /* ── Color ─────────────────────────────────────────────────────────── */
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-highlight: var(--highlight);
+  --color-highlight-ink: var(--highlight-ink);
+  --color-on-highlight: var(--on-highlight);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-aqi-1: var(--aqi-1);
+  --color-aqi-2: var(--aqi-2);
+  --color-aqi-3: var(--aqi-3);
+  --color-aqi-4: var(--aqi-4);
+  --color-aqi-5: var(--aqi-5);
+
+  --color-season-spring: var(--season-spring);
+  --color-season-summer: var(--season-summer);
+  --color-season-autumn: var(--season-autumn);
+  --color-season-winter: var(--season-winter);
+
+  --color-sights: var(--cat-sights);
+  --color-food: var(--cat-food);
+  --color-stays: var(--cat-stays);
+
+  /* ── Type ──────────────────────────────────────────────────────────── */
+  --font-sans:
+    var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+}
+
+@theme {
+  /* Fluid display scale (serif). Body sizes use Tailwind's default
+     xs/sm/base/lg; 0.75rem (text-xs) is the legibility floor. */
+  --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.022em;
+  --text-h1: clamp(2.125rem, 1.65rem + 1.9vw, 3.25rem);
+  --text-h1--line-height: 1.06;
+  --text-h1--letter-spacing: -0.018em;
+  --text-h2: clamp(1.625rem, 1.4rem + 0.95vw, 2.25rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.012em;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-lede: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
+  --text-lede--line-height: 1.55;
+
+  /* Layout */
+  --container-page: 76rem;
+  --container-prose: 42rem;
+
+  /* Shape: controls + cards use md, dialogs/sheets lg, chips full. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+
+  /* Depth: borders define cards; shadows are reserved for overlays. */
+  --shadow-overlay: 0 1px 2px oklch(0 0 0 / 0.06), 0 16px 40px -12px oklch(0.2 0.02 265 / 0.28);
+
+  /* Motion: one curve, three durations (see docs/motion-policy.md). */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --animate-live: live-pulse 2.4s var(--ease-standard) infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+}
+
+/* ── Light (default) ────────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+
+  --paper: oklch(0.972 0.007 85); /* ≈ #F7F4EE */
+  --surface: oklch(0.992 0.003 85);
+  --sunken: oklch(0.948 0.009 85);
+  --ink: oklch(0.225 0.012 265); /* ≈ #1B1D23 */
+  --ink-muted: oklch(0.465 0.014 265);
+  --ink-subtle: oklch(0.585 0.012 265);
+  --rule: oklch(0.885 0.008 85);
+  --rule-strong: oklch(0.78 0.01 85);
+
+  --accent: oklch(0.47 0.105 245); /* Harbor blue ≈ #22598A */
+  --accent-hover: oklch(0.405 0.1 245);
+  --accent-soft: oklch(0.93 0.026 240);
+  --on-accent: oklch(0.99 0.004 85);
+  --highlight: oklch(0.79 0.145 78); /* Marigold — fills/marks only */
+  --highlight-ink: oklch(0.5 0.105 70);
+  --on-highlight: oklch(0.225 0.012 265);
+  --danger: oklch(0.52 0.17 28);
+  --danger-soft: oklch(0.94 0.03 28);
+
+  /* OpenWeather AQI 1–5 (Good → Very poor). Always paired with a label. */
+  --aqi-1: oklch(0.64 0.13 155);
+  --aqi-2: oklch(0.76 0.13 118);
+  --aqi-3: oklch(0.79 0.14 80);
+  --aqi-4: oklch(0.66 0.17 45);
+  --aqi-5: oklch(0.52 0.17 15);
+
+  --season-spring: oklch(0.7 0.11 150);
+  --season-summer: oklch(0.8 0.13 85);
+  --season-autumn: oklch(0.66 0.14 45);
+  --season-winter: oklch(0.66 0.08 240);
+
+  --cat-sights: oklch(0.56 0.13 45);
+  --cat-food: oklch(0.54 0.11 155);
+  --cat-stays: oklch(0.5 0.1 250);
+}
+
+/* ── Dark ───────────────────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  --paper: oklch(0.19 0.008 265); /* ≈ #16181C */
+  --surface: oklch(0.225 0.009 265);
+  --sunken: oklch(0.165 0.008 265);
+  --ink: oklch(0.94 0.006 85);
+  --ink-muted: oklch(0.74 0.01 265);
+  --ink-subtle: oklch(0.62 0.01 265);
+  --rule: oklch(0.31 0.01 265);
+  --rule-strong: oklch(0.42 0.012 265);
+
+  --accent: oklch(0.77 0.095 240);
+  --accent-hover: oklch(0.84 0.08 240);
+  --accent-soft: oklch(0.3 0.05 245);
+  --on-accent: oklch(0.18 0.02 250);
+  --highlight: oklch(0.8 0.14 80);
+  --highlight-ink: oklch(0.83 0.12 80);
+  --on-highlight: oklch(0.225 0.012 265);
+  --danger: oklch(0.72 0.15 28);
+  --danger-soft: oklch(0.3 0.06 28);
+
+  --aqi-1: oklch(0.7 0.13 155);
+  --aqi-2: oklch(0.8 0.13 118);
+  --aqi-3: oklch(0.82 0.14 80);
+  --aqi-4: oklch(0.72 0.16 45);
+  --aqi-5: oklch(0.64 0.17 15);
+
+  --season-spring: oklch(0.62 0.1 150);
+  --season-summer: oklch(0.7 0.12 85);
+  --season-autumn: oklch(0.62 0.13 45);
+  --season-winter: oklch(0.6 0.08 240);
+
+  --cat-sights: oklch(0.72 0.12 45);
+  --cat-food: oklch(0.72 0.11 155);
+  --cat-stays: oklch(0.72 0.09 250);
+}
+
+/* ── Base ───────────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 4.5rem;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01" 0;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  h3,
+  h4 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Inputs keep their visual focus inside a field wrapper when present. */
+  [data-focus-within-ring]:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  [data-focus-within-ring] :focus-visible {
+    outline: none;
+  }
+
+  button,
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  dialog {
+    color: inherit;
+  }
+
+  /* Skip link: visible only when focused. */
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    top: 0.75rem;
+  }
+}
+
+/* ── Components that need more than utilities ───────────────────────── */
+@layer components {
+  /* Readable long-form copy for editorial pages. */
+  .prose-almanac {
+    max-width: var(--container-prose);
+    color: var(--ink);
+  }
+
+  .prose-almanac > * + * {
+    margin-top: 1.1em;
+  }
+
+  .prose-almanac h2:not(.not-prose *) {
+    margin-top: 2.2em;
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+  }
+
+  .prose-almanac h3:not(.not-prose *) {
+    margin-top: 1.8em;
+    font-size: var(--text-h3);
+  }
+
+  .prose-almanac a:not(.not-prose *) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .prose-almanac a:not(.not-prose *):hover {
+    color: var(--accent-hover);
+  }
+
+  .prose-almanac ul:not(.not-prose, .not-prose *) {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .prose-almanac li:not(.not-prose *) + li {
+    margin-top: 0.4em;
+  }
+
+  .prose-almanac strong {
+    font-weight: 600;
+  }
+
+  .prose-almanac > :first-child,
+  .prose-almanac > h2:first-child {
+    margin-top: 0;
+  }
+
+  /* Skeleton shimmer — static tint under reduced motion. */
+  .skeleton {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--sunken) 25%, var(--rule) 37%, var(--sunken) 63%);
+    background-size: 400% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Native <dialog> overlays (search, mobile menu). */
+  .overlay-dialog {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 200ms var(--ease-standard),
+      transform 280ms var(--ease-standard),
+      overlay 280ms allow-discrete,
+      display 280ms allow-discrete;
+  }
+
+  .overlay-dialog:not([open]) {
+    opacity: 0;
+  }
+
+  @starting-style {
+    .overlay-dialog[open] {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @starting-style {
+    .overlay-dialog[data-variant="sheet"][open] {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+
+  .overlay-dialog::backdrop {
+    background-color: oklch(0.18 0.01 265 / 0.45);
+    transition:
+      opacity 200ms var(--ease-standard),
+      overlay 280ms allow-discrete,
+      display 280ms allow-discrete;
+  }
+
+  @starting-style {
+    .overlay-dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* Horizontal scrollers hide the scrollbar but stay keyboard-scrollable. */
+  /* position: relative contains absolutely positioned descendants (e.g.
+     sr-only text) so they can't widen the page from inside the scroller. */
+  .scroll-x {
+    position: relative;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Decorative graticule behind the home hero. */
+  .graticule {
+    color: var(--rule);
+    mask-image: radial-gradient(ellipse at 70% 40%, black 20%, transparent 72%);
+  }
+}
+
+/* ── Leaflet (map) ──────────────────────────────────────────────────── */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background-color: var(--sunken);
+}
+
+.leaflet-container a {
+  color: var(--accent);
+}
+
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
+}
+
+.bcs-marker {
+  display: grid;
+  place-items: center;
+}
+
+.bcs-marker-dot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--accent);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px oklch(0 0 0 / 0.3);
+  transition: transform 120ms var(--ease-standard);
+}
+
+.bcs-marker--saved .bcs-marker-dot {
+  background-color: var(--highlight);
+}
+
+.bcs-marker--active .bcs-marker-dot {
+  outline: 3px solid color-mix(in oklab, var(--accent) 35%, transparent);
+}
+
+.leaflet-tooltip {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--ink);
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-overlay);
+}
+
+/* ── Accessibility preferences ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root,
+  .dark {
+    --ink-muted: var(--ink);
+    --ink-subtle: var(--ink-muted);
+    --rule: var(--rule-strong);
+  }
+}
+
+@media (forced-colors: active) {
+  .skeleton {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+
+  .bcs-marker-dot {
+    background-color: Highlight;
+    border-color: Canvas;
+  }
+}
+
+/* ── Print: the day plan prints on its own ──────────────────────────── */
+@media print {
+  html[data-print="plan"] body * {
+    visibility: hidden;
+  }
+
+  html[data-print="plan"] [data-print-region="plan"],
+  html[data-print="plan"] [data-print-region="plan"] * {
+    visibility: visible;
+  }
+
+  html[data-print="plan"] [data-print-region="plan"] {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+  }
+
+  [data-print-hide] {
+    display: none !important;
+  }
+}

@@ -1,4 +1,4 @@
-import type { Landmark, PlaceType } from "@/lib/places";
+import type { PlaceType } from "@/lib/places";
 
 export const SAVED_PLACES_STORAGE_KEY = "atlas_saved_places";
 export const PLACE_NOTES_STORAGE_KEY = "atlas_place_notes";
@@ -95,37 +95,6 @@ export const parseStoredNotes = (raw: string | null): Map<string, CityNotes> => 
   );
 };
 
-const LOCAL_PULSE_TAGS: Record<string, string[]> = {
-  TOURIST_ATTRACTION: ["Must See Icon", "Historic Photo Spot", "Worth The Wait"],
-  MUSEUM: ["Quiet Culture Escape", "Story Rich Halls", "Afternoon Slow Walk"],
-  PARK: ["Sunset Picnic Spot", "Shaded Chill Loop", "Golden Hour Lawn"],
-  AQUARIUM: ["Family Wonder Zone", "Rainy Day Win", "Calm Blue Glow"],
-  RESTAURANT: ["Local Favorite Bites", "Crowded But Worth", "Chef Driven Menu"],
-  CAFE: ["Slow Morning Sips", "Laptop Friendly Nook", "Pastry First Stop"],
-  HOTEL: ["Sleep Well Base", "Walkable City Hub", "Late Night Quiet"],
-};
-
-const localPulseMap = new Map<string, string[]>(Object.entries(LOCAL_PULSE_TAGS));
-
-export function getLocalPulseTags(place: Landmark) {
-  const tags = new Set<string>();
-  const primary = place.types?.at(0);
-  if (primary) {
-    const normalizedKey = primary.toUpperCase();
-    const fallbacks = localPulseMap.get(normalizedKey) || localPulseMap.get(primary);
-    fallbacks?.forEach((tag) => tags.add(tag));
-  }
-
-  const rating = place.rating ?? 0;
-  const reviews = place.userRatingCount ?? 0;
-  if (rating >= 4.6 && reviews >= 1000) tags.add("Crowded But Worth");
-  if (rating >= 4.7 && reviews > 0 && reviews <= 200) tags.add("Hidden Gem Spot");
-  if (reviews >= 500) tags.add("Always Lively Here");
-  if (place.priceLevel === "PRICE_LEVEL_VERY_EXPENSIVE") tags.add("High End Treat");
-
-  return Array.from(tags).slice(0, 3);
-}
-
 export const getNeighborhood = (address?: string) => address?.split(",")[0]?.trim();
 
 export const getAddressContext = (address?: string) => {
@@ -144,36 +113,6 @@ export const getAddressContext = (address?: string) => {
     primary: segments[0],
     secondary: segments.slice(1, 3).join(" • "),
   };
-};
-
-export const getInsiderTips = (place: Landmark) => {
-  const tips: string[] = [];
-  const name = place.displayName.text;
-  const neighborhood = getNeighborhood(place.formattedAddress);
-  const reviews = place.userRatingCount ?? 0;
-
-  if (reviews >= 1000) {
-    tips.push(`Arrive early at ${name} to beat the rush.`);
-  } else {
-    tips.push(`Quietest moments at ${name} are just after opening.`);
-  }
-
-  if (neighborhood) {
-    tips.push(`Best entry is from the ${neighborhood} side.`);
-  } else {
-    tips.push(`Look for the calmer side entrance at ${name}.`);
-  }
-
-  if (
-    place.types?.some((type) => {
-      const normalized = type.toLowerCase();
-      return normalized.includes("restaurant") || normalized.includes("food");
-    })
-  ) {
-    tips.push(`Ask about the daily special at ${name}.`);
-  }
-
-  return tips.slice(0, 2);
 };
 
 export function topK<T>(arr: T[], k: number, getValue: (item: T) => number): T[] {

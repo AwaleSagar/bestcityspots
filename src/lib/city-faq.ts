@@ -12,9 +12,8 @@ export interface FAQItem {
  * AI prose at request time — that would invalidate the "AI is summary,
  * not source" principle in the methodology.
  *
- * SEO Phase 2.2 (audit 5.5): emits visible FAQ copy + `FAQPage` JSON-LD
- * for rich-result eligibility, and a `SpeakableSpecification` block so the
- * city summary is voice-search-eligible.
+ * SEO Phase 2.2 (audit 5.5): rendered as visible FAQ copy on the city page
+ * alongside matching `FAQPage` JSON-LD (see app/cities/[slug]/city-data.ts).
  */
 export function buildFaqs(city: City, intro: string | null, comfort: string | null): FAQItem[] {
   const cityCountry = `${city.city}, ${city.country}`;
@@ -23,12 +22,12 @@ export function buildFaqs(city: City, intro: string | null, comfort: string | nu
       q: `What is the best time to visit ${city.city}?`,
       a:
         comfort && comfort.length > 0
-          ? `${city.city} currently registers a ${comfort.toLowerCase()} climate band in our cache; the city page weather strip and seasons block above show how that varies through the year.`
-          : `Climate suitability for ${city.city} varies by season — check the seasons block on this page for month-by-month guidance.`,
+          ? `Right now ${city.city} reads as ${comfort.toLowerCase()} in our climate data; the When to go section on this page shows how that varies through the year.`
+          : `Climate suitability for ${city.city} varies by season — check the When to go section on this page for month-by-month guidance.`,
     },
     {
       q: `Is ${city.city} safe for travelers?`,
-      a: `${city.city} is a major urban center in ${city.country}. Use the live AQI reading and neighborhood texture above as a starting point, and consult your government's travel advisory for ${city.country} before booking.`,
+      a: `${city.city} is a major urban center in ${city.country}. Use the live air-quality reading on this page as a starting point, and consult your government's travel advisory for ${city.country} before booking.`,
     },
     {
       q: `What language is spoken in ${city.city}?`,
@@ -53,7 +52,7 @@ export function buildFaqs(city: City, intro: string | null, comfort: string | nu
         }
       : {
           q: `What makes ${city.city} unique?`,
-          a: `${cityCountry} blends the cultural fabric of ${city.country} with its own neighborhood pulse — see the AI briefing above for an at-a-glance summary.`,
+          a: `${cityCountry} blends the cultural fabric of ${city.country} with its own neighborhood pulse — see the overview at the top of this page for an at-a-glance summary.`,
         },
   ];
 }
