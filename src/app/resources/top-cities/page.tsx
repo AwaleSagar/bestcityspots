@@ -1,15 +1,19 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import { getTopCities } from "@/lib/cities";
 import { fetchTrendingCityIds } from "@/app/actions";
-import TopCitiesPageContent from "@/components/pages/TopCitiesPageContent";
-import { publicEnv } from "@/lib/env";
 import { SITEMAP_CITY_COUNT } from "@/app/sitemap";
+import { getTopCities } from "@/lib/cities";
+import { formatPopulation } from "@/lib/format";
+import { getSiteUrl } from "@/lib/site";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Section";
+import { FilterableCityList } from "@/components/discovery/FilterableCityList";
+import { PrioritiesMixer } from "@/components/discovery/PrioritiesMixer";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { ListOrdered } from "lucide-react";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 
 const year = new Date().getFullYear();
 
@@ -41,7 +45,7 @@ export const revalidate = 86400;
 export default async function TopCitiesPage() {
   const [cities, trendingIdsArr] = await Promise.all([
     getTopCities(SITEMAP_CITY_COUNT),
-    fetchTrendingCityIds(),
+    fetchTrendingCityIds().catch(() => []),
   ]);
   const trendingIds = new Set(trendingIdsArr);
 
@@ -90,17 +94,84 @@ export default async function TopCitiesPage() {
     ],
   };
 
+  const countryCount = new Set(cities.map((city) => city.country)).size;
+  const capitalCount = cities.filter((city) => city.capital === "primary").length;
+  const combinedPopulation = cities.reduce((sum, city) => sum + (city.population ?? 0), 0);
+  const stats = [
+    { label: "Cities", value: String(cities.length) },
+    { label: "Countries", value: String(countryCount) },
+    { label: "National capitals", value: String(capitalCount) },
+    { label: "Combined population", value: formatPopulation(combinedPopulation) },
+  ];
+
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListStructuredData) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
-      />
-      <TopCitiesPageContent cities={citiesWithTrending} />
-    </>
+    <main id="main-content">
+      <JsonLd data={itemListStructuredData} />
+      <JsonLd data={breadcrumbStructuredData} />
+      <Container>
+        <PageHeader
+          breadcrumbs={[
+            { label: "Guides", href: "/guides" },
+            { label: `The Top ${SITEMAP_CITY_COUNT}` },
+          ]}
+          eyebrow={`Best cities to visit in ${year}`}
+          title={`The Top ${SITEMAP_CITY_COUNT}`}
+          lede="The world's largest cities, each with a full guide — then re-ranked by the priorities you choose. Free, no sign-up."
+        >
+          {cities.length > 0 ? (
+            <dl className="border-rule bg-rule grid grid-cols-2 gap-px overflow-hidden rounded-md border sm:grid-cols-4">
+              {stats.map((stat) => (
+                <div key={stat.label} className="bg-surface p-4">
+                  <dt className="text-ink-muted text-sm">{stat.label}</dt>
+                  <dd className="font-display mt-1 text-3xl tabular-nums">{stat.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+        </PageHeader>
+        <div className="space-y-20 py-12 pb-20">
+          <Section
+            id="mixer"
+            title="Rank by your priorities"
+            description="Weigh budget, air quality, safety and connectivity. Scores come from the same metrics shown on each city guide."
+          >
+            <PrioritiesMixer
+              cities={citiesWithTrending.map(({ id, slug, city, admin_name, country }) => ({
+                id,
+                slug,
+                city,
+                admin_name,
+                country,
+              }))}
+            />
+          </Section>
+          <Section id="all" title={`All ${cities.length || SITEMAP_CITY_COUNT}, by population`}>
+            {cities.length > 0 ? (
+              <FilterableCityList
+                label="cities"
+                cities={citiesWithTrending.map(
+                  ({ id, slug, city, admin_name, country, population, trending }) => ({
+                    id,
+                    slug,
+                    city,
+                    admin_name,
+                    country,
+                    population,
+                    trending,
+                  })
+                )}
+              />
+            ) : (
+              <EmptyState
+                icon={<ListOrdered aria-hidden />}
+                title="The ranking is unavailable right now"
+              >
+                Try again in a moment, or search for a city directly.
+              </EmptyState>
+            )}
+          </Section>
+        </div>
+      </Container>
+    </main>
   );
 }

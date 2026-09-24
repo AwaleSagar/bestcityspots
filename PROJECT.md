@@ -13,15 +13,16 @@ Next.js 16 (App Router, React 19, TypeScript 5 strict) · Tailwind 4 · Supabase
 ├── src/
 │   ├── app/                # App Router: routes, layouts, server actions
 │   │   ├── api/            # REST: analytics, cities/sphere, cities/insight, places/{search,save-event}, health, csp-report
-│   │   ├── cities/         # /cities listing + /cities/[slug] detail
-│   │   ├── countries/      # /countries hub + /countries/[slug]
+│   │   ├── cities/         # /cities listing + /cities/[slug] guide (city-data.ts holds its SEO/data rules)
+│   │   ├── countries/      # /countries A–Z index + /countries/[slug]
+│   │   ├── guides/         # /guides index of every ranking
 │   │   ├── best-cities-*/  # Topical SEO hubs (air quality, nomads, monthly)
+│   │   ├── compare/, search/, saved/   # Compare (URL-driven), search results, device-local saves
 │   │   ├── actions.ts      # Server actions
-│   │   ├── layout.tsx, page.tsx
-│   │   └── globals.css     # Liquid-glass design tokens
-│   ├── components/         # analytics, effects, features, layout, pages, sections, seo, ui
-│   ├── hooks/              # useDeviceType, useNetworkQuality, useRecentSearches
-│   ├── config/             # nav.ts
+│   │   ├── layout.tsx, page.tsx, error.tsx, global-error.tsx, not-found.tsx
+│   │   └── globals.css     # "Editorial almanac" design tokens (docs/design-tokens.md)
+│   ├── components/         # ui (primitives), layout, search, city, discovery, compare, saved, editorial, home, analytics, seo
+│   ├── hooks/              # useStoredValue + useSavedPlaces, usePlaceNotes, useRecentCities
 │   ├── platform/           # Platform layer (data-access + cache repositories)
 │   └── lib/                # Service layer (business logic, mostly server-only)
 ├── supabase/               # SQL: baseline files + ordered migrations/

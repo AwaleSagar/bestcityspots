@@ -1,45 +1,41 @@
 import Link from "next/link";
-import { ChevronRight, Home } from "lucide-react";
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
 
-interface BreadcrumbsProps {
-  items: BreadcrumbItem[];
-}
-
-export default function Breadcrumbs({ items }: BreadcrumbsProps) {
+export function Breadcrumbs({ items }: { items: BreadcrumbItem[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-6">
-      <ol className="flex items-center gap-2 text-sm">
-        <li>
-          <Link
-            href="/"
-            className="text-foreground/60 hover:text-foreground flex items-center gap-1.5 transition-colors duration-100"
-            aria-label="Home"
-          >
-            <Home className="h-4 w-4" aria-hidden />
-          </Link>
-        </li>
-        {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-2">
-            <ChevronRight className="text-foreground/20 h-4 w-4" aria-hidden="true" />
-            {item.href && index < items.length - 1 ? (
-              <Link
-                href={item.href}
-                className="text-foreground/60 hover:text-foreground transition-colors duration-100"
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <span className="text-foreground/80 font-medium" aria-current="page">
-                {item.label}
-              </span>
-            )}
-          </li>
-        ))}
+    <nav aria-label="Breadcrumb" className="text-ink-muted text-sm">
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        {items.map((item, index) => {
+          const isLast = index === items.length - 1;
+          return (
+            <li key={`${item.label}-${index}`} className="flex items-center gap-2">
+              {item.href && !isLast ? (
+                <Link
+                  href={item.href}
+                  className="hover:text-ink underline-offset-4 hover:underline"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span
+                  aria-current={isLast ? "page" : undefined}
+                  className={isLast ? "text-ink" : undefined}
+                >
+                  {item.label}
+                </span>
+              )}
+              {isLast ? null : (
+                <span aria-hidden className="text-ink-subtle">
+                  /
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

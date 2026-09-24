@@ -1,15 +1,10 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, CheckCircle2, Clock, Database, Sparkles } from "lucide-react";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import { publicEnv } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site";
+import { ProseLayout } from "@/components/editorial/ProseLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 
 // SEO Phase 2.4 (audit 7.3): explicit, structured methodology page that
 // surfaces sources, refresh cadence, and AI-vs-human attribution. Linked
@@ -97,133 +92,97 @@ const breadcrumbJsonLd = {
   ],
 };
 
+const TOC = [
+  { id: "sources", label: "Data sources" },
+  { id: "ai", label: "How we use AI" },
+  { id: "rankings", label: "Rankings" },
+  { id: "privacy", label: "Privacy & analytics" },
+  { id: "counters", label: "Counters & partner links" },
+  { id: "principles", label: "Principles" },
+];
+
 export default function MethodologyPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(aboutPageJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
-      <main id="main-content" className="text-foreground min-h-screen bg-transparent">
-        <div
-          className="container-gutter mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20"
-          style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
-        >
-          <Breadcrumbs items={[{ label: "About", href: "/about" }, { label: "Methodology" }]} />
-
-          <span className="eyebrow">
-            <Sparkles className="text-accent h-3.5 w-3.5" aria-hidden />
-            How we work
-          </span>
-          <h1 className="page-title text-foreground mt-6 max-w-2xl">
-            Methodology &mdash; sources, refresh cadence, and AI attribution.
-          </h1>
-          <p className="lede mt-5 max-w-xl">
-            We treat travel data like a public record: every metric on a city page traces back to a
-            named provider, a refresh window, and a clear note about whether humans or AI assembled
-            it.
-          </p>
-
-          <figure className="border-line bg-surface/60 mt-10 overflow-hidden rounded-2xl border">
-            <Image
-              src="/illustrations/methodology-pipeline.webp"
-              alt="Data pipeline: weather, places, public datasets, and AI flow through a scoring step into a ranked city list"
-              width={1400}
-              height={1120}
-              sizes="(min-width: 768px) 48rem, 100vw"
-              className="h-auto w-full"
-            />
-          </figure>
-
-          <section aria-labelledby="sources-heading" className="mt-12">
-            <h2
-              id="sources-heading"
-              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
+      <JsonLd data={aboutPageJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <ProseLayout
+        breadcrumbs={[{ label: "About", href: "/about" }, { label: "Methodology" }]}
+        eyebrow="How we work"
+        title="Methodology: sources, refresh cadence and AI attribution"
+        lede="We treat travel data like a public record: every number on a city guide traces back to a named provider, a refresh window, and a clear note about whether a person or an AI assembled it."
+        toc={TOC}
+      >
+        <h2 id="sources">Data sources</h2>
+        <div className="not-prose divide-rule border-rule mt-6 divide-y border-y">
+          {sources.map((source) => (
+            <div
+              key={source.name}
+              className="grid gap-2 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6"
             >
-              <Database className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
-              Data sources
-            </h2>
-            <ul className="mt-4 space-y-4">
-              {sources.map((source) => (
-                <li key={source.name} className="border-line bg-surface/60 rounded-xl border p-5">
-                  <h3 className="text-foreground text-base font-semibold">{source.name}</h3>
-                  <p className="text-muted mt-2 text-sm leading-relaxed">{source.used_for}</p>
-                  <p className="text-muted-strong mt-2 flex items-center gap-2 text-xs">
-                    <Clock className="h-3.5 w-3.5" aria-hidden />
-                    {source.refreshes}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* US-12 + US-13: transparency for counters and partner links. */}
-          <section aria-labelledby="transparency-heading" className="mt-12">
-            <h2
-              id="transparency-heading"
-              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
-            >
-              <CheckCircle2 className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
-              Counters &amp; partner links
-            </h2>
-            <div className="text-muted-strong mt-4 space-y-3 text-sm leading-relaxed">
-              <p>
-                &ldquo;Saved&rdquo; counters on place cards are fully anonymous aggregates: we store
-                only a per-place daily tally, never who saved what. No user identifiers, sessions,
-                or IP addresses are recorded, and counts are shown only once a place has been saved
-                at least five times.
-              </p>
-              <p>
-                Some stay listings include a clearly labeled <em>Partner</em> link to a booking
-                site. If you book through one, we may earn a commission at no extra cost to you.
-                Partner links never influence rankings — ordering comes from the same public rating
-                data as everything else — and we count only an anonymous total of clicks.
-              </p>
+              <h3 className="text-base font-semibold">{source.name}</h3>
+              <div>
+                <p>{source.used_for}</p>
+                <p className="text-ink-muted mt-1 text-sm">{source.refreshes}</p>
+              </div>
             </div>
-          </section>
-
-          <section aria-labelledby="principles-heading" className="mt-12">
-            <h2
-              id="principles-heading"
-              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
-            >
-              <CheckCircle2 className="text-accent mr-2 inline h-3.5 w-3.5" aria-hidden />
-              Principles
-            </h2>
-            <ul className="mt-4 space-y-3">
-              {principles.map((p) => (
-                <li
-                  key={p}
-                  className="text-muted-strong border-line border-l-2 pl-4 text-sm leading-relaxed"
-                >
-                  {p}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <nav className="mt-12 flex flex-wrap gap-3" aria-label="Methodology navigation">
-            <Link
-              href="/about"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden />
-              Back to About
-            </Link>
-            <Link
-              href="/resources/top-cities"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
-            >
-              Browse city guides
-              <ArrowRight className="h-4 w-4" aria-hidden />
-            </Link>
-          </nav>
+          ))}
         </div>
-      </main>
+
+        <h2 id="ai">How we use AI</h2>
+        <p>
+          Each city&apos;s overview, highlights and season notes are written by Google Gemini from a
+          fixed prompt, then validated against a schema before they&apos;re stored. They carry an
+          &ldquo;AI-written&rdquo; label and the date they were generated. AI never produces the
+          live numbers — temperature, air quality, ratings and population always come straight from
+          the providers above.
+        </p>
+        <p>
+          When a briefing is missing or outdated, the guide shows the last good version while a
+          fresh one is written, and falls back quietly if the AI service is unavailable.
+          Visitor-triggered AI generation draws from a small daily budget of its own, so it can
+          never exhaust the budget reserved for scheduled refreshes.
+        </p>
+
+        <h2 id="rankings">How rankings work</h2>
+        <p>
+          Every ranked guide states its scoring in plain language beside the list. Places within a
+          city are ordered by their number of traveler reviews. The{" "}
+          <Link href="/resources/top-cities#mixer">priorities mixer</Link> re-ranks the Top 250 in
+          your browser from the same public metrics; your weights never leave the device.
+        </p>
+
+        <h2 id="privacy">Privacy &amp; analytics</h2>
+        <p>
+          We count pageviews and a short list of anonymous actions (such as &ldquo;saved a
+          place&rdquo;) as aggregate totals. There are no accounts, no advertising trackers and no
+          cross-site identifiers, and we honor Do Not Track. Country and city — derived from your
+          connection, never your precise location — are recorded only if you opt in, and only as
+          totals. Saved places, notes and plans are stored in your browser and never uploaded.
+        </p>
+
+        {/* US-12 + US-13: transparency for counters and partner links. */}
+        <h2 id="counters">Counters &amp; partner links</h2>
+        <p>
+          &ldquo;Saved by&rdquo; counters on place cards are fully anonymous aggregates: we store
+          only a per-place daily tally, never who saved what. No user identifiers, sessions, or IP
+          addresses are recorded, and counts appear only once a place has been saved at least five
+          times.
+        </p>
+        <p>
+          Some stays include a clearly labelled <em>partner</em> link to a booking site. If you book
+          through one, we may earn a commission at no extra cost to you. Partner links never
+          influence rankings — ordering comes from the same public rating data as everything else —
+          and we count only an anonymous total of clicks.
+        </p>
+
+        <h2 id="principles">Principles</h2>
+        <ul>
+          {principles.map((principle) => (
+            <li key={principle}>{principle}</li>
+          ))}
+        </ul>
+      </ProseLayout>
     </>
   );
 }

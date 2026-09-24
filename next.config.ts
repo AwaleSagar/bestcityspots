@@ -12,18 +12,6 @@ const isDev = process.env.NODE_ENV !== "production";
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  // D1 View Transitions (redesign 2026 H2): the city hero gets a named
-  // transition so city→city navigations morph the hero, and reduced-motion
-  // users get instant navigation (see the globals.css guard).
-  //
-  // The `experimental.viewTransition` flag that used to enable this was
-  // REMOVED upstream in Next 16.3 (it no longer exists in ExperimentalConfig
-  // and nothing in the runtime reads it), so it is dropped here as part of the
-  // security upgrade off the vulnerable 16.2.x line. The `::view-transition-*`
-  // rules in globals.css are browser-level and stay in effect wherever the
-  // navigation triggers a view transition; if the cross-fade needs to be
-  // re-enabled explicitly, it is now done with React's <ViewTransition>
-  // component rather than a Next config flag.
   images: {
     qualities: [75, 85],
     remotePatterns: [
@@ -75,7 +63,7 @@ const nextConfig: NextConfig = {
           // us collect violation telemetry from real traffic before
           // promoting the policy to enforced mode. The directive set is
           // intentionally permissive (`'unsafe-inline'` for styles and
-          // scripts) because Next.js + Framer Motion + Tailwind v4 inject
+          // scripts) because Next.js, next-themes and Tailwind v4 inject
           // inline runtime CSS/JS — a stricter nonce-based policy needs
           // its own focused rollout.
           //

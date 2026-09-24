@@ -16,12 +16,12 @@ export const revalidate = 86400;
  * Number of cities surfaced in the sitemap.
  *
  * US-02 (product audit AF-3): this is pinned to the cache-warmed set — the
- * same `STATIC_CITY_COUNT = 250` pre-rendered in `cities/[slug]/page.tsx`
- * and warmed nightly by `scripts/warm-cache.ts --top-cities=250`. Submitting
+ * top 250 cities warmed nightly by `scripts/warm-cache.ts --top-cities=250`
+ * (also the Top 250 index at /resources/top-cities). Submitting
  * only pages with real cached content follows Google's thin-content guidance
  * ("fewer, stronger pages"): long-tail cities remain reachable and render
  * the reduced template, but are never advertised to crawlers. If the warm
- * envelope changes, change BOTH constants together.
+ * envelope changes, change the warmer and this constant together.
  */
 export const SITEMAP_CITY_COUNT = 250;
 
@@ -70,6 +70,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       images: [homeImage],
     },
     // SEO Phase 2.3: IA hubs.
+    {
+      url: `${siteUrl}/guides`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+      images: [homeImage],
+    },
     {
       url: `${siteUrl}/cities`,
       lastModified: now,

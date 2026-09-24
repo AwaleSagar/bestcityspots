@@ -1,15 +1,12 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Accessibility, Mail } from "lucide-react";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { publicEnv } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site";
+import { ProseLayout } from "@/components/editorial/ProseLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 const publicConfig = publicEnv();
-const siteUrl = (publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 const contactEmail = publicConfig.NEXT_PUBLIC_CONTACT_EMAIL;
 
 // UI review item 4: the European Accessibility Act (in force since June 2025)
@@ -39,98 +36,60 @@ const breadcrumbJsonLd = {
 };
 
 const implementedMeasures = [
-  "Color contrast of text meets or exceeds WCAG 2.2 AA ratios in light and dark themes",
-  "All functionality is operable by keyboard, with visible focus indicators",
-  "A skip-to-content link and landmark regions support screen-reader navigation",
-  "Touch targets meet the 44px minimum on interactive controls",
-  "Motion and animation respect the prefers-reduced-motion system setting",
-  "Increased-contrast preferences (prefers-contrast) are honored",
-  "Text can be resized up to 200% and pages remain usable",
-  "Loading states are announced to assistive technology",
+  "Text and interface colors meet WCAG 2.2 AA contrast ratios in both light and dark themes",
+  "Everything works with a keyboard, with a clearly visible focus indicator",
+  "A skip link, landmark regions and one heading outline per page support screen readers",
+  "Search, tabs, dialogs and menus follow WAI-ARIA patterns (combobox, tablist, modal dialog)",
+  "Controls meet the WCAG 2.2 target-size minimum, and primary controls grow to 44px on touch screens",
+  "Motion respects the reduced-motion setting, and increased-contrast preferences are honored",
+  "Text can be resized to 200% and layouts reflow down to 320px wide without horizontal scrolling",
+  "Loading, search results and confirmations are announced to assistive technology",
+  "Color is never the only signal — air quality and seasons always carry a text label",
 ] as const;
 
 export default function AccessibilityPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
-      <main id="main-content" className="text-foreground min-h-screen bg-transparent">
-        <div
-          className="container-gutter mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-20"
-          style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
-        >
-          <Breadcrumbs items={[{ label: "Accessibility" }]} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <ProseLayout
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Accessibility" }]}
+        title="Accessibility statement"
+        lede="Best City Spots is designed to be usable by everyone. We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.2, Level AA, across the whole site."
+      >
+        <h2 id="implemented">What we have implemented</h2>
+        <ul>
+          {implementedMeasures.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
 
-          <span className="eyebrow">
-            <Accessibility className="text-accent h-3.5 w-3.5" aria-hidden />
-            Accessibility
-          </span>
+        <h2 id="limitations">Known limitations</h2>
+        <p>
+          Maps are supplementary: every place on a map is also listed as text, but the map itself is
+          not fully usable with a screen reader. Some place photos come from third parties and only
+          carry the place name as alternative text. AI-written briefings are checked for structure,
+          not reviewed by a person before publishing.
+        </p>
 
-          <h1 className="page-title text-foreground mt-4">Accessibility statement</h1>
-
-          <p className="lede mt-5">
-            Best City Spots is designed to be usable by everyone. We aim to conform to the Web
-            Content Accessibility Guidelines (WCAG) 2.2, Level AA, across the whole site.
+        <h2 id="feedback">Feedback and contact</h2>
+        <p>
+          If you run into an accessibility barrier on this site, please tell us. We aim to respond
+          within five business days.
+        </p>
+        {contactEmail ? (
+          <p>
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
           </p>
-
-          <section className="mt-10" aria-labelledby="measures-heading">
-            <h2 id="measures-heading" className="section-title text-foreground">
-              What we have implemented
-            </h2>
-            <ul className="mt-5 space-y-3">
-              {implementedMeasures.map((item) => (
-                <li key={item} className="text-muted-strong flex gap-3 text-sm leading-relaxed">
-                  <span className="bg-accent mt-2 h-1.5 w-1.5 shrink-0 rounded-full" aria-hidden />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section className="mt-10" aria-labelledby="limitations-heading">
-            <h2 id="limitations-heading" className="section-title text-foreground">
-              Known limitations
-            </h2>
-            <p className="text-muted-strong mt-5 text-sm leading-relaxed">
-              Some third-party imagery and AI-generated briefing content may occasionally lack fully
-              descriptive alternative text. Live data visualizations (weather, air quality) provide
-              text equivalents, but their granularity is still being improved. We review these areas
-              continuously.
-            </p>
-          </section>
-
-          <section className="mt-10" aria-labelledby="feedback-heading">
-            <h2 id="feedback-heading" className="section-title text-foreground">
-              Feedback and contact
-            </h2>
-            <p className="text-muted-strong mt-5 text-sm leading-relaxed">
-              If you encounter an accessibility barrier on this site, please tell us. We aim to
-              respond within five business days.
-            </p>
-            {contactEmail ? (
-              <a href={`mailto:${contactEmail}`} className="btn-secondary mt-5">
-                <Mail className="h-4 w-4" aria-hidden />
-                {contactEmail}
-              </a>
-            ) : (
-              <p className="text-muted-strong mt-5 text-sm leading-relaxed">
-                Contact us via the details on the{" "}
-                <Link href="/about" className="text-link">
-                  About page
-                </Link>
-                .
-              </p>
-            )}
-          </section>
-
-          <p className="text-muted mt-12 text-xs">
-            This statement was last reviewed in June 2026 and is revisited alongside significant
-            interface changes.
+        ) : (
+          <p>
+            Contact us via the details on the <Link href="/about">About page</Link>.
           </p>
-        </div>
-      </main>
+        )}
+        <p className="text-ink-muted text-sm">
+          This statement was last reviewed in September 2026, alongside the redesign of the site,
+          and is revisited with every significant interface change.
+        </p>
+      </ProseLayout>
     </>
   );
 }

@@ -1,25 +1,26 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { City } from "@/lib/cities";
 import { useAnalytics } from "@/lib/useAnalytics";
+import { useRecentCities } from "@/hooks/useRecentCities";
 
 /**
- * Records a city view exactly once per mount.
- *
- * Used by the slug-based city route to keep the existing per-city analytics
- * working after the SEO Phase 1 URL migration, where the slug (not the
- * numeric id) is the canonical URL segment. The id is resolved server-side
- * from the slug and passed in as a prop.
+ * Once per city: records the anonymous `view_city` action (feeds the home
+ * page "opening now" index) and adds the city to this browser's recently
+ * viewed list (shown on /saved and in search).
  */
-export default function CityViewTracker({ cityId }: { cityId: number }) {
+export function CityViewTracker({ city }: { city: City }) {
   const { trackCityView } = useAnalytics();
+  const { addRecent } = useRecentCities();
   const reported = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!Number.isFinite(cityId) || reported.current === cityId) return;
-    reported.current = cityId;
-    trackCityView(cityId);
-  }, [cityId, trackCityView]);
+    if (reported.current === city.id) return;
+    reported.current = city.id;
+    trackCityView(city.id);
+    addRecent(city);
+  }, [city, trackCityView, addRecent]);
 
   return null;
 }

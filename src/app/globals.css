@@ -1,245 +1,225 @@
 @import "tailwindcss";
 
-@variant dark (&:where(.dark, .dark *));
+/*
+ * Best City Spots — "Editorial almanac" design system.
+ *
+ * Token reference and usage rules: docs/design-tokens.md
+ * Motion rules: docs/motion-policy.md
+ *
+ * Raw values live on :root / .dark as plain custom properties; the @theme
+ * block maps them to Tailwind utilities (bg-paper, text-ink, border-rule…)
+ * with `inline` so every utility resolves the live variable and dark mode is
+ * a pure variable swap. next-themes toggles the `.dark` class on <html>.
+ */
 
-/* ─── Tailwind Theme (radius scale — keep utilities and tokens in sync) ───
-   A3 three-step component-radius law (redesign 2026 H2, evidenced against
-   docs/component-patterns.json, n=181 component samples across 98 peers):
-     • pill  → rounded-full / --radius-full : actions (buttons) + chips
-     • xl    → rounded-xl  / --radius-xl    : cards, panels, stamps
-     • md    → rounded-md  / --radius-md    : inputs + inline controls
-   The field clusters sharp (96/181 at 0–4px) — our soft scale is the
-   documented divergence (see competitor-design-signals.md). Kill one-off
-   intermediate values; do not introduce rounded-lg / rounded-2xl on cards
-   or actions. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  /* ── Color ─────────────────────────────────────────────────────────── */
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-highlight: var(--highlight);
+  --color-highlight-ink: var(--highlight-ink);
+  --color-on-highlight: var(--on-highlight);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-aqi-1: var(--aqi-1);
+  --color-aqi-2: var(--aqi-2);
+  --color-aqi-3: var(--aqi-3);
+  --color-aqi-4: var(--aqi-4);
+  --color-aqi-5: var(--aqi-5);
+
+  --color-season-spring: var(--season-spring);
+  --color-season-summer: var(--season-summer);
+  --color-season-autumn: var(--season-autumn);
+  --color-season-winter: var(--season-winter);
+
+  --color-sights: var(--cat-sights);
+  --color-food: var(--cat-food);
+  --color-stays: var(--cat-stays);
+
+  /* ── Type ──────────────────────────────────────────────────────────── */
+  --font-sans:
+    var(--font-geist), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-newsreader), ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+}
 
 @theme {
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-3xl: 2rem;
-  --radius-4xl: 2.5rem;
+  /* Fluid display scale (serif). Body sizes use Tailwind's default
+     xs/sm/base/lg; 0.75rem (text-xs) is the legibility floor. */
+  --text-display: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.022em;
+  --text-h1: clamp(2.125rem, 1.65rem + 1.9vw, 3.25rem);
+  --text-h1--line-height: 1.06;
+  --text-h1--letter-spacing: -0.018em;
+  --text-h2: clamp(1.625rem, 1.4rem + 0.95vw, 2.25rem);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: -0.012em;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.3;
+  --text-lede: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
+  --text-lede--line-height: 1.55;
+
+  /* Layout */
+  --container-page: 76rem;
+  --container-prose: 42rem;
+
+  /* Shape: controls + cards use md, dialogs/sheets lg, chips full. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+
+  /* Depth: borders define cards; shadows are reserved for overlays. */
+  --shadow-overlay: 0 1px 2px oklch(0 0 0 / 0.06), 0 16px 40px -12px oklch(0.2 0.02 265 / 0.28);
+
+  /* Motion: one curve, three durations (see docs/motion-policy.md). */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --animate-live: live-pulse 2.4s var(--ease-standard) infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes live-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
 }
 
-/* ─── Design Tokens ─── */
-
+/* ── Light (default) ────────────────────────────────────────────────── */
 :root {
-  /* ── Azure Atlas palette (color audit 2026-06-13, Direction A) ──
-     All chroma values verified inside the sRGB gamut; all text pairs ≥4.5:1,
-     UI pairs ≥3:1 (see audit §5-6). Coral Spark is the identity accent;
-     Clay Press carries links/buttons (light text passes AA); Kiln is the
-     pressed/hover step. */
-  --background: oklch(0.977 0.007 81); /* Paper #FAF7F2 */
-  --foreground: oklch(0.229 0.015 58); /* Ink #221B16 */
+  color-scheme: light;
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: oklch(0.985 0.005 80);
-  --color-surface-strong: oklch(0.962 0.009 78);
-  --color-elevated: oklch(1 0 0);
-  /* Mist — 5.24:1 on Paper (WCAG 2.2 AA with margin) */
-  --color-muted: oklch(0.517 0.014 51);
-  --color-muted-strong: oklch(0.4 0.018 55);
-  --color-line: color-mix(in oklab, var(--foreground) 8%, transparent);
-  --color-accent: oklch(0.642 0.187 31); /* Coral Spark #E8543F — icons/identity (3.4:1 UI) */
-  /* A1 Coral discipline (redesign 2026 H2). Coral appears in exactly three
-     roles — (1) primary action fills (via --color-accent-strong/Clay Press,
-     never raw Coral Spark which fails 4.5:1 with light text), (2) active /
-     current / focus states, (3) one hero moment per viewport (e.g. the
-     search-shell glow). Everything decorative steps down to a low-opacity
-     color-mix tint, Dune Gold, or the cool counterweights. Evidence: only
-     21/98 peers ship a saturated warm primary, and most are muted ochres —
-     coral's distinction comes from scarcity + hue, not presence. Audit log
-     lives in docs/design-tokens.md §Coral usage. */
-  --color-accent-strong: oklch(
-    0.555 0.169 31
-  ); /* Clay Press #C2402E — links 4.8:1, btn fill 4.9:1 */
-  --color-accent-deep: oklch(0.5 0.16 31); /* Kiln — pressed/hover state */
-  --color-accent-soft: color-mix(in oklab, var(--color-accent) 10%, transparent);
-  --color-accent-contrast: oklch(0.98 0.005 80);
-  --color-brand-primary: var(--color-accent);
-  --color-brand-secondary: oklch(0.466 0.097 240); /* Deep Azure #15608A — 6.4:1 */
-  --color-brand-accent: oklch(0.631 0.113 76); /* Dune Gold #B07F2E — 3.3:1 UI */
-  --color-earth: oklch(0.6 0.07 75); /* warm sand (decorative tints only) */
-  --color-earth-soft: color-mix(in oklab, var(--color-earth) 12%, transparent);
-  --color-leaf: oklch(0.58 0.093 175); /* Sea Glass #2E8C77 — 3.8:1 UI */
-  --color-leaf-soft: color-mix(in oklab, var(--color-leaf) 10%, transparent);
-  --color-water: oklch(0.466 0.097 240); /* Deep Azure — real blue presence */
-  --color-water-soft: color-mix(in oklab, var(--color-water) 10%, transparent);
-  --color-glass: color-mix(in oklab, var(--background) 80%, white);
-  --color-glass-heavy: color-mix(in oklab, var(--background) 90%, white);
-  --color-glass-border: color-mix(in oklab, var(--foreground) 6%, transparent);
+  --paper: oklch(0.972 0.007 85); /* ≈ #F7F4EE */
+  --surface: oklch(0.992 0.003 85);
+  --sunken: oklch(0.948 0.009 85);
+  --ink: oklch(0.225 0.012 265); /* ≈ #1B1D23 */
+  --ink-muted: oklch(0.465 0.014 265);
+  --ink-subtle: oklch(0.585 0.012 265);
+  --rule: oklch(0.885 0.008 85);
+  --rule-strong: oklch(0.78 0.01 85);
 
-  --color-cat-dining: oklch(0.49 0.09 173); /* deep Sea Glass */
-  --color-cat-dining-soft: color-mix(in oklab, var(--color-cat-dining) 10%, transparent);
-  --color-cat-stays: oklch(0.45 0.1 245); /* Azure family */
-  --color-cat-stays-soft: color-mix(in oklab, var(--color-cat-stays) 10%, transparent);
+  --accent: oklch(0.47 0.105 245); /* Harbor blue ≈ #22598A */
+  --accent-hover: oklch(0.405 0.1 245);
+  --accent-soft: oklch(0.93 0.026 240);
+  --on-accent: oklch(0.99 0.004 85);
+  --highlight: oklch(0.79 0.145 78); /* Marigold — fills/marks only */
+  --highlight-ink: oklch(0.5 0.105 70);
+  --on-highlight: oklch(0.225 0.012 265);
+  --danger: oklch(0.52 0.17 28);
+  --danger-soft: oklch(0.94 0.03 28);
 
-  --color-season-spring: oklch(0.5 0.1 165);
-  --color-season-summer: oklch(0.58 0.12 80);
-  --color-season-autumn: oklch(0.55 0.15 35);
-  --color-season-winter: oklch(0.47 0.09 235);
+  /* OpenWeather AQI 1–5 (Good → Very poor). Always paired with a label. */
+  --aqi-1: oklch(0.64 0.13 155);
+  --aqi-2: oklch(0.76 0.13 118);
+  --aqi-3: oklch(0.79 0.14 80);
+  --aqi-4: oklch(0.66 0.17 45);
+  --aqi-5: oklch(0.52 0.17 15);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.1);
-  --shadow-3xl: 0 24px 56px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 8px 32px rgba(232, 84, 63, 0.12); /* Coral Spark */
+  --season-spring: oklch(0.7 0.11 150);
+  --season-summer: oklch(0.8 0.13 85);
+  --season-autumn: oklch(0.66 0.14 45);
+  --season-winter: oklch(0.66 0.08 240);
 
-  --font-sans: var(--font-instrument-sans);
-  --font-display: var(--font-cormorant-garamond);
-  /* System mono stack: usage is too sparse to justify a webfont payload (LCP) */
-  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, monospace;
-
-  --radius-full: 9999px;
-
-  --transition-fluid: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-organic: cubic-bezier(0.22, 1, 0.36, 1);
-  --transition-instant: 0.12s ease;
-
-  --color-selection-bg: color-mix(in oklab, var(--color-accent) 18%, transparent);
-  --color-selection-text: var(--color-accent-strong);
-  --touch-target-min: 44px;
-  --mobile-bottom-nav-height: 56px;
-
-  /* 0.75rem (12px) is the legibility floor for all text, incl. micro-labels */
-  --text-micro: 0.75rem;
-  --text-fluid-xs: clamp(0.75rem, 0.73rem + 0.1vw, 0.78rem);
-  --text-fluid-sm: clamp(0.8rem, 0.78rem + 0.12vw, 0.875rem);
-  --text-fluid-base: clamp(0.95rem, 0.93rem + 0.14vw, 1.05rem);
-  --text-fluid-lg: clamp(1.1rem, 1.02rem + 0.36vw, 1.25rem);
-  --text-fluid-xl: clamp(1.3rem, 1.14rem + 0.7vw, 1.6rem);
-  --text-fluid-2xl: clamp(1.7rem, 1.3rem + 1.3vw, 2.3rem);
-  --text-fluid-3xl: clamp(2.2rem, 1.6rem + 2vw, 3.2rem);
-  --text-fluid-4xl: clamp(2.8rem, 1.8rem + 3.2vw, 4.4rem);
-  --text-fluid-hero: clamp(2.8rem, 1.8rem + 4vw, 5.6rem);
-
-  --space-fluid-section: clamp(4rem, 8vw, 8rem);
-  --space-fluid-gap: calc(clamp(4rem, 8vw, 8rem) / 2);
-  --space-fluid-panel: clamp(1.25rem, 2.5vw, 2.5rem);
-  /* Uniform gap between cards in a card grid. Single source of truth so
-     every card list (cities, countries, hubs, top-cities) breathes the same
-     — replaces the ad-hoc gap-2/gap-4 values that drifted per page. */
-  --card-gap: clamp(0.75rem, 1.4vw, 1rem);
-  --radius-organic: 38% 62% 48% 52% / 56% 42% 58% 44%;
-  --radius-organic-inverse: 62% 38% 54% 46% / 44% 58% 42% 56%;
-  --pattern-botanical: color-mix(in oklab, var(--color-leaf) 13%, transparent);
+  --cat-sights: oklch(0.56 0.13 45);
+  --cat-food: oklch(0.54 0.11 155);
+  --cat-stays: oklch(0.5 0.1 250);
 }
 
+/* ── Dark ───────────────────────────────────────────────────────────── */
 .dark {
-  /* Azure Atlas dark: cool-neutral charcoal (audit fix #7) so the coral
-     accent pops by temperature contrast instead of stewing in sepia. */
-  --background: oklch(0.14 0.008 250);
-  --foreground: oklch(0.93 0.005 250);
+  color-scheme: dark;
 
-  --color-surface: oklch(0.17 0.009 250);
-  --color-surface-strong: oklch(0.2 0.01 250);
-  --color-elevated: oklch(0.23 0.012 250);
-  --color-muted: oklch(0.64 0.01 250); /* 5.9:1 on dark bg */
-  --color-muted-strong: oklch(0.78 0.008 250);
-  --color-line: color-mix(in oklab, var(--foreground) 10%, transparent);
-  --color-accent: oklch(0.72 0.13 33); /* light coral — 7.6:1 on bg */
-  --color-accent-strong: oklch(0.78 0.12 35); /* btn fill — dark text 8:1+ */
-  --color-accent-deep: oklch(0.83 0.09 35); /* pressed/hover (brightens in dark) */
-  --color-accent-soft: color-mix(in oklab, var(--color-accent) 14%, transparent);
-  --color-accent-contrast: oklch(0.15 0.01 250);
-  --color-brand-secondary: oklch(0.72 0.09 230);
-  --color-brand-accent: oklch(0.8 0.08 85);
-  --color-earth: oklch(0.74 0.06 78);
-  --color-earth-soft: color-mix(in oklab, var(--color-earth) 14%, transparent);
-  --color-leaf: oklch(0.74 0.09 170);
-  --color-leaf-soft: color-mix(in oklab, var(--color-leaf) 12%, transparent);
-  --color-water: oklch(0.72 0.09 230);
-  --color-water-soft: color-mix(in oklab, var(--color-water) 12%, transparent);
-  --color-glass: oklch(0.16 0.009 250);
-  --color-glass-heavy: oklch(0.19 0.01 250);
-  --color-glass-border: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --paper: oklch(0.19 0.008 265); /* ≈ #16181C */
+  --surface: oklch(0.225 0.009 265);
+  --sunken: oklch(0.165 0.008 265);
+  --ink: oklch(0.94 0.006 85);
+  --ink-muted: oklch(0.74 0.01 265);
+  --ink-subtle: oklch(0.62 0.01 265);
+  --rule: oklch(0.31 0.01 265);
+  --rule-strong: oklch(0.42 0.012 265);
 
-  --color-cat-dining: oklch(0.7 0.1 172);
-  --color-cat-dining-soft: color-mix(in oklab, var(--color-cat-dining) 10%, transparent);
-  --color-cat-stays: oklch(0.68 0.09 240);
-  --color-cat-stays-soft: color-mix(in oklab, var(--color-cat-stays) 10%, transparent);
+  --accent: oklch(0.77 0.095 240);
+  --accent-hover: oklch(0.84 0.08 240);
+  --accent-soft: oklch(0.3 0.05 245);
+  --on-accent: oklch(0.18 0.02 250);
+  --highlight: oklch(0.8 0.14 80);
+  --highlight-ink: oklch(0.83 0.12 80);
+  --on-highlight: oklch(0.225 0.012 265);
+  --danger: oklch(0.72 0.15 28);
+  --danger-soft: oklch(0.3 0.06 28);
 
-  --color-season-spring: oklch(0.7 0.1 165);
-  --color-season-summer: oklch(0.74 0.1 82);
-  --color-season-autumn: oklch(0.7 0.12 35);
-  --color-season-winter: oklch(0.66 0.09 235);
+  --aqi-1: oklch(0.7 0.13 155);
+  --aqi-2: oklch(0.8 0.13 118);
+  --aqi-3: oklch(0.82 0.14 80);
+  --aqi-4: oklch(0.72 0.16 45);
+  --aqi-5: oklch(0.64 0.17 15);
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.4);
-  --shadow-3xl: 0 24px 56px rgba(0, 0, 0, 0.45);
-  --shadow-glow: 0 8px 32px rgba(234, 132, 110, 0.15); /* light coral */
+  --season-spring: oklch(0.62 0.1 150);
+  --season-summer: oklch(0.7 0.12 85);
+  --season-autumn: oklch(0.62 0.13 45);
+  --season-winter: oklch(0.6 0.08 240);
 
-  --color-selection-text: oklch(0.97 0.005 250);
-  --pattern-botanical: color-mix(in oklab, var(--color-leaf) 16%, transparent);
+  --cat-sights: oklch(0.72 0.12 45);
+  --cat-food: oklch(0.72 0.11 155);
+  --cat-stays: oklch(0.72 0.09 250);
 }
 
-/* ─── Base ─── */
-
-html {
-  text-size-adjust: 100%;
-  /* Sticky header height + safe area so anchor/focus targets are never
-     hidden under the nav (WCAG 2.2 — 2.4.11 Focus Not Obscured) */
-  scroll-padding-top: calc(4.5rem + env(safe-area-inset-top, 0px));
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-::selection {
-  background: var(--color-selection-bg);
-  color: var(--color-selection-text);
-}
-
+/* ── Base ───────────────────────────────────────────────────────────── */
 @layer base {
-  * {
-    border-color: var(--color-line);
-  }
-
-  html,
-  body {
-    min-height: 100%;
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 4.5rem;
   }
 
   body {
-    position: relative;
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
     line-height: 1.6;
-    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding-left: env(safe-area-inset-left, 0);
-    padding-right: env(safe-area-inset-right, 0);
+    font-feature-settings: "ss01" 0;
   }
 
-  /* Display serif only at large sizes — Cormorant's light strokes read thin
-     below ~1.5rem, so h3–h6 stay on the sans for scanability. */
   h1,
   h2 {
-    font-family: var(--font-display), ui-serif, serif;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+    font-family: var(--font-display);
+    font-weight: 500;
     text-wrap: balance;
   }
 
   h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  h4 {
     font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
     text-wrap: balance;
   }
 
@@ -247,1028 +227,275 @@ html {
     text-wrap: pretty;
   }
 
-  .text-link,
-  article :where(a),
-  .prose :where(a) {
-    color: var(--color-accent-strong);
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Inputs keep their visual focus inside a field wrapper when present. */
+  [data-focus-within-ring]:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  [data-focus-within-ring] :focus-visible {
+    outline: none;
+  }
+
+  button,
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  dialog {
+    color: inherit;
+  }
+
+  /* Skip link: visible only when focused. */
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    top: 0.75rem;
+  }
+}
+
+/* ── Components that need more than utilities ───────────────────────── */
+@layer components {
+  /* Readable long-form copy for editorial pages. */
+  .prose-almanac {
+    max-width: var(--container-prose);
+    color: var(--ink);
+  }
+
+  .prose-almanac > * + * {
+    margin-top: 1.1em;
+  }
+
+  .prose-almanac h2:not(.not-prose *) {
+    margin-top: 2.2em;
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+  }
+
+  .prose-almanac h3:not(.not-prose *) {
+    margin-top: 1.8em;
+    font-size: var(--text-h3);
+  }
+
+  .prose-almanac a:not(.not-prose *) {
+    color: var(--accent);
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
+    text-underline-offset: 3px;
   }
 
-  img,
-  video {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
-}
-
-/* ─── Focus ─── */
-
-:where(a, button, input, textarea, select):focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 18%, transparent);
-}
-
-@media (prefers-contrast: more) {
-  :where(a, button, input, textarea, select):focus-visible {
-    outline-width: 3px;
-    box-shadow: none;
+  .prose-almanac a:not(.not-prose *):hover {
+    color: var(--accent-hover);
   }
 
-  .text-muted,
-  .text-muted-strong {
-    color: var(--foreground);
-  }
-}
-
-.skip-link {
-  position: absolute;
-  top: auto;
-  left: -9999px;
-}
-
-.skip-link:focus-visible {
-  position: fixed;
-  top: calc(0.75rem + env(safe-area-inset-top, 0px));
-  left: calc(0.75rem + env(safe-area-inset-left, 0px));
-}
-
-/* ─── Glass & Surface System ─── */
-
-.glass,
-.glass-dropdown,
-.liquid-glass {
-  border: 1px solid var(--color-glass-border);
-  background: var(--color-glass);
-  contain: layout style;
-  backdrop-filter: blur(16px) saturate(110%);
-}
-
-.glass {
-  box-shadow: var(--shadow-sm);
-}
-
-.glass-dropdown {
-  background: var(--color-glass-heavy);
-  box-shadow: var(--shadow-lg);
-}
-
-.liquid-glass {
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.liquid-glass::before,
-.atlas-panel::before,
-.atlas-panel-strong::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 40%);
-  opacity: 0.5;
-}
-
-.atlas-frame,
-.atlas-panel,
-.atlas-panel-strong {
-  position: relative;
-  overflow: hidden;
-}
-
-/* ─── Organic Surfaces ─── */
-
-.organic-section {
-  position: relative;
-  padding-block: var(--space-fluid-section);
-}
-
-.organic-section::before {
-  content: "";
-  position: absolute;
-  inset: 6% auto auto -12%;
-  width: min(34vw, 22rem);
-  aspect-ratio: 1;
-  border-radius: var(--radius-organic);
-  /* Soft stops instead of filter: blur() — avoids per-section GPU blur
-     layers that cause scroll jank / INP regressions on mid-range devices */
-  /* Audit fix #5: the cool half of the wheel enters at hero level —
-     azure replaces the second earth-tone stop. */
-  background:
-    radial-gradient(circle at 35% 35%, var(--color-leaf-soft), transparent 70%),
-    radial-gradient(circle at 70% 70%, var(--color-water-soft), transparent 72%);
-  opacity: 0.6;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.organic-panel {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--color-line);
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in oklab, var(--color-surface) 92%, var(--color-earth-soft)),
-      var(--color-surface)
-    ),
-    var(--color-surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.organic-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 14% 20%, var(--color-leaf-soft), transparent 34%),
-    radial-gradient(circle at 88% 16%, var(--color-water-soft), transparent 36%);
-  opacity: 0.22;
-}
-
-.organic-panel > *:not(.absolute) {
-  position: relative;
-  z-index: 1;
-}
-
-.organic-blob,
-.organic-blob-inverse {
-  border-radius: var(--radius-organic);
-}
-
-.organic-blob-inverse {
-  border-radius: var(--radius-organic-inverse);
-}
-
-.flow-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-  gap: clamp(1rem, 2vw, 1.5rem);
-}
-
-/* Shared card-list grid: one consistent gap (--card-gap) and a responsive,
-   auto-filling column track so every list of cards (CityCard on the cities /
-   countries / hub / top-cities surfaces) reflows identically — 1 column on
-   mobile, more as width allows — instead of each page hard-coding its own
-   grid-cols + gap. `align-items: stretch` (the grid default) guarantees equal
-   card heights within a row even with variable-length content. */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
-  gap: var(--card-gap);
-  align-items: stretch;
-}
-
-.intent-card,
-.destination-story-card {
-  container-type: inline-size;
-}
-
-.intent-card {
-  position: relative;
-  overflow: hidden;
-  /* A3: card → --radius-xl. */
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
-  transition:
-    border-color 0.22s var(--transition-organic),
-    transform 0.22s var(--transition-organic);
-}
-
-.source-chip {
-  display: inline-flex;
-  min-height: 1.75rem;
-  align-items: center;
-  gap: 0.4rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--color-line);
-  background: color-mix(in oklab, var(--color-surface) 82%, var(--color-earth-soft));
-  padding: 0.32rem 0.65rem;
-  color: var(--color-muted-strong);
-  font-size: var(--text-micro);
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-@container (min-width: 28rem) {
-  .destination-story-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-  }
-}
-
-/* ─── Cards ─── */
-
-.atlas-frame {
-  /* A3: cards/panels → --radius-xl (soft signature; field skews sharp). */
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.atlas-panel {
-  /* C glass-2.0: 1px inner light edge + small lift, no new blur layer
-     (INP budget is a hard constraint — no backdrop-filter here). */
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 color-mix(in oklab, var(--color-elevated) 60%, transparent);
-}
-
-.atlas-panel-strong {
-  border-radius: var(--radius-xl);
-  border: 1px solid color-mix(in oklab, var(--color-accent) 10%, var(--color-line));
-  background: var(--color-surface-strong);
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 color-mix(in oklab, var(--color-elevated) 60%, transparent);
-}
-
-/* ─── Typography Patterns ─── */
-
-.editorial-kicker,
-.section-heading {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: var(--text-fluid-sm);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.editorial-kicker::before,
-.section-heading::before {
-  content: "";
-  width: 1.2rem;
-  height: 1px;
-  background: var(--color-accent);
-  opacity: 0.4;
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: var(--text-micro);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.atlas-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: var(--text-micro);
-  font-weight: 500;
-  color: var(--color-muted);
-}
-
-.page-title {
-  font-size: var(--text-fluid-hero);
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-}
-
-/* Single source of truth for section-level headings (was inlined as
-   text-[clamp(1.8rem,3.5vw,3rem)] leading-[1.05] across components). */
-.section-title {
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
-  line-height: 1.1;
-}
-
-/* Vertical rhythm between page sections — one fluid scale, no breakpoint steps */
-.section-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-fluid-gap);
-}
-
-.lede {
-  color: var(--color-muted);
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.12rem);
-  line-height: 1.7;
-}
-
-.labelled-rule {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: var(--text-micro);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-muted);
-}
-
-.labelled-rule::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--color-line);
-}
-
-/* ─── Badges ─── */
-
-.badge-featured {
-  border-radius: 9999px;
-  padding: 0.2rem 0.55rem;
-  font-size: var(--text-micro);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  background: var(--color-accent-soft);
-  border: 1px solid color-mix(in oklab, var(--color-accent) 20%, transparent);
-  color: var(--color-accent-strong);
-}
-
-/* ─── Buttons ─── */
-
-.btn-primary,
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding: 0.65rem 1.3rem;
-  /* A3: actions are pills. Field is bimodal sharp/pill (component-patterns.json:
-     primary 21 sharp / 21 pill); we commit to pill as the soft signature. */
-  border-radius: var(--radius-full);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.btn-primary {
-  border: 1px solid transparent;
-  /* Clay Press, not Coral Spark: the lighter coral fails 4.5:1 with light
-     text (audit fix #8); Clay passes at 4.9:1. */
-  background: var(--color-accent-strong);
-  color: var(--color-accent-contrast);
-}
-
-.btn-secondary {
-  border: 1px solid var(--color-line);
-  background: var(--color-surface);
-  color: var(--foreground);
-}
-
-/* ─── Navigation ─── */
-
-.nav-pill {
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: var(--radius-md);
-}
-
-.nav-pill:hover {
-  background: var(--color-surface-strong);
-}
-
-.touch-target {
-  min-height: var(--touch-target-min);
-  min-width: var(--touch-target-min);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Horizontal swipe rows (tab switchers, chip rails). Contains overscroll so
-   a swipe at the row's edge doesn't trigger browser back-navigation, and
-   hides the scrollbar that otherwise renders under the pills on Android. */
-.scroll-row {
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.scroll-row::-webkit-scrollbar {
-  display: none;
-}
-
-.container-gutter {
-  padding-left: max(1rem, min(4vw, 2rem), env(safe-area-inset-left));
-  padding-right: max(1rem, min(4vw, 2rem), env(safe-area-inset-right));
-}
-
-/* ─── Misc ─── */
-
-.interactive-card {
-  transition:
-    transform 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.search-shell {
-  isolation: isolate;
-}
-
-.search-shell-glow {
-  position: absolute;
-  inset: -6px;
-  pointer-events: none;
-  border-radius: 1.5rem;
-  background: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in oklab, var(--color-accent) 6%, transparent),
-    transparent 85%
-  );
-  z-index: -1;
-}
-
-/* CSS-only entrance for above-the-fold content (replaces framer-motion in
-   the hero — keeps the first viewport free of animation-library JS for INP).
-   Stagger via --fade-up-delay; globally disabled by the reduced-motion rule. */
-@keyframes fade-up-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
+  .prose-almanac ul:not(.not-prose, .not-prose *) {
+    list-style: disc;
+    padding-left: 1.25rem;
   }
 
-  to {
+  .prose-almanac li:not(.not-prose *) + li {
+    margin-top: 0.4em;
+  }
+
+  .prose-almanac strong {
+    font-weight: 600;
+  }
+
+  .prose-almanac > :first-child,
+  .prose-almanac > h2:first-child {
+    margin-top: 0;
+  }
+
+  /* Skeleton shimmer — static tint under reduced motion. */
+  .skeleton {
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, var(--sunken) 25%, var(--rule) 37%, var(--sunken) 63%);
+    background-size: 400% 100%;
+    animation: var(--animate-shimmer);
+  }
+
+  /* Native <dialog> overlays (search, mobile menu). */
+  .overlay-dialog {
     opacity: 1;
     transform: none;
+    transition:
+      opacity 200ms var(--ease-standard),
+      transform 280ms var(--ease-standard),
+      overlay 280ms allow-discrete,
+      display 280ms allow-discrete;
+  }
+
+  .overlay-dialog:not([open]) {
+    opacity: 0;
+  }
+
+  @starting-style {
+    .overlay-dialog[open] {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @starting-style {
+    .overlay-dialog[data-variant="sheet"][open] {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+  }
+
+  .overlay-dialog::backdrop {
+    background-color: oklch(0.18 0.01 265 / 0.45);
+    transition:
+      opacity 200ms var(--ease-standard),
+      overlay 280ms allow-discrete,
+      display 280ms allow-discrete;
+  }
+
+  @starting-style {
+    .overlay-dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* Horizontal scrollers hide the scrollbar but stay keyboard-scrollable. */
+  /* position: relative contains absolutely positioned descendants (e.g.
+     sr-only text) so they can't widen the page from inside the scroller. */
+  .scroll-x {
+    position: relative;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .scroll-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Decorative graticule behind the home hero. */
+  .graticule {
+    color: var(--rule);
+    mask-image: radial-gradient(ellipse at 70% 40%, black 20%, transparent 72%);
   }
 }
 
-.animate-fade-up {
-  animation: fade-up-in 0.5s var(--transition-fluid) both;
-  animation-delay: var(--fade-up-delay, 0s);
+/* ── Leaflet (map) ──────────────────────────────────────────────────── */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background-color: var(--sunken);
 }
 
-@keyframes pulse-glow {
-  0%,
-  100% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.3;
-    transform: scale(1.04);
-  }
+.leaflet-container a {
+  color: var(--accent);
 }
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulse-glow 5s ease-in-out infinite;
-}
-
-/* ─── Seasonality dial ─── */
-
-.season-dial-wedge {
-  transition:
-    opacity 0.2s ease,
-    stroke 0.2s ease;
-  cursor: pointer;
-}
-
-.season-dial a:hover .season-dial-wedge,
-.season-dial a:focus-visible .season-dial-wedge {
-  opacity: 1;
-}
-
-.season-dial-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  fill: var(--color-background);
-  pointer-events: none;
-}
-
-.season-dial-center {
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  fill: var(--color-muted);
-}
-
-.season-dial-center-month {
-  font-size: 0.85rem;
-  font-weight: 700;
-  fill: var(--color-foreground);
-}
-
-/* ─── Atlas Passport ─── */
-
-.passport-stamp {
-  display: block;
-  border: 1.5px dashed color-mix(in oklab, var(--color-accent) 24%, var(--color-line));
-  /* A3: card/stamp → --radius-xl (was 1.25rem one-off, same value, now codified). */
-  border-radius: var(--radius-xl);
-  padding: 1.25rem 1rem;
-  text-align: center;
-  background: color-mix(in oklab, var(--color-surface) 65%, transparent);
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease;
-  transform: rotate(var(--stamp-tilt, 0deg));
-}
-
-.passport-stamp:nth-child(3n) {
-  --stamp-tilt: -1.2deg;
-}
-
-.passport-stamp:nth-child(3n + 2) {
-  --stamp-tilt: 0.9deg;
-}
-
-.passport-stamp:hover {
-  border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-line));
-  transform: rotate(0deg) scale(1.02);
-}
-
-.passport-stamp svg {
-  margin-inline: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .passport-stamp,
-  .passport-stamp:hover {
-    transform: none;
-  }
-}
-
-/* ─── Briefing chips (anticipatory Q&A) ─── */
-
-.briefing-chip {
-  /* A3: panel → --radius-xl (was 1rem one-off). */
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-line);
-  background: color-mix(in oklab, var(--color-surface) 72%, transparent);
-  transition: border-color 0.2s ease;
-}
-
-.briefing-chip[open],
-.briefing-chip:hover {
-  border-color: color-mix(in oklab, var(--color-accent) 18%, var(--color-line));
-}
-
-.briefing-chip-summary {
-  cursor: pointer;
-  list-style: none;
-  min-height: var(--touch-target-min);
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.55rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-.briefing-chip-summary::-webkit-details-marker {
-  display: none;
-}
-
-.briefing-chip-summary::after {
-  content: "+";
-  margin-left: auto;
-  color: var(--color-muted);
-  font-weight: 700;
-}
-
-.briefing-chip[open] .briefing-chip-summary::after {
-  content: "–";
-}
-
-/* ─── Command palette ─── */
-
-.palette-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 300;
-  background: color-mix(in oklab, var(--color-foreground) 22%, transparent);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.palette-panel {
-  width: 100%;
-  max-height: 70vh;
-  display: flex;
-  flex-direction: column;
-  border-radius: 1.25rem 1.25rem 0 0;
-  overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom, 0);
-}
-
-.palette-results {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-@media (min-width: 640px) {
-  .palette-overlay {
-    align-items: flex-start;
-    padding: 12vh 1.5rem 0;
-  }
-
-  .palette-panel {
-    max-width: 34rem;
-    max-height: 60vh;
-    border-radius: 1.25rem;
-  }
-}
-
-/* ─── Priorities Mixer ─── */
-
-.mixer-slider {
-  appearance: none;
-  height: 6px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--color-accent) 14%, var(--color-line));
-  outline-offset: 4px;
-  cursor: pointer;
-}
-
-.mixer-slider::-webkit-slider-thumb {
-  appearance: none;
-  height: 22px;
-  width: 22px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  border: 3px solid var(--color-background);
-  box-shadow: var(--shadow-sm);
-}
-
-.mixer-slider::-moz-range-thumb {
-  height: 22px;
-  width: 22px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  border: 3px solid var(--color-background);
-  box-shadow: var(--shadow-sm);
-}
-
-/* The balance illustration bakes a paper background; soften it on charcoal. */
-.dark .mixer-empty-art {
-  opacity: 0.85;
-  filter: brightness(0.92);
-  border-radius: 1rem;
-}
-
-/* ─── Living Atlas (weather-reactive city atmosphere) ─── */
-
-/* Decorative backdrop behind the city-page hero. The plate image lazy-loads
-   and fades in so LCP stays on text; the veil carries the temperature tint.
-   Bottom mask dissolves into the page background on both themes. */
-.atlas-atmosphere {
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: min(68vh, 620px);
-  overflow: hidden;
-  pointer-events: none;
-  z-index: -1;
-  mask-image: linear-gradient(to bottom, black 45%, transparent 96%);
-  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 96%);
-  --atlas-opacity: 0.38;
-}
-
-.dark .atlas-atmosphere {
-  --atlas-opacity: 0.28;
-}
-
-.atlas-atmosphere-img {
-  object-fit: cover;
-  opacity: 0;
-  transform-origin: center;
-  animation:
-    atlas-fade-in 1.4s ease-out 0.15s forwards,
-    atlas-drift var(--atlas-drift-duration, 80s) ease-in-out infinite alternate;
-}
-
-.atlas-atmosphere-veil {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(90% 75% at 50% 0%, var(--atlas-tint, transparent), transparent 72%);
-}
-
-@keyframes atlas-fade-in {
-  to {
-    opacity: var(--atlas-opacity, 0.38);
-  }
-}
-
-@keyframes atlas-drift {
-  from {
-    transform: scale(1.06) translateX(-1.25%);
-  }
-  to {
-    transform: scale(1.06) translateX(1.25%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .atlas-atmosphere-img {
-    animation: atlas-fade-in 0.01s forwards;
-    transform: scale(1.03);
-  }
-}
-
-/* ─── Map (US-05/US-06) ─── */
-
-/* Leaflet assigns z-index 200–700 to its panes and 1000 to its controls,
-   which beats the sticky header / mobile bottom nav (z-200) and makes the
-   map float above them while scrolling. `isolation: isolate` + z-index: 0
-   traps all of Leaflet's internal z-indexes inside the card's own stacking
-   context, so the whole map scrolls under fixed chrome like any other card. */
-.bcs-map {
-  isolation: isolate;
-  z-index: 0;
-}
-
-.bcs-map .leaflet-container {
-  width: 100%;
-  height: 100%;
-  background: var(--color-surface-strong);
-  font-family: inherit;
-}
-
-.bcs-map .leaflet-control-attribution {
-  background: color-mix(in oklab, var(--background) 80%, transparent);
-  color: var(--color-muted);
-  font-size: 0.625rem;
-}
-
-.bcs-map .leaflet-control-attribution a {
-  color: var(--color-muted-strong);
-}
-
-/* Dark tiles via the established CSS-filter approach — no second tile set. */
-.dark .bcs-map .leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+.dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.88) saturate(0.6);
 }
 
 .bcs-marker {
-  background: transparent;
-  border: none;
+  display: grid;
+  place-items: center;
 }
 
 .bcs-marker-dot {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  border: 2px solid var(--color-accent-contrast);
-  box-shadow: var(--shadow-sm);
+  border-radius: 9999px;
+  background-color: var(--accent);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px oklch(0 0 0 / 0.3);
+  transition: transform 120ms var(--ease-standard);
 }
 
 .bcs-marker--saved .bcs-marker-dot {
-  background: var(--color-leaf);
+  background-color: var(--highlight);
 }
 
 .bcs-marker--active .bcs-marker-dot {
-  background: var(--color-accent-strong);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 30%, transparent);
+  outline: 3px solid color-mix(in oklab, var(--accent) 35%, transparent);
 }
 
-.bcs-marker:focus-visible .bcs-marker-dot {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+.leaflet-tooltip {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--ink);
+  background-color: var(--surface);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-overlay);
 }
 
-/* ─── Print (US-10): isolate the itinerary plan ─── */
+/* ── Accessibility preferences ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
+@media (prefers-contrast: more) {
+  :root,
+  .dark {
+    --ink-muted: var(--ink);
+    --ink-subtle: var(--ink-muted);
+    --rule: var(--rule-strong);
+  }
+}
+
+@media (forced-colors: active) {
+  .skeleton {
+    background: Canvas;
+    border: 1px solid CanvasText;
+  }
+
+  .bcs-marker-dot {
+    background-color: Highlight;
+    border-color: Canvas;
+  }
+}
+
+/* ── Print: the day plan prints on its own ──────────────────────────── */
 @media print {
-  body * {
+  html[data-print="plan"] body * {
     visibility: hidden;
   }
 
-  .print-itinerary,
-  .print-itinerary * {
+  html[data-print="plan"] [data-print-region="plan"],
+  html[data-print="plan"] [data-print-region="plan"] * {
     visibility: visible;
   }
 
-  .print-itinerary {
+  html[data-print="plan"] [data-print-region="plan"] {
     position: absolute;
     inset: 0 auto auto 0;
     width: 100%;
-    border: none;
-    background: #fff;
-    color: #000;
-  }
-}
-
-/* ─── Reduced Motion ─── */
-
-@media (prefers-reduced-motion: reduce) {
-  html,
-  html:focus-within {
-    scroll-behavior: auto;
   }
 
-  body :where(*, *::before, *::after) {
-    animation-duration: 0.001ms !important;
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-
-  .search-shell-glow {
-    opacity: 0;
-  }
-
-  .intent-card:hover {
-    transform: none;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .intent-card:hover {
-    border-color: color-mix(in oklab, var(--color-accent) 18%, var(--color-line));
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-
-  .btn-primary:hover {
-    /* C: flat on hover — 58/67 peers are flat; shadowed CTAs read dated. */
-    background: var(--color-accent-deep);
-    transform: translateY(-1px);
-  }
-
-  .btn-primary:active {
-    /* Clay Press pressed state — scale-down, no shadow. */
-    background: var(--color-accent-deep);
-    transform: translateY(0) scale(0.98);
-  }
-
-  .btn-secondary:hover {
-    /* C: border-tint, NOT fill-swap (32/56 peers are light-ghost; the tint
-       communicates state without the dated surface-swap). */
-    border-color: color-mix(in oklab, var(--color-accent) 35%, var(--color-line));
-  }
-
-  .interactive-card:hover {
-    box-shadow: var(--shadow-md);
-    border-color: color-mix(in oklab, var(--color-accent) 12%, var(--color-line));
-  }
-}
-
-/* ─── Mobile ─── */
-
-@media (max-width: 767px) {
-  .glass,
-  .glass-dropdown,
-  .liquid-glass {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background: var(--color-glass-heavy);
-  }
-
-  .interactive-card {
-    transition: none;
-  }
-
-  .interactive-card:hover {
-    transform: none;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .interactive-card:active {
-    transform: scale(0.99);
-    transition: transform 0.1s ease;
-  }
-}
-
-/* ─── View Transitions (redesign 2026 H2, D1) ─── */
-
-/* The default root cross-fade, retuned to the calm-organic easing so route
-   changes feel like the rest of the motion system. Kept short (250ms) — long
-   route transitions read as lag. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0.25s;
-  animation-timing-function: var(--transition-organic);
-}
-
-/* Named morph: the city-page hero. When navigating city → city, both snapshots
-   contain an element with this name, so the hero (title + atmosphere frame)
-   morphs continuously rather than cross-fading with the rest of the page.
-   Navigating list → city animates the hero in as a gentle scale+fade. */
-.city-hero-transition {
-  view-transition-name: city-hero;
-}
-
-::view-transition-group(city-hero) {
-  animation-duration: 0.4s;
-  animation-timing-function: var(--transition-fluid);
-}
-
-::view-transition-old(city-hero) {
-  animation-name: city-hero-out;
-  animation-duration: 0.4s;
-  animation-timing-function: var(--transition-fluid);
-}
-
-::view-transition-new(city-hero) {
-  animation-name: city-hero-in;
-  animation-duration: 0.4s;
-  animation-timing-function: var(--transition-fluid);
-}
-
-@keyframes city-hero-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.99);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes city-hero-out {
-  from {
-    opacity: 1;
-    transform: none;
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-8px) scale(1.01);
-  }
-}
-
-/* Reduced-motion: instant navigation, no morph. The View Transitions API
-   respects prefers-reduced-motion when duration is zeroed. */
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
-
-  ::view-transition-group(*) {
-    animation: none !important;
-  }
-}
-
-/* ─── Night Atlas (redesign 2026 H2, D2) ─── */
-
-/* Dark mode gets its own personality: aurora-tinted panel glows that read as
-   a cool night-sky horizon on card top edges. Light mode stays unchanged.
-   All box-shadow only — no new DOM, no blur layers, INP-safe. */
-
-.dark .atlas-panel,
-.dark .atlas-frame,
-.dark .atlas-panel-strong {
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 oklch(0.32 0.03 250 / 0.5);
-}
-
-/* Aurora outer breath on the strongest panels — a barely-perceptible cool
-   glow that gives the dark canvas depth without competing with content.
-   Static (no animation) per the one-ambient-layer-per-viewport rule. */
-.dark .atlas-panel-strong {
-  box-shadow:
-    var(--shadow-sm),
-    inset 0 1px 0 oklch(0.34 0.04 250 / 0.55),
-    0 0 32px oklch(0.28 0.05 250 / 0.08);
-}
-
-/* Baked-background SVGs (mixer balance, passport stamps) were drawn for a
-   paper field. In dark mode, soften + cool them rather than shipping a
-   second asset set — same pattern as the Leaflet tile filter. */
-.dark img[src*="mixer-balance.svg"],
-.dark img[src*="passport-stamps.svg"] {
-  filter: brightness(0.82) saturate(0.7) hue-rotate(-8deg);
-  opacity: 0.9;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Night Atlas is static by design; no motion to disable. Guard exists for
-     completeness so future aurora animation is caught by the policy. */
-  .dark .atlas-panel-strong {
-    box-shadow:
-      var(--shadow-sm),
-      inset 0 1px 0 oklch(0.34 0.04 250 / 0.55);
+  [data-print-hide] {
+    display: none !important;
   }
 }

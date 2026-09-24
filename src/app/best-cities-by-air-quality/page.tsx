@@ -1,14 +1,10 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import { Wind } from "lucide-react";
-import TopicalHubLayout from "@/components/seo/TopicalHubLayout";
 import { getCleanestAirCities } from "@/lib/topical-hubs";
-import { publicEnv } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site";
+import { HubLayout } from "@/components/discovery/HubLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 
 const year = new Date().getFullYear();
 
@@ -32,7 +28,7 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 export default async function CleanestAirHubPage() {
-  const cities = await getCleanestAirCities();
+  const cities = await getCleanestAirCities().catch(() => []);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -64,21 +60,15 @@ export default async function CleanestAirHubPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }}
-      />
-      <TopicalHubLayout
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={itemListJsonLd} />
+      <HubLayout
         eyebrow="Air quality"
-        eyebrowIcon={<Wind className="text-accent h-3.5 w-3.5" aria-hidden />}
-        title={`Best cities by air quality (${year}).`}
-        lede="The cleanest-air cities indexed by Best City Spots, ranked by the most recent cached PM2.5 readings from public air-quality providers."
-        methodologyNote="Lower PM2.5 ranks higher. Readings come from the city_metrics cache populated by Open-Meteo and OpenWeather and refreshed when a city page is viewed."
-        breadcrumbLabel="Best cities by air quality"
+        title={`Best cities by air quality (${year})`}
+        lede="The cities in our index with the cleanest air, ranked by their most recent PM2.5 readings — the fine particles that matter most for health."
+        methodologyNote="Lower PM2.5 ranks higher. Readings come from Open-Meteo and OpenWeather and refresh when a city's guide is viewed, so recently visited cities carry the newest numbers."
+        breadcrumbLabel="Cleanest air"
+        currentPath="/best-cities-by-air-quality"
         cities={cities}
       />
     </>

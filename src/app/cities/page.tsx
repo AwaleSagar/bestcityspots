@@ -1,21 +1,19 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Compass } from "lucide-react";
-import Breadcrumbs from "@/components/ui/Breadcrumbs";
-import CityCard from "@/components/seo/CityCard";
+import { Globe2 } from "lucide-react";
 import { getTopCities } from "@/lib/cities";
 import { getCountrySummaries } from "@/lib/countries";
-import { publicEnv } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site";
+import { buttonClasses } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Section } from "@/components/ui/Section";
+import { CountryChips } from "@/components/discovery/CountryChips";
+import { FilterableCityList } from "@/components/discovery/FilterableCityList";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
-
-// SEO Phase 2.3 (audit 7.2): the `/cities` hub becomes the true crawl-
-// friendly index. The home page stays brand-led; this surface ranks for
-// generic "cities" head-term queries and forwards link equity.
+// SEO Phase 2.3 (audit 7.2): the `/cities` hub is the crawl-friendly index.
 export const metadata: Metadata = {
   title: "All Cities: Browse 200+ Travel Guides with Live Weather",
   description:
@@ -37,114 +35,84 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 const CITIES_INDEX_TOP_LIMIT = 200;
+const COUNTRY_CHIP_LIMIT = 24;
 
 export default async function CitiesIndexPage() {
   const [cities, countries] = await Promise.all([
     getTopCities(CITIES_INDEX_TOP_LIMIT),
-    getCountrySummaries(),
+    getCountrySummaries().catch(() => []),
   ]);
-
-  const breadcrumbJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
-      { "@type": "ListItem", position: 2, name: "Cities", item: `${siteUrl}/cities` },
-    ],
-  };
-
-  const collectionJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "All cities",
-    url: `${siteUrl}/cities`,
-    isPartOf: { "@id": `${siteUrl}/#website` },
-    numberOfItems: cities.length,
-  };
+  const siteUrl = getSiteUrl();
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+    <main id="main-content">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+            { "@type": "ListItem", position: 2, name: "Cities", item: `${siteUrl}/cities` },
+          ],
+        }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionJsonLd) }}
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "All cities",
+          url: `${siteUrl}/cities`,
+          isPartOf: { "@id": `${siteUrl}/#website` },
+          numberOfItems: cities.length,
+        }}
       />
-      <main id="main-content" className="text-foreground min-h-screen bg-transparent">
-        <div
-          className="container-gutter mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20"
-          style={{ paddingTop: "max(4rem, calc(env(safe-area-inset-top, 0px) + 5rem))" }}
-        >
-          <Breadcrumbs items={[{ label: "Cities" }]} />
-
-          <span className="eyebrow">
-            <Compass className="text-accent h-3.5 w-3.5" aria-hidden />
-            Browse all
-          </span>
-          <h1 className="page-title text-foreground mt-6 max-w-3xl">
-            All cities &mdash; the full Best City Spots index.
-          </h1>
-          <p className="lede mt-5 max-w-2xl">
-            Browse the most-visited cities indexed by Best City Spots, or jump straight to a country
-            to see its full city list.
-          </p>
-
-          <section aria-labelledby="facets-heading" className="mt-10">
-            <h2
-              id="facets-heading"
-              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
-            >
-              Browse by country
-            </h2>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {countries.slice(0, 36).map((country) => (
-                <Link
-                  key={country.slug}
-                  href={`/countries/${country.slug}`}
-                  className="border-line bg-surface/65 text-muted-strong hover:text-foreground rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
-                >
-                  {country.country}{" "}
-                  <span className="text-muted ml-1 text-xs">{country.cityCount}</span>
+      <Container>
+        <PageHeader
+          breadcrumbs={[{ label: "Home", href: "/" }, { label: "Cities" }]}
+          title="Cities"
+          lede="The world's largest cities, ranked by population. Open any guide for live conditions, seasons and places — or filter the list below."
+        />
+        <div className="space-y-16 py-12 pb-20">
+          {countries.length > 0 ? (
+            <Section
+              id="by-country"
+              title="Browse by country"
+              actions={
+                <Link href="/countries" className={buttonClasses({ variant: "link" })}>
+                  All {countries.length} countries
                 </Link>
-              ))}
-              <Link
-                href="/countries"
-                className="border-accent/30 bg-accent-soft text-accent rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors"
+              }
+            >
+              <CountryChips countries={countries.slice(0, COUNTRY_CHIP_LIMIT)} />
+            </Section>
+          ) : null}
+          <Section
+            id="top-cities"
+            title={`Top ${cities.length || CITIES_INDEX_TOP_LIMIT} cities by population`}
+          >
+            {cities.length > 0 ? (
+              <FilterableCityList
+                label="cities"
+                cities={cities.map(({ id, slug, city, admin_name, country, population }) => ({
+                  id,
+                  slug,
+                  city,
+                  admin_name,
+                  country,
+                  population,
+                }))}
+              />
+            ) : (
+              <EmptyState
+                icon={<Globe2 aria-hidden />}
+                title="The city index is unavailable right now"
               >
-                All countries →
-              </Link>
-            </div>
-          </section>
-
-          <section aria-labelledby="top-cities-heading" className="mt-12">
-            <h2
-              id="top-cities-heading"
-              className="text-muted text-xs font-semibold tracking-[0.22em] uppercase"
-            >
-              Top {cities.length} cities by population
-            </h2>
-            <ul className="card-grid mt-4">
-              {cities.map((city) => (
-                <li key={city.id}>
-                  <CityCard city={city} />
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <nav className="mt-12 flex flex-wrap gap-3" aria-label="Cities navigation">
-            <Link
-              href="/"
-              className="border-line bg-background/65 text-muted-strong hover:text-foreground inline-flex items-center gap-3 rounded-full border px-4 py-3 text-xs font-bold tracking-[0.18em] uppercase transition-colors duration-300"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden />
-              Back to home
-            </Link>
-          </nav>
+                We couldn&apos;t load the list. Search still works, or try again in a moment.
+              </EmptyState>
+            )}
+          </Section>
         </div>
-      </main>
-    </>
+      </Container>
+    </main>
   );
 }

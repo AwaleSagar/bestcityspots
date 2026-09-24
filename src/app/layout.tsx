@@ -1,14 +1,14 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Instrument_Sans } from "next/font/google";
-import { AnalyticsProvider, PageTracker } from "@/components/analytics";
-import LazyGeoConsentBanner from "@/components/analytics/LazyGeoConsentBanner";
-import MobileBottomNav from "@/components/layout/MobileBottomNav";
-import CommandPalette from "@/components/features/palette/CommandPalette";
-import SiteFooter from "@/components/layout/SiteFooter";
-import SiteNav from "@/components/layout/SiteNav";
-import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { Geist, Newsreader } from "next/font/google";
+import { serializeJsonLd } from "@/lib/json-ld";
 import { publicEnv } from "@/lib/env";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { LazyConsentBanner } from "@/components/analytics/LazyConsentBanner";
+import { PageTracker } from "@/components/analytics/PageTracker";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ThemeProvider } from "@/components/layout/ThemeProvider";
+import { SearchDialog } from "@/components/search/SearchDialog";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -18,28 +18,25 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   viewportFit: "cover",
-  // Azure Atlas palette (color audit): Paper / cool charcoal.
+  // Paper / ink — keep in sync with --paper in globals.css.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf7f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#07090c" },
+    { media: "(prefers-color-scheme: light)", color: "#f8f5f1" },
+    { media: "(prefers-color-scheme: dark)", color: "#121417" },
   ],
 };
 
-const instrumentSans = Instrument_Sans({
-  variable: "--font-instrument-sans",
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
   display: "swap",
 });
 
-const cormorantGaramond = Cormorant_Garamond({
-  variable: "--font-cormorant-garamond",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: ["400", "500"],
   display: "swap",
 });
-
-// IBM Plex Mono removed: --font-mono now uses the system mono stack
-// (globals.css) — its usage was too sparse to justify webfont weight on LCP.
 
 const publicConfig = publicEnv();
 const siteUrl = (publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
@@ -71,6 +68,9 @@ function parseSameAs(raw: string | undefined): string[] | undefined {
 }
 
 const sameAs = parseSameAs(publicConfig.NEXT_PUBLIC_ORGANIZATION_SAME_AS);
+// Privacy-conscious analytics stay off in development unless explicitly enabled.
+const analyticsEnabled =
+  publicConfig.NODE_ENV !== "development" || Boolean(publicConfig.NEXT_PUBLIC_ANALYTICS_DEV);
 const contactEmail = publicConfig.NEXT_PUBLIC_CONTACT_EMAIL;
 
 export const metadata: Metadata = {
@@ -181,13 +181,13 @@ const jsonLd = {
       publisher: { "@id": `${siteUrl}/#organization` },
       inLanguage: "en-US",
       // SEO audit 5.5: SearchAction unlocks sitelinks-search-box eligibility
-      // on the SERP. The target URL points at the on-site search results page,
+      // on the SERP. The target is the server-rendered /search results page,
       // wrapped in the EntryPoint schema Google requires.
       potentialAction: {
         "@type": "SearchAction",
         target: {
           "@type": "EntryPoint",
-          urlTemplate: `${siteUrl}/?q={search_term_string}`,
+          urlTemplate: `${siteUrl}/search?q={search_term_string}`,
         },
         "query-input": "required name=search_term_string",
       },
@@ -201,10 +201,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-      <body
-        className={`${instrumentSans.variable} ${cormorantGaramond.variable} min-h-screen antialiased`}
-      >
+    <html lang="en" suppressHydrationWarning className={`${geist.variable} ${newsreader.variable}`}>
+      <body className="flex min-h-dvh flex-col">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
@@ -215,25 +213,19 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AnalyticsProvider>
-            <PageTracker />
-            <SiteNav />
+          <AnalyticsProvider enabled={analyticsEnabled}>
             <a
               href="#main-content"
-              className="skip-link border-line bg-surface text-foreground z-[210] rounded-lg border px-4 py-2 text-xs font-semibold shadow-md transition"
+              className="skip-link bg-ink text-paper rounded-md px-4 py-2 text-sm font-medium"
             >
               Skip to content
             </a>
-            {/* Mobile: reserve space for the fixed MobileBottomNav (min-h-14
-                = 3.5rem) plus the home-indicator safe area so footer links
-                are never hidden behind it. */}
-            <div className="flex min-h-screen flex-col pb-[calc(3.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-              <div className="flex flex-1 flex-col">{children}</div>
-              <SiteFooter />
-            </div>
-            <MobileBottomNav />
-            <CommandPalette />
-            <LazyGeoConsentBanner />
+            <PageTracker />
+            <SiteHeader />
+            <div className="flex flex-1 flex-col">{children}</div>
+            <SiteFooter />
+            <SearchDialog />
+            <LazyConsentBanner />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>

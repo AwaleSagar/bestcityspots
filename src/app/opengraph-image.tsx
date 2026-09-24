@@ -10,149 +10,90 @@ export const size = {
 
 export const contentType = "image/png";
 
+const PAPER = "#f7f4ee";
+const INK = "#1b1d23";
+const MUTED = "#5b606b";
+const ACCENT = "#195f91";
+const RULE = "#d9d4ca";
+
+/** Social card in the editorial-almanac style: paper, ink and one accent. */
 export default async function Image() {
+  const meridians = [0.2, 0.42, 0.62, 0.8, 0.94];
+  const parallels = [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75];
   return new ImageResponse(
     <div
       style={{
-        height: "100%",
         width: "100%",
+        height: "100%",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#000",
-        backgroundImage: "radial-gradient(circle at 25% 25%, #1e1b4b 0%, #000 50%)",
-        fontFamily: "sans-serif",
         position: "relative",
+        backgroundColor: PAPER,
+        color: INK,
+        fontFamily: "serif",
         overflow: "hidden",
       }}
     >
-      {/* Background Orbs */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-100px",
-          left: "-100px",
-          width: "600px",
-          height: "600px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(37, 99, 235, 0.2)", // blue-600
-          filter: "blur(80px)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "-100px",
-          right: "-100px",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          backgroundColor: "rgba(234, 88, 12, 0.2)", // orange-600
-          filter: "blur(80px)",
-        }}
-      />
-
-      {/* Content */}
+      <svg
+        width="760"
+        height="760"
+        viewBox="-302 -302 604 604"
+        style={{ position: "absolute", right: -170, top: -65 }}
+        fill="none"
+        stroke={RULE}
+        strokeWidth="1.5"
+      >
+        <circle r="300" />
+        <line x1="0" y1="-300" x2="0" y2="300" />
+        {meridians.map((ratio) => (
+          <ellipse key={`m${ratio}`} rx={300 * ratio} ry="300" />
+        ))}
+        {parallels.map((ratio) => {
+          const y = 300 * ratio;
+          const half = Math.sqrt(300 * 300 - y * y);
+          return <line key={`p${ratio}`} x1={-half} y1={y} x2={half} y2={y} />;
+        })}
+        <circle cx="128" cy="-134" r="22" fill={ACCENT} stroke={PAPER} strokeWidth="8" />
+      </svg>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          gap: "20px",
-          zIndex: 10,
+          justifyContent: "space-between",
+          padding: "72px 80px",
+          width: "100%",
         }}
       >
-        <div
-          style={{
-            fontSize: 24,
-            letterSpacing: "0.4em",
-            color: "#60a5fa", // blue-400
-            textTransform: "uppercase",
-            fontWeight: 900,
-          }}
-        >
-          Urban Intelligence
+        <div style={{ display: "flex", fontSize: 30, letterSpacing: -0.5 }}>Best City Spots</div>
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: 760 }}>
+          <div style={{ fontSize: 76, lineHeight: 1.04, letterSpacing: -2 }}>
+            Choose your next city with the facts in view.
+          </div>
+          <div
+            style={{
+              marginTop: 28,
+              fontSize: 28,
+              color: MUTED,
+              fontFamily: "sans-serif",
+              lineHeight: 1.4,
+            }}
+          >
+            Live conditions · labelled AI briefings · places travelers rate
+          </div>
         </div>
-
         <div
           style={{
-            fontSize: 80,
-            fontWeight: 900,
-            color: "white",
-            lineHeight: 1,
-            letterSpacing: "-0.05em",
-            textAlign: "center",
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            textShadow: "0 0 40px rgba(255,255,255,0.2)",
-          }}
-        >
-          <span>BEST CITY</span>
-          <span>SPOTS</span>
-        </div>
-
-        <div
-          style={{
-            padding: "10px 30px",
-            borderRadius: "50px",
-            border: "1px solid rgba(255,255,255,0.2)",
-            backgroundColor: "rgba(255,255,255,0.05)",
-            color: "rgba(255,255,255,0.6)",
+            borderTop: `2px solid ${RULE}`,
+            paddingTop: 22,
             fontSize: 24,
-            letterSpacing: "0.1em",
-            marginTop: "20px",
+            color: MUTED,
+            fontFamily: "sans-serif",
           }}
         >
-          ATLAS // INDEX 01
+          bestcityspots.com
         </div>
       </div>
-
-      {/* Technical Decor Lines */}
-      <div
-        style={{
-          position: "absolute",
-          top: 40,
-          left: 40,
-          width: 40,
-          height: 1,
-          background: "rgba(255,255,255,0.2)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 40,
-          left: 40,
-          width: 1,
-          height: 40,
-          background: "rgba(255,255,255,0.2)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 40,
-          right: 40,
-          width: 40,
-          height: 1,
-          background: "rgba(255,255,255,0.2)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 40,
-          right: 40,
-          width: 1,
-          height: 40,
-          background: "rgba(255,255,255,0.2)",
-        }}
-      />
     </div>,
-    {
-      ...size,
-    }
+    size
   );
 }

@@ -1,14 +1,10 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
-import { Laptop2 } from "lucide-react";
-import TopicalHubLayout from "@/components/seo/TopicalHubLayout";
 import { getDigitalNomadCities } from "@/lib/topical-hubs";
-import { publicEnv } from "@/lib/env";
+import { getSiteUrl } from "@/lib/site";
+import { HubLayout } from "@/components/discovery/HubLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 
 const year = new Date().getFullYear();
 
@@ -34,7 +30,7 @@ export const metadata: Metadata = {
 export const revalidate = 86400;
 
 export default async function DigitalNomadHubPage() {
-  const cities = await getDigitalNomadCities();
+  const cities = await getDigitalNomadCities().catch(() => []);
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -66,21 +62,15 @@ export default async function DigitalNomadHubPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }}
-      />
-      <TopicalHubLayout
-        eyebrow="Digital nomads"
-        eyebrowIcon={<Laptop2 className="text-accent h-3.5 w-3.5" aria-hidden />}
-        title={`Best cities for digital nomads (${year}).`}
-        lede="A working ranking of remote-work-suitable cities, scored from connectivity bandwidth, climate comfort, and safety signals already cached for each city page."
-        methodologyNote="Score = connectivity_mbps + mild/warm climate bonus + safety bonus. Cities under 200,000 population are excluded so the surface stays useful for nomads."
-        breadcrumbLabel="Best cities for digital nomads"
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={itemListJsonLd} />
+      <HubLayout
+        eyebrow="Remote work"
+        title={`Best cities for digital nomads (${year})`}
+        lede="Cities ranked for remote work: fast connections first, then a livable climate and a safety signal — scored from the same data shown on each city guide."
+        methodologyNote="Score = download speed in Mbps, plus 12 points for a mild or warm climate and 6 for a safety score above 60. Cities under 200,000 people are left out."
+        breadcrumbLabel="For digital nomads"
+        currentPath="/best-cities-for-digital-nomads"
         cities={cities}
       />
     </>

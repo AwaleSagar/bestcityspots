@@ -1,20 +1,17 @@
-import { serializeJsonLd } from "@/lib/json-ld";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarRange } from "lucide-react";
-import TopicalHubLayout from "@/components/seo/TopicalHubLayout";
 import {
   getCitiesForMonth,
   isValidMonthSlug,
   listMonthSlugs,
   monthLabel,
 } from "@/lib/topical-hubs";
-import { publicEnv } from "@/lib/env";
+import { MonthSwitcher } from "@/components/discovery/MonthSwitcher";
+import { getSiteUrl } from "@/lib/site";
+import { HubLayout } from "@/components/discovery/HubLayout";
+import { JsonLd } from "@/components/seo/JsonLd";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = getSiteUrl();
 
 type RouteParams = { month: string };
 
@@ -58,7 +55,7 @@ export default async function BestCitiesByMonthPage({ params }: { params: Promis
   const { month } = await params;
   if (!isValidMonthSlug(month)) notFound();
 
-  const cities = await getCitiesForMonth(month);
+  const cities = await getCitiesForMonth(month).catch(() => []);
   const label = monthLabel(month);
   const year = new Date().getFullYear();
 
@@ -92,21 +89,16 @@ export default async function BestCitiesByMonthPage({ params }: { params: Promis
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }}
-      />
-      <TopicalHubLayout
+      <JsonLd data={breadcrumbJsonLd} />
+      <JsonLd data={itemListJsonLd} />
+      <HubLayout
         eyebrow={`Travel in ${label}`}
-        eyebrowIcon={<CalendarRange className="text-accent h-3.5 w-3.5" aria-hidden />}
-        title={`Best cities to visit in ${label} ${year}.`}
-        lede={`A working list of cities whose cached climate comfort and air quality align with travel in ${label}, ranked using deterministic scoring so the page stays stable between visits.`}
-        methodologyNote={`Cities whose cached climate_comfort label matches a travel-friendly band for ${label} score higher; PM2.5 reads in as a small penalty so cleaner-air cities surface first.`}
-        breadcrumbLabel={`Best cities to visit in ${label}`}
+        title={`Best cities to visit in ${label} ${year}`}
+        lede={`Cities whose current climate and air quality suit a trip in ${label}. The ranking is deterministic, so it stays stable between visits.`}
+        methodologyNote={`Cities whose climate band suits ${label} travel score higher, larger cities get a small boost, and PM2.5 counts as a small penalty so cleaner air rises. Month preferences follow Northern Hemisphere seasons.`}
+        breadcrumbLabel={`Best in ${label}`}
+        currentPath={`/best-cities-to-visit-in/${month}`}
+        subnav={<MonthSwitcher current={month} />}
         cities={cities}
       />
     </>
