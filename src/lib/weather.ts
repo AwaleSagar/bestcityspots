@@ -71,7 +71,9 @@ async function fetchFreshWeather(city: City): Promise<WeatherData | null> {
       humidity: primary.current.humidity,
       description: primary.current.description,
       icon: primary.current.icon,
-      wind_speed: primary.current.windSpeed,
+      // OpenWeather (units=metric) reports m/s; normalize to km/h so both
+      // providers (Open-Meteo already returns km/h) share one unit.
+      wind_speed: Math.round(primary.current.windSpeed * 3.6 * 10) / 10,
       aqi: aqiValue,
       aqi_label: aqiLabelFromOwm(aqiValue),
       updated_at: new Date().toISOString(),
