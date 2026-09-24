@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { decodeSharedList, encodeSharedList, SHARE_PARAM, type SharedList } from "./share-list";
+import { decodeSharedList, encodeSharedList, SHARE_PARAM, type SharedList } from "@/lib/share-list";
 import CityMap from "@/components/features/city/CityMap";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { Landmark } from "@/lib/places";
@@ -23,7 +23,7 @@ import {
   MAX_ITINERARY_DAYS,
   type CityNotes,
   type SavedPlace,
-} from "./experience-helpers";
+} from "@/lib/saved-places";
 import {
   EXPERIENCE_PRICE_LEVEL_LABELS,
   EXPERIENCE_PRICE_LEVELS,

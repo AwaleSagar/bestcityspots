@@ -11,7 +11,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "type-check": "tsc --noEmit",
-    "test:refactor": "tsx scripts/verify-refactor.ts",
+    "test:refactor": "tsx --conditions=react-server scripts/verify-refactor.ts",
     "test:google-places": "tsx test-google-places.ts",
     "test:supabase": "tsx scripts/test-supabase-backend.ts",
     "test:supabase:json": "tsx scripts/test-supabase-backend.ts --json",

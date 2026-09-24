@@ -4,11 +4,7 @@
  * Run: npm run test:share  (exit code non-zero on failure)
  */
 import assert from "node:assert/strict";
-import {
-  encodeSharedList,
-  decodeSharedList,
-  MAX_SHARED_PLACES,
-} from "../src/app/cities/[slug]/share-list";
+import { encodeSharedList, decodeSharedList, MAX_SHARED_PLACES } from "../src/lib/share-list";
 
 // 1. v1 round-trip (ids only) + 50-place URL budget (US-08 AC: < 2k chars).
 const ids = Array.from(

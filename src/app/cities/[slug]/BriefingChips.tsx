@@ -2,7 +2,7 @@ import { MessageCircleQuestion } from "lucide-react";
 import type { City } from "@/lib/cities";
 import { readCachedCityInsight } from "@/lib/intelligence";
 import { getCityMetrics } from "@/lib/metrics";
-import { buildFaqs } from "./CityFAQSection";
+import { buildFaqs } from "@/lib/city-faq";
 
 /**
  * Anticipatory briefing chips (innovation proposal Idea 7): the questions a

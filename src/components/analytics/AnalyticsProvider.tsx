@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { publicEnv } from "@/lib/env";
+import {
+  AnalyticsContext,
+  type ActionType,
+  type AnalyticsContextValue,
+} from "@/lib/analytics-context";
 import {
   getSessionStorageItem,
   getStorageItem,
@@ -20,19 +17,6 @@ import {
 // =============================================================================
 // Types
 // =============================================================================
-
-export type ActionType =
-  | "search"
-  | "save_place"
-  | "remove_save"
-  | "add_note"
-  | "delete_note"
-  | "view_guide"
-  | "view_city"
-  | "click_maps_link"
-  | "share"
-  | "download_itinerary"
-  | "click_affiliate";
 
 interface AnalyticsEvent {
   type: "pageview" | "action" | "session_end";
@@ -47,19 +31,9 @@ interface AnalyticsEvent {
   hasGeoConsent?: boolean;
 }
 
-interface AnalyticsContextValue {
-  trackPageView: (path: string, cityId?: number) => void;
-  trackAction: (action: ActionType) => void;
-  trackCityView: (cityId: number) => void;
-  setGeoConsent: (consent: boolean) => void;
-  hasGeoConsent: boolean;
-}
-
 // =============================================================================
 // Context
 // =============================================================================
-
-export const AnalyticsContext = createContext<AnalyticsContextValue | null>(null);
 
 // =============================================================================
 // Constants

@@ -1,10 +1,5 @@
 import assert from "node:assert/strict";
-import {
-  parseStoredNotes,
-  sanitizeKey,
-  sanitizeNotes,
-  topK,
-} from "../src/app/cities/[slug]/experience-helpers";
+import { parseStoredNotes, sanitizeKey, sanitizeNotes, topK } from "../src/lib/saved-places";
 import { parseReferrer, parseUserAgent } from "../src/lib/analytics";
 import { CACHE_TIERS, classifyAge } from "../src/lib/cache-config";
 

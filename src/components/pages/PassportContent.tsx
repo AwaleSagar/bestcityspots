@@ -7,7 +7,7 @@ import { ArrowRight, BookMarked, MapPin, StickyNote } from "lucide-react";
 import { cityHref, type City } from "@/lib/cities";
 import { getJsonStorageItem } from "@/lib/storage";
 import CityFingerprint from "@/components/ui/CityFingerprint";
-import { SAVED_PLACES_STORAGE_KEY, type SavedPlace } from "@/app/cities/[slug]/experience-helpers";
+import { SAVED_PLACES_STORAGE_KEY, type SavedPlace } from "@/lib/saved-places";
 
 const RECENT_KEY = "atlas_recent_searches";
 
