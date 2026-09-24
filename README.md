@@ -8,7 +8,7 @@ The interesting part, if you are here for the code, is the read path. Visitor re
 [![Security](https://github.com/AwaleSagar/bestcityspots/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/AwaleSagar/bestcityspots/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<img src="public/images/hero/home-hero.webp" alt="Best City Spots home page" width="100%" />
+<img src="docs/screenshots/home.png" alt="Best City Spots home page: a serif headline, a large city search field and a ranked list of the most-viewed city guides" width="100%" />
 
 ## What it does
 
@@ -17,9 +17,12 @@ The interesting part, if you are here for the code, is the read path. Visitor re
 - **Places** — landmarks, restaurants and stays from the Google Places API (New), ranked with a Bayesian score. Photos are copied into Supabase Storage and served with BlurHash placeholders, so nothing hotlinks Google and layout does not shift on load.
 - **Compare** — up to three cities side by side. The comparison lives in the URL (`/compare?cities=lisbon-portugal,porto-portugal`), so sharing it works.
 - **Topical hubs** — generated indexes for air quality, digital nomads, and month-by-month travel, plus per-country pages. These exist for search traffic and only list cities whose caches are actually warm.
-- **Saved places** — shortlists and notes stay in the browser (`localStorage`). A shortlist can be shared as a link; the notes are never encoded into it.
+- **Saved places** — shortlists, private notes and day-by-day plans stay in the browser (`localStorage`) and collect on `/saved`. A shortlist can be shared as a link; the notes are never encoded into it.
+- **Search everywhere** — an inline search on the home page, a ⌘K / Ctrl+K / `/` dialog on every page, and a server-rendered `/search?q=` results page that also works without JavaScript.
 
-Pages: `/`, `/cities`, `/cities/[slug]`, `/countries`, `/countries/[slug]`, `/compare`, `/best-cities-by-air-quality`, `/best-cities-for-digital-nomads`, `/best-cities-to-visit-in/[month]`, `/resources/top-cities`, `/methodology`, `/about`, `/accessibility`, `/press`, `/passport`.
+Pages: `/`, `/cities`, `/cities/[slug]`, `/countries`, `/countries/[slug]`, `/guides`, `/compare`, `/search`, `/saved`, `/best-cities-by-air-quality`, `/best-cities-for-digital-nomads`, `/best-cities-to-visit-in/[month]`, `/resources/top-cities`, `/methodology`, `/about`, `/accessibility`, `/press`. `/passport` permanently redirects to `/saved`.
+
+The interface follows the "editorial almanac" design system — warm paper and ink neutrals, one harbor-blue accent, Newsreader for display type and Geist for the interface. Tokens, component rules and motion rules live in [`docs/design-tokens.md`](docs/design-tokens.md) and [`docs/motion-policy.md`](docs/motion-policy.md).
 
 API: `/api/cities/insight` (SSE), `/api/cities/sphere`, `/api/places/search`, `/api/places/save-event`, `/api/analytics`, `/api/health`, `/api/csp-report`.
 
@@ -155,15 +158,17 @@ When something does need a paid call, it passes four independent gates. Any one 
 
 Layer 3 is the one that matters most, and it is deliberately in the database rather than in memory: an in-process counter reset on every container restart, which is how the original incident got expensive.
 
-Fresh data is meant to arrive through `npm run warm-cache`, run nightly. The warmed set is the top 250 cities by population, which is also what gets pre-rendered and listed in the sitemap; a city outside it, with a cold cache, renders a reduced profile rather than a page full of empty sections.
+Fresh data is meant to arrive through `npm run warm-cache`, run nightly. The warmed set is the top 250 cities by population, which is also what gets listed in the sitemap (city guides render per request so live conditions stay current); a city outside it, with a cold cache, renders a reduced profile rather than a page full of empty sections.
 
 ## Repository layout
 
 ```
 src/
   app/              routes, layouts, server actions, API handlers
-  components/       UI, grouped by role (features, layout, sections, seo, ui)
-  hooks/            useDeviceType, useNetworkQuality, useRecentSearches
+  components/       UI by domain: ui (primitives), layout, search, city, discovery,
+                    compare, saved, editorial, home, analytics, seo
+  hooks/            useStoredValue (shared localStorage state), useSavedPlaces,
+                    usePlaceNotes, useRecentCities
   platform/         data-access repositories and cache helpers
   lib/              service layer — providers, cost guard, search, ranking, validation
 supabase/           baseline SQL plus ordered migrations/
@@ -202,7 +207,7 @@ Operational scripts:
 
 ## Tests and CI
 
-There is no unit-test framework here. Instead there are executable verification scripts under `scripts/` — ranking, Zod validation, JSON-LD escaping, the cost guard, analytics input bounds, cache-warm prioritisation — and they run in CI. If you add logic to those areas, add to them.
+There is no unit-test framework here. Instead there are executable verification scripts under `scripts/` — ranking, Zod validation, JSON-LD escaping, the cost guard, analytics input bounds, cache-warm prioritisation, plus the pure frontend logic (share-list tokens, the AI briefing stream parser, analytics batching, search and display helpers) — and they run in CI. If you add logic to those areas, add to them.
 
 `npm run verify` is the same gate set CI runs, so a green local run predicts a green pipeline. CI itself is four parallel jobs (quality, verification scripts, production build, container build plus a boot smoke test) behind one `CI passed` roll-up. A separate weekly workflow fails on high or critical advisories in production dependencies. Deployment is a manual workflow — see `docs/ci-cd.md` for the jobs, the required secrets and the deliberate non-goals.
 

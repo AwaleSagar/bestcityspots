@@ -3,14 +3,14 @@
 ## 1. Project
 
 - **Name:** Best City Spots — premium urban-intelligence web app for deliberate travelers.
-- **Stack:** Next.js 16 (App Router, React 19, TypeScript 5 strict), Tailwind CSS 4, Supabase (Postgres + Storage + RLS), Framer Motion, Zod.
+- **Stack:** Next.js 16 (App Router, React 19, TypeScript 5 strict), Tailwind CSS 4, Supabase (Postgres + Storage + RLS), Zod. Motion is CSS-only.
 - **Canonical architecture source:** [`AGENTS.md`](../AGENTS.md) — full tech stack, data strategy, security model, and file map. This file covers Copilot-specific workflow + conventions; defer to `AGENTS.md` for anything restated here.
 
 ## 2. Architecture (quick map — see AGENTS.md for detail)
 
 - `src/app/` — routes, layouts, server actions, `api/*` route handlers. Prefer Server Components.
 - `src/lib/` — business logic, DB access, provider calls, AI generation. Route handlers stay thin. All privileged Supabase writes go through `requireServerClient()` (`src/lib/supabase.ts`); JSON-LD embeds serialize through `serializeJsonLd()` (`src/lib/json-ld.ts`).
-- `src/components/` — UI (analytics, effects, features, layout, pages, sections, seo, ui).
+- `src/components/` — UI by domain: `ui` (design-system primitives), `layout`, `search`, `city`, `discovery`, `compare`, `saved`, `editorial`, `home`, `analytics`, `seo`.
 - `supabase/` — baseline SQL at root; new schema changes in `supabase/migrations/<YYYYMMDDHHMM>_*.sql` (idempotent, one concern per file). **All cache/insights writes are `service_role`-only by RLS.**
 
 ## 3. Critical workflows
@@ -30,7 +30,7 @@
 - **Validation:** every API input, query param, and AI/provider output is validated with Zod. Reuse schemas from `src/lib/validation.ts`.
 - **Cache-first:** check DB → call provider → upsert cache. Invalidate by bumping `CACHE_TIERS[*].schemaVersion` (or `PROMPT_VERSIONS` for AI).
 - **Server-only:** start server-only modules with `import "server-only"`. Privileged Supabase **writes** use `requireServerClient()` (throws if the service-role key is missing); public reads may use the anon client.
-- **Styling:** Tailwind 4 utilities + liquid-glass CSS variables from `src/app/globals.css` (e.g. `--color-glass`, `--liquid-glow-1`, `--shadow-3xl`). No hardcoded colors. No inline `style={{}}` for static styling.
+- **Styling:** Tailwind 4 utilities backed by the semantic tokens in `src/app/globals.css` (`bg-paper`, `text-ink`, `text-ink-muted`, `border-rule`, `bg-accent`, …); see `docs/design-tokens.md`. Reuse `src/components/ui` primitives. No hardcoded colors. No inline `style={{}}` for static styling.
 - **Components:** prefer Server Components; mark `"use client"` only when you need browser APIs, event handlers, state, or effects.
 - **Errors:** handle explicitly in `src/lib`. Read paths prefer graceful degradation (`null`, `[]`, stale cache fallback) over throwing.
 

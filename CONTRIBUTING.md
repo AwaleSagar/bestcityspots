@@ -96,9 +96,11 @@ These are the rules that matter for this codebase. Please follow them.
 
 ### Styling
 
-- Tailwind 4 utilities + the liquid-glass CSS custom properties defined in `src/app/globals.css` (`--color-glass`, `--liquid-glow-*`, `--shadow-3xl`, etc.).
-- **No hardcoded colors** and no inline `style={{ ... }}` outside genuinely dynamic values.
-- Support dark mode via `next-themes` / Tailwind's `dark:` variants.
+- Tailwind 4 utilities backed by the semantic tokens in `src/app/globals.css` (`bg-paper`, `bg-surface`, `text-ink`, `text-ink-muted`, `border-rule`, `bg-accent`, …). The full reference and usage rules are in [`docs/design-tokens.md`](docs/design-tokens.md).
+- Build UI from the primitives in `src/components/ui` (`Button`/`buttonClasses`, `Section`, `PageHeader`, `SpecList`, `EmptyState`, `Notice`, `Tabs`, `Dialog`, …) before writing new markup patterns.
+- **No hardcoded colors** and no inline `style={{ ... }}` outside genuinely dynamic values (e.g. a score bar width).
+- Dark mode is a variable swap: tokens are redefined under `.dark` (set by `next-themes`), so components rarely need `dark:` variants.
+- Motion is CSS-only and must follow [`docs/motion-policy.md`](docs/motion-policy.md).
 
 ### Accessibility
 
@@ -116,12 +118,12 @@ These are the rules that matter for this codebase. Please follow them.
 
 | Kind               | Convention       | Example                                    |
 | ------------------ | ---------------- | ------------------------------------------ |
-| Components         | PascalCase       | `CityCard`, `SearchBar`                    |
+| Components         | PascalCase       | `CityCard`, `SearchField`                  |
 | Functions / vars   | camelCase        | `getUserData`, `isLoading`                 |
 | Constants          | UPPER_SNAKE_CASE | `MAX_RESULTS`, `CACHE_TIERS`               |
 | Interfaces / types | PascalCase       | `CityInsight`, `PlaceResult`               |
 | Utility files      | kebab-case       | `cache-config.ts`, `place-search-utils.ts` |
-| Component files    | PascalCase       | `CityCard.tsx`, `HeroHeader.tsx`           |
+| Component files    | PascalCase       | `CityCard.tsx`, `SearchDialog.tsx`         |
 
 ## Testing & verification
 

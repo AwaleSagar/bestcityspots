@@ -63,18 +63,18 @@ Always validate inputs and AI/provider outputs with **Zod** schemas from `src/li
 
 | Kind               | Convention       | Example                                    |
 | ------------------ | ---------------- | ------------------------------------------ |
-| Components         | PascalCase       | `CityCard`, `HeroHeader`                   |
+| Components         | PascalCase       | `CityCard`, `PlaceCard`                    |
 | Functions / vars   | camelCase        | `getCityById`, `isLoading`                 |
 | Constants          | UPPER_SNAKE_CASE | `MAX_RESULTS`, `CACHE_TIERS`               |
 | Interfaces / types | PascalCase       | `CityInsight`, `PlaceResult`               |
 | Utility files      | kebab-case       | `cache-config.ts`, `place-search-utils.ts` |
-| Component files    | PascalCase       | `CityCard.tsx`, `MobileBottomNav.tsx`      |
+| Component files    | PascalCase       | `CityCard.tsx`, `SearchDialog.tsx`         |
 
 ## Styling
 
 ```tsx
-// ✅ Tailwind utilities + liquid-glass tokens
-<div className="flex items-center gap-4 rounded-lg bg-glass/60 p-4 backdrop-blur-md hover:bg-glass/80 transition-colors">
+// ✅ Tailwind utilities + semantic design tokens
+<div className="flex items-center gap-4 rounded-md border border-rule bg-surface p-4 transition-colors hover:border-rule-strong">
   ...
 </div>
 
@@ -82,7 +82,7 @@ Always validate inputs and AI/provider outputs with **Zod** schemas from `src/li
 <div style={{ display: "flex", padding: 16, background: "#1a1a1a" }}>...</div>
 ```
 
-- Tailwind 4 + custom properties from `src/app/globals.css` (`--color-glass`, `--liquid-glow-*`, `--shadow-3xl`, …). No hardcoded colors.
+- Tailwind 4 + the semantic tokens from `src/app/globals.css` (`bg-paper`, `text-ink`, `text-ink-muted`, `border-rule`, `bg-accent`, …); reference in `docs/design-tokens.md`. No hardcoded colors.
 - Support dark mode via `next-themes` / `dark:` variants.
 
 ## Accessibility
@@ -118,7 +118,7 @@ Use `createLogger({ component })` from `src/lib/logger.ts` rather than ad-hoc `c
 
 - Memoize expensive derivations with `useMemo`; stabilize handlers with `useCallback`.
 - Debounce search and high-frequency inputs.
-- Use Next.js `<Image>` or the project's `OptimizedImage` wrapper for images.
+- Use Next.js `<Image>` (or `PlaceImage` for place photos, which adds the BlurHash preview) for images.
 
 ## Security
 
