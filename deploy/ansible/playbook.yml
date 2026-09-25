@@ -3,9 +3,9 @@
 # bestcityspots — production deploy playbook (Layers 1–3 of the cost-defense
 # model; Layer 4 is Google Cloud console-only, see deploy/README.md).
 #
-# What it does, idempotently, on a fresh Ubuntu host:
-#   • Host hardening: non-root deploy user, UFW firewall, fail2ban,
-#     unattended-upgrades.
+# What it does, idempotently, on a fresh Ubuntu host (22.04 / 24.04 / 26.04):
+#   • Host hardening: non-root deploy user, key-only SSH (no passwords, root
+#     by key only), UFW firewall, fail2ban, unattended-upgrades.
 #   • Docker Engine + compose plugin.
 #   • App: pin-checked git checkout, secret env_file (0600), `docker compose
 #     build && up -d` with previous-image retained for rollback.
@@ -57,6 +57,11 @@
     letsencrypt_email: ""
     warm_cache_cron: true
 
+    # Key-only SSH. The public key (read on the machine running Ansible) is
+    # installed for the deploy user; password logins are then disabled.
+    ssh_harden: true
+    ssh_public_key_file: "~/.ssh/id_ed25519.pub"
+
   # ---------------------------------------------------------------------------
   # PRE-FLIGHT GUARDRAILS — these run before any change is made to the host.
   # ---------------------------------------------------------------------------
@@ -92,12 +97,13 @@
       ansible.builtin.assert:
         that:
           - "vault_supabase_url | default('') | length > 0"
-          - "vault_supabase_anon_key | default('') | length > 0"
-          - "vault_supabase_service_role_key | default('') | length > 0"
+          - "vault_supabase_publishable_key | default('') is match('^sb_publishable_')"
+          - "vault_supabase_secret_key | default('') is match('^sb_secret_')"
           - "vault_site_url | default('') | length > 0"
         fail_msg: >-
           Missing required secrets. Populate group_vars/vault.yml (see
-          vault.example.yml) and encrypt it with ansible-vault.
+          vault.example.yml) with the project's publishable (sb_publishable_…)
+          and secret (sb_secret_…) keys, and encrypt it with ansible-vault.
         no_log: true
 
     - name: "Guardrail · deploy user must not be root"
@@ -114,6 +120,70 @@
         shell: /bin/bash
         create_home: true
       tags: [hardening]
+
+    # ---- Key-only SSH (lockout-safe) ----
+    # Order matters: install the deploy user's key and prove the account Ansible
+    # is connected as has a key BEFORE password logins are switched off.
+    - name: "SSH · install the operator's public key for the deploy user"
+      ansible.posix.authorized_key:
+        user: "{{ app_user }}"
+        key: "{{ lookup('ansible.builtin.file', ssh_public_key_file) }}"
+        state: present
+      when: ssh_harden | bool
+      tags: [hardening, ssh]
+
+    - name: "SSH · look up the connecting account's home"
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ ansible_user | default('root') }}"
+      when: ssh_harden | bool
+      tags: [hardening, ssh]
+
+    - name: "SSH · connecting account has authorized keys"
+      ansible.builtin.stat:
+        path: "{{ getent_passwd[ansible_user | default('root')][4] }}/.ssh/authorized_keys"
+      register: connecting_keys
+      when: ssh_harden | bool
+      tags: [hardening, ssh]
+
+    - name: "SSH · guard against lockout"
+      ansible.builtin.assert:
+        that:
+          - connecting_keys.stat.exists
+          - connecting_keys.stat.size > 0
+        fail_msg: >-
+          Refusing to disable password logins: {{ ansible_user | default('root') }}
+          has no ~/.ssh/authorized_keys on the host. Run ssh-copy-id first.
+      when: ssh_harden | bool
+      tags: [hardening, ssh]
+
+    # A 00- drop-in wins over later files (sshd keeps the first value it reads),
+    # including cloud images' 50-cloud-init.conf that re-enables passwords.
+    - name: "SSH · key-only authentication"
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/00-bestcityspots.conf
+        content: |
+          # MANAGED BY ANSIBLE (deploy/ansible/playbook.yml)
+          PasswordAuthentication no
+          KbdInteractiveAuthentication no
+          PermitEmptyPasswords no
+          PermitRootLogin prohibit-password
+          MaxAuthTries 4
+          X11Forwarding no
+        owner: root
+        group: root
+        mode: "0644"
+        validate: /usr/sbin/sshd -t -f %s
+      when: ssh_harden | bool
+      notify: reload ssh
+      tags: [hardening, ssh]
+
+    - name: Ensure the apt keyrings directory exists
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+      tags: [hardening, docker, cron]
 
     - name: Install baseline packages
       ansible.builtin.apt:
@@ -351,13 +421,21 @@
       when: enable_tls | bool
       tags: [tls]
 
-    - name: Obtain/renew certificate
+    # Runs on every play, not just the first: the nginx task above re-copies the
+    # repo's HTTP-only site config, and certbot must re-install the certificate
+    # (and the HTTP→HTTPS redirect) into it. --keep-until-expiring reuses the
+    # existing certificate, so this does not hit Let's Encrypt rate limits.
+    - name: Obtain (or re-install) the certificate for apex + www
+      vars:
+        site_domain: "{{ vault_site_url | regex_replace('^https?://', '') | regex_replace('/.*$', '') | regex_replace('^www\\.', '') }}"
       ansible.builtin.command:
         cmd: >-
-          certbot --nginx --non-interactive --agree-tos
+          certbot --nginx --non-interactive --agree-tos --keep-until-expiring --redirect
           -m {{ letsencrypt_email }}
-          -d {{ vault_site_url | regex_replace('^https?://', '') | regex_replace('/$', '') }}
-        creates: "/etc/letsencrypt/live/{{ vault_site_url | regex_replace('^https?://', '') | regex_replace('/$', '') }}/fullchain.pem"
+          --cert-name {{ site_domain }}
+          -d {{ site_domain }} -d www.{{ site_domain }}
+      register: certbot_run
+      changed_when: "'Congratulations' in certbot_run.stdout or 'Deploying' in certbot_run.stdout"
       when: enable_tls | bool and letsencrypt_email | length > 0
       tags: [tls]
 
@@ -376,9 +454,9 @@
             dest: /etc/apt/keyrings/nodesource.asc
             mode: "0644"
 
-        - name: Add NodeSource repo (Node 20.x)
+        - name: Add NodeSource repo (Node 22.x LTS)
           ansible.builtin.apt_repository:
-            repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_20.x nodistro main"
+            repo: "deb [signed-by=/etc/apt/keyrings/nodesource.asc] https://deb.nodesource.com/node_22.x nodistro main"
             filename: nodesource
             state: present
 
@@ -397,13 +475,16 @@
       changed_when: true
       tags: [cron]
 
-    - name: Ensure warm log exists and is writable by the deploy user
+    - name: Ensure warm logs exist and are writable by the deploy user
       ansible.builtin.file:
-        path: /var/log/bcs-warm.log
+        path: "{{ item }}"
         state: touch
         owner: "{{ app_user }}"
         group: "{{ app_user }}"
         mode: "0644"
+      loop:
+        - /var/log/bcs-warm.log
+        - /var/log/bcs-warm-photos.log
       when: warm_cache_cron | bool
       changed_when: false
       tags: [cron]
@@ -456,6 +537,17 @@
       tags: [verify]
 
   handlers:
+    - name: reload ssh
+      # Validate the whole configuration (all drop-ins) before reloading.
+      ansible.builtin.command: /usr/sbin/sshd -t
+      changed_when: false
+      notify: do reload ssh
+
+    - name: do reload ssh
+      ansible.builtin.systemd:
+        name: ssh
+        state: reloaded
+
     - name: reload nginx
       # validate ensures a broken config can NEVER be loaded into production.
       ansible.builtin.command: nginx -t

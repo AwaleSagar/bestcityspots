@@ -17,15 +17,15 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
   # Build-time placeholders. The build must never touch a real project or a
   # paid provider: `generateStaticParams` degrades to an empty city list
   # without Supabase, and the cost guard is cache-only in production unless a
   # live-fetch flag is set, so a CI build makes zero paid calls. Keys are
   # runtime-only by design (Dockerfile / incident action P4).
   NEXT_PUBLIC_SUPABASE_URL: https://example.invalid
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: ci_dummy_anon_key_12345678901234567890
-  SUPABASE_SERVICE_ROLE_KEY: ci_dummy_service_role_key_12345678901234567890
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_0000000000
+  SUPABASE_SECRET_KEY: sb_secret_ci_placeholder_0000000000
   GOOGLE_PLACES_API_KEY: ci_dummy_places_key
   GOOGLE_GEMINI_API_KEY: ci_dummy_gemini_key
   OPENWEATHERMAP_API_KEY: ci_dummy_openweather_key
@@ -61,11 +61,75 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      # Guards the migrations ↔ blank-project-baseline contract and the
-      # SECURITY DEFINER rules from the 2026-09-12 audit. See
+      # Static migration policy: RLS + explicit grants per table, no
+      # SECURITY DEFINER, pinned search_path, no retired key names. See
       # scripts/check-migrations.ts.
-      - name: Migration hygiene
+      - name: Migration policy
         run: npm run check:migrations
+
+      # Docker-free: applies every migration + seed to in-process Postgres
+      # (PGlite) and runs the pgTAP suite. The `database` job below repeats
+      # the pgTAP run against the real Supabase stack.
+      - name: Database checks (PGlite)
+        run: npm run check:db
+
+  # The authoritative database gate: the real Supabase images (Postgres,
+  # Auth, Storage, PostgREST) booted from supabase/config.toml, with the
+  # migrations and supabase/seed.sql applied exactly as `supabase db reset`
+  # does locally. No hosted project or credential is involved.
+  database:
+    name: Database (Supabase stack)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      # The Supabase CLI is a pinned devDependency — no third-party action.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Supabase (applies migrations + seed)
+        run: npx supabase start -x realtime,imgproxy,studio,edge-runtime,logflare,vector,supavisor,mailpit
+
+      - name: pgTAP tests
+        run: npx supabase test db
+
+      - name: Schema lint
+        run: npx supabase db lint --local --level warning --fail-on error
+
+      # The committed src/lib/database.types.ts is kept in the generator's
+      # format; compiling the app against freshly generated types proves the
+      # code matches the real schema (drift fails here).
+      - name: Type-check against generated types
+        run: |
+          npx supabase gen types --lang=typescript --local --schema public > /tmp/database.types.ts
+          cp /tmp/database.types.ts src/lib/database.types.ts
+          npx prettier --write src/lib/database.types.ts > /dev/null
+          npm run type-check
+          git diff --stat -- src/lib/database.types.ts || true
+
+      # End-to-end through the Data API with the local stack's keys: public
+      # reads, refused writes, service-only RPCs, storage bucket.
+      - name: Smoke test
+        run: |
+          npx supabase status -o env > /tmp/supabase.env
+          set -a; . /tmp/supabase.env; set +a
+          echo "::add-mask::$SECRET_KEY"
+          NEXT_PUBLIC_SUPABASE_URL="$API_URL" \
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$PUBLISHABLE_KEY" \
+          SUPABASE_SECRET_KEY="$SECRET_KEY" \
+            npm run db:smoke -- --allow-writes
+
+      - name: Stop Supabase
+        if: always()
+        run: npx supabase stop --no-backup
 
   test:
     name: Verification scripts
@@ -165,7 +229,7 @@ jobs:
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
-            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
             --tag bestcityspots:ci \
             .
 
@@ -180,7 +244,7 @@ jobs:
             -e NODE_ENV=production \
             -e HOSTNAME=0.0.0.0 \
             -e NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
-            -e NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            -e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
             -e GOOGLE_PLACES_LIVE_FETCH_ENABLED=false \
             -e GOOGLE_GEMINI_LIVE_FETCH_ENABLED=false \
             bestcityspots:ci
@@ -210,7 +274,7 @@ jobs:
     name: CI passed
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [quality, test, build, docker]
+    needs: [quality, database, test, build, docker]
     if: always()
     steps:
       - name: Check job results

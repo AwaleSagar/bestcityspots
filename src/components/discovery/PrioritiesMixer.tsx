@@ -18,10 +18,9 @@ import { CityRow } from "@/components/city/CityRow";
 export type MixerCity = Pick<City, "id" | "slug" | "city" | "admin_name" | "country">;
 
 const SLIDERS: ReadonlyArray<{ key: keyof MixerWeights; label: string; hint: string }> = [
-  { key: "cost", label: "Budget", hint: "Lower cost of living ranks higher" },
+  { key: "cost", label: "Budget", hint: "Lower national price level ranks higher" },
   { key: "air", label: "Air quality", hint: "Lower PM2.5 ranks higher" },
-  { key: "safety", label: "Safety", hint: "Higher safety score ranks higher" },
-  { key: "connectivity", label: "Connectivity", hint: "Faster internet ranks higher" },
+  { key: "safety", label: "Safety", hint: "Lower national homicide rate ranks higher" },
 ];
 
 function clamp(value: unknown): number {
@@ -38,7 +37,6 @@ function parseWeights(raw: string | null): MixerWeights {
       cost: clamp(parsed.cost),
       air: clamp(parsed.air),
       safety: clamp(parsed.safety),
-      connectivity: clamp(parsed.connectivity),
     };
   } catch {
     return DEFAULT_WEIGHTS;
@@ -53,12 +51,10 @@ function weightOf(weights: MixerWeights, key: keyof MixerWeights): number {
       return weights.air;
     case "safety":
       return weights.safety;
-    case "connectivity":
-      return weights.connectivity;
   }
 }
 
-/** Public metrics cache read for the candidate set (RLS: public SELECT). */
+/** Public `city_metrics` view read for the candidate set (RLS: public SELECT). */
 async function fetchMetrics(cityIds: number[]): Promise<MixerMetricsRow[]> {
   if (cityIds.length === 0) return [];
   try {
@@ -66,16 +62,17 @@ async function fetchMetrics(cityIds: number[]): Promise<MixerMetricsRow[]> {
     const { supabase } = await import("@/lib/supabase");
     const { data, error } = await supabase
       .from("city_metrics")
-      .select("city_id, cost_index, pollution_pm25, safety_score, connectivity_mbps")
+      .select("city_id, cost_index, pollution_pm25, homicide_rate_per_100k")
       .in("city_id", cityIds);
-    return error || !data ? [] : (data as MixerMetricsRow[]);
+    if (error || !data) return [];
+    return data.flatMap((row) => (row.city_id === null ? [] : [{ ...row, city_id: row.city_id }]));
   } catch {
     return [];
   }
 }
 
 /**
- * Personal re-ranking of the Top 250 from four weights. Computed in the
+ * Personal re-ranking of the Top 250 from three weights. Computed in the
  * browser from the public metrics cache; weights persist in localStorage
  * and never leave the device. Metrics load only once a weight is set.
  */

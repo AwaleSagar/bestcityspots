@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { placeSearchSchema } from "@/lib/validation";
+import { getCityById } from "@/lib/cities";
 import { searchPlaces } from "@/lib/places";
 
 const REQUEST_TIMEOUT_MS = 25_000;
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const parsed = placeSearchSchema.safeParse({
-      cityName: searchParams.get("cityName") ?? undefined,
+      cityId: searchParams.get("cityId") ?? undefined,
       type: searchParams.get("type") ?? undefined,
       query: searchParams.get("query") ?? undefined,
       minRating: searchParams.get("minRating") ?? undefined,
@@ -35,7 +36,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid search parameters" }, { status: 400 });
     }
 
-    const data = await searchPlaces({ ...parsed.data, signal: controller.signal });
+    const { cityId, ...filters } = parsed.data;
+    const city = await getCityById(cityId);
+    if (!city) {
+      return NextResponse.json({ error: "City not found" }, { status: 404 });
+    }
+
+    const data = await searchPlaces({
+      ...filters,
+      city: { id: city.id, name: city.city },
+      signal: controller.signal,
+    });
     const hasCoordinates =
       typeof parsed.data.lat === "number" && typeof parsed.data.lng === "number";
 

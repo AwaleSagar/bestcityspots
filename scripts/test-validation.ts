@@ -175,7 +175,7 @@ console.log("searchQuerySchema verification");
 console.log("placeSearchSchema verification");
 {
   const validSearch = {
-    cityName: "Paris",
+    cityId: "2988507",
     type: "landmarks",
     query: "Eiffel",
     minRating: 4.5,
@@ -202,6 +202,14 @@ console.log("placeSearchSchema verification");
   check(
     "invalid sorting criteria fails",
     placeSearchSchema.safeParse({ ...validSearch, sortBy: "popularity" }).success === false
+  );
+  check(
+    "missing cityId fails (the cache is keyed by city id)",
+    placeSearchSchema.safeParse({ ...validSearch, cityId: undefined }).success === false
+  );
+  check(
+    "non-numeric cityId fails",
+    placeSearchSchema.safeParse({ ...validSearch, cityId: "paris" }).success === false
   );
 }
 

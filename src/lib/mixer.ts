@@ -2,8 +2,9 @@
  * Priorities Mixer (UI innovation proposal, Idea 3).
  *
  * Personal, private city ranking: the visitor weights what matters (budget,
- * air, safety, connectivity) and the candidate set re-ranks entirely
- * client-side from the public `city_metrics` cache. Weights live in
+ * air, safety) and the candidate set re-ranks entirely client-side from the
+ * public `city_metrics` view. Budget and safety are country-level World Bank
+ * figures, so cities in one country tie on those dimensions. Weights live in
  * localStorage — consistent with the "planning remains personal, no account
  * gate" principle. No provider spend: one batched cache read per page.
  *
@@ -15,10 +16,9 @@ export interface MixerWeights {
   cost: number;
   air: number;
   safety: number;
-  connectivity: number;
 }
 
-export const DEFAULT_WEIGHTS: MixerWeights = { cost: 0, air: 0, safety: 0, connectivity: 0 };
+export const DEFAULT_WEIGHTS: MixerWeights = { cost: 0, air: 0, safety: 0 };
 
 export const WEIGHTS_STORAGE_KEY = "atlas_priority_weights";
 
@@ -26,8 +26,7 @@ export interface MixerMetricsRow {
   city_id: number;
   cost_index: number | null;
   pollution_pm25: number | null;
-  safety_score: number | null;
-  connectivity_mbps: number | null;
+  homicide_rate_per_100k: number | null;
 }
 
 export interface RankedCity {
@@ -42,15 +41,14 @@ export interface RankedCity {
 interface Dimension {
   key: keyof MixerWeights;
   metric: keyof Omit<MixerMetricsRow, "city_id">;
-  /** true when a *lower* raw value is better (cost, pollution). */
+  /** true when a *lower* raw value is better (cost, pollution, homicides). */
   invert: boolean;
 }
 
 const DIMENSIONS: Dimension[] = [
   { key: "cost", metric: "cost_index", invert: true },
   { key: "air", metric: "pollution_pm25", invert: true },
-  { key: "safety", metric: "safety_score", invert: false },
-  { key: "connectivity", metric: "connectivity_mbps", invert: false },
+  { key: "safety", metric: "homicide_rate_per_100k", invert: true },
 ];
 
 function readMetric(row: MixerMetricsRow, dimension: Dimension): number | null {
@@ -59,10 +57,8 @@ function readMetric(row: MixerMetricsRow, dimension: Dimension): number | null {
       return row.cost_index;
     case "pollution_pm25":
       return row.pollution_pm25;
-    case "safety_score":
-      return row.safety_score;
-    case "connectivity_mbps":
-      return row.connectivity_mbps;
+    case "homicide_rate_per_100k":
+      return row.homicide_rate_per_100k;
   }
 }
 
@@ -74,8 +70,6 @@ function readWeight(weights: MixerWeights, key: keyof MixerWeights): number {
       return weights.air;
     case "safety":
       return weights.safety;
-    case "connectivity":
-      return weights.connectivity;
   }
 }
 

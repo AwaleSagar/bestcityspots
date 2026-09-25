@@ -7,6 +7,7 @@ import { buildPlacesJsonLd } from "@/app/cities/[slug]/city-data";
 import { PlacesExplorer } from "./PlacesExplorer";
 
 interface PlacesSectionProps {
+  cityId: number;
   cityName: string;
   lat: number;
   lng: number;
@@ -20,12 +21,13 @@ interface PlacesSectionProps {
  * isPaidProviderEnabled() (kill switch + daily budget), so production with
  * live fetch off stays cache-only.
  */
-export async function PlacesSection({ cityName, lat, lng }: PlacesSectionProps) {
+export async function PlacesSection({ cityId, cityName, lat, lng }: PlacesSectionProps) {
   const options = { lat, lng, allowProviderFetch: true } as const;
+  const city = { id: cityId, name: cityName };
   const [landmarks, restaurants, hotels] = await Promise.all([
-    getTopPlaces(cityName, "landmarks", options),
-    getTopPlaces(cityName, "restaurants", options),
-    getTopPlaces(cityName, "hotels", options),
+    getTopPlaces(city, "landmarks", options),
+    getTopPlaces(city, "restaurants", options),
+    getTopPlaces(city, "hotels", options),
   ]);
   console.info(
     `[city-page] PlacesSection(${cityName}): landmarks=${landmarks.length} restaurants=${restaurants.length} hotels=${hotels.length}`

@@ -9,8 +9,8 @@
 
 # ── Required ──
 vault_supabase_url: "https://YOUR-REF.supabase.co"
-vault_supabase_anon_key: "REPLACE_ME"
-vault_supabase_service_role_key: "REPLACE_ME"
+vault_supabase_publishable_key: "sb_publishable_REPLACE_ME"
+vault_supabase_secret_key: "sb_secret_REPLACE_ME"
 vault_site_url: "https://bestcityspots.com"
 
 # ── Paid providers (optional — only needed if/when live fetch is enabled) ──

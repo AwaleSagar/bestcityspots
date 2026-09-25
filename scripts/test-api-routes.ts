@@ -25,7 +25,7 @@ try {
 
 // Set fake dummy Supabase environmental variables to successfully instantiate supabaseServer
 process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
-process.env.SUPABASE_SERVICE_ROLE_KEY = "super-secret-service-role-key-test-value-123456";
+process.env.SUPABASE_SECRET_KEY = "sb_secret_testvalue1234567890abcdef";
 
 import { NextRequest } from "next/server";
 

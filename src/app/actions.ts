@@ -3,7 +3,7 @@
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { getIntelligentTrendingCities } from "@/lib/intelligence";
-import { getTopCities, City } from "@/lib/cities";
+import { getTopCities, City, CITY_COLUMNS } from "@/lib/cities";
 import { getServerClient } from "@/lib/supabase";
 
 const fetchCachedTrendingDestinations = unstable_cache(
@@ -41,12 +41,12 @@ export const fetchTrendingDestinations = cache(async (): Promise<City[]> => {
  * index" so the front door quietly mirrors its own audience.
  *
  * Privacy posture: aggregate-only counts from `city_views_daily`, read
- * server-side via the service-role client (the table is RLS-locked to
+ * server-side via the secret-key client (the table is RLS-locked to
  * authenticated/service). No per-visitor data leaves the server. Cached daily
  * so a homepage render never touches the analytics table directly.
  *
  * Graceful degradation: if analytics or the service client is unavailable
- * (e.g. local dev without SUPABASE_SERVICE_ROLE_KEY), falls back to the
+ * (e.g. local dev without SUPABASE_SECRET_KEY), falls back to the
  * trending destinations feed so the living index is never empty.
  */
 const HOME_LIVING_INDEX_LIMIT = 6;
@@ -56,33 +56,21 @@ async function queryMostViewedCities(limit: number): Promise<City[]> {
   const serverClient = getServerClient();
   if (!serverClient) return [];
 
-  const from = new Date(Date.now() - DEMAND_WINDOW_DAYS * 86_400_000).toISOString().slice(0, 10);
+  // Aggregated in SQL; the analytics tables are service-role only.
+  const { data: ranked, error } = await serverClient.rpc("get_cities_by_traffic", {
+    result_limit: limit,
+    lookback_days: DEMAND_WINDOW_DAYS,
+  });
 
-  const { data: viewRows, error } = await serverClient
-    .from("city_views_daily")
-    .select("city_id, views")
-    .gte("stat_date", from);
-
-  if (error || !viewRows || viewRows.length === 0) {
-    if (error) console.warn("[audience] city_views_daily unavailable:", error.message);
+  if (error || !ranked || ranked.length === 0) {
+    if (error) console.warn("[audience] get_cities_by_traffic unavailable:", error.message);
     return [];
   }
 
-  const totals = new Map<number, number>();
-  for (const row of viewRows as Array<{ city_id: number; views: number | null }>) {
-    totals.set(row.city_id, (totals.get(row.city_id) ?? 0) + (row.views ?? 0));
-  }
-  const rankedIds = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([id]) => id);
-  if (rankedIds.length === 0) return [];
-
+  const rankedIds = ranked.map((row) => row.city_id);
   const { data: cityRows, error: cityError } = await serverClient
     .from("cities")
-    .select(
-      "id, city, city_ascii, slug, country, lat, lng, population, admin_name, iso2, iso3, capital"
-    )
+    .select(CITY_COLUMNS)
     .in("id", rankedIds);
   if (cityError || !cityRows) return [];
 

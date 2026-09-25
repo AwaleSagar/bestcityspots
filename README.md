@@ -12,8 +12,8 @@ The interesting part, if you are here for the code, is the read path. Visitor re
 
 ## What it does
 
-- **City search** — Postgres full-text search, trigram fuzzy matching and an alias table behind one RPC (`search_cities_elastic`). Tolerates typos, ranks by match quality with a population boost. There is also a nearest-city lookup from GPS coordinates.
-- **City guides** — an AI-written briefing (labelled as such), attractions, seasonal notes, weather, air quality and a set of city metrics, each with its source shown.
+- **City search** — prefix, full-text, trigram and edit-distance matching plus GeoNames alternate names (Bombay → Mumbai) behind one RPC (`search_cities`). Tolerates typos and transpositions, ranks by match quality with a population boost. There is also a nearest-city lookup from GPS coordinates.
+- **City guides** — an AI-written briefing (labelled as such), attractions, seasonal notes, weather, air quality and country-level World Bank indicators (price level, homicide rate, physicians), each with its source and year shown.
 - **Places** — landmarks, restaurants and stays from the Google Places API (New), ranked with a Bayesian score. Photos are copied into Supabase Storage and served with BlurHash placeholders, so nothing hotlinks Google and layout does not shift on load.
 - **Compare** — up to three cities side by side. The comparison lives in the URL (`/compare?cities=lisbon-portugal,porto-portugal`), so sharing it works.
 - **Topical hubs** — generated indexes for air quality, digital nomads, and month-by-month travel, plus per-country pages. These exist for search traffic and only list cities whose caches are actually warm.
@@ -28,13 +28,12 @@ API: `/api/cities/insight` (SSE), `/api/cities/sphere`, `/api/places/search`, `/
 
 ## Stack
 
-Next.js 16 (App Router, standalone output) on Node 20, React 19, TypeScript in strict mode, Tailwind 4. Supabase provides Postgres, Storage and RLS. Zod validates request input, environment variables and every provider response. Providers: Google Places (New), Gemini and OpenAI for briefings, OpenWeatherMap with Open-Meteo as a keyless fallback. Deployment is a Docker image behind nginx, provisioned with Ansible.
+Next.js 16 (App Router, standalone output) on Node 22 LTS, React 19, TypeScript in strict mode, Tailwind 4. Supabase provides Postgres, Storage and RLS. Zod validates request input, environment variables and every provider response. Providers: Google Places (New), Gemini and OpenAI for briefings, OpenWeatherMap with Open-Meteo as a keyless fallback. Deployment is a Docker image behind nginx, provisioned with Ansible.
 
 ## Requirements
 
-- Node 20 or newer, and npm
-- A Supabase project (the free tier is enough)
-- Python 3.9+ if you want the one-shot database setup script
+- Node 22 LTS or newer (`.nvmrc`), and npm
+- A Supabase project (the free tier is enough) — or Docker/OrbStack to run the whole Supabase stack locally
 - API keys, all optional to start: Google Places (New), Gemini and/or OpenAI, OpenWeatherMap
 
 The app degrades rather than crashing when a key is missing — no Places key means no places, no AI key means the briefing section stays empty. Supabase is the one hard dependency.
@@ -45,67 +44,46 @@ The app degrades rather than crashing when a key is missing — no Places key me
 git clone https://github.com/AwaleSagar/bestcityspots.git
 cd bestcityspots
 npm install
+cp .env.example .env.local
 ```
 
-Create `.env.local`. There is no `.env.example` in the repo (`.env*` is gitignored), so start from this:
+**Option A — local Supabase (Docker/OrbStack):**
 
 ```bash
-# required
-NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
-SUPABASE_SERVICE_ROLE_KEY=<service role key>
-
-# only used by scripts/setup_supabase.py
-SUPABASE_DB_URL=postgresql://postgres:<password>@<host>:5432/postgres
-
-# optional providers
-GOOGLE_PLACES_API_KEY=
-GOOGLE_GEMINI_API_KEY=
-OPENAI_API_KEY=
-OPENWEATHERMAP_API_KEY=
-
-# in development, let a city page fetch and cache real places on first view
-GOOGLE_PLACES_LIVE_FETCH_ENABLED=true
-GOOGLE_GEMINI_LIVE_FETCH_ENABLED=true
+npm run db:start        # boots Postgres/Auth/Storage/API, applies migrations + supabase/seed.sql
 ```
 
-Then set up the database. The Python script is idempotent and does schema, RLS, functions and seeding in one pass:
+Copy the printed API URL, Publishable key and Secret key into `.env.local`. The seed contains every country and the 300 largest cities, which is plenty for local work.
+
+**Option B — a hosted Supabase project:** follow `docs/external-services-setup.md` §1 (create the project, keys, auth settings), then:
 
 ```bash
-pip install "psycopg[binary]"
-python scripts/setup_supabase.py            # --skip-seed to re-run schema only
+npx supabase login && npx supabase link --project-ref <ref>
+npm run db:push         # apply supabase/migrations/
+npm run db:seed         # ~34k GeoNames cities + World Bank indicators
 ```
 
-It expects the city data at `data/worldcities.csv`. That file is not committed (`data/` is gitignored) — download the Basic dataset from [SimpleMaps World Cities](https://simplemaps.com/data/world-cities) (CC BY 4.0), unzip it, and drop the CSV there. Pass `--csv <path>` if you keep it somewhere else.
-
-If you would rather not run Python, paste `supabase/setup_all_blank_project.sql` into the Supabase SQL editor and seed separately:
+Then check the wiring and start the app:
 
 ```bash
-npx tsx scripts/seed-cities.ts data/worldcities.csv --limit=500
-```
-
-`--limit=500` keeps the top 500 cities by population, which is plenty for local work and much faster than seeding the whole file.
-
-Check credentials and start the dev server:
-
-```bash
-python scripts/test-keys.py    # DB, Places, Weather, AI — masks the keys it prints
-npm run test:supabase          # tables, RLS, and the search RPC
+npm run db:smoke                        # Data API end-to-end: reads, refused writes, RPCs, storage
+npm run admin -- add you@example.com    # optional: an admin for /admin
 npm run dev
 ```
 
+To let a city page fetch and cache real places on first view in development, set `GOOGLE_PLACES_API_KEY` and `GOOGLE_PLACES_LIVE_FETCH_ENABLED=true` in `.env.local`.
+
 ## Configuration
 
-Every variable is read through `src/lib/env.ts`, which validates with Zod and returns `undefined` (plus a one-time warning) rather than throwing, except where a caller explicitly requires a value.
+Every variable is listed and explained in `.env.example`. They are read through `src/lib/env.ts`, which validates each one with Zod and drops only the invalid value (with a one-time warning) rather than throwing, except where a caller explicitly requires a value.
 
 ### Supabase
 
-| Variable                        | Notes                                                                                |
-| ------------------------------- | ------------------------------------------------------------------------------------ |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Project URL. Also used to build public Storage URLs.                                 |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Ships to the browser. Read-only by RLS; the city search runs client-side against it. |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server only. Every cache write, image upload and budget claim uses it.               |
-| `SUPABASE_DB_URL`               | Direct Postgres URL, only for `scripts/setup_supabase.py`.                           |
+| Variable                               | Notes                                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`             | Project URL. Also used to build public Storage URLs and the image allow-list (build time).  |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_…`. Ships to the browser; RLS decides what it reads. City search uses it.   |
+| `SUPABASE_SECRET_KEY`                  | `sb_secret_…`. Server only, bypasses RLS. Every cache write, image upload and budget claim. |
 
 ### Providers and budgets
 
@@ -171,8 +149,8 @@ src/
                     usePlaceNotes, useRecentCities
   platform/         data-access repositories and cache helpers
   lib/              service layer — providers, cost guard, search, ranking, validation
-supabase/           baseline SQL plus ordered migrations/
-scripts/            setup, seeding, warmers, analytics, verification scripts
+supabase/           Supabase CLI project: config, migrations, generated seed, pgTAP tests
+scripts/            seeding (db/), admin, warmers, analytics, verification scripts
 deploy/             nginx config, Ansible playbook, deployment runbook
 docs/               ADRs, design tokens, CI/CD, security audit
 ```
@@ -181,47 +159,46 @@ Route handlers stay thin: parse, validate, delegate. Business logic, provider ca
 
 ## Scripts
 
-| Command                           | What it does                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------- |
-| `npm run dev`                     | Dev server                                                                      |
-| `npm run build` / `npm start`     | Production build and serve                                                      |
-| `npm run verify`                  | Everything CI runs: lint, format, types, migration checks, verification scripts |
-| `npm run lint` / `lint:fix`       | ESLint, including `eslint-plugin-security`                                      |
-| `npm run format` / `format:check` | Prettier (pinned to an exact version on purpose)                                |
-| `npm run type-check`              | `tsc --noEmit`                                                                  |
-| `npm run check:migrations`        | Migration naming, baseline mirroring, SECURITY DEFINER rules                    |
-| `npm run test:ci`                 | Verification scripts that need no network or credentials                        |
-| `npm test`                        | The above plus `test:providers`, which makes live calls                         |
+| Command                           | What it does                                                                 |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| `npm run dev`                     | Dev server                                                                   |
+| `npm run build` / `npm start`     | Production build and serve                                                   |
+| `npm run verify`                  | Lint, format, types, migration policy, PGlite DB tests, verification scripts |
+| `npm run lint` / `lint:fix`       | ESLint, including `eslint-plugin-security`                                   |
+| `npm run format` / `format:check` | Prettier (pinned to an exact version on purpose)                             |
+| `npm run type-check`              | `tsc --noEmit`                                                               |
+| `npm run check:migrations`        | Migration policy: RLS + grants, no SECURITY DEFINER, no retired key names    |
+| `npm run check:db`                | Migrations + seed + pgTAP on in-process Postgres (no Docker)                 |
+| `npm run test:ci`                 | Verification scripts that need no network or credentials                     |
+| `npm test`                        | The above plus `test:providers`, which makes live calls                      |
 
 Operational scripts:
 
 | Command                               | What it does                                                               |
 | ------------------------------------- | -------------------------------------------------------------------------- |
-| `python scripts/setup_supabase.py`    | One-shot schema, RLS, functions and seed                                   |
-| `python scripts/test-keys.py`         | Checks every external credential, masks the values                         |
+| `npm run db:start` / `db:stop`        | Local Supabase stack (Docker); `db:reset` re-applies migrations + seed     |
+| `npm run db:test` / `db:lint`         | pgTAP tests / schema lint against the local stack                          |
+| `npm run db:push`                     | Apply migrations to the linked hosted project                              |
+| `npm run db:seed`                     | Load GeoNames + World Bank reference data (`db:seed:sql` regenerates seed) |
+| `npm run db:types`                    | Regenerate `src/lib/database.types.ts` from the local stack                |
+| `npm run db:smoke`                    | End-to-end Data API checks against the configured project                  |
+| `npm run admin -- add <email>`        | Invite an admin (`remove`, `list`)                                         |
 | `npm run warm-cache`                  | Populates caches — the intended path for paid spend                        |
 | `npm run warm-cache:dry-run`          | Shows what would be fetched, spends nothing                                |
 | `npm run warm-top-cities`             | Warms the top N cities by population                                       |
 | `npm run analytics` / `analytics:30d` | Traffic reports from the aggregate tables                                  |
-| `npm run import:cost`                 | Imports the cost-of-living index (`docs/adr-001-cost-of-living-source.md`) |
 
 ## Tests and CI
 
 There is no unit-test framework here. Instead there are executable verification scripts under `scripts/` — ranking, Zod validation, JSON-LD escaping, the cost guard, analytics input bounds, cache-warm prioritisation, plus the pure frontend logic (share-list tokens, the AI briefing stream parser, analytics batching, search and display helpers) — and they run in CI. If you add logic to those areas, add to them.
 
-`npm run verify` is the same gate set CI runs, so a green local run predicts a green pipeline. CI itself is four parallel jobs (quality, verification scripts, production build, container build plus a boot smoke test) behind one `CI passed` roll-up. A separate weekly workflow fails on high or critical advisories in production dependencies. Deployment is a manual workflow — see `docs/ci-cd.md` for the jobs, the required secrets and the deliberate non-goals.
+The database has its own tests: pgTAP files in `supabase/tests/database/` cover RLS and grants on every table and function, search ranking, the budget and counter RPCs, analytics merges and admin access. `npm run check:db` runs them on in-process Postgres (PGlite) with no Docker, and CI runs them again against the real Supabase images.
+
+`npm run verify` is the same gate set CI runs, so a green local run predicts a green pipeline. CI itself is five parallel jobs (quality incl. the PGlite database checks, the Supabase stack — pgTAP, schema lint, generated-types type-check, Data API smoke test — verification scripts, production build, container build plus a boot smoke test) behind one `CI passed` roll-up. A separate weekly workflow fails on high or critical advisories in production dependencies. Deployment is a manual workflow — see `docs/ci-cd.md` for the jobs, the required secrets and the deliberate non-goals.
 
 ## Database changes
 
-New SQL goes in `supabase/migrations/` as `<YYYYMMDDHHMM>_<description>.sql`, idempotent, and mirrored into `supabase/setup_all_blank_project.sql` so a blank project ends up in the same state. Apply them in order:
-
-```bash
-for f in supabase/migrations/*.sql; do
-  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-done
-```
-
-`npm run check:migrations` enforces the naming, the mirroring, an idempotency guard, and — this one has bitten before — that any `SECURITY DEFINER` function pins `search_path` and revokes the default `PUBLIC` execute grant. Postgres grants EXECUTE to `PUBLIC` on new functions, and granting to `service_role` afterwards does not remove it; six analytics functions were callable with the public anon key because of exactly that.
+The workflow lives in `supabase/README.md`. In short: `npx supabase migration new <name>`, enable RLS and grant explicitly in the same file, no `SECURITY DEFINER`, add a pgTAP test, update `src/lib/database.types.ts`, run `npm run verify`. `npm run check:migrations` enforces the rules. Production migrations go through the manual **Database migrate** workflow (dry run, then apply).
 
 ## Deployment
 
@@ -243,7 +220,8 @@ It refuses unpinned refs and accidental live-fetch in production unless you over
 
 ## Security
 
-- Writes are locked to `service_role` everywhere — RLS on tables, policies on the Storage bucket, and `requireServerClient()` in `src/lib/supabase.ts`, which throws instead of quietly falling back to the anon client.
+- Writes are locked to `service_role` everywhere — RLS and explicit grants on every table, no `SECURITY DEFINER` functions, a Storage bucket with no write or list policies, and `requireServerClient()` in `src/lib/supabase.ts`, which throws instead of quietly falling back to the publishable client.
+- Auth is admin-only: sign-up is disabled, admins are invited with `npm run admin`, and `/admin` reads analytics through RLS with the admin's own session — never the secret key.
 - JSON-LD is embedded with `dangerouslySetInnerHTML`, but always through `serializeJsonLd()`, which escapes the `</script>` breakout sequence.
 - API input, query parameters and provider/AI responses are validated with Zod before anything trusts them.
 - Response headers (HSTS, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`) are set in `next.config.ts`. CSP is still `Report-Only` and reports to `/api/csp-report`; enforcing it needs a nonce rollout that has not happened yet.
@@ -255,24 +233,21 @@ It refuses unpinned refs and accidental live-fetch in production unless you over
 
 **A city page renders a short "reduced profile".** Its cache is cold and live fetching is off, which is the production default. Warm it (`npm run warm-top-cities`) or, locally, set `GOOGLE_PLACES_LIVE_FETCH_ENABLED=true` and reload the page once.
 
-**No places or photos anywhere.** Usually the key is missing, or the project has the legacy Places API enabled instead of Places API (New), or billing is not set up. `python scripts/test-keys.py` prints the real status code from each provider, which is normally enough to tell which.
+**No places or photos anywhere.** Usually the key is missing, or the project has the legacy Places API enabled instead of Places API (New), or billing is not set up. `npm run test:providers` makes live calls and prints the real status code from each provider, which is normally enough to tell which.
 
-**`[supabase] service-role client is unavailable`.** `SUPABASE_SERVICE_ROLE_KEY` is not set. Writes fail loudly on purpose — the alternative is silently falling back to the anon client, having RLS reject the write, and re-fetching from a paid API on every subsequent miss.
+**`[supabase] secret-key client is unavailable`.** `SUPABASE_SECRET_KEY` is not set. Writes fail loudly on purpose — the alternative is silently falling back to the publishable client, having RLS reject the write, and re-fetching from a paid API on every subsequent miss.
+
+**`[env] … is no longer read`.** A leftover key name from the old backend (`*_ANON_KEY` / `*_SERVICE_ROLE_KEY`). Use the publishable/secret key names from `.env.example`.
 
 **The AI briefing returns `rate_limit`.** A budget is exhausted. Check `provider_daily_usage` for today. Note there are two envelopes: the per-engine limit, and the smaller `AI_ON_DEMAND_DAILY_CALL_LIMIT` for generation triggered by visitors. Exhausting the second one is normal in production and means the warmer still has room.
 
-**Search returns nothing.** Either `cities` is empty (seed it) or `search_document` was never populated. Re-trigger the trigger:
-
-```sql
-UPDATE public.cities SET city = city;
-ANALYZE public.cities;
-```
+**Search returns nothing.** `cities` is probably empty — run `npm run db:seed` (hosted) or `npm run db:reset` (local). The search vector is a generated column, so there is nothing to backfill.
 
 **`/api/health` returns 503.** A dependency check failed. Send `Authorization: Bearer $HEALTH_CHECK_TOKEN` to see which one; without the token the endpoint deliberately reveals nothing.
 
 **`npm run format:check` fails right after `npm install`.** It should not any more — Prettier is pinned to an exact version for this reason. If it does, someone bumped it; run `npm run format` and commit the result as its own change.
 
-**`npm run check:migrations` fails on a migration you just wrote.** Read the message, it names the rule. Nine times out of ten it is the baseline mirror: append a `-- ═══ migrations/<file> ═══` section with the same SQL to `supabase/setup_all_blank_project.sql`.
+**`npm run check:migrations` fails on a migration you just wrote.** Read the message, it names the rule — usually a table without `enable row level security` or an explicit `GRANT`, or a function missing `set search_path = ''` / `revoke all … from public`.
 
 ## Contributing
 
@@ -282,4 +257,4 @@ ANALYZE public.cities;
 
 MIT, © 2026 Sagar Awale. See [LICENSE](LICENSE).
 
-City data from [SimpleMaps World Cities](https://simplemaps.com/data/world-cities) (CC BY 4.0). Map tiles from [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors via Leaflet. Weather and air quality from OpenWeatherMap and Open-Meteo; places from Google Places; briefings from Gemini or OpenAI.
+City data from [GeoNames](https://www.geonames.org) (CC BY 4.0). Country indicators from the [World Bank World Development Indicators](https://data.worldbank.org) (CC BY 4.0; homicide data via UNODC, physician density via WHO). Map tiles from [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors via Leaflet. Weather and air quality from OpenWeatherMap and Open-Meteo; places from Google Places; briefings from Gemini or OpenAI.

@@ -154,7 +154,7 @@ async function claimBudget(key: BudgetKey, limit: number, context: string): Prom
   } else if (isProd) {
     warnOnce(
       `${key}:no-client`,
-      `[cost-guard] no service-role client in production; failing closed for ${context}`
+      `[cost-guard] no secret-key client (SUPABASE_SECRET_KEY) in production; failing closed for ${context}`
     );
     return false;
   }

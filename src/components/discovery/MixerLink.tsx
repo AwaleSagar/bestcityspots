@@ -33,8 +33,8 @@ export function MixerLink() {
         </span>
         <span className="text-ink-muted mt-0.5 block text-sm">
           {active
-            ? "See the Top 250 re-ranked by budget, air, safety and connectivity."
-            : "Weigh budget, air, safety and connectivity to re-rank the Top 250."}
+            ? "See the Top 250 re-ranked by budget, air quality and safety."
+            : "Weigh budget, air quality and safety to re-rank the Top 250."}
         </span>
       </span>
     </Link>

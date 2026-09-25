@@ -133,7 +133,7 @@ export default async function TopCitiesPage() {
           <Section
             id="mixer"
             title="Rank by your priorities"
-            description="Weigh budget, air quality, safety and connectivity. Scores come from the same metrics shown on each city guide."
+            description="Weigh budget, air quality and safety. Scores come from the same metrics shown on each city guide."
           >
             <PrioritiesMixer
               cities={citiesWithTrending.map(({ id, slug, city, admin_name, country }) => ({

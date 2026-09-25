@@ -13,8 +13,7 @@ import {
 
 const base: CityMetrics = {
   cost_index: null,
-  connectivity_mbps: null,
-  safety_score: null,
+  homicide_rate_per_100k: null,
   pollution_pm25: null,
   climate_comfort: null,
   health_access_per_100k: null,
@@ -53,17 +52,21 @@ assert.equal(two[1].source, "Open-Meteo normals");
 const hollow = selectAvailableMetrics({
   ...base,
   climate_comfort: "   ",
-  connectivity_mbps: Number.NaN,
+  homicide_rate_per_100k: Number.NaN,
   cost_index: 0, // zero is a real value and must be kept
 });
 assert.equal(hollow.length, 1);
 assert.equal(hollow[0].key, "cost_index");
 
-// 6. Future data (US-09 cost index) appears automatically with no UI change.
-const future = selectAvailableMetrics({ ...base, cost_index: 42, safety_score: 71 });
+// 6. Country-level World Bank indicators render with honest labels.
+const future = selectAvailableMetrics({ ...base, cost_index: 42, homicide_rate_per_100k: 1.3 });
 assert.deepEqual(
   future.map((r) => r.key),
-  ["cost_index", "safety_score"]
+  ["cost_index", "homicide_rate_per_100k"]
+);
+assert.ok(
+  future.every((r) => r.label.includes("country")),
+  "labels must say country-level"
 );
 assert.equal(shouldRenderMetricsPanel(future), true);
 

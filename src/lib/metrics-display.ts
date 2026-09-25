@@ -12,8 +12,7 @@ export type MetricKey =
   | "pollution_pm25"
   | "climate_comfort"
   | "cost_index"
-  | "safety_score"
-  | "connectivity_mbps"
+  | "homicide_rate_per_100k"
   | "health_access_per_100k";
 
 export interface DisplayMetric {
@@ -35,12 +34,18 @@ interface MetricSpec {
 const METRIC_SPECS: readonly MetricSpec[] = [
   { key: "pollution_pm25", label: "Pollution (PM2.5)", unit: "µg/m³", sourceKey: "pollution" },
   { key: "climate_comfort", label: "Climate Comfort", sourceKey: "climate" },
-  { key: "cost_index", label: "Cost of Living Index", sourceKey: "cost" },
-  { key: "safety_score", label: "Safety Score", sourceKey: "safety" },
-  { key: "connectivity_mbps", label: "Connectivity", unit: "Mbps", sourceKey: "connectivity" },
+  // Country-level World Bank indicators — the labels say so, and `source`
+  // carries the year (docs/adr-003-reference-data-sources.md).
+  { key: "cost_index", label: "Price level (country, US = 100)", sourceKey: "cost" },
+  {
+    key: "homicide_rate_per_100k",
+    label: "Homicide rate (country)",
+    unit: "per 100k",
+    sourceKey: "safety",
+  },
   {
     key: "health_access_per_100k",
-    label: "Health Access",
+    label: "Physicians (country)",
     unit: "per 100k",
     sourceKey: "health",
   },

@@ -29,11 +29,10 @@ export interface City {
   city: string;
   city_ascii: string;
   /**
-   * URL-safe canonical slug (e.g. `lisbon-portugal`). Populated by the DB
-   * trigger introduced in migration 202605080000_cities_slug_seo.sql. May be
-   * undefined for very old rows that pre-date the migration; callers that
-   * build URLs should fall back to the numeric `id`, which the slug-aware
-   * route handler 308-redirects to the canonical slug.
+   * URL-safe canonical slug (e.g. `lisbon-portugal`), unique and always set
+   * in the database (computed by scripts/db/seed.ts). Optional here only
+   * because some callers build partial City objects; URL builders fall back
+   * to the numeric `id`, which the city route 308-redirects to the slug.
    */
   slug?: string;
   lat: number;
@@ -54,6 +53,10 @@ export interface CitySearchResult extends City {
   rank_score: number;
   match_type: "fts" | "fuzzy" | "alias";
 }
+
+/** Every column a `City` needs — never `select("*")` (it would pull the tsvector). */
+export const CITY_COLUMNS =
+  "id, city, city_ascii, slug, lat, lng, country, iso2, iso3, admin_name, capital, population";
 
 // Bounded LRU with per-entry TTL. Replaces the prior FIFO map so hot
 // autocomplete prefixes stay resident and stale entries don't linger.
@@ -116,8 +119,9 @@ export async function findNearestCity(lat: number, lng: number) {
 }
 
 /**
- * Elastic search: FTS + trigram fuzzy + alias matching via PostgreSQL RPC.
- * Results are ranked by relevance (match quality + population boost).
+ * City search via the `search_cities` RPC: prefix, full-text, trigram and
+ * edit-distance typo tolerance, plus GeoNames alternate names (Bombay →
+ * Mumbai). Ranked by match quality plus a population boost.
  */
 export async function searchCities(
   query: string,
@@ -134,7 +138,7 @@ export async function searchCities(
   try {
     const safeLimit = Math.max(1, Math.min(50, limit));
 
-    const { data, error } = await supabase.rpc("search_cities_elastic", {
+    const { data, error } = await supabase.rpc("search_cities", {
       query: cleanQuery,
       result_limit: safeLimit,
     });
@@ -196,14 +200,18 @@ export const getTopCities = reactCache(async (limit = 10) => {
  */
 export async function getCityById(id: number) {
   try {
-    const { data, error } = await supabase.from("cities").select("*").eq("id", id).single();
+    const { data, error } = await supabase
+      .from("cities")
+      .select(CITY_COLUMNS)
+      .eq("id", id)
+      .maybeSingle();
 
     if (error) {
       console.error(`Error fetching city with id ${id}:`, describeSupabaseError(error));
       return null;
     }
 
-    return data as City;
+    return (data as City | null) ?? null;
   } catch (e) {
     console.error(`Error fetching city with id ${id}:`, e);
     return null;
@@ -232,7 +240,7 @@ export async function getCityBySlug(slug: string) {
   try {
     const { data, error } = await supabase
       .from("cities")
-      .select("*")
+      .select(CITY_COLUMNS)
       .eq("slug", slug)
       .maybeSingle();
 

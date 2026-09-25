@@ -1,37 +1,22 @@
 /**
- * Analytics Report Generator for Marketing Team
- * Uses Supabase client directly - no psql required
+ * Analytics report from the aggregate analytics tables.
  *
  * Usage:
- *   npx tsx scripts/analytics-report.ts              # Last 7 days (default)
- *   npx tsx scripts/analytics-report.ts --days 30   # Last 30 days
- *   npx tsx scripts/analytics-report.ts --json      # Output as JSON
+ *   npm run analytics              # Last 7 days (default)
+ *   npm run analytics -- --days 30
+ *   npm run analytics -- --json    # Machine-readable
+ *
+ * Needs SUPABASE_SECRET_KEY (the tables are server-only). Admins can see the
+ * same numbers without a secret key at /admin.
  */
 
-import { config } from "dotenv";
-import { createClient } from "@supabase/supabase-js";
-
-// Load .env.local first, then .env
-config({ path: ".env.local" });
-config({ path: ".env" });
+import { secretClient } from "./db/env";
 
 // =============================================================================
 // Setup
 // =============================================================================
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("Error: Missing Supabase credentials in environment variables");
-  console.error(
-    "Required: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)"
-  );
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = secretClient();
 
 // Parse arguments
 const args = process.argv.slice(2);
@@ -108,7 +93,9 @@ function printSection(title: string, icon: string) {
 async function getOverview() {
   const { data, error } = await supabase
     .from("daily_visitor_stats")
-    .select("*")
+    .select(
+      "page_views, sessions, new_visitors, returning_visitors, sessions_ended, bounced_sessions, total_session_duration_sec"
+    )
     .gte("stat_date", DATE_FROM)
     .lte("stat_date", DATE_TO);
 
@@ -121,39 +108,31 @@ async function getOverview() {
     return null;
   }
 
-  const totals = data.reduce(
-    (acc, row) => ({
-      totalVisits: acc.totalVisits + (row.total_visits || 0),
-      uniqueVisitors: acc.uniqueVisitors + (row.unique_visitors || 0),
-      pageViews: acc.pageViews + (row.page_views || 0),
-      newVisitors: acc.newVisitors + (row.new_visitors || 0),
-      returningVisitors: acc.returningVisitors + (row.returning_visitors || 0),
-      avgSessionDuration: acc.avgSessionDuration + (row.avg_session_duration_sec || 0),
-      bounceRate: acc.bounceRate + (row.bounce_rate_pct || 0),
-    }),
-    {
-      totalVisits: 0,
-      uniqueVisitors: 0,
-      pageViews: 0,
-      newVisitors: 0,
-      returningVisitors: 0,
-      avgSessionDuration: 0,
-      bounceRate: 0,
-    }
-  );
+  type Row = (typeof data)[0];
+  const sum = (pick: (row: Row) => number) => data.reduce((acc, row) => acc + pick(row), 0);
+  const sessionsEnded = sum((r) => r.sessions_ended);
 
-  // Calculate averages
-  const count = data.length;
-  totals.avgSessionDuration = Math.round(totals.avgSessionDuration / count);
-  totals.bounceRate = Math.round(totals.bounceRate / count);
-
-  return totals;
+  // Rates over the whole period from raw counters — never an average of
+  // daily averages.
+  return {
+    pageViews: sum((r) => r.page_views),
+    sessions: sum((r) => r.sessions),
+    newVisitors: sum((r) => r.new_visitors),
+    returningVisitors: sum((r) => r.returning_visitors),
+    sessionsEnded,
+    avgSessionDuration:
+      sessionsEnded > 0 ? Math.round(sum((r) => r.total_session_duration_sec) / sessionsEnded) : 0,
+    bounceRate:
+      sessionsEnded > 0
+        ? Math.round((1000 * sum((r) => r.bounced_sessions)) / sessionsEnded) / 10
+        : 0,
+  };
 }
 
 async function getTrafficSources() {
   const { data, error } = await supabase
     .from("traffic_sources_daily")
-    .select("source_type, source_name, visits, unique_visitors")
+    .select("source_type, source_name, visits, new_visitors")
     .gte("stat_date", DATE_FROM)
     .lte("stat_date", DATE_TO);
 
@@ -163,15 +142,15 @@ async function getTrafficSources() {
   }
 
   // Aggregate by source_type
-  const byType = new Map<string, { visits: number; unique: number }>();
+  const byType = new Map<string, { visits: number; newVisitors: number }>();
   const byName = new Map<string, number>();
 
   for (const row of data || []) {
     const key = row.source_type;
-    const existing = byType.get(key) || { visits: 0, unique: 0 };
+    const existing = byType.get(key) || { visits: 0, newVisitors: 0 };
     byType.set(key, {
       visits: existing.visits + (row.visits || 0),
-      unique: existing.unique + (row.unique_visitors || 0),
+      newVisitors: existing.newVisitors + (row.new_visitors || 0),
     });
 
     if (row.source_type === "referral" && row.source_name) {
@@ -211,6 +190,7 @@ async function getDeviceStats() {
     byDevice.set(row.device_type, deviceVisits + (row.visits || 0));
 
     if (row.browser) {
+      // '' is the stored "unknown".
       const browserVisits = byBrowser.get(row.browser) || 0;
       byBrowser.set(row.browser, browserVisits + (row.visits || 0));
     }
@@ -237,7 +217,7 @@ async function getDeviceStats() {
 async function getGeoStats() {
   const { data, error } = await supabase
     .from("geo_stats_daily")
-    .select("country_code, visits, unique_visitors")
+    .select("country_code, visits")
     .gte("stat_date", DATE_FROM)
     .lte("stat_date", DATE_TO);
 
@@ -246,15 +226,12 @@ async function getGeoStats() {
     return null;
   }
 
-  const byCountry = new Map<string, { visits: number; unique: number }>();
+  const byCountry = new Map<string, { visits: number }>();
 
   for (const row of data || []) {
     const key = row.country_code;
-    const existing = byCountry.get(key) || { visits: 0, unique: 0 };
-    byCountry.set(key, {
-      visits: existing.visits + (row.visits || 0),
-      unique: existing.unique + (row.unique_visitors || 0),
-    });
+    const existing = byCountry.get(key) || { visits: 0 };
+    byCountry.set(key, { visits: existing.visits + (row.visits || 0) });
   }
 
   return Array.from(byCountry.entries())
@@ -270,7 +247,6 @@ async function getCityViews() {
       `
       city_id,
       views,
-      unique_viewers,
       cities (
         city,
         country
@@ -285,10 +261,7 @@ async function getCityViews() {
     return null;
   }
 
-  const byCity = new Map<
-    number,
-    { name: string; country: string; views: number; unique: number }
-  >();
+  const byCity = new Map<number, { name: string; country: string; views: number }>();
 
   for (const row of data || []) {
     // Supabase returns the joined table as an object (or null)
@@ -297,12 +270,10 @@ async function getCityViews() {
       name: cityData?.city || `City #${row.city_id}`,
       country: cityData?.country || "N/A",
       views: 0,
-      unique: 0,
     };
     byCity.set(row.city_id, {
       ...existing,
       views: existing.views + (row.views || 0),
-      unique: existing.unique + (row.unique_viewers || 0),
     });
   }
 
@@ -337,8 +308,10 @@ async function getUserActions() {
 
 async function getDailyTrend() {
   const { data, error } = await supabase
-    .from("daily_visitor_stats")
-    .select("stat_date, total_visits, unique_visitors, page_views")
+    .from("daily_visitor_summary")
+    .select("stat_date, page_views, sessions, bounce_rate_pct")
+    .gte("stat_date", DATE_FROM)
+    .lte("stat_date", DATE_TO)
     .order("stat_date", { ascending: false })
     .limit(7);
 
@@ -390,12 +363,14 @@ async function main() {
   const overview = await getOverview();
   if (overview) {
     console.log();
-    console.log(`  ${c("bold", "Total Visits:")}        ${formatNumber(overview.totalVisits)}`);
-    console.log(`  ${c("bold", "Unique Visitors:")}     ${formatNumber(overview.uniqueVisitors)}`);
     console.log(`  ${c("bold", "Page Views:")}          ${formatNumber(overview.pageViews)}`);
+    console.log(`  ${c("bold", "Sessions:")}            ${formatNumber(overview.sessions)}`);
     console.log();
     console.log(`  ${c("bold", "Avg Session:")}         ${overview.avgSessionDuration} seconds`);
     console.log(`  ${c("bold", "Bounce Rate:")}         ${overview.bounceRate}%`);
+    console.log(
+      `  ${c("dim", `(rates over ${formatNumber(overview.sessionsEnded)} completed sessions)`)}`
+    );
     console.log();
     console.log(`  ${c("green", "New Visitors:")}        ${formatNumber(overview.newVisitors)}`);
     console.log(
@@ -411,12 +386,12 @@ async function main() {
   if (traffic && traffic.byType.length > 0) {
     console.log();
     console.log(
-      `  ${c("bold", "Source".padEnd(15))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`
+      `  ${c("bold", "Source".padEnd(15))} ${c("bold", "Visits".padStart(12))} ${c("bold", "New".padStart(12))}`
     );
     console.log("  ─────────────────────────────────────────");
     for (const source of traffic.byType) {
       console.log(
-        `  ${source.type.padEnd(15)} ${formatNumber(source.visits).padStart(12)} ${formatNumber(source.unique).padStart(12)}`
+        `  ${source.type.padEnd(15)} ${formatNumber(source.visits).padStart(12)} ${formatNumber(source.newVisitors).padStart(12)}`
       );
     }
     if (traffic.topReferrers.length > 0) {
@@ -460,14 +435,10 @@ async function main() {
   const geo = await getGeoStats();
   if (geo && geo.length > 0) {
     console.log();
-    console.log(
-      `  ${c("bold", "Country".padEnd(8))} ${c("bold", "Visits".padStart(12))} ${c("bold", "Unique".padStart(12))}`
-    );
-    console.log("  ─────────────────────────────────────");
+    console.log(`  ${c("bold", "Country".padEnd(8))} ${c("bold", "Visits".padStart(12))}`);
+    console.log("  ─────────────────────");
     for (const country of geo) {
-      console.log(
-        `  ${country.country.padEnd(8)} ${formatNumber(country.visits).padStart(12)} ${formatNumber(country.unique).padStart(12)}`
-      );
+      console.log(`  ${country.country.padEnd(8)} ${formatNumber(country.visits).padStart(12)}`);
     }
   } else {
     console.log(`  ${c("dim", "No geographic data available (consent-based)")}`);
@@ -479,14 +450,14 @@ async function main() {
   if (cities && cities.length > 0) {
     console.log();
     console.log(
-      `  ${c("bold", "City".padEnd(25))} ${c("bold", "Country".padEnd(15))} ${c("bold", "Views".padStart(10))} ${c("bold", "Unique".padStart(10))}`
+      `  ${c("bold", "City".padEnd(25))} ${c("bold", "Country".padEnd(15))} ${c("bold", "Views".padStart(10))}`
     );
     console.log("  ────────────────────────────────────────────────────────────────");
     let rank = 1;
     for (const city of cities) {
       const name = city.name.length > 22 ? city.name.substring(0, 22) + "..." : city.name;
       console.log(
-        `  ${(rank + ".").padEnd(4)}${name.padEnd(21)} ${city.country.padEnd(15)} ${formatNumber(city.views).padStart(10)} ${formatNumber(city.unique).padStart(10)}`
+        `  ${(rank + ".").padEnd(4)}${name.padEnd(21)} ${city.country.padEnd(15)} ${formatNumber(city.views).padStart(10)}`
       );
       rank++;
     }
@@ -514,12 +485,13 @@ async function main() {
   if (trend && trend.length > 0) {
     console.log();
     console.log(
-      `  ${c("bold", "Date".padEnd(12))} ${c("bold", "Visits".padStart(10))} ${c("bold", "Unique".padStart(10))} ${c("bold", "Views".padStart(10))}`
+      `  ${c("bold", "Date".padEnd(12))} ${c("bold", "Views".padStart(10))} ${c("bold", "Sessions".padStart(10))} ${c("bold", "Bounce".padStart(8))}`
     );
     console.log("  ─────────────────────────────────────────────");
     for (const day of trend) {
+      const bounce = day.bounce_rate_pct === null ? "—" : `${day.bounce_rate_pct}%`;
       console.log(
-        `  ${day.stat_date.padEnd(12)} ${formatNumber(day.total_visits || 0).padStart(10)} ${formatNumber(day.unique_visitors || 0).padStart(10)} ${formatNumber(day.page_views || 0).padStart(10)}`
+        `  ${(day.stat_date ?? "").padEnd(12)} ${formatNumber(day.page_views || 0).padStart(10)} ${formatNumber(day.sessions || 0).padStart(10)} ${bounce.padStart(8)}`
       );
     }
   } else {

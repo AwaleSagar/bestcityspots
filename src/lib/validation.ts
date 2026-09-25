@@ -69,7 +69,7 @@ export const placePriceTierSchema = z.enum([
 export const placeSortSchema = z.enum(["relevance", "rating", "reviews", "distance"]);
 
 export const placeSearchSchema = z.object({
-  cityName: safeString.max(120, "City name is too long"),
+  cityId: cityIdSchema,
   type: placeTypeSchema.optional(),
   query: searchQuerySchema.optional(),
   minRating: z.coerce.number().min(0).max(5).default(0),

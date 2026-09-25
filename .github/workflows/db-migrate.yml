@@ -1,0 +1,86 @@
+name: Database migrate
+
+# Applies supabase/migrations/ to the hosted production project with the
+# Supabase CLI. Manual and environment-gated: run it with `dry_run` first to
+# see exactly which migrations are pending, then again to apply. Deploys never
+# migrate implicitly (deploy.yml only reminds you).
+#
+# Configure on the `production` environment:
+#   secrets.SUPABASE_ACCESS_TOKEN   personal access token (supabase.com/dashboard/account/tokens)
+#   secrets.SUPABASE_DB_PASSWORD    the project's database password
+#   vars.SUPABASE_PROJECT_REF       the 20-character project ref
+#
+# Reference data is loaded separately (`npm run db:seed` from a trusted
+# machine) — this workflow only changes schema.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only list pending migrations"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-migrate-production
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Migrate production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+      DRY_RUN: ${{ inputs.dry_run }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same static policy gate as CI, so nothing unreviewed reaches production.
+      - name: Migration policy
+        run: npm run check:migrations
+
+      - name: Check configuration
+        run: |
+          missing=0
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "secrets.SUPABASE_ACCESS_TOKEN is not set"; missing=1; }
+          [ -n "$SUPABASE_DB_PASSWORD" ] || { echo "secrets.SUPABASE_DB_PASSWORD is not set"; missing=1; }
+          echo "$SUPABASE_PROJECT_REF" | grep -Eq '^[a-z0-9]{20}$' \
+            || { echo "vars.SUPABASE_PROJECT_REF must be the 20-character project ref"; missing=1; }
+          exit "$missing"
+
+      - name: Link project
+        run: npx supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Pending migrations
+        run: npx supabase db push --linked --dry-run --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply migrations
+        if: env.DRY_RUN != 'true'
+        run: npx supabase db push --linked --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Database migrate"
+            echo ""
+            echo "- Project: \`$SUPABASE_PROJECT_REF\`"
+            echo "- Dry run: \`$DRY_RUN\`"
+          } >> "$GITHUB_STEP_SUMMARY"

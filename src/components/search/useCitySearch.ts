@@ -16,7 +16,7 @@ interface SearchState {
 }
 
 /**
- * Debounced, abortable city search against `search_cities_elastic` (anon
+ * Debounced, abortable city search against `search_cities` (anon
  * Supabase RPC, lazy-loaded on first use). Returns `idle` below two characters. Emits one `search`
  * analytics action per query session (reset when the field is cleared).
  */

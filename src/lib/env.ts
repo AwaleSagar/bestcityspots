@@ -7,16 +7,25 @@
  * Both are lazy and memoized so that merely importing this module never crashes
  * in test/CI/build environments that don't have secrets populated.
  *
+ * Each variable is validated on its own: a malformed value is dropped (with a
+ * one-time warning) without discarding the others, so e.g. a typo in
+ * NEXT_PUBLIC_CONTACT_EMAIL can't silently disable Supabase.
+ *
  * Callers should read the property they need; missing values resolve to
- * `undefined` and are reported via a one-time warning. Call `requireServerEnv()`
- * (or `requirePublicEnv()`) when a value is strictly required and you want a
- * loud error at the call site rather than a silent `undefined`.
+ * `undefined`. Call `requireServerEnv()` / `requirePublicEnv()` when a value is
+ * strictly required and you want a loud error at the call site instead.
+ *
+ * The full, documented list lives in `.env.example`.
  */
 import { z } from "zod";
 
 const publicSchema = z.object({
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(20).optional(),
+  // Publishable keys are safe in the browser; RLS decides what they can read.
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z
+    .string()
+    .regex(/^sb_publishable_[A-Za-z0-9_-]{10,}$/, "must be a publishable key (sb_publishable_…)")
+    .optional(),
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
   NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: z.string().optional(),
   NEXT_PUBLIC_ANALYTICS_DEV: z.string().optional(),
@@ -31,7 +40,11 @@ const publicSchema = z.object({
 });
 
 const serverSchema = z.object({
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(20).optional(),
+  // Secret keys bypass RLS: server-only, never NEXT_PUBLIC_.
+  SUPABASE_SECRET_KEY: z
+    .string()
+    .regex(/^sb_secret_[A-Za-z0-9_-]{10,}$/, "must be a secret key (sb_secret_…)")
+    .optional(),
   GOOGLE_PLACES_API_KEY: z.string().min(10).optional(),
   GOOGLE_GEMINI_API_KEY: z.string().min(10).optional(),
   GOOGLE_PLACES_LIVE_FETCH_ENABLED: z.enum(["true", "false"]).optional(),
@@ -51,12 +64,17 @@ const serverSchema = z.object({
   /** Preferred AI engine; the other becomes the fallback. Default: gemini. */
   AI_PROVIDER: z.enum(["gemini", "openai"]).optional(),
   OPENWEATHERMAP_API_KEY: z.string().min(10).optional(),
+  /** Bearer token that unlocks the detailed /api/health report. */
+  HEALTH_CHECK_TOKEN: z.string().min(16).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
   LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).optional(),
 });
 
 export type PublicEnv = z.infer<typeof publicSchema>;
 export type ServerEnv = z.infer<typeof serverSchema> & PublicEnv;
+
+/** Retired names from the deleted project. Read only to warn about them. */
+const LEGACY_ENV_NAMES = ["NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 
 let publicCache: PublicEnv | null = null;
 let serverCache: ServerEnv | null = null;
@@ -70,50 +88,45 @@ function warnOnce(key: string, issue: string) {
 }
 
 /**
- * Treat empty-string env vars (e.g. a bare `FOO=` line in a .env file) as
- * *unset* so they resolve to `undefined` rather than `""`.
- *
- * Zod's `.optional()` only admits `undefined`, not `""`, so an empty optional
- * like `NEXT_PUBLIC_CONTACT_EMAIL=` would otherwise fail `.email()`/`.min()`.
- * Because a single failed field makes the whole `safeParse` return `{}`, one
- * empty optional would silently discard *every* other value (including a
- * valid Supabase URL/key). Stripping empties first keeps optionals optional.
+ * Validates each field independently. Empty strings (a bare `FOO=` line) count
+ * as unset, so optional values stay optional.
  */
-function compact<T extends Record<string, unknown>>(raw: T): Partial<T> {
-  const out: Partial<T> = {};
-  for (const key in raw) {
-    // Keys are fixed literals from the call sites below, not user input.
+function parseFields<S extends z.ZodRawShape>(
+  schema: z.ZodObject<S>,
+  raw: Record<string, string | undefined>
+): Partial<z.infer<z.ZodObject<S>>> {
+  const out: Record<string, unknown> = {};
+  for (const [key, fieldSchema] of Object.entries(schema.shape)) {
+    // Keys come from the fixed schema above, not from user input.
     // eslint-disable-next-line security/detect-object-injection
     const value = raw[key];
-    if (typeof value === "string" && value.trim() === "") continue;
-    // eslint-disable-next-line security/detect-object-injection
-    out[key] = value;
+    if (value === undefined || value.trim() === "") continue;
+    const parsed = (fieldSchema as z.ZodType).safeParse(value);
+    if (parsed.success) {
+      // eslint-disable-next-line security/detect-object-injection
+      out[key] = parsed.data;
+    } else {
+      warnOnce(key, parsed.error.issues[0]?.message ?? "invalid value");
+    }
   }
-  return out;
+  return out as Partial<z.infer<z.ZodObject<S>>>;
 }
 
 export function publicEnv(): PublicEnv {
   if (publicCache) return publicCache;
-  const parsed = publicSchema.safeParse(
-    compact({
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-      NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-      NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
-      NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
-      NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
-      NEXT_PUBLIC_BOOKING_AFFILIATE_ID: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID,
-      NODE_ENV: process.env.NODE_ENV,
-    })
-  );
-  if (!parsed.success) {
-    for (const issue of parsed.error.issues) {
-      warnOnce(String(issue.path[0]), issue.message);
-    }
-    return {};
-  }
-  publicCache = parsed.data;
+  // NEXT_PUBLIC_* must be referenced literally so Next.js can inline them
+  // into client bundles.
+  publicCache = parseFields(publicSchema, {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    NEXT_PUBLIC_ANALYTICS_DEV: process.env.NEXT_PUBLIC_ANALYTICS_DEV,
+    NEXT_PUBLIC_ORGANIZATION_SAME_AS: process.env.NEXT_PUBLIC_ORGANIZATION_SAME_AS,
+    NEXT_PUBLIC_CONTACT_EMAIL: process.env.NEXT_PUBLIC_CONTACT_EMAIL,
+    NEXT_PUBLIC_BOOKING_AFFILIATE_ID: process.env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID,
+    NODE_ENV: process.env.NODE_ENV,
+  }) as PublicEnv;
   return publicCache;
 }
 
@@ -122,116 +135,54 @@ export function serverEnv(): ServerEnv {
     throw new Error("[env] serverEnv() cannot be called from a client bundle");
   }
   if (serverCache) return serverCache;
-  const parsed = serverSchema.safeParse(
-    compact({
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
-      GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
-      GOOGLE_PLACES_LIVE_FETCH_ENABLED: process.env.GOOGLE_PLACES_LIVE_FETCH_ENABLED,
-      GOOGLE_GEMINI_LIVE_FETCH_ENABLED: process.env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED,
-      GOOGLE_PLACES_DAILY_CALL_LIMIT: process.env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
-      GOOGLE_GEMINI_DAILY_CALL_LIMIT: process.env.GOOGLE_GEMINI_DAILY_CALL_LIMIT,
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-      OPENAI_LIVE_FETCH_ENABLED: process.env.OPENAI_LIVE_FETCH_ENABLED,
-      OPENAI_DAILY_CALL_LIMIT: process.env.OPENAI_DAILY_CALL_LIMIT,
-      AI_ON_DEMAND_DAILY_CALL_LIMIT: process.env.AI_ON_DEMAND_DAILY_CALL_LIMIT,
-      AI_PROVIDER: process.env.AI_PROVIDER,
-      OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
-      NODE_ENV: process.env.NODE_ENV,
-      LOG_LEVEL: process.env.LOG_LEVEL,
-    })
-  );
-  const pub = publicEnv();
-  if (!parsed.success) {
-    for (const issue of parsed.error.issues) {
-      warnOnce(String(issue.path[0]), issue.message);
+
+  for (const name of LEGACY_ENV_NAMES) {
+    // eslint-disable-next-line security/detect-object-injection
+    if (process.env[name]) {
+      warnOnce(
+        name,
+        "is no longer read. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY / SUPABASE_SECRET_KEY instead (see .env.example)."
+      );
     }
-    return { ...pub };
   }
-  serverCache = { ...pub, ...parsed.data };
+
+  const server = parseFields(serverSchema, {
+    SUPABASE_SECRET_KEY: process.env.SUPABASE_SECRET_KEY,
+    GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
+    GOOGLE_GEMINI_API_KEY: process.env.GOOGLE_GEMINI_API_KEY,
+    GOOGLE_PLACES_LIVE_FETCH_ENABLED: process.env.GOOGLE_PLACES_LIVE_FETCH_ENABLED,
+    GOOGLE_GEMINI_LIVE_FETCH_ENABLED: process.env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED,
+    GOOGLE_PLACES_DAILY_CALL_LIMIT: process.env.GOOGLE_PLACES_DAILY_CALL_LIMIT,
+    GOOGLE_GEMINI_DAILY_CALL_LIMIT: process.env.GOOGLE_GEMINI_DAILY_CALL_LIMIT,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    OPENAI_LIVE_FETCH_ENABLED: process.env.OPENAI_LIVE_FETCH_ENABLED,
+    OPENAI_DAILY_CALL_LIMIT: process.env.OPENAI_DAILY_CALL_LIMIT,
+    AI_ON_DEMAND_DAILY_CALL_LIMIT: process.env.AI_ON_DEMAND_DAILY_CALL_LIMIT,
+    AI_PROVIDER: process.env.AI_PROVIDER,
+    OPENWEATHERMAP_API_KEY: process.env.OPENWEATHERMAP_API_KEY,
+    HEALTH_CHECK_TOKEN: process.env.HEALTH_CHECK_TOKEN,
+    NODE_ENV: process.env.NODE_ENV,
+    LOG_LEVEL: process.env.LOG_LEVEL,
+  });
+
+  serverCache = { ...publicEnv(), ...server } as ServerEnv;
   return serverCache;
 }
 
-function readPublicEnvValue(key: keyof PublicEnv): PublicEnv[keyof PublicEnv] {
-  const env = publicEnv();
-  switch (key) {
-    case "NEXT_PUBLIC_SUPABASE_URL":
-      return env.NEXT_PUBLIC_SUPABASE_URL;
-    case "NEXT_PUBLIC_SUPABASE_ANON_KEY":
-      return env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    case "NEXT_PUBLIC_SITE_URL":
-      return env.NEXT_PUBLIC_SITE_URL;
-    case "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION":
-      return env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
-    case "NEXT_PUBLIC_ANALYTICS_DEV":
-      return env.NEXT_PUBLIC_ANALYTICS_DEV;
-    case "NEXT_PUBLIC_ORGANIZATION_SAME_AS":
-      return env.NEXT_PUBLIC_ORGANIZATION_SAME_AS;
-    case "NEXT_PUBLIC_CONTACT_EMAIL":
-      return env.NEXT_PUBLIC_CONTACT_EMAIL;
-    case "NEXT_PUBLIC_BOOKING_AFFILIATE_ID":
-      return env.NEXT_PUBLIC_BOOKING_AFFILIATE_ID;
-    case "NODE_ENV":
-      return env.NODE_ENV;
-  }
-}
-
-function readServerEnvValue(key: keyof ServerEnv): ServerEnv[keyof ServerEnv] {
-  const env = serverEnv();
-  switch (key) {
-    case "SUPABASE_SERVICE_ROLE_KEY":
-      return env.SUPABASE_SERVICE_ROLE_KEY;
-    case "GOOGLE_PLACES_API_KEY":
-      return env.GOOGLE_PLACES_API_KEY;
-    case "GOOGLE_GEMINI_API_KEY":
-      return env.GOOGLE_GEMINI_API_KEY;
-    case "GOOGLE_PLACES_LIVE_FETCH_ENABLED":
-      return env.GOOGLE_PLACES_LIVE_FETCH_ENABLED;
-    case "GOOGLE_GEMINI_LIVE_FETCH_ENABLED":
-      return env.GOOGLE_GEMINI_LIVE_FETCH_ENABLED;
-    case "GOOGLE_PLACES_DAILY_CALL_LIMIT":
-      return env.GOOGLE_PLACES_DAILY_CALL_LIMIT;
-    case "GOOGLE_GEMINI_DAILY_CALL_LIMIT":
-      return env.GOOGLE_GEMINI_DAILY_CALL_LIMIT;
-    case "OPENAI_API_KEY":
-      return env.OPENAI_API_KEY;
-    case "OPENAI_LIVE_FETCH_ENABLED":
-      return env.OPENAI_LIVE_FETCH_ENABLED;
-    case "OPENAI_DAILY_CALL_LIMIT":
-      return env.OPENAI_DAILY_CALL_LIMIT;
-    case "AI_ON_DEMAND_DAILY_CALL_LIMIT":
-      return env.AI_ON_DEMAND_DAILY_CALL_LIMIT;
-    case "AI_PROVIDER":
-      return env.AI_PROVIDER;
-    case "OPENWEATHERMAP_API_KEY":
-      return env.OPENWEATHERMAP_API_KEY;
-    case "LOG_LEVEL":
-      return env.LOG_LEVEL;
-    case "NEXT_PUBLIC_SUPABASE_URL":
-    case "NEXT_PUBLIC_SUPABASE_ANON_KEY":
-    case "NEXT_PUBLIC_SITE_URL":
-    case "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION":
-    case "NEXT_PUBLIC_ANALYTICS_DEV":
-    case "NEXT_PUBLIC_ORGANIZATION_SAME_AS":
-    case "NEXT_PUBLIC_CONTACT_EMAIL":
-    case "NEXT_PUBLIC_BOOKING_AFFILIATE_ID":
-    case "NODE_ENV":
-      return readPublicEnvValue(key);
-  }
-}
-
 export function requirePublicEnv<K extends keyof PublicEnv>(key: K): NonNullable<PublicEnv[K]> {
-  const value = readPublicEnvValue(key) as PublicEnv[K];
+  // eslint-disable-next-line security/detect-object-injection
+  const value = publicEnv()[key];
   if (value === undefined || value === null || value === "") {
-    throw new Error(`[env] Missing required public env var: ${key}`);
+    throw new Error(`[env] Missing required public env var: ${String(key)}`);
   }
   return value as NonNullable<PublicEnv[K]>;
 }
 
 export function requireServerEnv<K extends keyof ServerEnv>(key: K): NonNullable<ServerEnv[K]> {
-  const value = readServerEnvValue(key) as ServerEnv[K];
+  // eslint-disable-next-line security/detect-object-injection
+  const value = serverEnv()[key];
   if (value === undefined || value === null || value === "") {
-    throw new Error(`[env] Missing required server env var: ${key}`);
+    throw new Error(`[env] Missing required server env var: ${String(key)}`);
   }
   return value as NonNullable<ServerEnv[K]>;
 }

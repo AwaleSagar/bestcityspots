@@ -304,7 +304,12 @@ export default async function CityPage({
             description="Top sights, food and stays, ordered by how many travelers reviewed them."
           >
             <Suspense fallback={<PlacesSkeleton />}>
-              <PlacesSection cityName={city.city} lat={centerLat} lng={centerLng} />
+              <PlacesSection
+                cityId={city.id}
+                cityName={city.city}
+                lat={centerLat}
+                lng={centerLng}
+              />
             </Suspense>
           </Section>
           <Section id="conditions" title="Live conditions">

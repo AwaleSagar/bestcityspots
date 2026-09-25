@@ -23,9 +23,18 @@ interface CityMetricRow {
   city_id: number;
   pollution_pm25: number | null;
   climate_comfort: string | null;
-  connectivity_mbps: number | null;
-  safety_score: number | null;
+  cost_index: number | null;
+  homicide_rate_per_100k: number | null;
   updated_at: string | null;
+}
+
+/** View rows expose nullable columns; keep only rows that name a city. */
+function withCityId<T extends { city_id: number | null }>(
+  rows: T[] | null
+): (T & { city_id: number })[] {
+  return (rows ?? []).flatMap((row) =>
+    row.city_id === null ? [] : [{ ...row, city_id: row.city_id }]
+  );
 }
 
 const HUB_LIMIT = 30;
@@ -56,7 +65,7 @@ export const getCleanestAirCities = reactCache(async (): Promise<CityWithMetric[
     .order("pollution_pm25", { ascending: true })
     .limit(HUB_LIMIT);
 
-  const rows = (metrics ?? []) as CityMetricRow[];
+  const rows = withCityId(metrics);
   if (rows.length === 0) return [];
 
   const cities = await getCitiesByIds(rows.map((r) => r.city_id));
@@ -73,33 +82,42 @@ export const getCleanestAirCities = reactCache(async (): Promise<CityWithMetric[
 
 /**
  * Digital nomad hub. Approximates "nomad-friendly" with a simple, defensible
- * score: connectivity_mbps (when available) + climate comfort bias + a small
- * population floor (200k) so the hub doesn't surface tiny administrative
- * cities. We keep the formula transparent and trace it in the hub copy.
+ * score over sourced data only: climate comfort (live, Open-Meteo) plus
+ * affordability and safety (country-level World Bank WDI), with a population
+ * floor (200k) so the hub doesn't surface tiny administrative cities. The
+ * formula is spelled out in the hub copy.
  */
 export const getDigitalNomadCities = reactCache(async (): Promise<CityWithMetric[]> => {
   const { data: metrics } = await supabase
     .from("city_metrics")
-    .select("city_id, connectivity_mbps, climate_comfort, safety_score, updated_at")
-    .order("connectivity_mbps", { ascending: false, nullsFirst: false })
-    .limit(80);
+    .select(
+      "city_id, climate_comfort, cost_index, homicide_rate_per_100k, pollution_pm25, updated_at"
+    )
+    .not("climate_comfort", "is", null)
+    .limit(200);
 
-  const rows = (metrics ?? []) as CityMetricRow[];
+  const rows: CityMetricRow[] = withCityId(metrics);
   if (rows.length === 0) return [];
 
   const cities = await getCitiesByIds(rows.map((r) => r.city_id));
 
-  // Soft scoring: bandwidth bucket + climate-comfort bonus.
   const scored = rows
     .map((row) => {
       const city = cities.get(row.city_id);
       if (!city) return null;
       if ((city.population ?? 0) < 200_000) return null;
-      const mbps = row.connectivity_mbps ?? 0;
       const climateBonus = row.climate_comfort && /Mild|Warm/i.test(row.climate_comfort) ? 12 : 0;
-      const safetyBonus = (row.safety_score ?? 0) > 60 ? 6 : 0;
-      const score = mbps + climateBonus + safetyBonus;
-      const label = `${mbps ? `${Math.round(mbps)} Mbps · ` : ""}${row.climate_comfort ?? "Climate: pending"}`;
+      const affordability =
+        row.cost_index === null ? 0 : Math.min(10, Math.max(0, (100 - row.cost_index) / 5));
+      const safetyBonus =
+        row.homicide_rate_per_100k !== null && row.homicide_rate_per_100k < 2 ? 6 : 0;
+      const score = climateBonus + affordability + safetyBonus;
+      const label = [
+        row.climate_comfort ?? "Climate: pending",
+        row.cost_index !== null ? `price level ${Math.round(row.cost_index)}` : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
       return {
         ...city,
         metricLabel: label,
@@ -186,7 +204,7 @@ export const getCitiesForMonth = reactCache(async (slug: MonthSlug): Promise<Cit
     .not("climate_comfort", "is", null)
     .limit(200);
 
-  const rows = (metrics ?? []) as CityMetricRow[];
+  const rows = withCityId(metrics);
   if (rows.length === 0) return [];
 
   const cities = await getCitiesByIds(rows.map((r) => r.city_id));

@@ -14,7 +14,7 @@
  * Usage: npx tsx scripts/warm-top-cities.ts [options]
  *
  * City selection (default): demand-first priority list —
- *   1. most-viewed cities from Supabase analytics (city_views_daily, 30d)
+ *   1. most-viewed cities from Supabase analytics (get_cities_by_traffic, 30d)
  *   2. curated globally-popular destinations (src/lib/warm-priority.ts,
  *      Euromonitor arrivals + landmark research), with landmark queries
  *      enriched by each city's iconic POI names
@@ -33,7 +33,7 @@
  *   --help               Show this help
  *
  * Environment Variables:
- *   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY   (required)
+ *   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY   (required)
  *   GOOGLE_PLACES_API_KEY        (places + photos)
  *   AI_PROVIDER                  (insights provider: "openai" [default] or "gemini")
  *   OPENAI_API_KEY               (AI insights when AI_PROVIDER=openai)
@@ -55,6 +55,7 @@ config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 
 import { CACHE_TTL } from "../src/lib/cache-config";
+import { PROMPT_VERSIONS } from "../src/lib/prompt-versions";
 import {
   POPULAR_DESTINATIONS,
   buildLandmarkQuery,
@@ -220,9 +221,11 @@ by real visitor demand (Supabase analytics) → researched global popularity
 
 function createSupabaseClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SECRET_KEY;
   if (!url || !key) {
-    console.error("Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    console.error(
+      "Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY (see .env.example)"
+    );
     process.exit(1);
   }
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -251,24 +254,18 @@ async function getMostViewedCities(
   days: number,
   limit: number
 ): Promise<City[]> {
-  const from = new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
-  const { data, error } = await supabase
-    .from("city_views_daily")
-    .select("city_id, views")
-    .gte("stat_date", from);
+  // Aggregated in SQL (public.get_cities_by_traffic) instead of pulling every
+  // daily row into the script.
+  const { data, error } = await supabase.rpc("get_cities_by_traffic", {
+    result_limit: limit,
+    lookback_days: days,
+  });
   if (error || !data || data.length === 0) {
-    if (error) console.warn("  [priority] city_views_daily unavailable:", error.message);
+    if (error) console.warn("  [priority] get_cities_by_traffic unavailable:", error.message);
     return [];
   }
 
-  const totals = new Map<number, number>();
-  for (const row of data as Array<{ city_id: number; views: number | null }>) {
-    totals.set(row.city_id, (totals.get(row.city_id) ?? 0) + (row.views ?? 0));
-  }
-  const rankedIds = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([id]) => id);
+  const rankedIds = (data as Array<{ city_id: number }>).map((row) => row.city_id);
   if (rankedIds.length === 0) return [];
 
   const { data: cityRows, error: cityError } = await supabase
@@ -468,14 +465,14 @@ function ageMinutes(updatedAt: string): number {
 /** Places are "done" only when fresh AND carrying images (the gap we fill). */
 async function placesNeedWarm(
   supabase: SupabaseClient,
-  cityName: string,
+  cityId: number,
   type: PlaceType,
   imagesWanted: number
 ): Promise<boolean> {
   const { data } = await supabase
     .from("city_places_cache")
     .select("places_data, updated_at")
-    .eq("city_name", cityName)
+    .eq("city_id", cityId)
     .eq("place_type", type)
     .maybeSingle();
 
@@ -507,7 +504,7 @@ async function warmPlaces(
   type: PlaceType,
   opts: { dryRun: boolean; photos: boolean; imagesPerType: number }
 ): Promise<WarmOutcome> {
-  if (!(await placesNeedWarm(supabase, city.city, type, opts.photos ? opts.imagesPerType : 0))) {
+  if (!(await placesNeedWarm(supabase, city.id, type, opts.photos ? opts.imagesPerType : 0))) {
     return { warmed: false, cached: true, error: false };
   }
   if (opts.dryRun) return { warmed: true, cached: false, error: false };
@@ -579,12 +576,12 @@ async function warmPlaces(
 
     const { error } = await supabase.from("city_places_cache").upsert(
       {
-        city_name: city.city,
+        city_id: city.id,
         place_type: type,
         places_data: places,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "city_name,place_type" }
+      { onConflict: "city_id,place_type" }
     );
     if (error) {
       console.error(`    Error caching ${city.city}/${type}: ${error.message}`);
@@ -646,7 +643,7 @@ async function warmWeather(
     const aqiData = (await aqiRes.json()) as { list?: { main?: { aqi?: number } }[] };
     const aqiValue = aqiData.list?.[0]?.main?.aqi ?? 0;
 
-    await supabase.from("city_weather_cache").upsert(
+    const { error: cacheError } = await supabase.from("city_weather_cache").upsert(
       {
         city_id: city.id,
         temp: weather.main?.temp ?? 0,
@@ -656,13 +653,15 @@ async function warmWeather(
         humidity: weather.main?.humidity ?? 0,
         description: weather.weather?.[0]?.description ?? "unknown",
         icon: weather.weather?.[0]?.icon ?? "",
-        wind_speed: weather.wind?.speed ?? 0,
+        // OpenWeather reports m/s; the app stores km/h (src/lib/weather.ts).
+        wind_speed: Math.round((weather.wind?.speed ?? 0) * 3.6 * 10) / 10,
         aqi: aqiValue,
         aqi_label: getAqiLabel(aqiValue),
         updated_at: new Date().toISOString(),
       },
       { onConflict: "city_id" }
     );
+    if (cacheError) throw new Error(cacheError.message);
     return { warmed: true, cached: false, error: false };
   } catch (e) {
     console.error("    Error warming weather:", e instanceof Error ? e.message : e);
@@ -676,7 +675,7 @@ async function warmMetrics(
   dryRun: boolean
 ): Promise<WarmOutcome> {
   const { data } = await supabase
-    .from("city_metrics")
+    .from("city_live_metrics")
     .select("updated_at")
     .eq("city_id", city.id)
     .maybeSingle();
@@ -712,7 +711,8 @@ async function warmMetrics(
       }
     }
 
-    await supabase.from("city_metrics").upsert(
+    // Live metrics only; country indicators come from `npm run db:seed`.
+    const { error: cacheError } = await supabase.from("city_live_metrics").upsert(
       {
         city_id: city.id,
         pollution_pm25: pm25,
@@ -722,6 +722,7 @@ async function warmMetrics(
       },
       { onConflict: "city_id" }
     );
+    if (cacheError) throw new Error(cacheError.message);
     return { warmed: true, cached: false, error: false };
   } catch (e) {
     console.error("    Error warming metrics:", e instanceof Error ? e.message : e);
@@ -828,12 +829,11 @@ async function warmInsights(
     const { error } = await supabase.from("city_ai_insights").upsert(
       {
         city_id: city.id,
-        city_name: city.city,
-        country: city.country,
         intro: (parsed.intro || "").slice(0, 600),
         attractions: parsed.attractions || [],
         seasons: parsed.seasons || [],
         weather: parsed.weather || [],
+        prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "city_id" }

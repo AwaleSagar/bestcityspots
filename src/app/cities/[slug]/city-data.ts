@@ -36,7 +36,7 @@ export const isCityWarm = cache(async (city: City): Promise<boolean> => {
     getCachedInsightRead(city.id)
       .then((read) => read.insight)
       .catch(() => null),
-    readPlacesCache(city.city, "landmarks").catch(() => null),
+    readPlacesCache(city.id, "landmarks").catch(() => null),
   ]);
   const warm = Boolean(insight || places);
   console.info(

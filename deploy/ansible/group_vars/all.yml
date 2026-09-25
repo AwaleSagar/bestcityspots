@@ -5,8 +5,8 @@ app_user: "deploy"
 app_dir: "/opt/bestcityspots"
 compose_project: "bestcityspots"
 
-# CHANGE ME: your git remote (SSH preferred; add a deploy key to the host).
-app_repo: "git@github.com:YOUR_ORG/bestcityspots.git"
+# The repository is public, so the host clones over HTTPS with no deploy key.
+app_repo: "https://github.com/AwaleSagar/bestcityspots.git"
 
 # app_version is intentionally NOT set here — pass a pinned tag/SHA on the CLI:
 #   -e app_version=v1.4.2
@@ -28,3 +28,9 @@ enable_tls: false            # flip to true once DNS A/AAAA records resolve
 letsencrypt_email: ""
 
 warm_cache_cron: true
+
+# ── SSH ───────────────────────────────────────────────────────────────────
+# Public key installed for the deploy user; password logins are then turned
+# off (the playbook refuses if the connecting account has no key).
+ssh_harden: true
+ssh_public_key_file: "~/.ssh/id_ed25519.pub"

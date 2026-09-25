@@ -14,11 +14,7 @@ import { tryClaimPaidProviderUse } from "../cost-guard";
 const log = createLogger({ component: "provider/gemini" });
 const PROVIDER = "gemini";
 
-/** Increment when a prompt or expected response shape changes. */
-export const PROMPT_VERSIONS = {
-  CITY_INSIGHT: 2,
-  TRENDING_CITIES: 3,
-} as const;
+export { PROMPT_VERSIONS } from "../prompt-versions";
 
 const MODEL = "gemini-3-flash-preview";
 const GENERATE_TIMEOUT_MS = 15_000;

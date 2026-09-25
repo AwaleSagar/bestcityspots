@@ -1,6 +1,9 @@
 # ADR-001: Cost-of-Living Data Source
 
-Status: Accepted · Date: 2026-06-11 · Story: US-09 (audit AF-2)
+Status: **Superseded** by [ADR-003](adr-003-reference-data-sources.md) (2026-09-25) · Date: 2026-06-11 · Story: US-09 (audit AF-2)
+
+> The importer and `data/cost-of-living.csv` described here were removed with the
+> backend rebuild. Cost now comes from World Bank price levels, country-level.
 
 ## Context
 

@@ -114,9 +114,9 @@ jobs:
             echo "- Commit: \`$sha\`"
             echo "- Dry run: \`$DRY_RUN\`"
             echo ""
-            echo "SQL migrations are **not** applied by this workflow — check"
-            echo "\`supabase/migrations/\` for anything unapplied and run it first"
-            echo "(docs/ci-cd.md → Database migrations)."
+            echo "Database migrations are **not** applied by this workflow. Run the"
+            echo "**Database migrate** workflow first (dry run, then apply) whenever"
+            echo "\`supabase/migrations/\` changed (docs/ci-cd.md → Database migrations)."
           } >> "$GITHUB_STEP_SUMMARY"
 
       # First-party tooling only: the runner already has ssh, and pinning

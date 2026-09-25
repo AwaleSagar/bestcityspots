@@ -39,7 +39,8 @@ export function SiteFooter() {
       <Container className="border-rule text-ink-muted flex flex-col gap-4 border-t py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {year} Best City Spots · Weather: OpenWeather &amp; Open-Meteo · Places: Google · Maps:
-          © OpenStreetMap contributors · Briefings: Google Gemini
+          © OpenStreetMap contributors · Cities: GeoNames (CC BY 4.0) · Country data: World Bank (CC
+          BY 4.0) · Briefings: Google Gemini
         </p>
         <ThemeSwitcher />
       </Container>
