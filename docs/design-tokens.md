@@ -71,8 +71,8 @@ more` collapses `ink-muted`/`ink-subtle` to `ink` and strengthens rules.
 
 | Family                   | Utility        | Use                                                 |
 | ------------------------ | -------------- | --------------------------------------------------- |
-| Newsreader (`next/font`) | `font-display` | `h1`/`h2`, the city overview lede, large numerals   |
-| Geist (`next/font`)      | `font-sans`    | Everything else; `tabular-nums` for any column data |
+| Newsreader (self-hosted) | `font-display` | `h1`/`h2`, the city overview lede, large numerals   |
+| Geist (self-hosted)      | `font-sans`    | Everything else; `tabular-nums` for any column data |
 
 | Size utility          | Value                                | Use                       |
 | --------------------- | ------------------------------------ | ------------------------- |

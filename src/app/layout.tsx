@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
 import { serializeJsonLd } from "@/lib/json-ld";
 import { publicEnv } from "@/lib/env";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
@@ -25,17 +25,26 @@ export const viewport: Viewport = {
   ],
 };
 
-const geist = Geist({
+// Self-hosted latin variable fonts (OFL, see ./fonts/LICENSE-OFL.txt).
+// next/font/google broke builds whenever Google served multi-parameter
+// `/l/font?kit=…` URLs, which Turbopack's loader rejects, so builds no
+// longer fetch from Google at all.
+const geist = localFont({
+  src: "./fonts/Geist-latin-var.woff2",
   variable: "--font-geist",
-  subsets: ["latin"],
+  weight: "100 900",
+  style: "normal",
   display: "swap",
+  adjustFontFallback: "Arial",
 });
 
-const newsreader = Newsreader({
+const newsreader = localFont({
+  src: "./fonts/Newsreader-latin-var.woff2",
   variable: "--font-newsreader",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: "200 800",
+  style: "normal",
   display: "swap",
+  adjustFontFallback: "Times New Roman",
 });
 
 const publicConfig = publicEnv();
