@@ -46,9 +46,16 @@ const sources: Array<{
       "Cached 60 minutes per city; served stale-while-revalidate up to 24 hours when providers are unreachable.",
   },
   {
-    name: "Public city datasets",
-    used_for: "Population, country, ISO codes, region/admin name, coordinates.",
-    refreshes: "Static reference data; updated when upstream datasets release new revisions.",
+    name: "GeoNames",
+    used_for:
+      "Cities with a population above 15,000 (and every national capital): names, alternate names used by search, coordinates, population, region and country. Licensed CC BY 4.0.",
+    refreshes: "Static reference data; re-imported from geonames.org when we refresh the dataset.",
+  },
+  {
+    name: "World Bank (WDI)",
+    used_for:
+      "Country-level price level (PPP ÷ exchange rate, United States = 100), intentional homicide rate (UNODC) and physicians per capita (WHO). These are national figures, not city measurements, and every city page labels them that way. Licensed CC BY 4.0.",
+    refreshes: "Re-imported from the World Bank API; each value shows the year it describes.",
   },
   {
     name: "Google Gemini",

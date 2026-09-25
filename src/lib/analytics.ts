@@ -216,8 +216,7 @@ export function parseReferrer(referrer: string | null): {
 export async function recordDailyVisitorStats(
   date: string,
   events: AnalyticsEvent[],
-  sessionDuration: number | null,
-  pageCount: number | null
+  sessionEnd: { durationSec: number; pageCount: number | null } | null
 ): Promise<void> {
   const sessions = new Set<string>();
   let newVisitors = 0;
@@ -231,20 +230,21 @@ export async function recordDailyVisitorStats(
     if (event.type === "pageview") pageViews++;
   }
 
-  const totalVisits = pageViews;
-  const uniqueVisitors = sessions.size;
-  const isBounce = pageCount !== null && pageCount <= 1;
+  // Only a batch carrying `session_end` contributes to session duration and
+  // bounce rate; mid-session batches add page views and sessions only.
+  const isBounce =
+    sessionEnd !== null && sessionEnd.pageCount !== null && sessionEnd.pageCount <= 1;
 
   try {
     await upsertDailyVisitorStats({
       date,
-      visits: totalVisits,
-      unique: uniqueVisitors,
-      pageviews: pageViews,
-      duration: sessionDuration || 0,
-      bounce: isBounce ? 1 : 0,
+      pageViews,
+      sessions: sessions.size,
       newVisitors,
       returningVisitors,
+      sessionsEnded: sessionEnd ? 1 : 0,
+      bouncedSessions: isBounce ? 1 : 0,
+      sessionDurationSec: sessionEnd?.durationSec ?? 0,
     });
   } catch (error) {
     log.error("daily_stats_write_failed", {
@@ -258,7 +258,7 @@ export async function recordTrafficSource(
   date: string,
   sourceType: SourceTypeValue,
   sourceName: string,
-  uniqueVisitors: number
+  newVisitors: number
 ): Promise<void> {
   try {
     await upsertTrafficSource({
@@ -266,7 +266,7 @@ export async function recordTrafficSource(
       sourceType,
       sourceName,
       visits: 1,
-      unique: uniqueVisitors,
+      newVisitors,
     });
   } catch (error) {
     log.error("traffic_source_write_failed", {
@@ -375,13 +375,17 @@ export async function processAnalyticsBatch(
   const { sourceType, sourceName } = parseReferrer(metadata.referrer);
 
   const sessionEndEvent = events.find((e) => e.type === "session_end");
-  const sessionDuration = sessionEndEvent?.sessionDuration || null;
-  const pageCount = sessionEndEvent?.pageCount || null;
+  const sessionEnd = sessionEndEvent
+    ? {
+        durationSec: sessionEndEvent.sessionDuration ?? 0,
+        pageCount: sessionEndEvent.pageCount ?? null,
+      }
+    : null;
   const hasGeoConsent = events.some((e) => e.hasGeoConsent === true);
   const isNewVisitor = events.some((e) => e.isNewVisitor === true);
 
   const writes: Promise<void>[] = [
-    recordDailyVisitorStats(today, events, sessionDuration, pageCount),
+    recordDailyVisitorStats(today, events, sessionEnd),
     recordTrafficSource(today, sourceType, sourceName, isNewVisitor ? 1 : 0),
     recordDeviceStats(today, deviceType, browser, os),
   ];

@@ -61,11 +61,17 @@ type CachedLandmark = Landmark & {
 
 export type PlaceType = "landmarks" | "restaurants" | "hotels";
 
+/**
+ * The city a place list belongs to: `id` keys the cache (so same-named cities
+ * never share rows), `name` phrases the Google Places query.
+ */
+export type PlaceCity = { id: number; name: string };
+
 export type PlacePriceTier = "free" | "inexpensive" | "moderate" | "expensive" | "very_expensive";
 export type PlaceSort = "relevance" | "rating" | "reviews" | "distance";
 
 export type PlaceSearchOptions = {
-  cityName: string;
+  city: PlaceCity;
   type?: PlaceType;
   query?: string;
   minRating?: number;
@@ -127,18 +133,18 @@ function getPlacesWriteClient() {
   if (!hasWarnedMissingServiceRole) {
     hasWarnedMissingServiceRole = true;
     console.warn(
-      "[places] SUPABASE_SERVICE_ROLE_KEY missing; cache writes and image uploads are disabled."
+      "[places] SUPABASE_SECRET_KEY missing; cache writes and image uploads are disabled."
     );
   }
 
   return null;
 }
 
-function buildPlacesRequestKey(cityName: string, type: PlaceType, opts?: TopPlacesOptions): string {
+function buildPlacesRequestKey(city: PlaceCity, type: PlaceType, opts?: TopPlacesOptions): string {
   const lat = typeof opts?.lat === "number" ? opts.lat.toFixed(3) : "na";
   const lng = typeof opts?.lng === "number" ? opts.lng.toFixed(3) : "na";
   const radius = typeof opts?.radiusKm === "number" ? opts.radiusKm.toFixed(0) : "default";
-  return [cityName.toLowerCase(), type, lat, lng, radius].join(":");
+  return [city.id, type, lat, lng, radius].join(":");
 }
 
 function isAbortError(error: unknown): boolean {
@@ -223,7 +229,7 @@ function filterPlacesByRadius(
 }
 
 async function savePlacesCache(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType,
   places: Landmark[],
   updatedAt = new Date().toISOString()
@@ -238,10 +244,10 @@ async function savePlacesCache(
   }
 
   try {
-    await writePlacesCache(cityName, type, places, updatedAt);
+    await writePlacesCache(city.id, type, places, updatedAt);
   } catch (error) {
     console.warn(
-      `[places] Failed to save cache for ${cityName}/${type}:`,
+      `[places] Failed to save cache for ${city.name} (${city.id})/${type}:`,
       error instanceof Error ? error.message : error
     );
   }
@@ -339,12 +345,12 @@ async function enrichRankedPlaceImages(
 }
 
 async function loadExistingBlurhashes(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType
 ): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   try {
-    const cache = await readPlacesCache(cityName, type);
+    const cache = await readPlacesCache(city.id, type);
     const places = cache?.places_data ?? [];
     for (const p of places) {
       if (p.id && typeof p.blurhash === "string" && p.blurhash.length > 0) {
@@ -358,7 +364,7 @@ async function loadExistingBlurhashes(
 }
 
 async function fetchFreshPlaces(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
@@ -369,7 +375,7 @@ async function fetchFreshPlaces(
   const centerLng = opts?.lng;
   const hasCoords = typeof centerLat === "number" && typeof centerLng === "number";
 
-  const primaryPlaces = await fetchFromGoogle(getPrimaryQuery(cityName, type), {
+  const primaryPlaces = await fetchFromGoogle(getPrimaryQuery(city.name, type), {
     lat: centerLat,
     lng: centerLng,
     effectiveRadiusKm: hasCoords ? effectiveRadiusKm : undefined,
@@ -386,7 +392,7 @@ async function fetchFreshPlaces(
   // dedupe the additional fallback batch against the primary id set.
   const dedupedPrimary = dedupePlaces(places);
   let rankedPlaces = rankingEngine.rank(dedupedPrimary);
-  const fallbackQuery = getFallbackBudgetQuery(cityName, type);
+  const fallbackQuery = getFallbackBudgetQuery(city.name, type);
   const shouldRunFallback = Boolean(
     fallbackQuery &&
     (rankedPlaces.length < MIN_RESULTS_BEFORE_FALLBACK ||
@@ -412,14 +418,14 @@ async function fetchFreshPlaces(
   }
 
   if (rankedPlaces.length === 0) {
-    console.info("[places] No places returned after search", { cityName, type });
+    console.info("[places] No places returned after search", { city: city.name, type });
     return [];
   }
 
   const rankedGooglePlaces = rankedPlaces as GooglePlace[];
   // Look up any blurhashes we've already computed for this (city, type) so
   // background SWR refreshes don't re-download storage images.
-  const existingBlurhashes = await loadExistingBlurhashes(cityName, type);
+  const existingBlurhashes = await loadExistingBlurhashes(city, type);
   await enrichRankedPlaceImages(rankedGooglePlaces, existingBlurhashes, opts?.signal);
   stripPhotoMetadata(rankedGooglePlaces);
 
@@ -427,11 +433,11 @@ async function fetchFreshPlaces(
 }
 
 async function fetchAndCachePlaces(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
-  const requestKey = buildPlacesRequestKey(cityName, type, opts);
+  const requestKey = buildPlacesRequestKey(city, type, opts);
   const existingRequest = inFlightPlacesRequests.get(requestKey);
   if (existingRequest) {
     return existingRequest;
@@ -439,10 +445,10 @@ async function fetchAndCachePlaces(
 
   const request = (async () => {
     recordPlacesCacheEvent(type, false);
-    const freshPlaces = await fetchFreshPlaces(cityName, type, opts);
+    const freshPlaces = await fetchFreshPlaces(city, type, opts);
 
     if (freshPlaces.length > 0) {
-      await savePlacesCache(cityName, type, freshPlaces);
+      await savePlacesCache(city, type, freshPlaces);
     }
 
     return freshPlaces;
@@ -647,7 +653,7 @@ async function fetchFromGoogle(
  * Re-invokes getTopPlaces with a flag to skip the cache read and force a fresh fetch.
  */
 async function refreshPlacesInBackground(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<void> {
@@ -655,29 +661,29 @@ async function refreshPlacesInBackground(
     return;
   }
   try {
-    await getTopPlaces(cityName, type, { ...opts, _bypassCache: true } as never);
+    await getTopPlaces(city, type, { ...opts, _bypassCache: true } as never);
   } catch (e) {
     if (isAbortError(e)) {
       throw e;
     }
-    console.warn(`[places] Background refresh failed for ${cityName}/${type}:`, e);
+    console.warn(`[places] Background refresh failed for ${city.name}/${type}:`, e);
   }
 }
 
 export async function getTopPlaces(
-  cityName: string,
+  city: PlaceCity,
   type: PlaceType,
   opts?: TopPlacesOptions
 ): Promise<Landmark[]> {
   // Read lazily (not at module load) so scripts that populate env after
   // import — e.g. dotenv in warmers — still get enrichment.
   if (!serverEnv().GOOGLE_PLACES_API_KEY) {
-    console.warn(`[places] Missing API key; returning empty for ${cityName} / ${type}`);
+    console.warn(`[places] Missing API key; returning empty for ${city.name} / ${type}`);
     return [];
   }
 
   log.debug("get_top_places", {
-    cityName,
+    cityId: city.id,
     type,
     allowProviderFetch: Boolean(opts?.allowProviderFetch),
     liveEnabled: isPaidProviderEnabled("google-places"),
@@ -686,8 +692,8 @@ export async function getTopPlaces(
   try {
     // 1. Check Supabase Cache first (30-day hard TTL, 7-day soft-refresh)
     const bypassCache = !!(opts as Record<string, unknown> | undefined)?._bypassCache;
-    const cache = bypassCache ? null : await readPlacesCache(cityName, type);
-    log.debug("cache_lookup", { cityName, type, hit: Boolean(cache) });
+    const cache = bypassCache ? null : await readPlacesCache(city.id, type);
+    log.debug("cache_lookup", { cityId: city.id, type, hit: Boolean(cache) });
 
     if (cache) {
       const updatedAt = new Date(cache.updated_at);
@@ -702,7 +708,7 @@ export async function getTopPlaces(
       const normalizedChanged = normalizedResults.some((result) => result.changed);
 
       if (normalizedChanged) {
-        void savePlacesCache(cityName, type, cachedPlaces, cache.updated_at);
+        void savePlacesCache(city, type, cachedPlaces, cache.updated_at);
       }
 
       if (daysSinceUpdate < CACHE_TTL.PLACES_FRESH_DAYS) {
@@ -728,7 +734,7 @@ export async function getTopPlaces(
           opts?.allowProviderFetch &&
           (shouldRefreshForAge || shouldRefreshForCoverage || shouldRefreshForImages)
         ) {
-          refreshPlacesInBackground(cityName, type, opts).catch(() => {});
+          refreshPlacesInBackground(city, type, opts).catch(() => {});
         }
 
         return cachedPlaces;
@@ -743,7 +749,7 @@ export async function getTopPlaces(
     if (!opts?.allowProviderFetch || !isPaidProviderEnabled("google-places")) {
       // Routine in production (cache-only, warmer-only spend) — debug, not warn.
       log.debug("live_fetch_blocked", {
-        cityName,
+        cityId: city.id,
         type,
         allowProviderFetch: Boolean(opts?.allowProviderFetch),
         liveEnabled: isPaidProviderEnabled("google-places"),
@@ -752,14 +758,14 @@ export async function getTopPlaces(
       return [];
     }
 
-    const fetched = await fetchAndCachePlaces(cityName, type, opts);
-    log.debug("live_fetch_done", { cityName, type, count: fetched.length });
+    const fetched = await fetchAndCachePlaces(city, type, opts);
+    log.debug("live_fetch_done", { cityId: city.id, type, count: fetched.length });
     return fetched;
   } catch (e) {
     if (isAbortError(e)) {
       throw e;
     }
-    console.error(`Failed to fetch ${type} for ${cityName}:`, e);
+    console.error(`Failed to fetch ${type} for ${city.name}:`, e);
     return [];
   }
 }
@@ -776,7 +782,7 @@ export async function searchPlaces(options: PlaceSearchOptions): Promise<PlaceSe
 
   const batches = await Promise.all(
     requestedTypes.map((placeType) =>
-      getTopPlaces(options.cityName, placeType, {
+      getTopPlaces(options.city, placeType, {
         lat: options.lat,
         lng: options.lng,
         radiusKm: options.radiusKm,

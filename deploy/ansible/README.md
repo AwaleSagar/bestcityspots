@@ -5,17 +5,18 @@ Automates **Layers 1–3** of the cost-defense model in `deploy/README.md`
 (GCP quota caps, key restriction, budget kill) is console-only — already
 done; verify quarterly.
 
-## What it provisions (idempotent, on fresh Ubuntu 22.04/24.04)
+## What it provisions (idempotent, on fresh Ubuntu 22.04/24.04/26.04)
 
-- Hardened host: non-root `deploy` user, UFW (deny incoming, allow 22/80/443,
-  **deny 3000**), fail2ban, unattended-upgrades.
+- Hardened host: non-root `deploy` user, key-only SSH (password logins off,
+  root by key only — with a lockout guard), UFW (deny incoming, allow
+  22/80/443, **deny 3000**), fail2ban, unattended-upgrades.
 - Docker Engine + compose plugin.
 - App: pin-checked git checkout → `.env.production` (0600) → `docker compose
 build && up -d`, with the previous image kept for rollback.
 - nginx reverse proxy using the repo's `deploy/nginx/bestcityspots.conf`
   (rate limits + bot blocks), validated with `nginx -t` before every reload.
 - Optional certbot TLS.
-- Nightly cache-warm cron — runs on the host via Node (installs Node 20 +
+- Nightly cache-warm cron — runs on the host via Node (installs Node 22 LTS +
   `npm ci`), because the standalone runtime image intentionally omits
   `scripts/`. This is the only intended paid-spend path, and it claims from the
   same durable budget so a misconfigured cron can't exceed the daily envelope.
@@ -23,10 +24,16 @@ build && up -d`, with the previous image kept for rollback.
 ## Prerequisites
 
 ```bash
-ansible-galaxy collection install community.general
+brew install ansible        # or: pipx install --include-deps ansible
+# the full `ansible` package already ships community.general and ansible.posix
 ```
 
-A reachable host with SSH key access and passwordless sudo (or `--ask-become-pass`).
+A reachable host with SSH **key** access. On a freshly installed VPS that's
+root only, so install your key once (you type the root password, nobody else):
+
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub root@<server-ip>
+```
 
 ## Setup
 
@@ -85,7 +92,10 @@ docker compose --env-file .env.production -p bestcityspots up -d
 ## Notes
 
 - **Supabase migrations are not run by this playbook** (managed DB; running DDL
-  from a deploy is itself a footgun). Apply migrations via the Supabase SQL
-  editor / `supabase db push` _before_ deploying new code, per `deploy/README.md`.
+  from a deploy is itself a footgun). Apply them with the **Database migrate**
+  GitHub workflow _before_ deploying new code, per `deploy/README.md`.
+- The vault needs the new-style Supabase keys: `vault_supabase_publishable_key`
+  (`sb_publishable_…`) and `vault_supabase_secret_key` (`sb_secret_…`); the
+  preflight rejects anything else.
 - Add `inventory.ini` and `group_vars/vault.yml` to `.gitignore` (the example
   files are safe to commit).

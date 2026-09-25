@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         // SEO audit T8: API routes return JSON only — keep them out of the
         // crawl budget so search engines focus on indexable HTML pages.
-        disallow: ["/api/"],
+        disallow: ["/api/", "/admin", "/auth/"],
       },
       // Cost guard: block high-volume AI/data crawlers from indexing the site.
       // Well-behaved bots honor robots.txt and this can materially reduce

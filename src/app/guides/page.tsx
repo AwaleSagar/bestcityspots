@@ -36,7 +36,7 @@ const RANKINGS: GuideLink[] = [
   {
     href: "/resources/top-cities",
     title: "The Top 250",
-    body: "The largest cities with full guides — re-rank them by budget, air, safety and connectivity.",
+    body: "The largest cities with full guides — re-rank them by budget, air quality and safety.",
     icon: ListOrdered,
   },
   {

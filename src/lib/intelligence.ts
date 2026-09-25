@@ -1,6 +1,6 @@
 import "server-only";
 import { supabase, requireServerClient } from "./supabase";
-import { City } from "./cities";
+import { City, CITY_COLUMNS, searchCities } from "./cities";
 import { z } from "zod";
 import {
   generateText,
@@ -129,8 +129,6 @@ export async function readCachedCityInsight(cityId: number): Promise<CachedCityI
  */
 export function upsertCityInsight(city: City, insight: CityInsight): void {
   void writeCityInsightCache(city.id, {
-    city_name: city.city,
-    country: city.country,
     ...insight,
     prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
     updated_at: new Date().toISOString(),
@@ -203,7 +201,8 @@ export async function getIntelligentTrendingCities(): Promise<City[]> {
       .eq("id", 1)
       .maybeSingle();
     if (cache) {
-      cachedNames = Array.isArray(cache.city_names) ? cache.city_names : [];
+      const names = TrendingCitiesSchema.safeParse(cache.city_names);
+      cachedNames = names.success ? names.data : [];
       cachedUpdatedAt = cache.updated_at ?? null;
       cachedVersion = typeof cache.prompt_version === "number" ? cache.prompt_version : null;
       const versionMatches =
@@ -288,25 +287,49 @@ async function matchCitiesInDb(cityNames: string[]): Promise<City[]> {
   const uniqueCityNames = Array.from(new Set(pairs.map((p) => p.city)));
 
   try {
-    const { data: matchedCities, error } = await supabase
-      .from("cities")
-      .select(
-        "id, city, city_ascii, country, iso2, iso3, admin_name, capital, population, lat, lng"
-      )
-      .in("city", uniqueCityNames)
-      .order("population", { ascending: false });
-    if (error) {
-      log.warn("match_cities_failed", { error: error.message });
+    // Exact matches on the display or ASCII name (GeoNames: "São Paulo" /
+    // "Sao Paulo"), most populous first.
+    const [byName, byAscii] = await Promise.all([
+      supabase
+        .from("cities")
+        .select(CITY_COLUMNS)
+        .in("city", uniqueCityNames)
+        .order("population", { ascending: false }),
+      supabase
+        .from("cities")
+        .select(CITY_COLUMNS)
+        .in("city_ascii", uniqueCityNames)
+        .order("population", { ascending: false }),
+    ]);
+    if (byName.error || byAscii.error) {
+      log.warn("match_cities_failed", { error: (byName.error ?? byAscii.error)?.message });
       return [];
     }
-    const rows = (matchedCities as City[]) || [];
+    const rowsById = new Map<number, City>();
+    for (const row of [...(byName.data ?? []), ...(byAscii.data ?? [])] as City[]) {
+      rowsById.set(row.id, row);
+    }
+    const rows = [...rowsById.values()].sort((a, b) => b.population - a.population);
+    const matches = (row: City, name: string) => row.city === name || row.city_ascii === name;
+
+    // Names the model phrases differently from GeoNames ("New York" vs "New
+    // York City") go through search, which also knows alternate names.
+    const unmatched = pairs.filter((pair) => !rows.some((row) => matches(row, pair.city)));
+    const searched = new Map<string, City[]>();
+    await Promise.all(
+      unmatched.slice(0, 8).map(async (pair) => {
+        searched.set(pair.city, await searchCities(pair.city, 5));
+      })
+    );
 
     // For each requested pair, prefer an exact (city, country) match; else
     // fall back to the most populous city with that name.
     const seen = new Set<number>();
     const resolved: City[] = [];
     for (const pair of pairs) {
-      const candidates = rows.filter((r) => r.city === pair.city);
+      const candidates = rows.some((r) => matches(r, pair.city))
+        ? rows.filter((r) => matches(r, pair.city))
+        : (searched.get(pair.city) ?? []);
       if (candidates.length === 0) continue;
       const exact = pair.country
         ? candidates.find((r) => r.country.toLowerCase() === (pair.country as string).toLowerCase())

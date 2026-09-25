@@ -9,7 +9,7 @@
 The photo warmer (`scripts/warm-top-cities.ts`) builds its city list at run
 time from three ranked sources, deduped to `--limit`:
 
-1. **Demand — Supabase insights.** Cities ranked by `city_views_daily` views
+1. **Demand — Supabase insights.** Cities ranked by `get_cities_by_traffic()` (`city_views_daily` views)
    over the last 30 days, queried live at warm time. What real visitors open
    most gets warmed first, and the ranking self-updates every night as
    traffic shifts.

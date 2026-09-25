@@ -8,11 +8,11 @@ Thanks for contributing! This guide focuses on project-specific conventions. For
 git clone https://github.com/AwaleSagar/bestcityspots.git
 cd bestcityspots
 npm install
-cp .env.example .env.local   # (or create one — see README)
+cp .env.example .env.local   # every variable is documented there
 npm run dev
 ```
 
-Prerequisites: **Node.js 20.x+**, **npm 10.x+**, Git.
+Prerequisites: **Node.js 22 LTS** (see `.nvmrc`), **npm 10.x+**, Git.
 
 Placeholder env values are enough for `lint`, `type-check`, and `build`. The app degrades gracefully when backends are unreachable.
 
@@ -36,7 +36,7 @@ Placeholder env values are enough for `lint`, `type-check`, and `build`. The app
 [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
-feat(search): add alias fallback in search_cities_elastic
+feat(search): add alias fallback in search_cities
 fix(http): pass caller AbortSignal into provider fetch
 docs(readme): refresh API surface and env vars
 ```
@@ -52,7 +52,7 @@ These are the rules that matter for this codebase. Please follow them.
 - Read env via `publicEnv()` / `serverEnv()` from `src/lib/env.ts`. **Never read `process.env` directly** in app code.
 - Use `requireServerEnv(key)` when a value is mandatory at the call site.
 - Only `NEXT_PUBLIC_*` may be referenced from client components.
-- Never expose `SUPABASE_SERVICE_ROLE_KEY` or any provider key to the client.
+- Never expose `SUPABASE_SECRET_KEY` or any provider key to the client.
 
 ### Outbound HTTP
 
@@ -72,9 +72,10 @@ These are the rules that matter for this codebase. Please follow them.
 
 ### Database (Supabase)
 
-- Baseline SQL is in `supabase/*.sql`. **New schema changes go in `supabase/migrations/<YYYYMMDDHHMM>_<short_description>.sql`** — idempotent (`IF NOT EXISTS`, `CREATE OR REPLACE`), one concern per file. See [`supabase/migrations/README.md`](supabase/migrations/README.md).
-- RLS is the primary security boundary. Review and adjust policies (`supabase/security.sql`, `supabase/harden_security.sql`) when adding tables, columns, or write paths.
-- Privileged writes are server-only via `supabaseServer` (service role).
+- The schema is managed with the Supabase CLI. **Every change is a new migration**: `npx supabase migration new <short_description>`, one concern per file. Never edit an applied migration. Full workflow: [`supabase/README.md`](supabase/README.md).
+- Every table gets RLS **and** explicit GRANTs in the same migration; no `SECURITY DEFINER`; functions pin `search_path = ''` and revoke PUBLIC. `npm run check:migrations` enforces it.
+- Add or extend a pgTAP file in `supabase/tests/database/` and update `src/lib/database.types.ts` with every schema change.
+- Privileged writes are server-only via `requireServerClient()` / `supabaseServer` (secret key).
 
 ### Cost & rate control
 
@@ -131,7 +132,7 @@ There is no full automated test suite yet. The minimum bar is one command —
 the same gates CI runs, so a green local run means a green pipeline:
 
 ```bash
-npm run verify      # lint + format:check + type-check + check:migrations + test:ci
+npm run verify      # lint + format:check + type-check + check:migrations + check:db + test:ci
 npm run build       # smoke-build for non-trivial changes
 ```
 
@@ -141,7 +142,8 @@ Individually, if you want faster feedback on one thing:
 npm run lint
 npm run format:check      # `npm run format` to fix
 npm run type-check
-npm run check:migrations  # migration naming, baseline mirroring, SECURITY DEFINER rules
+npm run check:migrations  # migration policy: RLS + grants, no SECURITY DEFINER, search_path
+npm run check:db          # migrations + seed + pgTAP on in-process Postgres (no Docker)
 npm run test:ci           # every verification script except the network-dependent ones
 ```
 
@@ -154,7 +156,8 @@ they are not in CI:
 ```bash
 npm run test:providers       # live Open-Meteo / provider connectivity
 npm run test:google-places   # Google Places integration
-npm run test:supabase        # Supabase backend smoke tests
+npm run db:smoke             # Data API checks against the project in .env.local
+npm run db:test              # pgTAP against the local Supabase stack (Docker)
 npm run test:refactor        # Cross-cutting refactor verification
 ```
 
@@ -166,12 +169,11 @@ When touching ranking, validation, search, cache freshness, or analytics aggrega
 - [ ] No new `process.env` references — use `env.ts`
 - [ ] No direct `fetch` to third parties — goes through `http.ts` / `providers/*`
 - [ ] All new inputs / AI outputs validated with Zod
-- [ ] New SQL lives in `supabase/migrations/` and is idempotent, is mirrored into
-      `supabase/setup_all_blank_project.sql`, and any `security definer` function
-      pins `set search_path` and revokes the default `PUBLIC` grant
-      (`npm run check:migrations` enforces all of this)
+- [ ] Schema changes are a new `supabase/migrations/` file (`npx supabase migration new`)
+      with RLS + explicit GRANTs, no `security definer`, a pgTAP test, and
+      updated `src/lib/database.types.ts` (`npm run check:migrations` / `check:db` enforce this)
 - [ ] RLS policies reviewed if tables / write paths changed
-- [ ] No secrets committed; no `SUPABASE_SERVICE_ROLE_KEY` reachable from client code
+- [ ] No secrets committed; no `SUPABASE_SECRET_KEY` reachable from client code
 - [ ] Documentation updated when behavior, routes, env vars, or scripts change
 
 ## Questions

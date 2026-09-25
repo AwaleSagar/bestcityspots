@@ -8,54 +8,67 @@ bringing up the app on a fresh production machine. Companion docs:
 
 ## 1. Supabase
 
-**Create project**
+Everything schema-related is in `supabase/` and applied with the Supabase CLI
+(pinned devDependency). Details: `supabase/README.md`.
 
-1. supabase.com → New project (region close to your VM). Note the project ref.
-2. Copy from Settings → API: `Project URL`, `anon` key, `service_role` key.
+**Create the project**
 
-**Schema setup — automated (recommended)**
+1. supabase.com → **New project**, in a region close to the VM. Keep the Data
+   API enabled with the default `public` schema. If the dashboard offers
+   **"Automatically expose new tables"**, leave it **off**: every migration
+   grants access explicitly.
+2. **Project Settings → API Keys → "Publishable and secret API keys"**: create
+   (or copy) one publishable key (`sb_publishable_…`) and one secret key
+   (`sb_secret_…`). The legacy `anon`/`service_role` JWT keys are not used,
+   and you can disable them.
+3. Note the **project ref** (Settings → General) and the **database
+   password** (only needed by the CLI to push migrations).
 
-- `pip install "psycopg[binary]"` then `python scripts/setup_supabase.py`
-  — bootstraps a blank project end-to-end (extensions, base tables, all SQL
-  below in correct order, RLS, city seed, verification). Idempotent; exits
-  non-zero on the first failure. Needs `SUPABASE_DB_URL` (or
-  `SUPABASE_DB_PASSWORD`) + `SUPABASE_SERVICE_ROLE_KEY` in env/`.env.local`.
+**Auth (admin-only — do this before the first deploy)**
 
-**Schema setup — manual (SQL editor or `supabase db push`, in this order)**
+4. **Authentication → Sign In / Providers**: turn **off** "Allow new users to
+   sign up", keep **Email** enabled, and disable every other provider.
+5. **Authentication → URL Configuration**: Site URL = `https://bestcityspots.com`;
+   Redirect URLs = `https://bestcityspots.com/auth/confirm`.
+6. **Authentication → Emails → Magic Link**: paste the body of
+   `supabase/templates/magic_link.html` (subject: "Your Best City Spots admin
+   sign-in link"). The link must go to `{{ .SiteURL }}/auth/confirm?token_hash=…`.
+7. **Custom SMTP** (Authentication → Emails → SMTP): recommended. Supabase's
+   built-in sender is heavily rate-limited and meant for testing.
 
-1. Core: `supabase/security.sql`, `supabase/performance.sql`
-2. Cache tables: `supabase/city_ai_insights.sql`, `supabase/city_metrics.sql`,
-   `supabase/cache_optimization.sql`, `supabase/place_images_bucket.sql`
-3. Search: `supabase/elastic_search.sql`, `supabase/20260412_places_search_filters.sql`
-4. Analytics: `supabase/visitor_analytics.sql`, `supabase/analytics_functions.sql`
-5. Hardening: `supabase/harden_security.sql`, then
-   `supabase/20260311_places_cache_cost_optimization.sql`
-6. Migrations: everything in `supabase/migrations/` by timestamp —
-   **`202606111000_provider_budget_and_cache_idempotency.sql` is mandatory**
-   (the production cost guard fails closed without it). The later migrations
-   lock `city_ai_insights` writes to `service_role` (`202606281400`) and
-   create `ai_trending_cache` + `place_saves_daily` (`202606281500`,
-   `202606120900`).
+**Schema, data and first admin**
 
-**Seed data**
+```bash
+npx supabase login
+npx supabase link --project-ref <ref>        # prompts for the DB password
+npm run db:push                              # apply supabase/migrations/
+# put NEXT_PUBLIC_SUPABASE_URL / _PUBLISHABLE_KEY / SUPABASE_SECRET_KEY in .env.local
+npm run db:seed                              # GeoNames cities + World Bank indicators (~2 min)
+npm run admin -- add you@example.com         # invite-only admin
+npm run db:smoke                             # read-only end-to-end check
+```
 
-- `npx tsx scripts/seed-cities.ts data/worldcities.csv`
+For later production schema changes, use the **Database migrate** GitHub
+workflow (dry run first) instead of pushing from a laptop.
 
-**RLS policy invariants (verify, don't assume)**
+**Security invariants (tested by `npm run check:db` / `db:test`, verify on prod with `db:smoke`)**
 
-- Cache tables (`city_places_cache`, `place_details_cache`, `city_ai_insights`,
-  `city_weather_cache`, `city_metrics`, `ai_trending_cache`): public `SELECT`, writes `service_role` only.
-- `place_saves_daily`: `service_role` only (incremented via `record_place_save()` RPC).
-- `provider_daily_usage`: `service_role` only (read and write).
-- Analytics tables: writes via RPCs with `service_role`; no anon writes.
-- Quick check: `select tablename, policyname, roles from pg_policies where schemaname='public';`
+- Reference data and caches: public `SELECT`; writes `service_role` only.
+- Ledgers (`provider_daily_usage`, `place_saves_daily`, `cache_hit_stats`,
+  analytics): `service_role` only, plus admin `SELECT` through RLS.
+- No `SECURITY DEFINER` functions. Service RPCs are invoker functions
+  executable only by `service_role`; `search_cities` is the only anon RPC.
+- `place_images` bucket: public read by URL, 1 MiB `image/jpeg` only, no
+  listing, uploads via the secret key only.
 
 **Connection**
 
-- App connects via URL + keys only (no direct Postgres string needed):
-  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `SUPABASE_SERVICE_ROLE_KEY`. The service-role key is server-only — never in
-  client code, never in Docker build args.
+- The app connects with URL + keys only (no Postgres connection string):
+  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_SECRET_KEY`. The secret key is server-only: never in client code,
+  never a Docker build arg.
+- `NEXT_PUBLIC_*` values are baked in at build time, so switching projects
+  needs a rebuild.
 
 ## 2. Google Places API
 
@@ -92,10 +105,11 @@ bringing up the app on a fresh production machine. Companion docs:
 
 ## 5. Environment file
 
-Create `.env.production` next to `docker-compose.yml` (template: README §Environment):
+Create `.env.production` next to `docker-compose.yml` (template: `.env.example`;
+on Ansible-managed hosts it is rendered from the vault):
 
-- Required: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-  `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`
+- Required: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+  `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_SITE_URL`
 - Providers: `GOOGLE_PLACES_API_KEY`, `GOOGLE_GEMINI_API_KEY`, `OPENWEATHERMAP_API_KEY`
 - Cost guard (keep these values): `GOOGLE_PLACES_LIVE_FETCH_ENABLED=false`,
   `GOOGLE_GEMINI_LIVE_FETCH_ENABLED=false`, `GOOGLE_PLACES_DAILY_CALL_LIMIT=100`,
@@ -106,10 +120,10 @@ Create `.env.production` next to `docker-compose.yml` (template: README §Enviro
 
 ## 6. Pre-deployment checklist (new machine)
 
-- [ ] Supabase schema + migrations applied (§1) and seeded; spot-check:
-      `select count(*) from cities;` returns > 40k.
-- [ ] `select * from get_provider_usage(current_date);` runs (proves the
-      budget RPC exists).
+- [ ] Supabase migrations applied (§1, `npx supabase migration list` shows
+      no pending) and seeded; `npm run db:smoke` passes against the project
+      (≈34k cities, indicators loaded, bucket present, anon writes refused).
+- [ ] At least one admin exists (`npm run admin -- list`) and Auth sign-up is off.
 - [ ] Both Google keys are **fresh**, restricted (IP + API), and quota-capped (§2–3).
 - [ ] `.env.production` present; validate before building:
       `npx tsx -e "import('./src/lib/env').then(m=>console.log(m.serverEnv()))"`
@@ -139,15 +153,17 @@ systemctl reload nginx
 - [ ] Site up via nginx: `curl -sI https://bestcityspots.com/` → `200`, HTML.
 - [ ] Health: `curl -s https://bestcityspots.com/api/health` → `"ok"` status;
       with `Authorization: Bearer $HEALTH_CHECK_TOKEN` for detail.
-- [ ] Supabase live: `curl -s https://bestcityspots.com/api/cities/sphere | head -c 200`
-      returns city JSON (proves anon read path).
-- [ ] City page SSR: `curl -s https://bestcityspots.com/cities/london | grep -c "<h1"` ≥ 1.
+- [ ] Supabase live: `curl -s 'https://bestcityspots.com/api/cities/sphere?mode=population' | head -c 200`
+      returns city JSON (proves the publishable-key read path).
+- [ ] City page SSR: `curl -s https://bestcityspots.com/cities/london-united-kingdom | grep -c "<h1"` ≥ 1.
+- [ ] Admin: magic-link sign-in at `/admin/login` works; `/admin` shows numbers.
 - [ ] Rate limit active: 40 rapid requests to `/cities/london` from one IP →
       mix of `200`/`429` (see `deploy/README.md` for the loop).
 - [ ] Bot block active: `curl -A "GPTBot" -so /dev/null -w "%{http_code}" https://bestcityspots.com/` → `403`.
-- [ ] Cost guard durable: `select * from get_provider_usage(current_date);` —
-      rows appear only after a warmer run; SSR traffic must not move counters
-      while live-fetch flags are `false`.
+- [ ] Cost guard durable: `/admin` → "Paid provider calls today" (or
+      `select * from provider_daily_usage where day = current_date;`) shows
+      rows only after a warmer run; SSR traffic must not move counters while
+      live-fetch flags are `false`.
 - [ ] Warmer dry run: `npm run warm-cache:dry-run` lists work without spend;
       then schedule the nightly cron (deploy/README.md §Cache warming).
 - [ ] 404 path cheap: request `/cities/not-a-real-slug` twice; second response

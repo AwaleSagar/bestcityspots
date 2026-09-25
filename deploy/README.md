@@ -57,7 +57,7 @@ deny 3000/tcp inbound as defense in depth.)
   `GOOGLE_GEMINI_DAILY_CALL_LIMIT` (default 25).
 - Warmer envelopes: `WARM_CACHE_PLACES_BUDGET` (default 300),
   `WARM_CACHE_GEMINI_BUDGET` (default 100).
-- Inspect today's spend: `select * from get_provider_usage(current_date);`
+- Inspect today's spend: `/admin` → "Paid provider calls today", or `select * from provider_daily_usage where day = current_date;`
 
 ## Cache warming (the only intended spend path)
 
@@ -73,18 +73,20 @@ npm run warm-cache:dry-run   # always available for a no-spend preview
 The warmer claims from the same durable budget, so a misconfigured cron
 cannot exceed the daily envelope either.
 
-## Migration to apply
+## Database before deploy
 
-`supabase/migrations/202606111000_provider_budget_and_cache_idempotency.sql`
-— creates `provider_daily_usage`, `claim_provider_use()`, `get_provider_usage()`
-and enforces cache-table idempotency constraints. Apply via the Supabase SQL
-editor or `supabase db push` **before** deploying this code; until it exists,
-the production cost guard fails closed (cache-only — safe, but no live
-refresh).
+The durable budget (`provider_daily_usage` + `claim_provider_use()`) comes
+from `supabase/migrations/20260925120400_budget_and_counters.sql`. Apply all
+pending migrations with the **Database migrate** workflow (dry run, then
+apply) **before** deploying code that needs them; without the budget table the
+production cost guard fails closed (cache-only — safe, but no live refresh).
+A fresh project also needs `npm run db:seed` and one admin
+(`npm run admin -- add …`) — see `docs/external-services-setup.md` §1.
 
 ## Weekly checks
 
-- `select * from get_provider_usage(current_date);` vs. expectations.
+- `/admin` → "Paid provider calls today" (or
+  `select * from provider_daily_usage where day = current_date;`) vs. expectations.
 - nginx: `grep ' 429 ' /var/log/nginx/access.log | wc -l` — sustained spikes
   mean someone is probing; consider tightening zones or fronting with
   Cloudflare (bot fight mode + origin concealment).

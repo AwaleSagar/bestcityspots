@@ -10,12 +10,12 @@ const year = new Date().getFullYear();
 
 export const metadata: Metadata = {
   title: `Best Cities for Digital Nomads (${year}): Connectivity & Comfort Ranked`,
-  description: `Cities ranked for remote-work suitability based on cached connectivity, climate comfort, and safety signals (${year}).`,
+  description: `Cities ranked for remote-work suitability based on climate comfort, national price level and national safety data (${year}).`,
   alternates: { canonical: "/best-cities-for-digital-nomads" },
   openGraph: {
     title: `Best Cities for Digital Nomads (${year}) | Best City Spots`,
     description:
-      "Cities ranked for remote-work suitability based on cached connectivity, climate, and safety signals.",
+      "Cities ranked for remote-work suitability based on climate comfort, national price level and national safety data.",
     url: "/best-cities-for-digital-nomads",
     type: "website",
   },
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `Best Cities for Digital Nomads (${year}) | Best City Spots`,
     description:
-      "Cities ranked for remote-work suitability based on cached connectivity, climate, and safety signals.",
+      "Cities ranked for remote-work suitability based on climate comfort, national price level and national safety data.",
   },
 };
 
@@ -67,8 +67,8 @@ export default async function DigitalNomadHubPage() {
       <HubLayout
         eyebrow="Remote work"
         title={`Best cities for digital nomads (${year})`}
-        lede="Cities ranked for remote work: fast connections first, then a livable climate and a safety signal — scored from the same data shown on each city guide."
-        methodologyNote="Score = download speed in Mbps, plus 12 points for a mild or warm climate and 6 for a safety score above 60. Cities under 200,000 people are left out."
+        lede="Cities ranked for remote work: a livable climate first, then affordability and safety — scored from the same sourced data shown on each city guide."
+        methodologyNote="Score = 12 points for a mild or warm climate, plus up to 10 for affordability ((100 − national price level) ÷ 5), plus 6 when the national homicide rate is below 2 per 100,000. Price level and homicide rate are country-level World Bank figures. Cities under 200,000 people are left out."
         breadcrumbLabel="For digital nomads"
         currentPath="/best-cities-for-digital-nomads"
         cities={cities}

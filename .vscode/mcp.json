@@ -1,9 +1,15 @@
 {
+	"inputs": [
+		{
+			"type": "promptString",
+			"id": "supabase-project-ref",
+			"description": "Supabase project ref (Dashboard → Project Settings → General → Reference ID)"
+		}
+	],
 	"servers": {
 		"supabase": {
 			"type": "http",
-			"url": "https://mcp.supabase.com/mcp?project_ref=qfdksbeknatqtdvcrwxa"
+			"url": "https://mcp.supabase.com/mcp?project_ref=${input:supabase-project-ref}&read_only=true"
 		}
-	},
-	"inputs": []
+	}
 }

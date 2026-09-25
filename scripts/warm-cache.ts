@@ -22,8 +22,7 @@
  *
  * Environment Variables:
  *   NEXT_PUBLIC_SUPABASE_URL
- *   NEXT_PUBLIC_SUPABASE_ANON_KEY
- *   SUPABASE_SERVICE_ROLE_KEY
+ *   SUPABASE_SECRET_KEY
  *   GOOGLE_PLACES_API_KEY
  *   GOOGLE_GEMINI_API_KEY
  *   OPENWEATHERMAP_API_KEY
@@ -38,6 +37,7 @@ config({ path: resolve(process.cwd(), ".env.local") });
 config({ path: resolve(process.cwd(), ".env") });
 import { TRENDING_2026, CITY_ALIASES } from "./trending-destinations";
 import { CACHE_TTL } from "../src/lib/cache-config";
+import { PROMPT_VERSIONS } from "../src/lib/prompt-versions";
 
 // ============================================================================
 // Types
@@ -131,10 +131,12 @@ function getAqiLabel(aqi: number): string {
 
 function createSupabaseClient(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SECRET_KEY;
 
   if (!url || !key) {
-    console.error("Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    console.error(
+      "Error: Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SECRET_KEY (see .env.example)"
+    );
     process.exit(1);
   }
 
@@ -255,7 +257,7 @@ Examples:
 
 Environment Variables Required:
   NEXT_PUBLIC_SUPABASE_URL
-  SUPABASE_SERVICE_ROLE_KEY
+  SUPABASE_SECRET_KEY
   GOOGLE_PLACES_API_KEY (for --places)
   GOOGLE_GEMINI_API_KEY (for --insights)
   OPENWEATHERMAP_API_KEY (for --weather)
@@ -342,32 +344,25 @@ async function getTopCitiesByPopulation(supabase: SupabaseClient, limit: number)
 }
 
 async function getTopCitiesByTraffic(supabase: SupabaseClient, limit: number): Promise<City[]> {
-  const { data, error } = await supabase.rpc("get_cities_by_traffic", { result_limit: limit });
-
+  // Most-viewed cities over the last 30 days (aggregate analytics only).
+  const { data, error } = await supabase.rpc("get_cities_by_traffic", {
+    result_limit: limit,
+    lookback_days: 30,
+  });
   if (error) {
-    // Fallback: run a manual join if the RPC doesn't exist
-    console.warn("  RPC get_cities_by_traffic not found, using manual query...");
-    const { data: fallback, error: fbErr } = await supabase
-      .from("city_views_daily")
-      .select("city_id, views")
-      .order("views", { ascending: false })
-      .limit(limit * 2);
-
-    if (fbErr || !fallback?.length) return [];
-
-    const cityIds = [...new Set(fallback.map((r: { city_id: number }) => r.city_id))].slice(
-      0,
-      limit
-    );
-    const { data: cities } = await supabase
-      .from("cities")
-      .select("id, city, city_ascii, country, lat, lng, population, admin_name")
-      .in("id", cityIds);
-
-    return (cities || []) as City[];
+    console.warn(`  get_cities_by_traffic failed: ${error.message}`);
+    return [];
   }
 
-  return (data || []) as City[];
+  const rankedIds = ((data || []) as Array<{ city_id: number }>).map((row) => row.city_id);
+  if (rankedIds.length === 0) return [];
+
+  const { data: cities } = await supabase
+    .from("cities")
+    .select("id, city, city_ascii, country, lat, lng, population, admin_name")
+    .in("id", rankedIds);
+  const byId = new Map(((cities || []) as City[]).map((c) => [c.id, c]));
+  return rankedIds.map((id) => byId.get(id)).filter((c): c is City => Boolean(c));
 }
 
 async function resolveCities(
@@ -422,13 +417,13 @@ async function resolveCities(
 
 async function checkPlacesCacheStatus(
   supabase: SupabaseClient,
-  cityName: string,
+  cityId: number,
   placeType: string
 ): Promise<{ isFresh: boolean; ageInDays: number | null }> {
   const { data } = await supabase
     .from("city_places_cache")
     .select("updated_at")
-    .eq("city_name", cityName)
+    .eq("city_id", cityId)
     .eq("place_type", placeType)
     .maybeSingle();
 
@@ -528,7 +523,7 @@ async function warmPlacesCache(
   placeType: (typeof PLACE_TYPES)[number],
   dryRun: boolean
 ): Promise<{ warmed: boolean; cached: boolean; error: boolean }> {
-  const status = await checkPlacesCacheStatus(supabase, city.city, placeType);
+  const status = await checkPlacesCacheStatus(supabase, city.id, placeType);
 
   if (status.isFresh) {
     return { warmed: false, cached: true, error: false };
@@ -593,12 +588,16 @@ async function warmPlacesCache(
 
     // Store in cache
     if (places.length > 0) {
-      await supabase.from("city_places_cache").upsert({
-        city_name: city.city,
-        place_type: placeType,
-        places_data: places,
-        updated_at: new Date().toISOString(),
-      });
+      const { error: cacheError } = await supabase.from("city_places_cache").upsert(
+        {
+          city_id: city.id,
+          place_type: placeType,
+          places_data: places,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "city_id,place_type" }
+      );
+      if (cacheError) throw new Error(cacheError.message);
     }
 
     return { warmed: true, cached: false, error: false };
@@ -664,19 +663,19 @@ async function warmInsightsCache(
     const parsed = JSON.parse(responseText.slice(start, end + 1));
 
     // Store in cache
-    await supabase.from("city_ai_insights").upsert(
+    const { error: cacheError } = await supabase.from("city_ai_insights").upsert(
       {
         city_id: city.id,
-        city_name: city.city,
-        country: city.country,
         intro: (parsed.intro || "").slice(0, 600),
         attractions: parsed.attractions || [],
         seasons: parsed.seasons || [],
         weather: parsed.weather || [],
+        prompt_version: PROMPT_VERSIONS.CITY_INSIGHT,
         updated_at: new Date().toISOString(),
       },
       { onConflict: "city_id" }
     );
+    if (cacheError) throw new Error(cacheError.message);
 
     return { warmed: true, cached: false, error: false };
   } catch (err) {
@@ -748,13 +747,17 @@ async function warmWeatherCache(
       humidity: weather.main?.humidity || 0,
       description: weather.weather?.[0]?.description || "unknown",
       icon: weather.weather?.[0]?.icon || "",
-      wind_speed: weather.wind?.speed || 0,
+      // OpenWeather reports m/s; the app stores km/h (src/lib/weather.ts).
+      wind_speed: Math.round((weather.wind?.speed || 0) * 3.6 * 10) / 10,
       aqi: aqiValue,
       aqi_label: getAqiLabel(aqiValue),
       updated_at: new Date().toISOString(),
     };
 
-    await supabase.from("city_weather_cache").upsert(row, { onConflict: "city_id" });
+    const { error: cacheError } = await supabase
+      .from("city_weather_cache")
+      .upsert(row, { onConflict: "city_id" });
+    if (cacheError) throw new Error(cacheError.message);
     return { warmed: true, cached: false, error: false };
   } catch (err) {
     console.error("    Error warming weather:", err);
@@ -767,7 +770,7 @@ async function checkMetricsCacheStatus(
   cityId: number
 ): Promise<{ isFresh: boolean; ageInMinutes: number | null }> {
   const { data } = await supabase
-    .from("city_metrics")
+    .from("city_live_metrics")
     .select("updated_at")
     .eq("city_id", cityId)
     .maybeSingle();
@@ -819,7 +822,8 @@ async function warmMetricsCache(
       }
     }
 
-    await supabase.from("city_metrics").upsert(
+    // Live metrics only; country indicators come from `npm run db:seed`.
+    const { error: cacheError } = await supabase.from("city_live_metrics").upsert(
       {
         city_id: city.id,
         pollution_pm25: pm25,
@@ -829,6 +833,7 @@ async function warmMetricsCache(
       },
       { onConflict: "city_id" }
     );
+    if (cacheError) throw new Error(cacheError.message);
 
     return { warmed: true, cached: false, error: false };
   } catch (err) {

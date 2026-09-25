@@ -1,11 +1,32 @@
 import type { NextConfig } from "next";
 
-let supabaseHost = "supabase.co";
-try {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (url) supabaseHost = new URL(url).hostname;
-} catch {
-  // fallback: supabase.co matches *.supabase.co subdomains in some setups
+type RemotePattern = NonNullable<NonNullable<NextConfig["images"]>["remotePatterns"]>[number];
+
+/**
+ * next/image may only load Storage objects from THIS project's host (read at
+ * build time — changing projects needs a rebuild). Protocol and port come from
+ * the URL, so the local stack (http://127.0.0.1:54321) works too. With no URL
+ * configured, no Supabase host is allowed at all.
+ */
+function supabaseStoragePatterns(): RemotePattern[] {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!raw) return [];
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return [];
+  }
+  const base = {
+    protocol: url.protocol.replace(":", "") as "http" | "https",
+    hostname: url.hostname,
+    ...(url.port ? { port: url.port } : {}),
+  };
+  return [
+    { ...base, pathname: "/storage/v1/object/public/**" },
+    // Image transformation URLs (WebP/resize on the fly)
+    { ...base, pathname: "/storage/v1/render/image/public/**" },
+  ];
 }
 
 const isDev = process.env.NODE_ENV !== "production";
@@ -14,20 +35,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   images: {
     qualities: [75, 85],
-    remotePatterns: [
-      // Standard Supabase Storage URLs
-      {
-        protocol: "https",
-        hostname: supabaseHost,
-        pathname: "/storage/v1/object/public/**",
-      },
-      // Supabase Image Transformation URLs (for WebP/resize on-the-fly)
-      {
-        protocol: "https",
-        hostname: supabaseHost,
-        pathname: "/storage/v1/render/image/public/**",
-      },
-    ],
+    remotePatterns: supabaseStoragePatterns(),
   },
   async headers() {
     return [

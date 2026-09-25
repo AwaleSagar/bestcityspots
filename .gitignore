@@ -52,8 +52,9 @@ logs/
 !.vscode/launch.json
 !.vscode/mcp.json
 
-# env files (can opt-in for committing if needed)
+# env files — only the documented template is committed
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -83,24 +84,18 @@ __pycache__/
 .agent/*
 .agents/*
 
-# local seed data (large; not for version control)
-/data/worldcities.csv
+# downloaded reference data (GeoNames, World Bank) — reproducible via npm run db:seed
+/data/
 
 # supabase local dev
 supabase/.branches/
 supabase/.temp/
+supabase/.env
 
 # misc tooling
 *.tgz
 .npm/
 .firecrawl/
-
-# graphify generated caches (keep graph reports/json tracked)
-/graphify-out/cache/
-/src/graphify-out/cache/
-# graphify intermediate working files (chunks, transcripts, semantic cache)
-/graphify-out/.graphify_*
-
 
 # Internal UI/UX review reference (not tracked)
 bestcityspots.md

@@ -1,4 +1,5 @@
 import "server-only";
+import type { Json } from "@/lib/database.types";
 import { requireServerClient, supabase } from "@/lib/supabase";
 
 export interface CityInsightCacheRow {
@@ -18,14 +19,12 @@ export async function readCityInsightCache(cityId: number): Promise<CityInsightC
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as CityInsightCacheRow;
+  return data;
 }
 
 export async function writeCityInsightCache(
   cityId: number,
   payload: {
-    city_name: string;
-    country: string;
     intro: string;
     attractions: unknown;
     seasons: unknown;
@@ -35,9 +34,19 @@ export async function writeCityInsightCache(
   }
 ): Promise<void> {
   const db = requireServerClient();
-  const { error } = await db
-    .from("city_ai_insights")
-    .upsert({ city_id: cityId, ...payload }, { onConflict: "city_id" });
+  const { error } = await db.from("city_ai_insights").upsert(
+    {
+      city_id: cityId,
+      intro: payload.intro,
+      // Validated by CityInsightSchema (src/lib/intelligence.ts) before writing.
+      attractions: payload.attractions as Json,
+      seasons: payload.seasons as Json,
+      weather: payload.weather as Json,
+      prompt_version: payload.prompt_version,
+      updated_at: payload.updated_at,
+    },
+    { onConflict: "city_id" }
+  );
 
   if (error) {
     throw new Error(error.message || "Failed to write city insight cache");

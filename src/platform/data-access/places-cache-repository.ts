@@ -1,4 +1,5 @@
 import "server-only";
+import type { Json } from "@/lib/database.types";
 import { supabase, supabaseServer } from "@/lib/supabase";
 import type { Landmark, PlaceType } from "@/lib/places";
 
@@ -7,26 +8,28 @@ export interface PlacesCacheRow {
   updated_at: string;
 }
 
+/** Cache rows are keyed by city id so same-named cities never share places. */
 export async function readPlacesCache(
-  cityName: string,
+  cityId: number,
   type: PlaceType
 ): Promise<PlacesCacheRow | null> {
   const { data, error } = await supabase
     .from("city_places_cache")
     .select("places_data, updated_at")
-    .eq("city_name", cityName)
+    .eq("city_id", cityId)
     .eq("place_type", type)
     .maybeSingle();
 
   if (error || !data) return null;
   return {
-    places_data: (data.places_data || []) as Landmark[],
-    updated_at: data.updated_at as string,
+    // Written only by writePlacesCache below, from ranked Landmark objects.
+    places_data: Array.isArray(data.places_data) ? (data.places_data as unknown as Landmark[]) : [],
+    updated_at: data.updated_at,
   };
 }
 
 export async function writePlacesCache(
-  cityName: string,
+  cityId: number,
   type: PlaceType,
   places: Landmark[],
   updatedAt: string
@@ -37,12 +40,12 @@ export async function writePlacesCache(
 
   const { error } = await supabaseServer.from("city_places_cache").upsert(
     {
-      city_name: cityName,
+      city_id: cityId,
       place_type: type,
-      places_data: places,
+      places_data: places as unknown as Json,
       updated_at: updatedAt,
     },
-    { onConflict: "city_name,place_type" }
+    { onConflict: "city_id,place_type" }
   );
 
   if (error) {

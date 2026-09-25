@@ -5,7 +5,7 @@
 
 import type { City } from "./cities";
 
-/** simplemaps `capital` column → human label (raw values: primary/admin/minor). */
+/** `cities.capital` → human label (primary/admin/minor, from GeoNames PPLC/PPLA/PPLA2-4). */
 export function capitalLabel(capital: string | null | undefined): string | null {
   switch (capital) {
     case "primary":

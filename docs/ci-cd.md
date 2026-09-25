@@ -11,24 +11,33 @@ npm run verify
 ```
 
 That is the same gate set CI runs — lint, format check, type check, migration
-hygiene, verification scripts — so a green local run means a green pipeline.
+policy, the PGlite database tests, verification scripts — so a green local run
+means a green pipeline (CI additionally runs the pgTAP suite on the real
+Supabase stack).
 Run it before opening a PR and you will rarely wait on a red build.
 
 ## Pipeline at a glance
 
-| Workflow                                            | Trigger                               | What it protects                                                                                |
-| --------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [`ci.yml`](../.github/workflows/ci.yml)             | PR → main, push → main                | Correctness: lint, format, types, migrations, verification scripts, Next build, container image |
-| [`security.yml`](../.github/workflows/security.yml) | Lockfile changes, weekly cron, manual | Dependency advisories and committed credentials                                                 |
-| [`deploy.yml`](../.github/workflows/deploy.yml)     | Manual dispatch only                  | The production host                                                                             |
-| [`dependabot.yml`](../.github/dependabot.yml)       | Weekly (npm), monthly (actions)       | Keeping the above from rotting                                                                  |
+| Workflow                                                | Trigger                               | What it protects                                                                                 |
+| ------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [`ci.yml`](../.github/workflows/ci.yml)                 | PR → main, push → main                | Correctness: lint, format, types, migrations, database tests, verification scripts, build, image |
+| [`db-migrate.yml`](../.github/workflows/db-migrate.yml) | Manual dispatch only                  | Production schema: pending-migration dry run, then `supabase db push`                            |
+| [`security.yml`](../.github/workflows/security.yml)     | Lockfile changes, weekly cron, manual | Dependency advisories and committed credentials                                                  |
+| [`deploy.yml`](../.github/workflows/deploy.yml)         | Manual dispatch only                  | The production host                                                                              |
+| [`dependabot.yml`](../.github/dependabot.yml)           | Weekly (npm), monthly (actions)       | Keeping the above from rotting                                                                   |
 
 ### CI jobs
 
-`ci.yml` runs four jobs in parallel plus a roll-up:
+`ci.yml` runs five jobs in parallel plus a roll-up:
 
-- **quality** (~2 min) — `lint`, `format:check`, `type-check`, `check:migrations`.
-  Deliberately first and dependency-free so a typo fails fast.
+- **quality** (~2 min) — `lint`, `format:check`, `type-check`, `check:migrations`,
+  and `check:db` (every migration + the seed applied to in-process Postgres,
+  then the pgTAP suite). Deliberately first and Docker-free so a mistake fails fast.
+- **database** (~5 min) — boots the real Supabase images with the CLI (applying
+  migrations and `supabase/seed.sql`), runs `supabase test db`, the schema
+  linter, type-checks the app against freshly generated types, and runs
+  `npm run db:smoke --allow-writes` against the local Data API. No hosted
+  project or credential is involved.
 - **test** (~3 min) — `npm run test:ci`: every verification script under
   `scripts/` except `test:providers`.
 - **build** (~5 min) — the production Next build, with `.next/cache` restored
@@ -48,7 +57,7 @@ connectivity stays a local/manual check:
 
 ```bash
 npm run test:providers    # needs outbound network
-npm run test:supabase     # needs real Supabase credentials
+npm run db:smoke          # read-only checks against the project in .env.local
 npm run test:google-places
 ```
 
@@ -69,7 +78,7 @@ layers (incident action P4).
 - A full `npm audit` runs as advisory-only and writes to the job summary — a
   build-tool advisory should be visible without wedging every PR.
 - A credential scan greps for Google API keys, OpenAI keys, and JWT-shaped
-  strings. The Supabase **anon** key is public by design; the service-role key
+  strings. The Supabase **publishable** key is public by design; the secret key
   and provider keys never are.
 - The weekly cron matters more than the PR trigger: advisories are usually
   published _after_ the lockfile that contains them was merged.
@@ -84,31 +93,29 @@ merges it along with the reformat.
 
 ## Database migrations
 
-**The pipeline does not apply SQL.** Migrations are applied by a human, in
-order, before (or alongside) the deploy that needs them:
+Schema lives in `supabase/migrations/` and is applied with the Supabase CLI
+(workflow and rules: [`supabase/README.md`](../supabase/README.md)).
 
-```bash
-for f in supabase/migrations/*.sql; do
-  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
-done
-```
+**Production:** Actions → **Database migrate** → run with `dry_run` checked to
+list pending migrations, then run again unchecked to apply. It needs, on the
+`production` environment: `secrets.SUPABASE_ACCESS_TOKEN`,
+`secrets.SUPABASE_DB_PASSWORD` and `vars.SUPABASE_PROJECT_REF`. Deploys never
+migrate implicitly; migrate first when a release depends on a schema change.
 
 `npm run check:migrations` ([`scripts/check-migrations.ts`](../scripts/check-migrations.ts))
-enforces four rules in CI:
+enforces, in CI and before every production migration:
 
-1. Filename is `<YYYYMMDDHHMM>_<snake_case>.sql` with a plausible timestamp.
-2. Every migration is mirrored by a section in `supabase/setup_all_blank_project.sql`.
-   That file is how a blank project is built; drift there means a rebuilt
-   environment silently lacks a change, which is exactly what happened to the
-   `search_cities_elastic` coord-type fix and the visitor-stats weighting fix.
-3. Each migration carries an idempotency guard (`if not exists`,
-   `create or replace`, `drop ... if exists`, `on conflict`) — or an explicit
-   `-- not-idempotent: <reason>` comment.
-4. Any `security definer` function pins `set search_path` **and** revokes the
-   default `PUBLIC` execute grant. PostgreSQL grants EXECUTE to `PUBLIC` by
-   default and granting to `service_role` does not remove it; that gap was
-   finding H-1 of the security audit, where the browser-visible anon key could
-   write every analytics table through PostgREST.
+1. Filename is `<YYYYMMDDHHMMSS>_<snake_case>.sql` (`npx supabase migration new`).
+2. Every `create table` enables RLS and GRANTs explicitly in the same file —
+   new Supabase projects no longer expose tables to the Data API by default.
+3. No `SECURITY DEFINER`. It bypasses RLS; the old backend's audit finding H-1
+   (browser-callable analytics writers) came from exactly this.
+4. Every function pins `search_path` and revokes PUBLIC's default EXECUTE.
+5. Every view is `security_invoker`.
+6. The retired key names and objects of the deleted project never reappear.
+
+`supabase/tests/database/00_security_posture.test.sql` asserts the same posture
+against a live database, so a rule the regexes miss still fails CI.
 
 ## Deploying
 
@@ -161,7 +168,8 @@ Give the CI key the narrowest access that still works: it needs to run
 | Symptom                                    | First move                                                                                        |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------- |
 | `format:check` fails                       | `npm run format` — never hand-edit to match the formatter                                         |
-| `check:migrations` fails                   | Read the message; it names the file and the rule (usually a missing baseline mirror)              |
+| `check:migrations` fails                   | Read the message; it names the file and the rule (usually missing RLS/GRANT or search_path)       |
+| `check:db` / `database` job fails          | The failing pgTAP assertion is printed with have/want; reproduce with `npm run check:db`          |
 | `audit` fails on a production dep          | `npm audit fix`, or bump the direct dependency; do not lower `--audit-level`                      |
 | `docker` job fails but `build` passed      | The app compiles but the image does not boot — check the container logs the job prints            |
 | Deploy fails at the health check           | `deploy.sh` already rolled back; the host is on the previous image. Investigate before re-running |
@@ -176,4 +184,5 @@ Give the CI key the narrowest access that still works: it needs to run
 - **No test coverage gate.** There is no unit-test framework here yet; a
   coverage number over script-based verification would be theatre.
 - **No preview environments.** A single VM and a Supabase project with real
-  cache tables make ephemeral environments more cost than value today.
+  cache tables make ephemeral environments more cost than value today. The CI
+  `database` job covers schema changes without one.

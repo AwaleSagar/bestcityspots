@@ -4,10 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # Paid-provider keys intentionally NOT passed at build time (incident
-        # action P4): builds are cache-only, and build args leak into layers.
+        # Public values only. Secrets (SUPABASE_SECRET_KEY, provider keys) are
+        # never build args — they would persist in image layers (incident
+        # action P4). They arrive at runtime through env_file below.
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
     image: bestcityspots:latest
     ports:
       - "127.0.0.1:3000:3000"
@@ -25,7 +26,9 @@ services:
       - GOOGLE_GEMINI_DAILY_CALL_LIMIT=${GOOGLE_GEMINI_DAILY_CALL_LIMIT:-25}
       # Visitor-triggered AI generation envelope (security audit M-2).
       - AI_ON_DEMAND_DAILY_CALL_LIMIT=${AI_ON_DEMAND_DAILY_CALL_LIMIT:-5}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    # SUPABASE_SECRET_KEY comes only from .env.production. (Listing it under
+    # `environment:` would override env_file with an empty value whenever the
+    # shell doesn't export it.)
     env_file:
       - .env.production
     restart: unless-stopped
