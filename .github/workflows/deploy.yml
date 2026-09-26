@@ -94,7 +94,7 @@ jobs:
           echo "Ref '$DEPLOY_REF' looks like a git ref."
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
