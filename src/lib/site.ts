@@ -11,7 +11,7 @@ export const SITE_TAGLINE = "City guides with the sources in view";
 
 /** Canonical origin without a trailing slash. */
 export function getSiteUrl(): string {
-  return (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(/\/$/, "");
+  return (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.co").replace(/\/$/, "");
 }
 
 export function absoluteUrl(path: string): string {

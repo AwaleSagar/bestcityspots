@@ -78,7 +78,7 @@ export default function PressPage() {
             A free, no-sign-up city research tool combining live weather and air-quality data with
             AI-assisted briefings.
           </li>
-          <li>Credit line: Source: Best City Spots (bestcityspots.com)</li>
+          <li>Credit line: Source: Best City Spots (bestcityspots.co)</li>
           <li>
             How the data is collected and labelled: <Link href="/methodology">/methodology</Link>
           </li>

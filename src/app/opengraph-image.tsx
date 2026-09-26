@@ -90,7 +90,7 @@ export default async function Image() {
             fontFamily: "sans-serif",
           }}
         >
-          bestcityspots.com
+          bestcityspots.co
         </div>
       </div>
     </div>,

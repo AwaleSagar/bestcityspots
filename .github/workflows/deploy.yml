@@ -167,7 +167,7 @@ jobs:
       - name: Verify public health endpoint
         if: ${{ inputs.dry_run == false && inputs.skip_health_check == false }}
         env:
-          HEALTH_URL: ${{ vars.PUBLIC_HEALTH_URL || 'https://bestcityspots.com/api/health' }}
+          HEALTH_URL: ${{ vars.PUBLIC_HEALTH_URL || 'https://bestcityspots.co/api/health' }}
         run: |
           for attempt in $(seq 1 12); do
             code="$(curl -sS -o /dev/null -w '%{http_code}' --max-time 10 "$HEALTH_URL" || true)"

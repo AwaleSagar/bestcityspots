@@ -50,7 +50,7 @@ async function fetchSeries(
   const lastYear = new Date().getUTCFullYear();
   const url = `${API}/country/all/indicator/${indicator}?format=json&per_page=20000&date=${FIRST_YEAR}:${lastYear}`;
   const response = await fetch(url, {
-    headers: { "user-agent": "bestcityspots-seed/1.0 (+https://bestcityspots.com)" },
+    headers: { "user-agent": "bestcityspots-seed/1.0 (+https://bestcityspots.co)" },
   });
   if (!response.ok) throw new Error(`World Bank ${indicator}: HTTP ${response.status}`);
 

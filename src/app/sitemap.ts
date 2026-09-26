@@ -5,10 +5,7 @@ import { getCountrySummaries } from "@/lib/countries";
 import { listMonthSlugs } from "@/lib/topical-hubs";
 import { publicEnv } from "@/lib/env";
 
-const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
-  /\/$/,
-  ""
-);
+const siteUrl = (publicEnv().NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.co").replace(/\/$/, "");
 
 export const revalidate = 86400;
 

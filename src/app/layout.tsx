@@ -48,7 +48,7 @@ const newsreader = localFont({
 });
 
 const publicConfig = publicEnv();
-const siteUrl = (publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.com").replace(
+const siteUrl = (publicConfig.NEXT_PUBLIC_SITE_URL ?? "https://bestcityspots.co").replace(
   /\/$/,
   ""
 );

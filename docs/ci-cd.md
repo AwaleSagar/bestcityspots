@@ -1,6 +1,6 @@
 # CI/CD
 
-How code gets from a branch to bestcityspots.com, and what has to be true at
+How code gets from a branch to bestcityspots.co, and what has to be true at
 each step. Companion to [`deploy/README.md`](../deploy/README.md), which covers
 the host itself (nginx, cost-protection layers, the Google Cloud checklist).
 
@@ -154,11 +154,11 @@ deploys should need approval, then set:
 
 Optional repository **variables** (not secrets):
 
-| Variable            | Default                                |
-| ------------------- | -------------------------------------- |
-| `DEPLOY_PORT`       | `22`                                   |
-| `DEPLOY_REPO_DIR`   | `/opt/bestcityspots`                   |
-| `PUBLIC_HEALTH_URL` | `https://bestcityspots.com/api/health` |
+| Variable            | Default                               |
+| ------------------- | ------------------------------------- |
+| `DEPLOY_PORT`       | `22`                                  |
+| `DEPLOY_REPO_DIR`   | `/opt/bestcityspots`                  |
+| `PUBLIC_HEALTH_URL` | `https://bestcityspots.co/api/health` |
 
 Give the CI key the narrowest access that still works: it needs to run
 `scripts/deploy.sh` in the repo directory and talk to Docker, nothing more.

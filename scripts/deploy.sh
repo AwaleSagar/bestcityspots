@@ -7,7 +7,7 @@ set -Eeuo pipefail
 #   REPO_DIR=/var/www/bestcityspots ./scripts/deploy.sh
 #
 # Common overrides:
-#   GIT_BRANCH=main DEPLOY_HEALTH_URL=https://bestcityspots.com ./scripts/deploy.sh
+#   GIT_BRANCH=main DEPLOY_HEALTH_URL=https://bestcityspots.co ./scripts/deploy.sh
 #   ./scripts/deploy.sh --dry-run --skip-pull
 
 readonly SCRIPT_NAME="$(basename "$0")"

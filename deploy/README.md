@@ -36,7 +36,7 @@ See `deploy/nginx/bestcityspots.conf`. After installing:
 ```bash
 nginx -t && systemctl reload nginx
 # verify: a burst of >30 requests/min from one IP to /cities/* returns 429
-for i in $(seq 1 40); do curl -so /dev/null -w "%{http_code}\n" https://bestcityspots.com/cities/london; done | sort | uniq -c
+for i in $(seq 1 40); do curl -so /dev/null -w "%{http_code}\n" https://bestcityspots.co/cities/london-united-kingdom; done | sort | uniq -c
 ```
 
 Also confirm the origin is unreachable directly:

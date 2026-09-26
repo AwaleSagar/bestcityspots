@@ -28,8 +28,8 @@ Everything schema-related is in `supabase/` and applied with the Supabase CLI
 
 4. **Authentication → Sign In / Providers**: turn **off** "Allow new users to
    sign up", keep **Email** enabled, and disable every other provider.
-5. **Authentication → URL Configuration**: Site URL = `https://bestcityspots.com`;
-   Redirect URLs = `https://bestcityspots.com/auth/confirm`.
+5. **Authentication → URL Configuration**: Site URL = `https://bestcityspots.co`;
+   Redirect URLs = `https://bestcityspots.co/auth/confirm`.
 6. **Authentication → Emails → Magic Link**: paste the body of
    `supabase/templates/magic_link.html` (subject: "Your Best City Spots admin
    sign-in link"). The link must go to `{{ .SiteURL }}/auth/confirm?token_hash=…`.
@@ -150,16 +150,16 @@ systemctl reload nginx
 - [ ] Container healthy: `docker compose ps` shows `running`; logs clean:
       `docker compose logs --tail 50 web` (no `[env]` or `[cost-guard]` errors).
 - [ ] Origin sealed: `curl -m3 http://<server-ip>:3000/` from outside → connection refused.
-- [ ] Site up via nginx: `curl -sI https://bestcityspots.com/` → `200`, HTML.
-- [ ] Health: `curl -s https://bestcityspots.com/api/health` → `"ok"` status;
+- [ ] Site up via nginx: `curl -sI https://bestcityspots.co/` → `200`, HTML.
+- [ ] Health: `curl -s https://bestcityspots.co/api/health` → `"ok"` status;
       with `Authorization: Bearer $HEALTH_CHECK_TOKEN` for detail.
-- [ ] Supabase live: `curl -s 'https://bestcityspots.com/api/cities/sphere?mode=population' | head -c 200`
+- [ ] Supabase live: `curl -s 'https://bestcityspots.co/api/cities/sphere?mode=population' | head -c 200`
       returns city JSON (proves the publishable-key read path).
-- [ ] City page SSR: `curl -s https://bestcityspots.com/cities/london-united-kingdom | grep -c "<h1"` ≥ 1.
+- [ ] City page SSR: `curl -s https://bestcityspots.co/cities/london-united-kingdom | grep -c "<h1"` ≥ 1.
 - [ ] Admin: magic-link sign-in at `/admin/login` works; `/admin` shows numbers.
 - [ ] Rate limit active: 40 rapid requests to `/cities/london` from one IP →
       mix of `200`/`429` (see `deploy/README.md` for the loop).
-- [ ] Bot block active: `curl -A "GPTBot" -so /dev/null -w "%{http_code}" https://bestcityspots.com/` → `403`.
+- [ ] Bot block active: `curl -A "GPTBot" -so /dev/null -w "%{http_code}" https://bestcityspots.co/` → `403`.
 - [ ] Cost guard durable: `/admin` → "Paid provider calls today" (or
       `select * from provider_daily_usage where day = current_date;`) shows
       rows only after a warmer run; SSR traffic must not move counters while

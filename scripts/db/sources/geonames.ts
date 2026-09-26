@@ -72,7 +72,7 @@ export async function ensureGeoNamesFiles(
     if (existsSync(target) && !options.refresh) continue;
     log(`downloading ${BASE_URL}/${file}`);
     const response = await fetch(`${BASE_URL}/${file}`, {
-      headers: { "user-agent": "bestcityspots-seed/1.0 (+https://bestcityspots.com)" },
+      headers: { "user-agent": "bestcityspots-seed/1.0 (+https://bestcityspots.co)" },
     });
     if (!response.ok) {
       throw new Error(`GeoNames download failed for ${file}: HTTP ${response.status}`);

@@ -12,7 +12,7 @@ const ids = Array.from(
   (_, i) => `ChIJ${"x".repeat(20)}${String(i).padStart(3, "0")}`
 );
 const v1 = encodeSharedList("Lisbon", ids);
-const url = `https://bestcityspots.com/cities/lisbon-portugal?shared=${v1}`;
+const url = `https://bestcityspots.co/cities/lisbon-portugal?shared=${v1}`;
 assert.ok(url.length < 2000, `URL budget exceeded: ${url.length}`);
 const decodedV1 = decodeSharedList(v1);
 assert.equal(decodedV1?.city, "Lisbon");
