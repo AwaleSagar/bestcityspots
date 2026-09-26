@@ -39,9 +39,9 @@ export async function writeCityInsightCache(
       city_id: cityId,
       intro: payload.intro,
       // Validated by CityInsightSchema (src/lib/intelligence.ts) before writing.
-      attractions: payload.attractions as Json,
-      seasons: payload.seasons as Json,
-      weather: payload.weather as Json,
+      attractions: payload.attractions as NonNullable<Json>,
+      seasons: payload.seasons as NonNullable<Json>,
+      weather: payload.weather as NonNullable<Json>,
       prompt_version: payload.prompt_version,
       updated_at: payload.updated_at,
     },

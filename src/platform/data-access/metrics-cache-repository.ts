@@ -56,7 +56,7 @@ export async function writeCityLiveMetrics(
       city_id: cityId,
       pollution_pm25: metrics.pollution_pm25,
       climate_comfort: metrics.climate_comfort,
-      source: metrics.source as Json,
+      source: metrics.source as NonNullable<Json>,
       updated_at: metrics.updated_at,
     },
     { onConflict: "city_id" }

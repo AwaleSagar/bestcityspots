@@ -20,13 +20,13 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          city_names?: Json;
+          city_names?: NonNullable<Json>;
           id?: number;
           prompt_version: number;
           updated_at?: string;
         };
         Update: {
-          city_names?: Json;
+          city_names?: NonNullable<Json>;
           id?: number;
           prompt_version?: number;
           updated_at?: string;
@@ -145,22 +145,22 @@ export type Database = {
           weather: Json;
         };
         Insert: {
-          attractions?: Json;
+          attractions?: NonNullable<Json>;
           city_id: number;
           intro: string;
           prompt_version: number;
-          seasons?: Json;
+          seasons?: NonNullable<Json>;
           updated_at?: string;
-          weather?: Json;
+          weather?: NonNullable<Json>;
         };
         Update: {
-          attractions?: Json;
+          attractions?: NonNullable<Json>;
           city_id?: number;
           intro?: string;
           prompt_version?: number;
-          seasons?: Json;
+          seasons?: NonNullable<Json>;
           updated_at?: string;
-          weather?: Json;
+          weather?: NonNullable<Json>;
         };
         Relationships: [
           {
@@ -207,14 +207,14 @@ export type Database = {
           city_id: number;
           climate_comfort?: string | null;
           pollution_pm25?: number | null;
-          source?: Json;
+          source?: NonNullable<Json>;
           updated_at?: string;
         };
         Update: {
           city_id?: number;
           climate_comfort?: string | null;
           pollution_pm25?: number | null;
-          source?: Json;
+          source?: NonNullable<Json>;
           updated_at?: string;
         };
         Relationships: [
@@ -237,13 +237,13 @@ export type Database = {
         Insert: {
           city_id: number;
           place_type: string;
-          places_data?: Json;
+          places_data?: NonNullable<Json>;
           updated_at?: string;
         };
         Update: {
           city_id?: number;
           place_type?: string;
-          places_data?: Json;
+          places_data?: NonNullable<Json>;
           updated_at?: string;
         };
         Relationships: [
@@ -389,7 +389,7 @@ export type Database = {
           physicians_year?: number | null;
           price_level_index?: number | null;
           price_level_year?: number | null;
-          source?: Json;
+          source?: NonNullable<Json>;
         };
         Update: {
           homicide_rate_per_100k?: number | null;
@@ -400,7 +400,7 @@ export type Database = {
           physicians_year?: number | null;
           price_level_index?: number | null;
           price_level_year?: number | null;
-          source?: Json;
+          source?: NonNullable<Json>;
         };
         Relationships: [
           {
