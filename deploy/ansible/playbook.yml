@@ -73,6 +73,16 @@
           Refusing to run. Re-invoke with  -e confirm=bestcityspots-prod
           to acknowledge this targets PRODUCTION.
         success_msg: "Production deploy confirmed."
+      tags: [always]
+
+    # group_vars/ only auto-loads files named after inventory groups, so the
+    # secrets file is loaded explicitly (vault-encrypted or plain, 0600).
+    - name: "Secrets · load group_vars/vault.yml"
+      ansible.builtin.include_vars:
+        file: "{{ playbook_dir }}/group_vars/vault.yml"
+      when: (playbook_dir ~ '/group_vars/vault.yml') is file
+      no_log: true
+      tags: [always]
 
     - name: "Guardrail · app_version must be a pinned ref (not a moving branch)"
       ansible.builtin.assert:
@@ -82,6 +92,7 @@
         fail_msg: >-
           app_version is empty or points at a moving branch. Pin a tag or SHA
           (e.g. -e app_version=v1.4.2), or override with -e allow_unpinned=true.
+      tags: [app, cron]
 
     - name: "Guardrail · live paid-API fetch stays OFF unless explicitly allowed"
       ansible.builtin.assert:
@@ -92,6 +103,7 @@
           incident class that caused the billing spike. If truly intended,
           re-run with -e allow_live_fetch=true (and make sure GCP quota caps +
           budget kill from deploy/README.md Layer 4 are in place).
+      tags: [app, cron]
 
     - name: "Guardrail · all required secrets are present"
       ansible.builtin.assert:
@@ -105,11 +117,14 @@
           vault.example.yml) with the project's publishable (sb_publishable_…)
           and secret (sb_secret_…) keys, and encrypt it with ansible-vault.
         no_log: true
+      # Host-only runs (--tags hardening,ssh,firewall,docker,nginx) need no secrets.
+      tags: [app, tls, cron]
 
     - name: "Guardrail · deploy user must not be root"
       ansible.builtin.assert:
         that: "app_user != 'root'"
         fail_msg: "app_user must be an unprivileged account, not root."
+      tags: [always]
 
   # ---------------------------------------------------------------------------
   tasks:
@@ -127,6 +142,8 @@
     - name: "SSH · install the operator's public key for the deploy user"
       ansible.posix.authorized_key:
         user: "{{ app_user }}"
+        # Explicit path so --check works before the user exists.
+        path: "/home/{{ app_user }}/.ssh/authorized_keys"
         key: "{{ lookup('ansible.builtin.file', ssh_public_key_file) }}"
         state: present
       when: ssh_harden | bool
@@ -537,10 +554,14 @@
       tags: [verify]
 
   handlers:
+    # Validate-then-reload chains: the validating handler must report
+    # "changed" or Ansible never passes the notification on (a handler with
+    # changed_when: false silently skips the reload). If validation fails the
+    # handler fails and nothing is reloaded.
     - name: reload ssh
       # Validate the whole configuration (all drop-ins) before reloading.
       ansible.builtin.command: /usr/sbin/sshd -t
-      changed_when: false
+      changed_when: true
       notify: do reload ssh
 
     - name: do reload ssh
@@ -552,7 +573,7 @@
       # validate ensures a broken config can NEVER be loaded into production.
       ansible.builtin.command: nginx -t
       register: nginx_test
-      changed_when: false
+      changed_when: true
       notify: do reload nginx
 
     - name: do reload nginx
