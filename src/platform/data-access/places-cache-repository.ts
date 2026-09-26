@@ -42,7 +42,7 @@ export async function writePlacesCache(
     {
       city_id: cityId,
       place_type: type,
-      places_data: places as unknown as Json,
+      places_data: places as unknown as NonNullable<Json>,
       updated_at: updatedAt,
     },
     { onConflict: "city_id,place_type" }

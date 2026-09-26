@@ -112,8 +112,11 @@ jobs:
           npx supabase gen types --lang=typescript --local --schema public > /tmp/database.types.ts
           cp /tmp/database.types.ts src/lib/database.types.ts
           npx prettier --write src/lib/database.types.ts > /dev/null
+          # Show how the committed file differs from the generator (informational;
+          # formatting may differ — what must hold is that the app compiles).
+          git --no-pager diff --stat -- src/lib/database.types.ts || true
+          git --no-pager diff -- src/lib/database.types.ts | head -400 || true
           npm run type-check
-          git diff --stat -- src/lib/database.types.ts || true
 
       # End-to-end through the Data API with the local stack's keys: public
       # reads, refused writes, service-only RPCs, storage bucket.
